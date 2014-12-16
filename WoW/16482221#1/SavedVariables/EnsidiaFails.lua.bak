@@ -1,0 +1,15 @@
+
+EnsidiaFailsDB = {
+	["profileKeys"] = {
+		["김곱충 - 줄진"] = "Default",
+	},
+	["profiles"] = {
+		["Default"] = {
+			["disabled"] = false,
+		},
+	},
+}
+EnsidiaFails_FailCount = {
+}
+EnsidiaFails_OFailCount = {
+}

@@ -1,0 +1,176 @@
+
+ReforgeLiteDB = {
+	["windowHeight"] = 564,
+	["activeWindowTitle"] = {
+		0.8, -- [1]
+		0, -- [2]
+		0, -- [3]
+	},
+	["windowY"] = 731.9999389648438,
+	["reforgeCheat"] = 5,
+	["profiles"] = {
+		["김곱충 - 줄진"] = {
+			["method"] = {
+				["items"] = {
+					{
+					}, -- [1]
+					{
+						["src"] = 5,
+						["reforge"] = 35,
+						["dst"] = 8,
+						["amount"] = 269,
+					}, -- [2]
+					{
+					}, -- [3]
+					{
+						["src"] = 6,
+						["reforge"] = 39,
+						["dst"] = 4,
+						["amount"] = 232,
+					}, -- [4]
+					{
+						["src"] = 6,
+						["reforge"] = 39,
+						["dst"] = 4,
+						["amount"] = 392,
+					}, -- [5]
+					{
+						["src"] = 5,
+						["reforge"] = 35,
+						["dst"] = 8,
+						["amount"] = 218,
+					}, -- [6]
+					{
+						["src"] = 5,
+						["reforge"] = 35,
+						["dst"] = 8,
+						["amount"] = 366,
+					}, -- [7]
+					{
+						["src"] = 6,
+						["reforge"] = 42,
+						["dst"] = 8,
+						["amount"] = 400,
+					}, -- [8]
+					{
+					}, -- [9]
+					{
+					}, -- [10]
+					{
+						["src"] = 4,
+						["reforge"] = 28,
+						["dst"] = 8,
+						["amount"] = 294,
+					}, -- [11]
+					{
+					}, -- [12]
+					{
+					}, -- [13]
+					{
+						["src"] = 6,
+						["reforge"] = 42,
+						["dst"] = 8,
+						["amount"] = 382,
+					}, -- [14]
+					{
+						["src"] = 6,
+						["reforge"] = 42,
+						["dst"] = 8,
+						["amount"] = 302,
+					}, -- [15]
+					{
+					}, -- [16]
+				},
+				["stats"] = {
+					276, -- [1]
+					0, -- [2]
+					0, -- [3]
+					5102, -- [4]
+					4027, -- [5]
+					2569, -- [6]
+					0, -- [7]
+					8863, -- [8]
+				},
+			},
+			["weights"] = {
+				0, -- [1]
+				0, -- [2]
+				0, -- [3]
+				180, -- [4]
+				140, -- [5]
+				120, -- [6]
+				0, -- [7]
+				160, -- [8]
+			},
+			["caps"] = {
+				{
+					["stat"] = 4,
+					["points"] = {
+						{
+							["value"] = 5100,
+							["preset"] = 3,
+							["method"] = 1,
+							["after"] = 0,
+						}, -- [1]
+					},
+				}, -- [1]
+				{
+					["stat"] = 0,
+					["points"] = {
+						{
+							["value"] = 0,
+							["preset"] = 1,
+							["method"] = 1,
+							["after"] = 0,
+						}, -- [1]
+					},
+				}, -- [2]
+			},
+			["ilvlCap"] = 0,
+			["targetLevel"] = 3,
+			["prio"] = {
+				{
+					["value"] = 5100,
+					["preset"] = 3,
+					["stat"] = 4,
+					["capped"] = true,
+				}, -- [1]
+				{
+					["value"] = 0,
+					["preset"] = 1,
+					["capped"] = false,
+					["stat"] = 8,
+				}, -- [2]
+				{
+					["value"] = 0,
+					["preset"] = 1,
+					["capped"] = false,
+					["stat"] = 5,
+				}, -- [3]
+				{
+					["value"] = 0,
+					["preset"] = 1,
+					["capped"] = false,
+					["stat"] = 6,
+				}, -- [4]
+			},
+			["buffs"] = {
+			},
+			["itemsLocked"] = {
+			},
+			["customMethodPresets"] = {
+			},
+		},
+	},
+	["windowWidth"] = 800,
+	["itemSize"] = 24,
+	["openOnReforge"] = true,
+	["windowX"] = 320.0000915527344,
+	["customPresets"] = {
+	},
+	["inactiveWindowTitle"] = {
+		0.5, -- [1]
+		0.5, -- [2]
+		0.5, -- [3]
+	},
+}

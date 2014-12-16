@@ -1,0 +1,8 @@
+VER 3 0100000000000001 "대혼란" "ABILITY_WARLOCK_BANEOFHAVOC"
+#showtooltip 대혼란
+/cast [@mouseover,harm,nodead][@target,harm,nodead] 대혼란
+END
+VER 3 0100000000000002 "어둠의 연소" "SPELL_SHADOW_SCOURGEBUILD"
+#showtooltip 어둠의 연소
+/cast [@mouseover,harm,nodead][@target,harm,nodead] 어둠의 연소
+END

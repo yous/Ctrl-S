@@ -1,0 +1,33 @@
+
+DataStore_CharactersDB = {
+	["profileKeys"] = {
+		["김곱충 - 줄진"] = "김곱충 - 줄진",
+	},
+	["global"] = {
+		["Characters"] = {
+			["Default.줄진.김곱충"] = {
+				["XPMax"] = 93465000,
+				["played"] = 856635,
+				["guildRankName"] = "노답",
+				["isResting"] = 1,
+				["lastUpdate"] = 1395486375,
+				["class"] = "흑마법사",
+				["race"] = "블러드 엘프",
+				["level"] = 90,
+				["XP"] = 2783,
+				["RestXP"] = 0,
+				["money"] = 177672160,
+				["gender"] = 2,
+				["subZone"] = "초승달의 전당",
+				["zone"] = "두 달의 제단",
+				["guildRankIndex"] = 2,
+				["name"] = "김곱충",
+				["faction"] = "Horde",
+				["englishRace"] = "BloodElf",
+				["guildName"] = "저 동아리는 해로운 동아리다",
+				["lastLogoutTimestamp"] = 1395486375,
+				["englishClass"] = "WARLOCK",
+			},
+		},
+	},
+}

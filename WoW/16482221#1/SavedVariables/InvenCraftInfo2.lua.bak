@@ -1,0 +1,9 @@
+
+InvenCraftInfo2DB = {
+}
+InvenCraftInfo2KnownDB = {
+	["줄진"] = {
+		{
+		}, -- [1]
+	},
+}

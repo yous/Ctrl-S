@@ -1,0 +1,4 @@
+Quartz: disabled
+Decursive: disabled
+ChocolateBar_Options: disabled
+ChocolateBar: disabled

@@ -1,0 +1,3 @@
+
+BlueItemInfo3CharDB = {
+}

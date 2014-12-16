@@ -1,0 +1,4 @@
+VER 3 0000000000000001 "Decursive" "INV_MISC_QUESTIONMARK"
+/stopcasting
+/cast [@mouseover,nomod,exists] 공포;  [@mouseover,exists,mod:ctrl] 공포; [@mouseover,exists,mod:shift] 공포
+END

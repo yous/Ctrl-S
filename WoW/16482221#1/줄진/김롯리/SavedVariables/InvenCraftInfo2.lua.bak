@@ -1,0 +1,3 @@
+
+InvenCraftInfo2CharDB = {
+}

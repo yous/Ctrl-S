@@ -1,0 +1,17 @@
+
+combusettingstable = nil
+CombuCautlevelvar = nil
+CombuCautscalevar = nil
+CombuCautalphavar = nil
+CombuCautlockvar = nil
+CombuCauthidevar = nil
+CombuCautTimevar = nil
+CombuCautChatRaidvar = nil
+CombuCautChatSayvar = nil
+CombuCautChatYellvar = nil
+CombuCautAnnouncevar = nil
+CombuCautChatAltvar = nil
+CombuCautAnnounceAltvar = nil
+CombuCautChatAlonevar = nil
+CombuCautenablevar = nil
+combumbtrackersettingstable = nil
