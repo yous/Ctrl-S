@@ -1,19 +1,19 @@
 
 TradeSkillMaster_AuctioningDB = {
-	["profiles"] = {
-		["Default"] = {
+	["factionrealm"] = {
+		["Horde - 줄진"] = {
+			["player"] = {
+				["버징기"] = true,
+				["나라잃은토템"] = true,
+			},
 		},
 	},
 	["profileKeys"] = {
 		["나라잃은토템 - 줄진"] = "Default",
 		["버징기 - 줄진"] = "Default",
 	},
-	["factionrealm"] = {
-		["Horde - 줄진"] = {
-			["player"] = {
-				["나라잃은토템"] = true,
-				["버징기"] = true,
-			},
+	["profiles"] = {
+		["Default"] = {
 		},
 	},
 }

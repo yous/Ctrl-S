@@ -20,17 +20,3 @@ X: 0
 Y: 128
 W: 150
 H: 42
-Frame: _NPCScanOverlayKey
-FrameLevel: 80
-Anchor: CENTER
-X: 303
-Y: -63
-W: 199
-H: 404
-Frame: SkadaBarWindowSkada
-FrameLevel: 5
-Anchor: TOPRIGHT
-X: -217
-Y: -85
-W: 240
-H: 200
