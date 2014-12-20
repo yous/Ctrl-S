@@ -56,12 +56,13 @@ end
 
 desc 'Link the World of Warcraft account settings'
 task :wow do
+  target = 'World of Warcraft/WTF/Account/16482221#1'
   link_path = LinkPath.new(
     windows: if RbConfig::CONFIG['host_cpu'] =~ /x86_64/
-               'C:/Program Files (x86)/World of Warcraft/WTF/Account/16482221#1'
+               "C:/Program Files (x86)/#{target}"
              else
-               'C:/Program Files/World of Warcraft/WTF/Account/16482221#1'
+               "C:/Program Files/#{target}"
              end,
-    mac: '/Applications/World of Warcraft/WTF/Account/16482221#1')
+    mac: "/Applications/#{target}")
   link_path.link('WoW/16482221#1')
 end
