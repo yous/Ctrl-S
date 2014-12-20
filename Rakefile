@@ -1,8 +1,10 @@
+require 'pathname'
+
 class LinkPath
   def initialize(windows: nil, linux: nil, mac: nil)
-    @windows = windows
-    @linux = linux
-    @mac = mac
+    @windows = windows ? Pathname.new(windows) : nil
+    @linux = linux ? Pathname.new(linux) : nil
+    @mac = mac ? Pathname.new(mac) : nil
   end
 
   def self.os
@@ -27,6 +29,7 @@ class LinkPath
       $stderr.puts "File already exists: #{dest}"
     else
       real_source = Pathname.new(source).realpath
+      FileUtils.mkdir_p(dest.dirname)
       FileUtils.ln_s(real_source, dest)
     end
   end
