@@ -1,4 +1,7 @@
 require 'pathname'
+require 'yaml'
+
+CONFIG = YAML.load(File.read('config.yml'))
 
 class LinkPath
   def initialize(windows: nil, linux: nil, mac: nil)
@@ -56,13 +59,25 @@ end
 
 desc 'Link the World of Warcraft account settings'
 task :wow do
-  target = 'World of Warcraft/WTF/Account/16482221#1'
-  link_path = LinkPath.new(
-    windows: if ENV['ProgramFiles(x86)']
-               Pathname.new(ENV['ProgramFiles(x86)']).join(target)
-             elsif ENV['ProgramFiles']
-               Pathname.new(ENV['ProgramFiles']).join(target)
-             end,
-    mac: "/Applications/#{target}")
-  link_path.link('WoW/16482221#1')
+  account = CONFIG['wow_account']
+  custom_path = CONFIG['wow_custom_path']
+  target = "WTF/Account/#{account}"
+  windows = if custom_path['windows']
+              custom_path['windows'].join(target)
+            else
+              if ENV['ProgramFiles(x86)']
+                Pathname.new(ENV['ProgramFiles(x86)'])
+                  .join('World of Warcraft').join(target)
+              elsif ENV['ProgramFiles']
+                Pathname.new(ENV['ProgramFiles'])
+                  .join('World of Warcraft').join(target)
+              end
+            end
+  mac = if custom_path['mac']
+          custom_path['mac'].join(target)
+        else
+          "/Applications/World of Warcraft/#{target}"
+        end
+  link_path = LinkPath.new(windows: windows, mac: mac)
+  link_path.link("WoW/#{account}")
 end
