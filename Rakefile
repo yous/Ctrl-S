@@ -60,7 +60,7 @@ task :wow do
   link_path = LinkPath.new(
     windows: if ENV['ProgramFiles(x86)']
                Pathname.new(ENV['ProgramFiles(x86)']).join(target)
-             else
+             elsif ENV['ProgramFiles']
                Pathname.new(ENV['ProgramFiles']).join(target)
              end,
     mac: "/Applications/#{target}")
