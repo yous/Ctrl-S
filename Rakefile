@@ -57,7 +57,8 @@ desc 'Link the World of Warcraft account settings'
 task :wow do
   os = LinkPath.os
   account = CONFIG['wow_account']
-  custom_path = CONFIG['wow_custom_path'] && CONFIG['wow_custom_path'][os]
+  custom_path = CONFIG['wow_custom_path'] && CONFIG['wow_custom_path'][os.to_s]
+  custom_path = Pathname.new(custom_path) if custom_path
   target = "WTF/Account/#{account}"
   link_path =
     case os
