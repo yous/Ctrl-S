@@ -4,10 +4,9 @@ require 'yaml'
 CONFIG = YAML.load(File.read('config.yml'))
 
 class LinkPath
-  def initialize(windows: nil, linux: nil, mac: nil)
-    @windows = windows ? Pathname.new(windows) : nil
-    @linux = linux ? Pathname.new(linux) : nil
-    @mac = mac ? Pathname.new(mac) : nil
+  def initialize(path, required_path: nil)
+    @path = path ? Pathname.new(path) : nil
+    @required_path = required_path ? Pathname.new(required_path) : nil
   end
 
   def self.os
@@ -23,19 +22,16 @@ class LinkPath
   end
 
   def link(source)
-    dest = case LinkPath.os
-           when :windows then @windows
-           when :linux   then @linux
-           when :mac     then @mac
-           end
-    if !dest
+    if !@path
       $stderr.puts 'Not compatible with the host OS.'
-    elsif File.exist?(dest)
-      $stderr.puts "File already exists: #{dest}"
+    elsif File.exist?(@path)
+      $stderr.puts "File already exists: #{@path}"
+    elsif !File.exist?(@required_path)
+      $stderr.puts "File doesn't exist: #{@required_path}"
     else
       real_source = Pathname.new(source).realpath
-      FileUtils.mkdir_p(dest.dirname)
-      create_link(real_source, dest)
+      FileUtils.mkdir_p(@path.dirname)
+      create_link(real_source, @path)
     end
   end
 
@@ -59,25 +55,31 @@ end
 
 desc 'Link the World of Warcraft account settings'
 task :wow do
+  os = LinkPath.os
   account = CONFIG['wow_account']
-  custom_path = CONFIG['wow_custom_path']
+  custom_path = CONFIG['wow_custom_path'] && CONFIG['wow_custom_path'][os]
   target = "WTF/Account/#{account}"
-  windows = if custom_path['windows']
-              custom_path['windows'].join(target)
-            else
-              if ENV['ProgramFiles(x86)']
-                Pathname.new(ENV['ProgramFiles(x86)'])
-                  .join('World of Warcraft').join(target)
-              elsif ENV['ProgramFiles']
-                Pathname.new(ENV['ProgramFiles'])
-                  .join('World of Warcraft').join(target)
-              end
-            end
-  mac = if custom_path['mac']
-          custom_path['mac'].join(target)
-        else
-          "/Applications/World of Warcraft/#{target}"
-        end
-  link_path = LinkPath.new(windows: windows, mac: mac)
+  link_path =
+    case os
+    when :windows
+      if custom_path
+        LinkPath.new(custom_path.join(target), required_path: custom_path)
+      else
+        program_files = if ENV['ProgramFiles(x86)']
+                          ENV['ProgramFiles(x86)']
+                        elsif ENV['ProgramFiles']
+                          ENV['ProgramFiles']
+                        end
+        required_path = Pathname.new(program_files).join('World of Warcraft')
+        LinkPath.new(required_path.join(target), required_path: required_path)
+      end
+    when :mac
+      if custom_path
+        LinkPath.new(custom_path.join(target), required_path: custom_path)
+      else
+        required_path = Pathname.new('/Applications/World of Warcraft')
+        LinkPath.new(required_path.join(target), required_path: required_path)
+      end
+    end
   link_path.link("WoW/#{account}")
 end
