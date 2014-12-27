@@ -28,7 +28,7 @@ DBM_AutoInvite_Settings = {
 }
 DBM_DKP_System_Settings = {
 	["boss_event"] = true,
-	["lastevent"] = 0,
+	["lastevent"] = 1419638805,
 	["start_points"] = 10,
 	["boss_desc"] = "%s",
 	["start_desc"] = "Raid Start",
@@ -39,11 +39,83 @@ DBM_DKP_System_Settings = {
 	["items"] = {
 	},
 	["history"] = {
+		{
+			["time_end"] = 1419630822,
+			["time_start"] = 0,
+			["events"] = {
+				{
+					["items"] = {
+					},
+					["description"] = "란지트",
+					["zone"] = "하늘탑",
+					["timestamp"] = 1419630822,
+					["points"] = 10,
+					["members"] = {
+					},
+					["event_type"] = "bosskill",
+				}, -- [1]
+				{
+					["items"] = {
+					},
+					["description"] = "아라크나스",
+					["zone"] = "하늘탑",
+					["timestamp"] = 1419631007,
+					["points"] = 10,
+					["members"] = {
+					},
+					["event_type"] = "bosskill",
+				}, -- [2]
+				{
+					["items"] = {
+					},
+					["description"] = "루크란",
+					["zone"] = "하늘탑",
+					["timestamp"] = 1419631226,
+					["points"] = 10,
+					["members"] = {
+					},
+					["event_type"] = "bosskill",
+				}, -- [3]
+				{
+					["items"] = {
+					},
+					["description"] = "대현자 비릭스",
+					["zone"] = "하늘탑",
+					["timestamp"] = 1419631603,
+					["points"] = 10,
+					["members"] = {
+					},
+					["event_type"] = "bosskill",
+				}, -- [4]
+				{
+					["items"] = {
+					},
+					["description"] = "Raid Attendance",
+					["zone"] = "서리방벽",
+					["members"] = {
+					},
+					["points"] = 10,
+					["event_type"] = "",
+					["timestamp"] = 1419635204,
+				}, -- [5]
+				{
+					["items"] = {
+					},
+					["description"] = "Raid Attendance",
+					["zone"] = "나그란드",
+					["members"] = {
+					},
+					["points"] = 10,
+					["event_type"] = "",
+					["timestamp"] = 1419638805,
+				}, -- [6]
+			},
+		}, -- [1]
 	},
 	["time_points"] = 10,
 	["boss_points"] = 10,
 	["start_event"] = true,
-	["working_in"] = 0,
+	["working_in"] = 1,
 	["enabled"] = false,
 	["grpandraid"] = false,
 }

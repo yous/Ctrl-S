@@ -1,7 +1,3 @@
-Quartz: disabled
-Decursive: disabled
-ChocolateBar_Options: disabled
-ChocolateBar: disabled
 StormEarthAndFire: disabled
 Omen: disabled
 GatherMate2: enabled
