@@ -54,3 +54,7 @@
 	path = WoW/AddOns/Postal
 	url = https://github.com/yous/Ctrl-S.git
 	branch = Postal
+[submodule "WoW/AddOns/Skada"]
+	path = WoW/AddOns/Skada
+	url = https://github.com/yous/Ctrl-S.git
+	branch = Skada
