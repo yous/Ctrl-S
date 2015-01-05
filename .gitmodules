@@ -25,3 +25,6 @@
 	path = WoW/AddOns/GatherMate2_Data
 	url = https://github.com/yous/Ctrl-S.git
 	branch = GatherMate2_Data
+[submodule "WoW/AddOns/GearStatsSummary"]
+	path = WoW/AddOns/GearStatsSummary
+	url = https://github.com/zhengruiw02/GearStatsSummary.git
