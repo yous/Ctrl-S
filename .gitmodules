@@ -43,3 +43,7 @@
 [submodule "WoW/AddOns/Mapster"]
 	path = WoW/AddOns/Mapster
 	url = git://git.wowace.com/wow/mapster/mainline.git
+[submodule "WoW/AddOns/MogIt"]
+	path = WoW/AddOns/MogIt
+	url = https://github.com/yous/Ctrl-S.git
+	branch = MogIt
