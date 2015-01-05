@@ -61,3 +61,6 @@
 [submodule "WoW/AddOns/StormEarthAndFire"]
 	path = WoW/AddOns/StormEarthAndFire
 	url = git://git.curseforge.net/wow/storm-earth-and-fire/mainline.git
+[submodule "WoW/AddOns/TellMeWhen"]
+	path = WoW/AddOns/TellMeWhen
+	url = git://git.curseforge.net/wow/tellmewhen/mainline.git
