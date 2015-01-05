@@ -8,3 +8,6 @@
 [submodule "WoW/AddOns/_NPCScan.Overlay"]
 	path = WoW/AddOns/_NPCScan.Overlay
 	url = git://git.wowace.com/wow/npcscan-overlay/mainline.git
+[submodule "WoW/AddOns/AddOnSkins"]
+	path = WoW/AddOns/AddOnSkins
+	url = git://git.curseforge.net/wow/elvui_addonskins/mainline.git
