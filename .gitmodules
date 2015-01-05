@@ -18,3 +18,10 @@
 	path = WoW/AddOns/ExtraCD
 	url = https://github.com/yous/Ctrl-S.git
 	branch = ExtraCD
+[submodule "WoW/AddOns/GatherMate2"]
+	path = WoW/AddOns/GatherMate2
+	url = git://git.wowace.com/wow/gathermate2/mainline.git
+[submodule "WoW/AddOns/GatherMate2_Data"]
+	path = WoW/AddOns/GatherMate2_Data
+	url = https://github.com/yous/Ctrl-S.git
+	branch = GatherMate2_Data
