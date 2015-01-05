@@ -28,3 +28,7 @@
 [submodule "WoW/AddOns/GearStatsSummary"]
 	path = WoW/AddOns/GearStatsSummary
 	url = https://github.com/zhengruiw02/GearStatsSummary.git
+[submodule "WoW/AddOns/GTFO"]
+	path = WoW/AddOns/GTFO
+	url = https://github.com/yous/Ctrl-S.git
+	branch = GTFO
