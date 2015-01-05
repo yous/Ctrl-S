@@ -47,3 +47,6 @@
 	path = WoW/AddOns/MogIt
 	url = https://github.com/yous/Ctrl-S.git
 	branch = MogIt
+[submodule "WoW/AddOns/Omen"]
+	path = WoW/AddOns/Omen
+	url = git://git.wowace.com/wow/omen-threat-meter/mainline.git
