@@ -64,3 +64,6 @@
 [submodule "WoW/AddOns/TellMeWhen"]
 	path = WoW/AddOns/TellMeWhen
 	url = git://git.curseforge.net/wow/tellmewhen/mainline.git
+[submodule "WoW/AddOns/TomTom"]
+	path = WoW/AddOns/TomTom
+	url = git://git.curseforge.net/wow/tomtom/mainline.git
