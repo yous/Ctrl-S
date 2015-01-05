@@ -14,3 +14,7 @@
 [submodule "WoW/AddOns/Decursive"]
 	path = WoW/AddOns/Decursive
 	url = git://git.wowace.com/wow/decursive/mainline.git
+[submodule "WoW/AddOns/ExtraCD"]
+	path = WoW/AddOns/ExtraCD
+	url = https://github.com/yous/Ctrl-S.git
+	branch = ExtraCD
