@@ -58,3 +58,6 @@
 	path = WoW/AddOns/Skada
 	url = https://github.com/yous/Ctrl-S.git
 	branch = Skada
+[submodule "WoW/AddOns/StormEarthAndFire"]
+	path = WoW/AddOns/StormEarthAndFire
+	url = git://git.curseforge.net/wow/storm-earth-and-fire/mainline.git
