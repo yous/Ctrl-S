@@ -1,4 +1,4 @@
 [submodule "WoW/AddOns/!NoTaint"]
 	path = WoW/AddOns/!NoTaint
-	url = ./
+	url = https://github.com/yous/Ctrl-S.git
 	branch = !NoTaint
