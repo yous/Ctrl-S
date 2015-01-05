@@ -67,3 +67,33 @@
 [submodule "WoW/AddOns/TomTom"]
 	path = WoW/AddOns/TomTom
 	url = git://git.curseforge.net/wow/tomtom/mainline.git
+[submodule "WoW/AddOns/TradeSkillMaster"]
+	path = WoW/AddOns/TradeSkillMaster
+	url = git://git.curseforge.net/wow/tradeskill-master/mainline.git
+[submodule "WoW/AddOns/TradeSkillMaster_Accounting"]
+	path = WoW/AddOns/TradeSkillMaster_Accounting
+	url = git://git.curseforge.net/wow/tradeskillmaster_accounting/mainline.git
+[submodule "WoW/AddOns/TradeSkillMaster_AuctionDB"]
+	path = WoW/AddOns/TradeSkillMaster_AuctionDB
+	url = git://git.curseforge.net/wow/tradeskillmaster_auctiondb/mainline.git
+[submodule "WoW/AddOns/TradeSkillMaster_Auctioning"]
+	path = WoW/AddOns/TradeSkillMaster_Auctioning
+	url = git://git.curseforge.net/wow/tradeskillmaster_auctioning/mainline.git
+[submodule "WoW/AddOns/TradeSkillMaster_Crafting"]
+	path = WoW/AddOns/TradeSkillMaster_Crafting
+	url = git://git.curseforge.net/wow/tradeskillmaster_crafting/mainline.git
+[submodule "WoW/AddOns/TradeSkillMaster_Destroying"]
+	path = WoW/AddOns/TradeSkillMaster_Destroying
+	url = git://git.curseforge.net/wow/tradeskillmaster_destroying/mainline.git
+[submodule "WoW/AddOns/TradeSkillMaster_ItemTracker"]
+	path = WoW/AddOns/TradeSkillMaster_ItemTracker
+	url = git://git.curseforge.net/wow/tradeskillmaster_itemtracker/mainline.git
+[submodule "WoW/AddOns/TradeSkillMaster_Mailing"]
+	path = WoW/AddOns/TradeSkillMaster_Mailing
+	url = git://git.curseforge.net/wow/tradeskillmaster_mailing/mainline.git
+[submodule "WoW/AddOns/TradeSkillMaster_Shopping"]
+	path = WoW/AddOns/TradeSkillMaster_Shopping
+	url = git://git.curseforge.net/wow/tradeskillmaster_shopping/mainline.git
+[submodule "WoW/AddOns/TradeSkillMaster_Warehousing"]
+	path = WoW/AddOns/TradeSkillMaster_Warehousing
+	url = git://git.curseforge.net/wow/tradeskillmaster_warehousing/mainline.git
