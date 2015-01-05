@@ -32,3 +32,11 @@
 	path = WoW/AddOns/GTFO
 	url = https://github.com/yous/Ctrl-S.git
 	branch = GTFO
+[submodule "WoW/AddOns/HandyNotes"]
+	path = WoW/AddOns/HandyNotes
+	url = https://github.com/yous/Ctrl-S.git
+	branch = HandyNotes
+[submodule "WoW/AddOns/HandyNotes_TimelessIsleChests"]
+	path = WoW/AddOns/HandyNotes_TimelessIsleChests
+	url = https://github.com/yous/Ctrl-S.git
+	branch = HandyNotes_TimelessIsleChests
