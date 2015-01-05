@@ -2,3 +2,9 @@
 	path = WoW/AddOns/!NoTaint
 	url = https://github.com/yous/Ctrl-S.git
 	branch = !NoTaint
+[submodule "WoW/AddOns/_NPCScan"]
+	path = WoW/AddOns/_NPCScan
+	url = git://git.wowace.com/wow/npcscan/mainline.git
+[submodule "WoW/AddOns/_NPCScan.Overlay"]
+	path = WoW/AddOns/_NPCScan.Overlay
+	url = git://git.wowace.com/wow/npcscan-overlay/mainline.git
