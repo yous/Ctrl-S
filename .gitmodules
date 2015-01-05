@@ -11,3 +11,6 @@
 [submodule "WoW/AddOns/AddOnSkins"]
 	path = WoW/AddOns/AddOnSkins
 	url = git://git.curseforge.net/wow/elvui_addonskins/mainline.git
+[submodule "WoW/AddOns/Decursive"]
+	path = WoW/AddOns/Decursive
+	url = git://git.wowace.com/wow/decursive/mainline.git
