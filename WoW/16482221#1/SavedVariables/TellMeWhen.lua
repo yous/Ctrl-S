@@ -15,10 +15,6 @@ TellMeWhenDB = {
 				}, -- [2]
 			},
 		},
-		["AuraCache"] = {
-			[154253] = 2,
-			[167187] = 2,
-		},
 	},
 	["Version"] = 72218,
 	["profileKeys"] = {
@@ -47,14 +43,22 @@ TellMeWhenDB = {
 					["Columns"] = 2,
 					["Icons"] = {
 						{
+							["ShowTimer"] = true,
 							["Type"] = "cooldown",
 							["Name"] = "응징의 격노",
+							["ShowTimerTextnoOCC"] = true,
 							["Enabled"] = true,
+							["ShowTimerText"] = true,
+							["ShowWhen"] = 3,
 						}, -- [1]
 						{
+							["ShowTimer"] = true,
 							["Type"] = "cooldown",
 							["Name"] = "빛의 무기",
+							["ShowTimerTextnoOCC"] = true,
 							["Enabled"] = true,
+							["ShowTimerText"] = true,
+							["ShowWhen"] = 3,
 						}, -- [2]
 					},
 				}, -- [1]
