@@ -41,3 +41,6 @@ DBM-PvP: disabled
 DBM-Party-Cataclysm: disabled
 DBM-Party-WotLK: disabled
 DBM-Party-BC: disabled
+DBM-Interrupts: disabled
+DBM-LDB: disabled
+DBM-RaidLeadTools: disabled

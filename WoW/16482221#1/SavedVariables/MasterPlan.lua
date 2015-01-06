@@ -1,3 +1,0 @@
-
-MasterPlanConfig = nil
-MasterPlanData = nil

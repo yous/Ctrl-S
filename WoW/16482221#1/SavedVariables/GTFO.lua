@@ -14,7 +14,7 @@ GTFOData = {
 	["IgnoreOptions"] = {
 		["Fatigue"] = true,
 	},
-	["UnmuteMode"] = false,
 	["SoundChannel"] = "Master",
+	["UnmuteMode"] = false,
 	["TrivialMode"] = false,
 }
