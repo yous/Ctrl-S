@@ -1,10 +1,10 @@
 
 MogItDB = {
-	["profileKeys"] = {
-		["버징기 - 줄진"] = "Default",
-	},
 	["global"] = {
 		["version"] = "3.4.0",
+	},
+	["profileKeys"] = {
+		["버징기 - 줄진"] = "Default",
 	},
 	["profiles"] = {
 		["Default"] = {
