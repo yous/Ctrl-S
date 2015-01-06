@@ -1,2 +1,4 @@
 /WoW/16482221#1/**/*.bak
 /WoW/16482221#1/**/*.old
+/WoW/16482221#1/*/*/SavedVariables/ElvUI.lua
+/WoW/16482221#1/*/*/SavedVariables/Skada.lua
