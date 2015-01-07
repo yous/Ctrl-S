@@ -774,6 +774,7 @@ ElvDB = {
 				["bar1"] = {
 					["heightMult"] = 3,
 				},
+				["macrotext"] = true,
 				["bar5"] = {
 					["buttons"] = 12,
 					["buttonsPerRow"] = 1,
