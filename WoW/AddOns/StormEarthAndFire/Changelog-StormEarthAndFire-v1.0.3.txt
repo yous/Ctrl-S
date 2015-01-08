@@ -1,0 +1,12 @@
+tag v1.0.3
+d201c43185a138cf9c8f2c3a404526831ea73b34
+Kevin Ballard <kevin@sb.org>
+2014-11-17 22:25:37 -0800
+
+Tagging as v1.0.3
+
+
+--------------------
+
+Kevin Ballard:
+	- Bump TOC for WoD

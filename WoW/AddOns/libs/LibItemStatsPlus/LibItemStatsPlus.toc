@@ -1,0 +1,11 @@
+## Interface: 50400
+## Title: Lib: ItemStatsPlus
+## Notes: Library for summing up all stats from gears
+## Version: r11
+## Author: zhengruiw02
+## X-E-mail: zhengruiw02 [at] gmail.com
+## X-Category: Library
+## X-License: GNU General Public License version 3 (GPLv3)
+## OptionalDeps: LibStub
+
+lib.xml

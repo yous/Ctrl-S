@@ -1,0 +1,8 @@
+<Ui xmlns="http://www.blizzard.com/wow/ui/">	
+	<Script file="profile.lua"/>
+	<Script file="global.lua"/>
+	<Script file="private.lua"/>
+	<Script file="eui.lua"/>
+	<Script file="user.lua"/>
+	<Include file="filters\load_filters.xml"/>
+</Ui>

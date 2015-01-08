@@ -1,0 +1,17 @@
+## Interface: 60000
+## Title: Storm, Earth, and Fire
+## Author: Eridius
+## Notes: Tracker for Storm, Earth, and Fire spirits
+## Version: v1.0.3
+## OptionalDeps: LibStub, CallbackHandler-1.0, LibStormEarthAndFire-1.0, LibSharedMedia-3.0, Ace3, AceGUI-3.0-SharedMediaWidgets
+## X-Category: Class - Monk
+## X-Curse-Packaged-Version: v1.0.3
+## X-Curse-Project-Name: Storm, Earth, and Fire
+## X-Curse-Project-ID: storm-earth-and-fire
+## X-Curse-Repository-ID: wow/storm-earth-and-fire/mainline
+
+## SavedVariables: StormEarthAndFireDB
+
+embeds.xml
+
+Core.xml

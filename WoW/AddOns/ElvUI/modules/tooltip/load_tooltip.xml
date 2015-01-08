@@ -1,0 +1,8 @@
+<Ui xmlns="http://www.blizzard.com/wow/ui/">	
+	<Include file="..\..\..\libs\LibItemData-1.0\lib.xml"/>
+	<Script file='tooltip.lua'/>
+	<Script file='Achievement.lua'/>
+	<Script file='UnitRole.lua'/>
+
+	<Script file='hh.lua'/>
+</Ui>

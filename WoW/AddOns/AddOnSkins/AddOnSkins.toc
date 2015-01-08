@@ -1,0 +1,12 @@
+﻿## Interface: 60000
+## Title: |cffC495DDEUI|r |cffFFFFFFAddOnSkins|r
+## Title-zhCN: |cffC495DDEUI|r美化皮肤模块
+## Title-koKR: |cffC495DDEUI|rAddOnSkins 모듈
+## Version: 3.12-4-g23e9862
+## Author: Azilroka, Sortokk
+## SavedVariablesPerCharacter: AddOnSkinsOptions
+## OptionalDep: DSM, ElvUI, Tukui, HydraUI
+## X-Tukui-ProjectID: 128
+## X-Tukui-ProjectFolders: AddOnSkins
+
+Load_AddOnSkins.xml

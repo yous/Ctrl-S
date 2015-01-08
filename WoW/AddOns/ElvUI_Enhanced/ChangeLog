@@ -1,0 +1,23 @@
+2014-11-24 (3.0.5)
+* Changed modules\datatexts\extratexts.lua#201 with suggested errorfix from Zamma@Curseforge related to Datatexts.  Thanks :)
+
+2014-10-26 (3.0.4)
+* Changed misc/questreward.lua to properly skin rewards (Thanks Shenj@Curse)
+* Changed hooksecure updatesettings in modules/maps/minimaplocation.lua to align buff bar with minimap
+
+2014-10-20
+* Added changes to Libs/LibBalancePowerTracker-1.1 for Druid Eclipse changes (Thanks N30Ex@Curseforge)
+
+2014-10-19
+* Added modules/watchframe again; (Thanks to kkthnxbyegaming@Curse)
+
+2014-10-18
+* Modified misc/QuestReward.lua to remove error messages with single and multi-reward quest. It should now autopick the one with the highest value (like before).
+
+2014-10-17
+* Removed WatchFrame
+* Modified Elvui_Enhanced.toc for version 6.0 UI
+* Modified misc/PaperDoll.lua to show correct item level (with upgrades)
+* Modified misc/QuestReward.lua to no longer give error messages
+* MOdified misc/Raidmarkers.lua with accurate markers (Credits jessehulsey@TukUI)
+

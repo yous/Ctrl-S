@@ -1,0 +1,59 @@
+------------------------------------------------------------------------
+r404 | kagaro | 2015-01-04 07:02:03 +0000 (Sun, 04 Jan 2015) | 1 line
+Changed paths:
+   A /tags/v24.7 (from /trunk:403)
+
+GatherMate2_Data: Data update
+------------------------------------------------------------------------
+r403 | mmosimca | 2014-12-31 20:02:38 +0000 (Wed, 31 Dec 2014) | 1 line
+Changed paths:
+   M /trunk/TreasureData.lua
+
+Added data for Highmaul Reliquary treasures.
+------------------------------------------------------------------------
+r400 | kagaro | 2014-12-21 07:02:49 +0000 (Sun, 21 Dec 2014) | 1 line
+Changed paths:
+   M /trunk/HerbalismData.lua
+   M /trunk/MiningData.lua
+   M /trunk/TreasureData.lua
+
+GatherMate2_Data: Data update
+------------------------------------------------------------------------
+r398 | kagaro | 2014-12-14 07:02:10 +0000 (Sun, 14 Dec 2014) | 1 line
+Changed paths:
+   M /trunk/HerbalismData.lua
+   M /trunk/MiningData.lua
+   M /trunk/TreasureData.lua
+
+GatherMate2_Data: Data update
+------------------------------------------------------------------------
+r395 | kagaro | 2014-12-06 15:46:26 +0000 (Sat, 06 Dec 2014) | 1 line
+Changed paths:
+   M /trunk/HerbalismData.lua
+   M /trunk/MiningData.lua
+   M /trunk/TreasureData.lua
+
+GatherMate2_Data: Data update
+------------------------------------------------------------------------
+r393 | kagaro | 2014-12-05 18:17:29 +0000 (Fri, 05 Dec 2014) | 1 line
+Changed paths:
+   M /trunk/HerbalismData.lua
+   M /trunk/MiningData.lua
+   M /trunk/TreasureData.lua
+
+GatherMate2_Data: Data update
+------------------------------------------------------------------------
+r392 | kagaro | 2014-12-05 18:08:58 +0000 (Fri, 05 Dec 2014) | 1 line
+Changed paths:
+   M /trunk/GatherMateData.lua
+
+Added wod import filter
+------------------------------------------------------------------------
+r390 | kagaro | 2014-12-05 14:10:03 +0000 (Fri, 05 Dec 2014) | 1 line
+Changed paths:
+   M /trunk/HerbalismData.lua
+   M /trunk/MiningData.lua
+   M /trunk/TreasureData.lua
+
+GatherMate2_Data: Data update
+------------------------------------------------------------------------
