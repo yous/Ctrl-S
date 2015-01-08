@@ -53,34 +53,69 @@ class LinkPath
   end
 end
 
-desc 'Link the World of Warcraft account settings'
-task :wow do
-  os = LinkPath.os
-  account = CONFIG['wow_account']
-  custom_path = CONFIG['wow_custom_path'] && CONFIG['wow_custom_path'][os.to_s]
-  custom_path = Pathname.new(custom_path) if custom_path
-  target = "WTF/Account/#{account}"
-  link_path =
-    case os
-    when :windows
-      if custom_path
-        LinkPath.new(custom_path.join(target), required_path: custom_path)
-      else
-        program_files = if ENV['ProgramFiles(x86)']
-                          ENV['ProgramFiles(x86)']
-                        elsif ENV['ProgramFiles']
-                          ENV['ProgramFiles']
-                        end
-        required_path = Pathname.new(program_files).join('World of Warcraft')
-        LinkPath.new(required_path.join(target), required_path: required_path)
+namespace :wow do
+  desc 'Link the World of Warcraft account settings'
+  task :account do
+    os = LinkPath.os
+    account = CONFIG['wow_account']
+    custom_path = CONFIG['wow_custom_path'] &&
+      CONFIG['wow_custom_path'][os.to_s]
+    custom_path = Pathname.new(custom_path) if custom_path
+    target = "WTF/Account/#{account}"
+    link_path =
+      case os
+      when :windows
+        if custom_path
+          LinkPath.new(custom_path.join(target), required_path: custom_path)
+        else
+          program_files = if ENV['ProgramFiles(x86)']
+                            ENV['ProgramFiles(x86)']
+                          elsif ENV['ProgramFiles']
+                            ENV['ProgramFiles']
+                          end
+          required_path = Pathname.new(program_files).join('World of Warcraft')
+          LinkPath.new(required_path.join(target), required_path: required_path)
+        end
+      when :mac
+        if custom_path
+          LinkPath.new(custom_path.join(target), required_path: custom_path)
+        else
+          required_path = Pathname.new('/Applications/World of Warcraft')
+          LinkPath.new(required_path.join(target), required_path: required_path)
+        end
       end
-    when :mac
-      if custom_path
-        LinkPath.new(custom_path.join(target), required_path: custom_path)
-      else
-        required_path = Pathname.new('/Applications/World of Warcraft')
-        LinkPath.new(required_path.join(target), required_path: required_path)
+    link_path.link("WoW/#{account}")
+  end
+
+  desc 'Link the World of Warcraft addons'
+  task :addons do
+    os = LinkPath.os
+    custom_path = CONFIG['wow_custom_path'] &&
+      CONFIG['wow_custom_path'][os.to_s]
+    custom_path = Pathname.new(custom_path) if custom_path
+    target = 'Interface/AddOns'
+    link_path =
+      case os
+      when :windows
+        if custom_path
+          LinkPath.new(custom_path.join(target), required_path: custom_path)
+        else
+          program_files = if ENV['ProgramFiles(x86)']
+                            ENV['ProgramFiles(x86)']
+                          elsif ENV['ProgramFiles']
+                            ENV['ProgramFiles']
+                          end
+          required_path = Pathname.new(program_files).join('World of Warcraft')
+          LinkPath.new(required_path.join(target), required_path: required_path)
+        end
+      when :mac
+        if custom_path
+          LinkPath.new(custom_path.join(target), required_path: custom_path)
+        else
+          required_path = Pathname.new('/Applications/World of Warcraft')
+          LinkPath.new(required_path.join(target), required_path: required_path)
+        end
       end
-    end
-  link_path.link("WoW/#{account}")
+    link_path.link('WoW/AddOns')
+  end
 end
