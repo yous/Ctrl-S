@@ -1378,6 +1378,12 @@ ExtraCDDB = {
 			},
 		},
 		["버징기 - 줄진"] = {
+			["sortingData"] = {
+				["126700"] = {
+					["enable"] = true,
+					["order"] = 1,
+				},
+			},
 			["spells"] = {
 				["142535"] = {
 					["enchant"] = {

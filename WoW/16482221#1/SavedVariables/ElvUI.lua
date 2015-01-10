@@ -17,7 +17,7 @@ ElvDB = {
 		["줄진"] = {
 			["김곱충"] = 184322690,
 			["김롯리"] = 13136,
-			["버징기"] = 5144573,
+			["버징기"] = 6818200,
 			["나라잃은토템"] = 2270,
 		},
 	},
@@ -61,10 +61,10 @@ ElvDB = {
 			"|cffffd200Message:|r|cffffffff ...rface\\AddOns\\ElvUI\\modules\\unitframes\\unitframes.lua:844: No unit provided to create or update.|r\n|cffffd200Time:|r|cffffffff 01/09/15 23:34:15|r\n|cffffd200Count:|r|cffffffff 38|r\n|cffffd200Stack:|r|cffffffff Interface\\FrameXML\\RestrictedFrames.lua:600: in function <Interface\\FrameXML\\RestrictedFrames.lua:598>\n[C]: ?\n[C]: ?\nInterface\\FrameXML\\RestrictedFrames.lua:604: in function <Interface\\FrameXML\\RestrictedFrames.lua:603>\nInterface\\FrameXML\\RestrictedFrames.lua:742: in function `CallMethod'\n[string \"		local header = self:GetParent()...\"]:52: in function <[string \"		local header = self:GetParent()...\"]:1>\n(tail call): ?\n[C]: ?\nInterface\\FrameXML\\RestrictedExecution.lua:441: in function <Interface\\FrameXML\\RestrictedExecution.lua:412>\nInterface\\FrameXML\\SecureGroupHeaders.lua:116: in function <Interface\\FrameXML\\SecureGroupHeaders.lua:110>\nInterface\\FrameXML\\SecureGroupHeaders.lua:166: in function <Interface\\FrameXML\\SecureGroupHeaders.lua:123>\nInterface\\FrameXML\\SecureGroupHeaders.lua:488: in function <Interface\\FrameXML\\SecureGroupHeaders.lua:387>\n...\n...rface\\AddOns\\ElvUI\\modules\\unitframes\\unitframes.lua:617: in function `Update'\n...rface\\AddOns\\ElvUI\\modules\\unitframes\\unitframes.lua:917: in function `UpdateAllHeaders'\n...rface\\AddOns\\ElvUI\\modules\\unitframes\\unitframes.lua:435: in function `Update_AllFrames'\n...rface\\AddOns\\ElvUI\\modules\\unitframes\\unitframes.lua:1055: in function `?'\n...Ons\\libs\\CallbackHandler-1.0\\CallbackHandler-1.0.lua:147: in function <...Ons\\libs\\CallbackHandler-1.0\\CallbackHandler-1.0.lua:147>\n[string \"safecall Dispatcher[1]\"]:4: in function <[string \"safecall Dispatcher[1]\"]:4>\n[C]: ?\n[string \"safecall Dispatcher[1]\"]:13: in function `?'\n...Ons\\libs\\CallbackHandler-1.0\\CallbackHandler-1.0.lua:92: in function `Fire'\nInterface\\AddOns\\libs\\AceEvent-3.0\\AceEvent-3.0.lua:120: in function <Interface\\AddOns\\libs\\AceEvent-3.0\\AceEvent-3.0.lua:119>\n|r\n|cffffd200Locals:|r|cffffffff <none>|r", -- [1]
 		},
 		["gtData"] = {
-			["버징기-줄진"] = "강철 호드의 심장:150,궁지에 빠진 창백한 오크:20,살아있는 강철엄니:51,무리를 이끄는 자:17,머릿수로 밀어붙이기:20,지나친 호기심:50",
+			["버징기-줄진"] = "정령의 영토:82,칼리리의 어미:464",
 		},
 		["gtTime"] = {
-			["버징기-줄진"] = "2015/01/10 11:06:56",
+			["버징기-줄진"] = "2015/01/10 21:22:18",
 		},
 		["unitframe"] = {
 			["aurafilters"] = {
