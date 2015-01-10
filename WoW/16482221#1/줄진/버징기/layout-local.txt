@@ -13,6 +13,13 @@ X: -167
 Y: -138
 W: 32
 H: 32
+Frame: FollowerLocationInfoFrame
+FrameLevel: 10
+Anchor: LEFT
+X: 300
+Y: 0
+W: 538
+H: 538
 Frame: _NPCScanButton
 FrameLevel: 1
 Anchor: BOTTOM
@@ -20,10 +27,3 @@ X: 0
 Y: 128
 W: 150
 H: 42
-Frame: TellMeWhen_ConfigWarning
-FrameLevel: 31
-Anchor: TOP
-X: 0
-Y: -60
-W: 330
-H: 112

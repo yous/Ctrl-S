@@ -17,7 +17,7 @@ ElvDB = {
 		["줄진"] = {
 			["김곱충"] = 184322690,
 			["김롯리"] = 13136,
-			["버징기"] = 17796870,
+			["버징기"] = 5144573,
 			["나라잃은토템"] = 2270,
 		},
 	},
@@ -58,13 +58,13 @@ ElvDB = {
 	["global"] = {
 		["screenheight"] = 900,
 		["luaError"] = {
-			"|cffffd200Message:|r|cffffffff ...ns\\Blizzard_AchievementUI\\Blizzard_AchievementUI.lua:699: Usage: GetCategoryNumAchievements(categoryID, includeSuperceded)|r\n|cffffd200Time:|r|cffffffff 01/07/15 04:41:21|r\n|cffffd200Count:|r|cffffffff 5|r\n|cffffd200Stack:|r|cffffffff [C]: ?\n[C]: in function `GetCategoryNumAchievements'\n...ns\\Blizzard_AchievementUI\\Blizzard_AchievementUI.lua:699: in function `AchievementFrameComparison_UpdateStatusBars'\n...ns\\Blizzard_AchievementUI\\Blizzard_AchievementUI.lua:2798: in function <...ns\\Blizzard_AchievementUI\\Blizzard_AchievementUI.lua:2795>\n|r\n|cffffd200Locals:|r|cffffffff |r", -- [1]
+			"|cffffd200Message:|r|cffffffff ...rface\\AddOns\\ElvUI\\modules\\unitframes\\unitframes.lua:844: No unit provided to create or update.|r\n|cffffd200Time:|r|cffffffff 01/09/15 23:34:15|r\n|cffffd200Count:|r|cffffffff 38|r\n|cffffd200Stack:|r|cffffffff Interface\\FrameXML\\RestrictedFrames.lua:600: in function <Interface\\FrameXML\\RestrictedFrames.lua:598>\n[C]: ?\n[C]: ?\nInterface\\FrameXML\\RestrictedFrames.lua:604: in function <Interface\\FrameXML\\RestrictedFrames.lua:603>\nInterface\\FrameXML\\RestrictedFrames.lua:742: in function `CallMethod'\n[string \"		local header = self:GetParent()...\"]:52: in function <[string \"		local header = self:GetParent()...\"]:1>\n(tail call): ?\n[C]: ?\nInterface\\FrameXML\\RestrictedExecution.lua:441: in function <Interface\\FrameXML\\RestrictedExecution.lua:412>\nInterface\\FrameXML\\SecureGroupHeaders.lua:116: in function <Interface\\FrameXML\\SecureGroupHeaders.lua:110>\nInterface\\FrameXML\\SecureGroupHeaders.lua:166: in function <Interface\\FrameXML\\SecureGroupHeaders.lua:123>\nInterface\\FrameXML\\SecureGroupHeaders.lua:488: in function <Interface\\FrameXML\\SecureGroupHeaders.lua:387>\n...\n...rface\\AddOns\\ElvUI\\modules\\unitframes\\unitframes.lua:617: in function `Update'\n...rface\\AddOns\\ElvUI\\modules\\unitframes\\unitframes.lua:917: in function `UpdateAllHeaders'\n...rface\\AddOns\\ElvUI\\modules\\unitframes\\unitframes.lua:435: in function `Update_AllFrames'\n...rface\\AddOns\\ElvUI\\modules\\unitframes\\unitframes.lua:1055: in function `?'\n...Ons\\libs\\CallbackHandler-1.0\\CallbackHandler-1.0.lua:147: in function <...Ons\\libs\\CallbackHandler-1.0\\CallbackHandler-1.0.lua:147>\n[string \"safecall Dispatcher[1]\"]:4: in function <[string \"safecall Dispatcher[1]\"]:4>\n[C]: ?\n[string \"safecall Dispatcher[1]\"]:13: in function `?'\n...Ons\\libs\\CallbackHandler-1.0\\CallbackHandler-1.0.lua:92: in function `Fire'\nInterface\\AddOns\\libs\\AceEvent-3.0\\AceEvent-3.0.lua:120: in function <Interface\\AddOns\\libs\\AceEvent-3.0\\AceEvent-3.0.lua:119>\n|r\n|cffffd200Locals:|r|cffffffff <none>|r", -- [1]
 		},
 		["gtData"] = {
-			["버징기-줄진"] = "머릿수로 밀어붙이기:26,감시자 효과:11,우리 아래의 어둠:41",
+			["버징기-줄진"] = "강철 호드의 심장:150,궁지에 빠진 창백한 오크:20,살아있는 강철엄니:51,무리를 이끄는 자:17,머릿수로 밀어붙이기:20,지나친 호기심:50",
 		},
 		["gtTime"] = {
-			["버징기-줄진"] = "2015/01/07 05:01:32",
+			["버징기-줄진"] = "2015/01/10 11:06:56",
 		},
 		["unitframe"] = {
 			["aurafilters"] = {
@@ -480,7 +480,7 @@ ElvDB = {
 			["bagsOffsetFixed"] = true,
 			["movers"] = {
 				["ElvUF_TargetTargetMover"] = "BOTTOMElvUIParentBOTTOM150114",
-				["ShiftAB"] = "BOTTOMRIGHTElvUIParentBOTTOMRIGHT-218276",
+				["ShiftAB"] = "TOPLEFTElvUIParentBOTTOMLEFT1700278",
 				["PetAB"] = "RIGHTElvUIParentRIGHT-800",
 				["ElvUF_RaidMover"] = "BOTTOMLEFTElvUIParentBOTTOMLEFT4195",
 				["ElvAB_2"] = "BOTTOMElvUIParentBOTTOM038",
@@ -752,6 +752,32 @@ ElvDB = {
 							68, -- [5]
 						},
 					}, -- [4]
+				},
+			},
+			["unitframe"] = {
+				["units"] = {
+					["focus"] = {
+						["power"] = {
+							["width"] = "spaced",
+						},
+					},
+					["boss"] = {
+						["power"] = {
+							["width"] = "spaced",
+						},
+					},
+					["targettarget"] = {
+						["power"] = {
+							["width"] = "spaced",
+						},
+					},
+				},
+				["colors"] = {
+					["castColor"] = {
+						["b"] = 0.31,
+						["g"] = 0.31,
+						["r"] = 0.31,
+					},
 				},
 			},
 			["datatexts"] = {

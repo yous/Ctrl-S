@@ -24,6 +24,7 @@ DBM_SavedOptions = {
 		0, -- [3]
 	},
 	["SpecialWarningPoint"] = "CENTER",
+	["CheckGear"] = true,
 	["SpecialWarningX"] = 0,
 	["WorldBossAlert"] = false,
 	["RaidWarningPosition"] = {
@@ -37,8 +38,11 @@ DBM_SavedOptions = {
 	["ShowMinimapButton"] = false,
 	["MoviesSeen"] = {
 		["12084"] = true,
+		["12283"] = true,
 		["12082"] = true,
+		["11751"] = true,
 	},
+	["ShowAllVersions"] = true,
 	["DebugMode"] = false,
 	["ShowWarningsInChat"] = true,
 	["ShowCombatLogMessage"] = true,
@@ -76,7 +80,9 @@ DBM_SavedOptions = {
 	["SpecialWarningFlashDura3"] = 1,
 	["MovieFilter"] = "AfterFirst",
 	["HPFramePoint"] = "CENTER",
+	["SpecialWarningSound4"] = "Sound\\Creature\\HoodWolf\\HoodWolfTransformPlayer01.ogg",
 	["AutologBosses"] = false,
+	["SpecialWarningFlashDura4"] = 0.7,
 	["SpecialWarningFlashCol3"] = {
 		1, -- [1]
 		0, -- [2]
@@ -126,12 +132,18 @@ DBM_SavedOptions = {
 	["DontSetIcons"] = false,
 	["BigBrotherAnnounceToRaid"] = false,
 	["CountdownVoice"] = "Corsica",
+	["SpecialWarningFlashCol4"] = {
+		1, -- [1]
+		0, -- [2]
+		1, -- [3]
+	},
 	["CountdownVoice3"] = "Pewsey",
 	["AutoRespond"] = true,
 	["HealthFrameGrowUp"] = false,
 	["DontShowPT"] = true,
 	["HideBossEmoteFrame"] = true,
 	["HideGarrisonUpdates"] = true,
+	["DontPlayCountdowns"] = false,
 	["ShowBigBrotherOnCombatStart"] = false,
 	["AFKHealthWarning"] = true,
 	["RangeFrameRadarX"] = 100,
@@ -179,6 +191,8 @@ DBM_SavedOptions = {
 	["BlockVersionUpdateNotice"] = false,
 	["SpamBlockBossWhispers"] = false,
 	["HideApplicantAlerts"] = 0,
+	["FakeBWVersion"] = false,
+	["SpecialWarningFlashAlph4"] = 0.4,
 	["ShowFlashFrame"] = true,
 }
 DBT_SavedOptions = nil
