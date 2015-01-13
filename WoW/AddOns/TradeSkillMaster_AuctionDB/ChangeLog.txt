@@ -1,3 +1,9 @@
+v2.6.3
+*Possible fix for realm names (weird blizzard apostrophe again).
+
+v2.6.2
+*Fixed again an issue with importing app data if realm name contained an apostrophe.
+
 v2.6.1
 *Updated app data encoding scheme (with r250 of the TSM App) to fix issues with having data for many realms.
 

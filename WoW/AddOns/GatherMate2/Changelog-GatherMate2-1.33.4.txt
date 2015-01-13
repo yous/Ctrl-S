@@ -1,0 +1,14 @@
+tag 1.33.4
+eddbac98ce16cd7142eaa1e38c83f729de419399
+Hendrik Leppkes <h.leppkes@gmail.com>
+2015-01-12 00:01:59 +0100
+
+Tag as 1.33.4
+
+
+--------------------
+
+Hendrik Leppkes:
+	- Fix typo in icon path for Large Battered Chest
+MMOSimca:
+	- Added support for Highmaul Reliquary as a Treasure. Fixed a typo in the icon path for Solid Fel Iron Chest.

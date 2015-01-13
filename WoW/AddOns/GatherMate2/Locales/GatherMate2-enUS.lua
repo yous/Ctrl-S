@@ -319,6 +319,7 @@ NL["Heartblossom"] = true
 NL["Heavy Fel Iron Chest"] = true
 NL["Highland Guppy School"] = true
 NL["Highland Mixed School"] = true
+NL["Highmaul Reliquary"] = true
 NL["Huge Obsidian Slab"] = true
 NL["Icecap"] = true
 NL["Icethorn"] = true

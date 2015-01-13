@@ -316,6 +316,7 @@ NL["Gromsblood"] = "Sangue di Grom" -- Needs review
 -- NL["Heavy Fel Iron Chest"] = "Heavy Fel Iron Chest"
 -- NL["Highland Guppy School"] = "Highland Guppy School"
 -- NL["Highland Mixed School"] = "Highland Mixed School"
+-- NL["Highmaul Reliquary"] = "Highmaul Reliquary"
 -- NL["Huge Obsidian Slab"] = "Huge Obsidian Slab"
 NL["Icecap"] = "Corolla Invernale" -- Needs review
 -- NL["Icethorn"] = "Icethorn"

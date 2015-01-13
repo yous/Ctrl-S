@@ -1,0 +1,29 @@
+------------------------------------------------------------------------
+r405 | kagaro | 2015-01-11 07:02:35 +0000 (Sun, 11 Jan 2015) | 1 line
+Changed paths:
+   A /tags/v24.8 (from /trunk:404)
+
+GatherMate2_Data: Data update
+------------------------------------------------------------------------
+r403 | mmosimca | 2014-12-31 20:02:38 +0000 (Wed, 31 Dec 2014) | 1 line
+Changed paths:
+   M /trunk/TreasureData.lua
+
+Added data for Highmaul Reliquary treasures.
+------------------------------------------------------------------------
+r400 | kagaro | 2014-12-21 07:02:49 +0000 (Sun, 21 Dec 2014) | 1 line
+Changed paths:
+   M /trunk/HerbalismData.lua
+   M /trunk/MiningData.lua
+   M /trunk/TreasureData.lua
+
+GatherMate2_Data: Data update
+------------------------------------------------------------------------
+r398 | kagaro | 2014-12-14 07:02:10 +0000 (Sun, 14 Dec 2014) | 1 line
+Changed paths:
+   M /trunk/HerbalismData.lua
+   M /trunk/MiningData.lua
+   M /trunk/TreasureData.lua
+
+GatherMate2_Data: Data update
+------------------------------------------------------------------------

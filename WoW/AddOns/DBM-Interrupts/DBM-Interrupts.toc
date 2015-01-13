@@ -1,6 +1,6 @@
 ## Interface: 60000
 ## Title: |cffffe00a<|r|cffff7d0aDBM|r|cffffe00a>|r |cff69ccf0Interrupts|r
-## Version: 6.0.0
+## Version: 6.0.0b
 ## Author: Tristan Maxson
 ## Notes: Adds Interrupt Timers To DBM
 ## X-DBM-Mod-Category: General

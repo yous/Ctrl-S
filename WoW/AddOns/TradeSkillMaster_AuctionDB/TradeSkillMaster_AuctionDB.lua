@@ -165,7 +165,7 @@ function TSM:LoadAuctionData()
 end
 
 function TSMAuctionDB_LoadAppData(index, dataStr)
-	if index ~= "Global" and index ~= GetRealmName() then return end
+	if index ~= "Global" and gsub(index, "’", "'") ~= gsub(GetRealmName(), "’", "'") then return end
 	local data = assert(loadstring(dataStr))()
 	TSM.AppData = TSM.AppData or {}
 	if index == "Global" then
@@ -176,15 +176,8 @@ function TSMAuctionDB_LoadAppData(index, dataStr)
 end
 
 function TSM:OnEnable()
-	-- Backwards compatability until r250 of the app is released
-	if TSM.AppData2 then
-		TSM.AppData = {global=TSM.AppData2.Global, realm=TSM.AppData2[GetRealmName()]}
-		TSM.AppData2 = nil
-	end
-	
 	TSMAuctionDB_LoadAppData = nil
 	if TSM.AppData then
-		local realm = GetRealmName()
 		if TSM.AppData.realm then
 			TSM.db.realm.appDataUpdate = TSM.AppData.realm.downloadTime
 			TSM.db.realm.lastCompleteScan = TSM.AppData.realm.downloadTime
