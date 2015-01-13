@@ -164,7 +164,7 @@ TellMeWhenDB = {
 											["PrtsAfter"] = 1,
 											["Operator"] = "<=",
 											["Name"] = "신성한 목적",
-											["Level"] = 3,
+											["Level"] = 4,
 										}, -- [3]
 										["n"] = 3,
 									},
@@ -200,10 +200,11 @@ TellMeWhenDB = {
 											["PrtsBefore"] = 1,
 										}, -- [2]
 										{
-											["Type"] = "STANCE",
+											["Type"] = "BUFFDUR",
 											["PrtsAfter"] = 1,
-											["Name"] = "정의의 문장",
-											["AndOr"] = "OR",
+											["Operator"] = "<=",
+											["Name"] = "천상의 십자군",
+											["Level"] = 4,
 										}, -- [3]
 										["n"] = 3,
 									},
