@@ -21,6 +21,9 @@ SkadaDB = {
 					["point"] = "TOPRIGHT",
 				}, -- [1]
 			},
+			["reset"] = {
+				["join"] = 1,
+			},
 		},
 	},
 }
