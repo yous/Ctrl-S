@@ -1,7 +1,7 @@
 
 AshranHelper = {
 	["InviteCounter"] = 0,
-	["BoneCounter"] = 0,
+	["BoneCounter"] = 6,
 	["EventEnabled"] = false,
 	["InviteEnabled"] = false,
 	["EventKeywords"] = {

@@ -6,11 +6,11 @@ _NPCScanOverlayOptions = {
 		["BattlefieldMinimap"] = true,
 		["Minimap"] = true,
 	},
-	["ShowAll"] = false,
-	["Version"] = "6.0.3.4",
-	["ShowKey"] = true,
 	["MiniMapIcon"] = {
 	},
+	["Version"] = "6.0.3.4",
+	["ShowKey"] = true,
+	["ShowAll"] = false,
 	["ModulesExtra"] = {
 		["WorldMap"] = {
 			["RangeRing"] = true,
