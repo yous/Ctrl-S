@@ -45,9 +45,9 @@ TellMeWhenDB = {
 				{
 					["GUID"] = "TMW:group:1KZ_USSmSYm4",
 					["Point"] = {
-						["y"] = -100,
+						["y"] = 150,
 					},
-					["Scale"] = 1.5,
+					["Scale"] = 1,
 					["Rows"] = 2,
 					["Columns"] = 5,
 					["Icons"] = {
