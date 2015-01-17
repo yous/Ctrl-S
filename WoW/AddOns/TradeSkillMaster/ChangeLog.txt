@@ -1,3 +1,6 @@
+v2.10.14
+*Items which are bind on account (or bnet account) will now properly be treated as BoP.
+
 v2.10.13
 *Made some changes to how data for the app is stored.
 
