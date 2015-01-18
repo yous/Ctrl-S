@@ -801,6 +801,7 @@ ElvDB = {
 					["heightMult"] = 3,
 				},
 				["bar5"] = {
+					["point"] = "TOPRIGHT",
 					["buttons"] = 12,
 					["buttonsPerRow"] = 1,
 				},
