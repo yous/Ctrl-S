@@ -59,6 +59,7 @@ TellMeWhenDB = {
 							["Name"] = "퇴마술",
 							["Enabled"] = true,
 							["ShowWhen"] = 3,
+							["RangeCheck"] = true,
 						}, -- [1]
 						{
 							["ShowTimer"] = true,
@@ -68,6 +69,7 @@ TellMeWhenDB = {
 							["Name"] = "심판",
 							["Enabled"] = true,
 							["ShowWhen"] = 3,
+							["RangeCheck"] = true,
 						}, -- [2]
 						{
 							["ShowTimer"] = true,
@@ -77,6 +79,7 @@ TellMeWhenDB = {
 							["Name"] = "성전사의 일격",
 							["Enabled"] = true,
 							["ShowWhen"] = 3,
+							["RangeCheck"] = true,
 						}, -- [3]
 						{
 							["ShowTimer"] = true,
@@ -86,6 +89,7 @@ TellMeWhenDB = {
 							["Name"] = "정의의 망치",
 							["Enabled"] = true,
 							["ShowWhen"] = 3,
+							["RangeCheck"] = true,
 						}, -- [4]
 						nil, -- [5]
 						{
@@ -135,6 +139,7 @@ TellMeWhenDB = {
 								["n"] = 1,
 							},
 							["ShowWhen"] = 3,
+							["RangeCheck"] = true,
 						}, -- [7]
 						{
 							["ShowTimer"] = true,
@@ -172,6 +177,7 @@ TellMeWhenDB = {
 								["n"] = 1,
 							},
 							["ShowWhen"] = 3,
+							["RangeCheck"] = true,
 							["Enabled"] = true,
 							["ManaCheck"] = true,
 						}, -- [8]
@@ -252,6 +258,7 @@ TellMeWhenDB = {
 								["n"] = 1,
 							},
 							["ShowWhen"] = 3,
+							["RangeCheck"] = true,
 							["Enabled"] = true,
 						}, -- [10]
 					},
