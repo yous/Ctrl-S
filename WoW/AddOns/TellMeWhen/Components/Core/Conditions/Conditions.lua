@@ -76,19 +76,20 @@ CNDT.COMMON.standardtcoords = {0.07, 0.93, 0.07, 0.93}
 CNDT.Condition_Defaults = {
 	n 					= 0,
 	["**"] = {
-		AndOr 	   		= "AND",
-		Type 	   		= "",
-		Icon 	   		= "",
-		Operator   		= "==",
-		Level 	   		= 0,
-		Unit 	   		= "player",
-		Name 	   		= "",
-		Name2 	   		= "",
-		PrtsBefore 		= 0,
-		PrtsAfter  		= 0,
+		AndOr			= "AND",
+		Type			= "",
+		Icon			= "",
+		Operator		= "==",
+		Level			= 0,
+		Unit			= "player",
+		Name			= "",
+		Name2			= "",
+		PrtsBefore		= 0,
+		PrtsAfter		= 0,
 		Checked			= false,
-		Checked2   		= false,
-		Runes 	   		= {},
+		Checked2		= false,
+
+		-- Runes 		= {}, -- Deprecated
 
 		-- IMPORTANT: This setting can be a number OR a table.
 		BitFlags		= 0x0, -- may also be a table.
@@ -599,29 +600,51 @@ end
 function CNDT:GROUP_ROSTER_UPDATE()
 	TMW.UNITS:UpdateTankAndAssistMap()
 	
-	for oldunit in pairs(Env) do
-		if CNDT.SpecialUnitsUsed[oldunit] then
-			TMW.UNITS:SubstituteSpecialUnit(oldunit, Env, oldunit, true)
+	for oldUnit in pairs(Env) do
+		if CNDT.SpecialUnitsUsed[oldUnit] then
+			local newUnit = TMW.UNITS:SubstituteSpecialUnit(oldUnit)
+			Env[oldUnit] = newUnit or oldUnit
 		end
 	end
 end
 
 
 function CNDT:GetTableSubstitution(tbl)
-	if type(tbl) ~= "table" then
-		error("not a table")
-	end
+	TMW:ValidateType("CNDT:GetTableSubstitution(tbl)", "tbl", tbl, "table")
 
+	-- We used to check the format of the address explicitly,
+	-- but ticket 1076 demonstrates that sometimes it can be in the format
+	-- "table: 0000000312EBEB0" (the format I get), or "table: 0x1ba1bbb00" (from the ticket)
+	-- so instead we just check that the metatable exists.
 	local address = tostring(tbl)
-	if not address:match("^table: [0-9A-F]*$") then
-		error("can't substitute tables with __tostring metamethods")
+	if TMW.approachTable(tbl, getmetatable, "__tostring") then
+		error("can't substitute tables with __tostring metamethods: " .. address)
 	end
 
-	local var = address:gsub(": ", "_")
+	local var = address:gsub(":", "_"):gsub(" ", "")
 	CNDT.Env.TABLES[var] = tbl
 
 	return "TABLES." .. var
 end
+
+function CNDT:GetBitFlag(conditionSettings, index)
+	if type(conditionSettings.BitFlags) == "table" then
+		return conditionSettings.BitFlags[index]
+	else
+		local flag = bit.lshift(1, index-1)
+		return bit.band(conditionSettings.BitFlags, flag) == flag
+	end
+end
+
+function CNDT:ToggleBitFlag(conditionSettings, index)
+	if type(conditionSettings.BitFlags) == "table" then
+		conditionSettings.BitFlags[index] = (not conditionSettings.BitFlags[index]) and true or nil
+	else
+		local flag = bit.lshift(1, index-1)
+		conditionSettings.BitFlags = bit.bxor(conditionSettings.BitFlags, flag)
+	end
+end
+
 
 CNDT.Substitutions = {
 

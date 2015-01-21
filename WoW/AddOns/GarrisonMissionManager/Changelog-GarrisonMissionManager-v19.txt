@@ -1,0 +1,8 @@
+2015-01-19  ovolkov  <ovolkov>
+
+[66814236b3cd] [v19]
+* GarrisonMissionManager.txt:
+
+reformat docs some more; clarify fully maxed followers behavior; add follower ilevel indicator feature
+
+

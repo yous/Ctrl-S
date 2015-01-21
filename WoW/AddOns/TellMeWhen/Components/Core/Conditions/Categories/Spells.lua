@@ -356,8 +356,8 @@ ConditionCategory:RegisterCondition(13,	 "ITEMRANGE", {
 ConditionCategory:RegisterCondition(14,	 "ITEMINBAGS", {
 	text = L["ITEMINBAGS"],
 	min = 0,
-	max = 50,
-	texttable = function(k) return format(ITEM_SPELL_CHARGES, k) end,
+	range = 25,
+	step = 0.1,
 	name = function(editbox) TMW:TT(editbox, "ITEMINBAGS", "CNDT_ONLYFIRST") editbox.label = L["ITEMTOCHECK"] end,
 	useSUG = "itemwithslots",
 	unit = false,
@@ -707,6 +707,8 @@ function Env.UnitCastCount(...)
 	return Env.UnitCastCount(...)
 end
 ConditionCategory:RegisterCondition(32,	 "CASTCOUNT", {
+	old = true,
+	
 	text = L["CONDITIONPANEL_CASTCOUNT"],
 	tooltip = L["CONDITIONPANEL_CASTCOUNT_DESC"],
 	range = 10,

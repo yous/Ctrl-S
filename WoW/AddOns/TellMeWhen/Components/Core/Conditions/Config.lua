@@ -488,12 +488,7 @@ function CNDT:BitFlags_DropDown()
 		--info.tooltipText = 
 
 		info.value = index
-		if type(conditionSettings.BitFlags) == "table" then
-			info.checked = conditionSettings.BitFlags[index]
-		else
-			local flag = bit.lshift(1, index-1)
-			info.checked = bit.band(conditionSettings.BitFlags, flag) == flag
-		end
+		info.checked = CNDT:GetBitFlag(conditionSettings, index)
 		info.keepShownOnClick = true
 		info.isNotRadio = true
 		info.func = CNDT.BitFlags_DropDown_OnClick
@@ -509,12 +504,7 @@ function CNDT:BitFlags_DropDown_OnClick(frame)
 
 	local index = self.value
 
-	if type(conditionSettings.BitFlags) == "table" then
-		conditionSettings.BitFlags[index] = (not conditionSettings.BitFlags[index]) and true or nil
-	else
-		local flag = bit.lshift(1, index-1)
-		conditionSettings.BitFlags = bit.bxor(conditionSettings.BitFlags, flag)
-	end
+	CNDT:ToggleBitFlag(conditionSettings, index)
 
 	TMW.IE:ScheduleIconSetup()
 	group:LoadAndDraw()
@@ -524,31 +514,17 @@ end
 
 
 ---------- Runes ----------
-function CNDT:RuneHandler(rune)
-	local id = rune:GetID()
-	local pair
-	if id > 6 then
-		pair = _G[gsub(rune:GetName(), "Death", "")]
-	else
-		pair = _G[rune:GetName() .. "Death"]
-	end
-	if rune:GetChecked() ~= nil then
-		pair:SetChecked(nil)
-	end
-end
-
 function CNDT:Rune_GetChecked()
 	return self.checked
 end
 
 function CNDT:Rune_SetChecked(checked)
-	self.checked = checked
 	if checked then
+		self.checked = true
 		self.Check:SetTexture("Interface\\RAIDFRAME\\ReadyCheck-Ready")
-	elseif checked == nil then
+	else
+		self.checked = false
 		self.Check:SetTexture(nil)
-	elseif checked == false then
-		self.Check:SetTexture("Interface\\RAIDFRAME\\ReadyCheck-NotReady")
 	end
 end
 
@@ -790,16 +766,6 @@ TMW:RegisterCallback("TMW_CNDT_GROUP_DRAWGROUP", function(event, CndtGroup, cond
 	end
 end)
 
--- Runes
-TMW:RegisterCallback("TMW_CNDT_GROUP_DRAWGROUP", function(event, CndtGroup, conditionData, conditionSettings)
-
-	for k, rune in pairs(CndtGroup.Runes) do
-		if type(rune) == "table" then
-			rune:SetChecked(conditionSettings.Runes[rune:GetID()])
-		end
-	end
-end)
-
 -- Parentheses
 TMW:RegisterCallback("TMW_CNDT_GROUP_DRAWGROUP", function(event, CndtGroup, conditionData, conditionSettings)
 
@@ -1001,6 +967,24 @@ TMW:RegisterCallback("TMW_CNDT_GROUP_DRAWGROUP", function(event, CndtGroup, cond
 	end
 end)
 
+-- Runes
+TMW:RegisterCallback("TMW_CNDT_GROUP_DRAWGROUP", function(event, CndtGroup, conditionData, conditionSettings)
+	if conditionData and conditionData.runesConfig then
+
+		for k, rune in pairs(CndtGroup.Runes) do
+			if type(rune) == "table" then
+				local index = rune.key
+				rune:SetChecked(CNDT:GetBitFlag(conditionSettings, index))
+			end
+		end
+
+		CndtGroup.Runes:Show()
+		CndtGroup.Slider:SetWidth(217)
+	else
+		CndtGroup.Runes:Hide()
+	end
+end)
+
 -- BitFlags dropdown
 TMW:RegisterCallback("TMW_CNDT_GROUP_DRAWGROUP", function(event, CndtGroup, conditionData, conditionSettings)
 
@@ -1050,13 +1034,7 @@ TMW:RegisterCallback("TMW_CNDT_GROUP_DRAWGROUP", function(event, CndtGroup, cond
 		local text = ""
 		for index, name in TMW:OrderedPairs(conditionData.bitFlags) do
 
-			local flagSet
-			if type(conditionSettings.BitFlags) == "table" then
-				flagSet = conditionSettings.BitFlags[index]
-			else
-				local flag = bit.lshift(1, index-1)
-				flagSet = bit.band(conditionSettings.BitFlags, flag) == flag
-			end
+			local flagSet = CNDT:GetBitFlag(conditionSettings, index)
 
 			if flagSet then
 				if conditionSettings.Checked then
@@ -1105,6 +1083,10 @@ TMW:RegisterCallback("TMW_CNDT_GROUP_DRAWGROUP", function(event, CndtGroup, cond
 		if conditionData.funcstr == "DEPRECATED" then
 			CndtGroup.Deprecated:SetFormattedText(TMW.L["CNDT_DEPRECATED_DESC"], get(conditionData.text))
 
+			if CndtGroup.Deprecated:IsShown() then
+				CndtGroup:SetHeight(CndtGroup:GetHeight() - CndtGroup.Deprecated:GetHeight())
+				CndtGroup.Deprecated:Hide()
+			end
 			if not CndtGroup.Deprecated:IsShown() then
 				-- Need to reset the height to 0 before calling GetStringHeight
 				-- for consistency. Causes weird behavior if we don't do this.
@@ -1114,7 +1096,7 @@ TMW:RegisterCallback("TMW_CNDT_GROUP_DRAWGROUP", function(event, CndtGroup, cond
 				CndtGroup:SetHeight(CndtGroup:GetHeight() + CndtGroup.Deprecated:GetHeight())
 				CndtGroup.Deprecated:Show()
 			end
-		else
+		elseif not conditionData.customDeprecated then
 			if CndtGroup.Deprecated:IsShown() then
 				CndtGroup:SetHeight(CndtGroup:GetHeight() - CndtGroup.Deprecated:GetHeight())
 				CndtGroup.Deprecated:Hide()

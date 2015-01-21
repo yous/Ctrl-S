@@ -1,7 +1,7 @@
 local mod	= DBM:NewMod(155, "DBM-ThroneFourWinds", nil, 75)
 local L		= mod:GetLocalizedStrings()
 
-mod:SetRevision(("$Revision: 142 $"):sub(12, -3))
+mod:SetRevision(("$Revision: 145 $"):sub(12, -3))
 mod:SetCreatureID(46753)
 mod:SetEncounterID(1034)
 mod:DisableEEKillDetection()
@@ -33,7 +33,7 @@ local warnPhase3			= mod:NewPhaseAnnounce(3)
 local warnCloud				= mod:NewSpellAnnounce(89588, 3)
 local warnLightningRod		= mod:NewTargetAnnounce(89668, 4)
 
-local specWarnWindBurst		= mod:NewSpecialWarningSpell(87770, nil, nil, nil, true)
+local specWarnWindBurst		= mod:NewSpecialWarningSpell(87770, nil, nil, nil, 2)
 local specWarnIceStorm		= mod:NewSpecialWarningMove(91020)
 local specWarnCloud			= mod:NewSpecialWarningMove(89588)
 local specWarnLightningRod	= mod:NewSpecialWarningMoveAway(89668)

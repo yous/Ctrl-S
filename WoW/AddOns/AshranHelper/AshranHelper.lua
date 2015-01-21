@@ -138,6 +138,20 @@ function lootFilter(self, event, msg)
 end
 
 -- 
+--  Filter out some spammy system messages, though only if we are in Ashran 
+--
+function systemFilter(self, event, msg) 
+	if (isInAshran and msg ~= nil and (msg:find("is already in group") 
+						or msg:find("No player named") 
+						or msg:find("You have invited") 
+						or msg:find("has joined the raid group") 
+						or msg:find("has left the raid"))) then
+		return true
+	end
+	return false
+end
+
+-- 
 -- ugly but working way to detect ashran queue, play a sound when ready to enter
 --
 function uiUpdate(self, elapsed) 
@@ -224,10 +238,12 @@ myFrame:RegisterEvent("CHAT_MSG_CHANNEL")
 myFrame:RegisterEvent("CHAT_MSG_WHISPER") 
 myFrame:RegisterEvent("CHAT_MSG_SAY") 
 ChatFrame_AddMessageEventFilter("CHAT_MSG_LOOT", lootFilter)
+ChatFrame_AddMessageEventFilter("CHAT_MSG_SYSTEM", systemFilter)
 myFrame:SetScript("OnUpdate", uiUpdate)
 myFrame:RegisterEvent("ADDON_LOADED")
 myFrame:RegisterEvent("GET_ITEM_INFO_RECEIVED")
 
 SlashCmdList.ASHRANAUTO = slashCommand
 SLASH_ASHRANAUTO1, SLASH_ASHRANAUTO2 = "/ashranhelper", "/ash"
+
 

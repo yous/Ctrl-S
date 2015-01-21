@@ -564,6 +564,9 @@ L["ICONMENU_BAROFFS"] = [[This amount will be added to the bar in order to offse
 
 Useful for custom indicators of when you should begin casting a spell to prevent a buff from falling off, or to indicate the power required to cast a spell and still have some left over for an interrupt.]]
 
+L["ICONMENU_BAR_COLOR_BACKDROP"] = "Backdrop Color/Opacity"
+L["ICONMENU_BAR_COLOR_BACKDROP_DESC"] = "Configure the color and opacity of the backdrop beind the bar."
+
 L["ICONMENU_BAR_COLOR_START"] = "Start Color"
 L["ICONMENU_BAR_COLOR_START_DESC"] = "Color of the bar when the cooldown/duration has just begun."
 L["ICONMENU_BAR_COLOR_MIDDLE"] = "Halfway Color"
@@ -1209,6 +1212,10 @@ L["TEXTLAYOUTS_POINT_DESC"] = "The point on the text display that will be anchor
 L["TEXTLAYOUTS_RELATIVEPOINT_DESC"] = "The point on the object that will be anchored to"
 L["TEXTLAYOUTS_RELATIVETO_DESC"] = "The object that the text will be anchored to"
 
+
+L["TEXTLAYOUTS_ERR_ANCHOR_BADINDEX"] = "Layout error: Text display #%d is trying to anchor to text display #%d, but #%d doesn't exist, so text display #%d won't work."
+L["TEXTLAYOUTS_ERR_ANCHOR_BADANCHOR"] = "This text layout doesn't work with this group's display method. Choose a different text layout. (Missing anchor: %s)"
+
 L["UIPANEL_ANCHORNUM"] = "Anchor %d"
 
 -- -------------
@@ -1267,15 +1274,29 @@ If you don't want to display the icon being checked, check %q in the icon editor
 
 The group of the icon being checked must be shown in order to check the icon.]=]
 
-L["CONDITIONPANEL_RUNES_DESC"] = [=[Use this condition type to only show the icon when the selected runes are available.
 
-Each rune is a check button. A check mark will require that the rune be usable, an 'X' will require that the rune be unusable, no mark will ignore the rune.
 
-The runes in the second row are the death rune version of each rune above.]=]
-L["CONDITIONPANEL_RUNES_CHECK"] = "Force top-row runes to only match non-death runes."
-L["CONDITIONPANEL_RUNES_CHECK_DESC"] = [=[Normally, configuring the runes in the top row for this condition will let them match either a normal rune or a death rune in that slot.
 
-Enable this option to force the runes in the top row to only match non-death runes.]=]
+L["CONDITIONPANEL_RUNES"] = "Rune Count"
+L["CONDITIONPANEL_RUNES_DESC3"] = [=[Use this condition type to only show the icon when the desired number of runes are available.]=]
+L["CONDITIONPANEL_RUNES_CHECK_DESC"] = [=[Check this rune to count this rune type into the total count for the condition.]=]
+
+L["CONDITIONPANEL_RUNES_DESC_GENERIC"] = [=[Each rune is a check button. Check each rune to have it be counted into the conditions.
+
+The runes in the first row will not match death runes. The runes in the second row are the death rune version of each rune above.]=]
+
+
+L["CONDITIONPANEL_RUNESRECH"] = "Recharging Rune Count"
+L["CONDITIONPANEL_RUNESRECH_DESC"] = [=[Use this condition type to only show the icon when the desired number of runes are recharging.]=]
+
+
+
+L["CONDITIONPANEL_RUNESLOCK"] = "Locked Rune Count"
+L["CONDITIONPANEL_RUNESLOCK_DESC"] = [=[Use this condition type to only show the icon when the desired number of runes are locked (awaiting recharge).]=]
+
+
+
+
 L["CONDITIONPANEL_PVPFLAG"] = "Unit is PvP Flagged"
 L["CONDITIONPANEL_LEVEL"] = "Unit Level"
 L["CONDITIONPANEL_CLASS"] = "Unit Class"
@@ -1899,6 +1920,13 @@ L["LOSECONTROL_TYPE_SCHOOLLOCK"] = "Spell School Locked"
 L["LOSECONTROL_TYPE_MAGICAL_IMMUNITY"] = "Magical Immunity"
 L["LOSECONTROL_TYPE_DESC_USEUNKNOWN"] = "NOTE: It is not known if this loss of control type is used or not."
 
+
+L["EVENT_CATEGORY_CONDITION"] = "Conditions"
+L["EVENT_CATEGORY_MISC"] = "Miscellaneous"
+L["EVENT_CATEGORY_VISIBILITY"] = "Visibility"
+L["EVENT_CATEGORY_TIMER"] = "Timer"
+L["EVENT_CATEGORY_CHANGED"] = "Data Changed"
+L["EVENT_CATEGORY_CLICK"] = "Interaction"
 
 L["SOUND_EVENT_ONSHOW"] = "On Show"
 L["SOUND_EVENT_ONSHOW_DESC"] = "This event triggers when the icon becomes shown (even if %q is checked)."

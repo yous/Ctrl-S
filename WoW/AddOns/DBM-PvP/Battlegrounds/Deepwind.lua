@@ -4,7 +4,7 @@
 local mod		= DBM:NewMod("z1105", "DBM-PvP", 2)
 local L			= mod:GetLocalizedStrings()
 
-mod:SetRevision(("$Revision: 39 $"):sub(12, -3))
+mod:SetRevision(("$Revision: 41 $"):sub(12, -3))
 mod:SetZone(DBM_DISABLE_ZONE_DETECTION)
 
 mod:RegisterEvents(
@@ -79,10 +79,22 @@ local function get_basecount()
 end
 
 local function get_score()
-	if not bgzone then return 0,0 end
-	local AllyScore		= tonumber(string.match((select(4, GetWorldStateUIInfo(2)) or ""), L.ScoreExpr)) or 0
-	local HordeScore	= tonumber(string.match((select(4, GetWorldStateUIInfo(3)) or ""), L.ScoreExpr)) or 0
-	return AllyScore, HordeScore
+	if not bgzone then
+		return 0, 0
+	end
+	local ally, horde = 2, 3
+	for i = 1, 3 do
+		if select(5, GetWorldStateUIInfo(i)) then
+			if string.match(select(5, GetWorldStateUIInfo(i)), "Alliance") then--find -- "Interface\\TargetingFrame\\UI-PVP-Alliance", must be alliance.
+				ally = i
+				horde = i + 1
+				break
+			end
+		end
+	end
+	local allyScore	= tonumber(string.match((select(4, GetWorldStateUIInfo(ally)) or ""), L.ScoreExpr)) or 0
+	local hordeScore = tonumber(string.match((select(4, GetWorldStateUIInfo(horde)) or ""), L.ScoreExpr)) or 0
+	return allyScore, hordeScore
 end
 
 local get_gametime

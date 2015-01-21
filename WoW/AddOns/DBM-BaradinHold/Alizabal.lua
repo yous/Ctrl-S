@@ -1,7 +1,7 @@
 local mod	= DBM:NewMod(339, "DBM-BaradinHold", nil, 74)
 local L		= mod:GetLocalizedStrings()
 
-mod:SetRevision(("$Revision: 142 $"):sub(12, -3))
+mod:SetRevision(("$Revision: 145 $"):sub(12, -3))
 mod:SetCreatureID(55869)
 mod:SetEncounterID(1332)
 mod:DisableEEKillDetection()
@@ -16,12 +16,12 @@ mod:RegisterEvents(
 )
 
 local warnBladeDance			= mod:NewSpellAnnounce(104995, 4)
-local warnSkewer				= mod:NewTargetAnnounce(104936, 4, nil, mod:IsTank() or mod:IsHealer())
+local warnSkewer				= mod:NewTargetAnnounce(104936, 4, nil, "Tank|Healer")
 local warnSeethingHate			= mod:NewTargetAnnounce(105067, 3)
 
 local specWarnBladeDance		= mod:NewSpecialWarningRun(104995, nil, nil, nil, 4)
-local specWarnSkewer			= mod:NewSpecialWarningSpell(104936, mod:IsTank() or mod:IsHealer())
-local specWarnSeethingHate		= mod:NewSpecialWarningYou(105067, mod:IsTank())--off tank may need this warn. 
+local specWarnSkewer			= mod:NewSpecialWarningSpell(104936, "Tank|Healer")
+local specWarnSeethingHate		= mod:NewSpecialWarningYou(105067, "Tank")--off tank may need this warn. 
 
 local timerBladeDance			= mod:NewBuffActiveTimer(15, 104995)
 local timerBladeDanceCD			= mod:NewCDTimer(60, 104995)

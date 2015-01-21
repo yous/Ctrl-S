@@ -638,8 +638,10 @@ function IE:DoUpgrade(type, version, ...)
 	if type == "global" then
 	
 		-- delegate to locale
-		for locale, ls in pairs(IE.db.locale) do
-			IE:DoUpgrade("locale", version, ls, locale)
+		if IE.db.sv.locale then
+			for locale, ls in pairs(IE.db.sv.locale) do
+				IE:DoUpgrade("locale", version, ls, locale)
+			end
 		end
 	
 		--All Global Upgrades Complete
@@ -2502,7 +2504,7 @@ TMW:NewClass("Config_Frame_WhenChecks", "Config_Frame"){
 TMW:NewClass("Config_ColorButton", "Button", "Config_Frame"){
 	
 	OnNewInstance_ColorButton = function(self, data)
-		assert(self.background and self.text and self:GetNormalTexture(), 
+		assert(self.background1 and self.text and self.swatch, 
 			"This setting frame doesn't inherit from the thing that it should have inherited from")
 
 		self.text:SetText(get(data.label or data.title))
@@ -2561,8 +2563,8 @@ TMW:NewClass("Config_ColorButton", "Button", "Config_Frame"){
 		if settings then
 			local c = settings[self.setting]
 
-			self:GetNormalTexture():SetVertexColor(c.r, c.g, c.b, 1)
-			self.background:SetAlpha(c.a)
+			self.swatch:SetTexture(c.r, c.g, c.b, c.a)
+		--	self.background:SetAlpha(c.a)
 
 			self:CheckInteractionStates()
 		end
@@ -2819,24 +2821,24 @@ function IE:GetRealNames(Name)
 	local text = TMW:CleanString(Name)
 	
 	local CI_typeData = Types[CI.ics.Type]
-	local SoI = CI_typeData.checksItems and "item" or "spell"
+	local checksItems = CI_typeData.checksItems
 	
 	-- Note 11/12/12 (WoW 5.0.4) - caching causes incorrect results with "replacement spells" after switching specs like the corruption/immolate pair 
 	--if cachednames[CI.ics.Type .. SoI .. text] then return cachednames[CI.ics.Type .. SoI .. text] end
 
 	local tbl
-	if SoI == "item" then
+	if checksItems then
 		tbl = TMW:GetItems(text)
 	else
 		tbl = TMW:GetSpells(text).Array
 	end
-	local durations = CI_typeData.DurationSyntax and TMW:GetSpells(text).Durations
+	local durations = TMW:GetSpells(text).Durations
 
 	local Cache = TMW:GetModule("SpellCache"):GetCache()
 	
 	for k, v in pairs(tbl) do
 		local name, texture
-		if SoI == "item" then
+		if checksItems then
 			name = v:GetName() or v.what or ""
 			texture = v:GetIcon()
 		else
@@ -2862,27 +2864,25 @@ function IE:GetRealNames(Name)
 			texture = texture or GetSpellTexture(name)
 		end
 
-		if type(v) == "number" then
-			name = format("%s |cff7f6600(%d)|r", name, v)
+		local dur = ""
+		if CI_typeData.DurationSyntax or durations[k] > 0 then
+			dur = ": "..TMW:FormatSeconds(durations[k])
 		end
 
-		if not tiptemp[name] then --prevents duplicates.
+		local str = (texture and ("|T" .. texture .. ":0|t") or "") .. name .. dur
 
-			local dur = Types[CI.ics.Type].DurationSyntax and ": "..TMW:FormatSeconds(durations[k]).."" or ""
-
-			local str = (texture and ("|T" .. texture .. ":0|t") or "") .. name .. dur
-			tinsert(outTable,  str)
+		if type(v) == "number" and tonumber(name) ~= v then
+			str = str .. format(" |cff7f6600(%d)|r", v)
 		end
 
-		tiptemp[name] = true
+		tinsert(outTable,  str)
 	end
-	wipe(tiptemp)
 
 	return outTable
 end
 
 function GameTooltip:TMW_AddSpellBreakdown(tbl)
-	if #tbl <= 1 then
+	if #tbl <= 0 then
 		return
 	end
 

@@ -1,7 +1,7 @@
 local mod	= DBM:NewMod(184, "DBM-Party-Cataclysm", 11, 76)
 local L		= mod:GetLocalizedStrings()
 
-mod:SetRevision(("$Revision: 142 $"):sub(12, -3))
+mod:SetRevision(("$Revision: 147 $"):sub(12, -3))
 mod:SetCreatureID(52053)
 mod:SetZone()
 
@@ -27,7 +27,7 @@ local timerGaze				= mod:NewTargetTimer(17, 96342)
 local timerZanzilElixir		= mod:NewCDTimer(30, 96316)
 
 mod:AddBoolOption("SetIconOnGaze", false)
-mod:AddBoolOption("InfoFrame", mod:IsHealer())--on by default for healers, so they know what numpties to heal through gas
+mod:AddBoolOption("InfoFrame", "Healer")--on by default for healers, so they know what numpties to heal through gas
 
 function mod:GazeTarget()
 	local targetname = self:GetBossTarget(52054)

@@ -128,7 +128,6 @@ L["BURNING_EMBERS_FRAGMENTS"] = "燃火餘燼碎片"
 L["BURNING_EMBERS_FRAGMENTS_DESC"] = [=[一個完整的燃火餘燼由十個碎片所組成.
 
 假如你有一個半的燃火餘燼(由十五個餘燼碎片組成),你要監視全部的餘燼碎片時,可能需要使用此條件.]=]
-L["BurstManaRegen"] = "突發性法力恢復"
 L["CACHING"] = "TellMeWhen正在快取和篩選遊戲中的所有法術.這只需要在每次魔獸世界補丁升級之後完成一次.您可以使用下方的滑桿加快或減慢過程."
 L["CACHINGSPEED"] = "法術快取速度(每幀法術):"
 L["CASTERFORM"] = "施法者形態"
@@ -241,6 +240,10 @@ L["CLEU_NOFILTERS"] = "%s圖示在%s沒有定義任何篩選條件.你需要定�
 L["CLEU_PARTY_KILL"] = "隊伍擊殺"
 L["CLEU_PARTY_KILL_DESC"] = "當隊伍中的某人殺死某個怪物時觸發."
 L["CLEU_RANGE_DAMAGE"] = "遠程攻擊傷害"
+L["CLEU_RANGE_DAMAGE_MULTISTRIKE"] = "遠程物理傷害雙擊" -- Needs review
+L["CLEU_RANGE_DAMAGE_MULTISTRIKE_DESC"] = [=[當你的自動射擊雙擊時發生。
+
+它會同時觸發%q事件。]=] -- Needs review
 L["CLEU_RANGE_MISSED"] = "遠程攻擊未命中"
 L["CLEU_SOURCEUNITS"] = "用於檢查的來源單位"
 L["CLEU_SOURCEUNITS_DESC"] = "選擇你想要圖示檢查的事件來源單位,可以保留空白讓圖示檢查任意的事件來源單位."
@@ -267,6 +270,10 @@ L["CLEU_SPELL_DAMAGE"] = "法術傷害"
 L["CLEU_SPELL_DAMAGE_CRIT"] = "法術致命一擊"
 L["CLEU_SPELL_DAMAGE_CRIT_DESC"] = "此事件在任意法術傷害造成致命一擊時發生，會跟%q事件同時觸發。"
 L["CLEU_SPELL_DAMAGE_DESC"] = "此事件在任意法術造成傷害時發生."
+L["CLEU_SPELL_DAMAGE_MULTISTRIKE"] = "法術傷害雙擊" -- Needs review
+L["CLEU_SPELL_DAMAGE_MULTISTRIKE_DESC"] = [=[當你的法術傷害雙擊時發生。
+
+它會同時觸發%q事件。]=] -- Needs review
 L["CLEU_SPELL_DAMAGE_NONCRIT"] = "法術未致命一擊"
 L["CLEU_SPELL_DAMAGE_NONCRIT_DESC"] = "此事件在任意法術傷害沒有造成致命一擊時發生，會跟%q事件同時觸發。"
 L["CLEU_SPELL_DISPEL"] = "驅散"
@@ -284,6 +291,10 @@ L["CLEU_SPELL_ENERGIZE_DESC"] = "此事件在一個單位獲得資源時發生(�
 L["CLEU_SPELL_EXTRA_ATTACKS"] = "獲得額外攻擊"
 L["CLEU_SPELL_EXTRA_ATTACKS_DESC"] = "此事件在你獲得額外的近戰攻擊時發生."
 L["CLEU_SPELL_HEAL"] = "治療"
+L["CLEU_SPELL_HEAL_MULTISTRIKE"] = "治療法術雙擊" -- Needs review
+L["CLEU_SPELL_HEAL_MULTISTRIKE_DESC"] = [=[當你的治療法術雙擊時發生。
+
+它會同時觸發%q事件。]=] -- Needs review
 L["CLEU_SPELL_INSTAKILL"] = "秒殺"
 L["CLEU_SPELL_INTERRUPT"] = "中斷 - 被中斷的法術"
 L["CLEU_SPELL_INTERRUPT_DESC"] = [=[此事件在施法被中斷時發生.
@@ -301,9 +312,17 @@ L["CLEU_SPELL_LEECH"] = "資源吸取"
 L["CLEU_SPELL_LEECH_DESC"] = "此事件在從一個單位移除資源給另一單位時發生(資源指生命值/法力值/怒氣/能量等)."
 L["CLEU_SPELL_MISSED"] = "法術未命中"
 L["CLEU_SPELL_PERIODIC_DAMAGE"] = "傷害(週期)"
+L["CLEU_SPELL_PERIODIC_DAMAGE_MULTISTRIKE"] = "持續傷害雙擊" -- Needs review
+L["CLEU_SPELL_PERIODIC_DAMAGE_MULTISTRIKE_DESC"] = [=[當你的持續傷害雙擊時發生。
+
+它會同時觸發%q事件。]=] -- Needs review
 L["CLEU_SPELL_PERIODIC_DRAIN"] = "抽取資源(週期)"
 L["CLEU_SPELL_PERIODIC_ENERGIZE"] = "獲得資源(週期)"
 L["CLEU_SPELL_PERIODIC_HEAL"] = "治療(週期)"
+L["CLEU_SPELL_PERIODIC_HEAL_MULTISTRIKE"] = "持續治療雙擊" -- Needs review
+L["CLEU_SPELL_PERIODIC_HEAL_MULTISTRIKE_DESC"] = [=[當你的持續治療法術雙擊時發生。
+
+它會同時觸發%q事件。]=] -- Needs review
 L["CLEU_SPELL_PERIODIC_LEECH"] = "資源吸取(週期)"
 L["CLEU_SPELL_PERIODIC_MISSED"] = "傷害(週期)未命中"
 L["CLEU_SPELL_REFLECT"] = "法術反射"
@@ -319,6 +338,10 @@ L["CLEU_SPELL_STOLEN_DESC"] = [=[此事件在增益被竊取時發生,很可能�
 L["CLEU_SPELL_SUMMON"] = "法術召喚"
 L["CLEU_SPELL_SUMMON_DESC"] = "此事件在一個NPC被召喚或者生成時發生."
 L["CLEU_SWING_DAMAGE"] = "近戰攻擊傷害"
+L["CLEU_SWING_DAMAGE_MULTISTRIKE"] = "平砍雙擊" -- Needs review
+L["CLEU_SWING_DAMAGE_MULTISTRIKE_DESC"] = [=[當你的平砍雙擊時發生。
+
+它會同時觸發%q事件。]=] -- Needs review
 L["CLEU_SWING_MISSED"] = "近戰攻擊未命中"
 L["CLEU_TIMER"] = "設定事件的計時器"
 L["CLEU_TIMER_DESC"] = [=[設定圖示計時器在事件發生時的持續時間.
@@ -484,11 +507,10 @@ L["COLOR_OVERRIDEDEFAULT"] = "使用"
 L["COLOR_OVERRIDEDEFAULT_DESC"] = "勾選此項將使用該設定替代*全局顏色*."
 L["COLOR_RESET_DESC"] = "點擊將此設定重設為預設值"
 L["COMPARISON"] = "比較"
-L["CONDITIONALPHA"] = "持續時間/堆疊/條件未通過時"
-L["CONDITIONALPHA_CONDITIONICON"] = "持續時間未通過時"
-L["CONDITIONALPHA_CONDITIONICON_DESC"] = "此透明度設定用於持續時間的要求無法得到滿足時.如果在另外兩個透明度的設定下圖示已經隱藏,此選項將被忽略."
-L["CONDITIONALPHA_DESC"] = "此透明度設定用於條件未通過或者持續時間/堆疊數量的要求無法得到滿足時.如果在另外兩個透明度的設定下圖示已經隱藏,此選項將被忽略."
 L["CONDITIONALPHA_METAICON"] = "條件未通過時"
+L["CONDITIONALPHA_METAICON_DESC"] = [=[此透明度用於條件未通過時.
+
+條件可在%q選項卡中設定.]=]
 L["CONDITION_COUNTER"] = "用於檢查的計數器"
 L["CONDITION_COUNTER_EB_DESC"] = "輸入你想要檢查的計數器名稱。"
 L["CONDITIONORMETA_CHECKINGINVALID"] = "警告!群組 %d,圖示 %d 正在檢查一個無效的圖示(群組 %d , 圖示 %d)"
@@ -519,7 +541,6 @@ L["CONDITIONPANEL_BITFLAGS_CHECK_DESC"] = [=[檢查此設置，以反轉用於�
 默認情況下，這種情況將通過是否有任何選擇的選項是正確的。
 
 如果選中該設置，限制將會通過如果所有選擇的選項是錯誤的。]=] -- Needs review
-L["CONDITIONPANEL_BITFLAGS_CHOOSEMENU"] = "選擇%s..." -- Needs review
 L["CONDITIONPANEL_BITFLAGS_NEVER"] = "無 - 不要精確" -- Needs review
 L["CONDITIONPANEL_BITFLAGS_NOT"] = "不" -- Needs review
 L["CONDITIONPANEL_BITFLAGS_SELECTED"] = "|cff7fffff已選|r:" -- Needs review
@@ -621,17 +642,9 @@ L["CONDITIONPANEL_RAIDICON"] = "單位團隊標記"
 L["CONDITIONPANEL_REMOVE"] = "移除此條件"
 L["CONDITIONPANEL_RESTING"] = "休息狀態"
 L["CONDITIONPANEL_ROLE"] = "單位隊伍職責"
-L["CONDITIONPANEL_RUNES_CHECK"] = "強制第一行的符文僅匹配非死亡符文"
 L["CONDITIONPANEL_RUNES_CHECK_DESC"] = [=[正常情況下,第一行的符文無論是不是死亡符文,在符合條件設定時都會通過.
 
 啟用這個選項強制第一行的符文僅匹配非死亡符文.]=]
-L["CONDITIONPANEL_RUNES_DESC"] = [=[使用此條件類型只在選擇的符文條件通過時顯示圖示.
-
-每個符文都可以被標記.'V'打勾時條件需要在符文可用的情況下才能通過,'X'打叉時則條件需要在符文不可用的情況下才能通過,沒有標記的符文不會被檢查.
-
-第二行符文為上面每個符文所對應的死亡符文.
-
-說明:不要局限於只用一個符文條件,你可以添加多個符文條件靈活的設定符文的可用不可用情況來達到自己想要的效果.]=]
 L["CONDITIONPANEL_SPELLRANGE"] = "單位在法術範圍內"
 L["CONDITIONPANEL_SWIMMING"] = "游泳狀態"
 L["CONDITIONPANEL_THREAT_RAW"] = "單位威脅值 - 原始"
@@ -717,25 +730,13 @@ L["DefensiveBuffs"] = "防禦性增益"
 L["DESCENDING"] = "降序"
 L["DIALOG_HEADER_CHANGELOG"] = "TellMeWhen更新日誌"
 L["DISABLED"] = "已停用"
-L["Disarmed"] = "繳械"
 L["Disease"] = "疾病"
 L["Disoriented"] = "困惑"
 L["DOMAIN_GLOBAL"] = "|cff00c300共用|r"
 L["DOMAIN_GLOBAL_SWITCHTO"] = "轉換為帳號共用群組"
 L["DOMAIN_PROFILE"] = "角色設定檔"
 L["DOMAIN_PROFILE_SWITCHTO"] = "移動群組到角色設定檔：%q"
-L["DontMelee"] = "近戰不能"
-L["DR-ControlledRoot"] = "控制定身"
-L["DR-ControlledStun"] = "控制擊暈"
-L["DR-Cyclone"] = "颶風術"
-L["DR-Disarm"] = "繳械"
 L["DR-Disorient"] = "迷惑/其他"
-L["DR-Fear"] = "恐懼"
-L["DR-Horrify"] = "恐慌"
-L["DR-MindControl"] = "精神控制"
-L["DR-RandomRoot"] = "短暫/隨機定身"
-L["DR-RandomStun"] = "短暫/隨機擊暈"
-L["DR-ShortDisorient"] = "短暫迷惑、其他"
 L["DR-Silence"] = "沉默"
 L["DR-Taunt"] = "嘲諷"
 L["DT_DOC_AuraSource"] = "返回圖示檢查的增益/減益的來源單位。最好同[Name]標籤一起使用。 (此標籤僅能用於圖示類型：%s)。"
@@ -763,6 +764,7 @@ L["DT_DOC_Unit"] = "返回當前圖示所檢查的單位或單位名稱.同[Name
 L["DT_INSERTGUID_GENERIC_DESC"] = "如果你想要在一個圖示上顯示另外一個圖示的資訊，可以 |cff7fffffShift+滑鼠點擊|r那個圖示將它的唯一識別碼添加到標籤參數icon中即可。"
 L["DT_INSERTGUID_TOOLTIP"] = "|cff7fffffShift+滑鼠點擊|r將這個圖示的識別碼插入到DogTag."
 L["DURATION"] = "持續時間"
+L["DURATIONALPHA_DESC"] = "設定在你要求的持續時間不符合時圖示顯示的不透明度." -- Needs review
 L["DURATIONPANEL_TITLE2"] = "持續時間限定"
 L["DURATIONPERC"] = "持續時間(百分比)"
 L["EARTH"] = "大地圖騰"
@@ -837,8 +839,8 @@ L["EVENTS_HANDLER_ADD_DESC"] = "|cff7fffff點擊|r添加這個通知事件。"
 L["EVENTS_HANDLERS_ADD"] = "新增通知事件..."
 L["EVENTS_HANDLERS_ADD_DESC"] = "|cff7fffff點擊|r選擇一個通知事件新增到此圖示."
 L["EVENTS_HANDLERS_GLOBAL_DESC"] = [=[|cff7fffff點擊|r開啟通知事件設定選項.
-|cff7fffff右鍵點擊|r更改事件的觸發.
-|cff7fffff點擊並拖拽|r來變更排序.]=]
+|cff7fffff右鍵點擊|r複製或更改事件的觸發.
+|cff7fffff點擊並拖拽|r來變更排序.]=] -- Needs review
 L["EVENTS_HANDLERS_HEADER"] = "通知事件處理器"
 L["EVENTS_HANDLERS_PLAY"] = "測試通知事件"
 L["EVENTS_HANDLERS_PLAY_DESC"] = "|cff7fffff點擊|r測試通知事件"
@@ -963,9 +965,6 @@ L["HELP_FIRSTUCD"] = [=[這是你第一次使用一個採取特定時間語法�
 "62618: 3:00"
 
 用建議列表插入條目時會自動添加在滑鼠提示資訊中顯示的時間(譯者註:自動添加時間功能支援提示資訊中有顯示冷卻時間的法術以及提示資訊中有註明持續時間的大部分法術,如果一個法術同時存在上述兩種時間,會優先選擇添加冷卻時間,假如自動添加的時間不正確,請自行手動變更).]=]
-L["HELP_IE_TIMERTEXTHANDLER_MISSING"] = [=[TellMeWhen在所有已安裝的插件中無法找到可以用於處理此設定的插件.
-
-如果你啟用了該選項,但是無法看到任何計時器的數字,請到Curse.com或WoWInterface.com下載並安裝插件"OmniCC".]=]
 L["HELP_IMPORT_CURRENTPROFILE"] = [=[嘗試在這個設定檔中移動或複制一個圖示到另外一個圖示欄位嗎?
 
 你可以輕鬆的做到這一點,使用|cff7fffff滑鼠右鍵點擊圖示並拖拽|r它到另外一個圖示欄位(這個過程需要按下滑鼠右鍵不放開). 當你放開滑鼠右鍵時,會出現一個有很多選項的選單.
@@ -1013,7 +1012,6 @@ L["ICONMENU_ABSENTONANY_DESC"] = "設定在檢查的所有單位中只要其中�
 L["ICONMENU_ADDMETA"] = "添加到'整合圖示'"
 L["ICONMENU_ALLOWGCD"] = "允許公共冷卻"
 L["ICONMENU_ALLOWGCD_DESC"] = "勾選此項允許冷卻時鐘顯示公共冷卻,而不是忽略它."
-L["ICONMENU_ALPHA"] = "透明度"
 L["ICONMENU_ANCHORTO"] = "依附於 %s"
 L["ICONMENU_ANCHORTO_DESC"] = [=[依附%s於%s,無論%s如何移動,%s都會跟隨它一起移動.
 
@@ -1107,7 +1105,7 @@ L["ICONMENU_CTRLGROUP_DESC"] = [=[啟用此選項讓這個圖示控制整個群�
 
 該群組中的其他圖示都不能進行單獨設定。
 
-當你需要快速定制群組的佈局、樣式或者排列選項，可以選擇使用它控制群組。]=]
+當你需要快速定制群組的佈局、樣式或者排列選項，可以選擇使用它控制群組。]=] -- Needs review
 L["ICONMENU_CTRLGROUP_UNAVAILABLE_DESC"] = "當前圖示類型不能控制整個群組。"
 L["ICONMENU_CUSTOMTEX"] = "自訂圖示材質"
 L["ICONMENU_CUSTOMTEX_DESC"] = [=[你可以使用下列方法更改這個圖示的顯示材質：
@@ -1160,8 +1158,6 @@ L["ICONMENU_FAKEMAX_DESC"] = [=[設定計時器的偽最大值.
 L["ICONMENU_FOCUS"] = "專注目標"
 L["ICONMENU_FOCUSTARGET"] = "專注目標的目標"
 L["ICONMENU_FRIEND"] = "友好"
-L["ICONMENU_GHOUL"] = "非永久食屍鬼(沒加天賦%s)"
-L["ICONMENU_GHOUL_DESC"] = "僅用於在你沒有加 %s 這個天賦時,你召喚的食屍鬼的持續時間."
 L["ICONMENU_HIDENOUNITS"] = "無單位時隱藏"
 L["ICONMENU_HIDENOUNITS_DESC"] = "勾選此項可在單位不存在時致使圖示檢查的所有單位都無效的情況下隱藏該圖示(包括單位條件的設定在內)."
 L["ICONMENU_HIDEUNEQUIPPED"] = "當裝備欄缺少武器時隱藏"
@@ -1271,21 +1267,11 @@ L["ICONMENU_SHOWSTACKS_DESC"] = "勾選此項顯示物品的堆疊數量並啟�
 L["ICONMENU_SHOWTIMER"] = "顯示計時器"
 L["ICONMENU_SHOWTIMER_DESC"] = "勾選此項讓該圖示的冷卻時鐘動畫在可用時顯示.(譯者註:此選項僅影響圖示的時鐘動畫,就是技能冷卻時的那個轉圈效果,不包括數字在內哦.)"
 L["ICONMENU_SHOWTIMERTEXT"] = "顯示計時器數字"
-L["ICONMENU_SHOWTIMERTEXT_DESC"] = [=[勾選此項在圖示上顯示剩餘冷卻時間或持續時間的數字.
-
-需要已安裝OmniCC或者其他冷卻計時插件才可使用.(譯者註:某些冷卻計時插件可能不支援此選項)]=]
+L["ICONMENU_SHOWTIMERTEXT_DESC"] = "勾選此項在圖示上顯示剩餘冷卻時間或持續時間的數字." -- Needs review
 L["ICONMENU_SHOWTIMERTEXT_NOOCC"] = "顯示ElvUI計時器數字"
 L["ICONMENU_SHOWTIMERTEXT_NOOCC_DESC"] = [=[勾選此項使用ElvUI的冷卻數字來顯示圖示剩餘的冷卻時間/持續時間.
 
 此設定僅用於ElvUI的計時器.如果你有其他插件提供類似此種計時器的功能(像是OmniCC),你可以利用%q選項來控制那些計時器. 我們不推薦兩個選項同時啟用.]=]
-L["ICONMENU_SHOWTTTEXT"] = "顯示變數文字"
-L["ICONMENU_SHOWTTTEXT_DESC"] = [=[勾選此項顯示從法術效果的提示資訊中找到的第一個變數(數字).比如用此監視傷害護盾的剩餘吸收量等等.
-
-該數字會替代圖示原有的堆疊數量的數值,如果你需要顯示圖示的堆疊數量,請不要勾選此項.
-
-數字是由暴雪API所提供,跟你在法術效果的提示資訊中看到的數字可能會不同(像是伺服器已經在線修正,客戶端依然顯示錯誤的數字這種情況),在大多數情況下都能顯示正確的數字.
-
-譯者註：勾選此項後在|cff7fffff文字顯示方案|r一定要選擇|cff7fffff[Stacks]|r或|cff7fffff[Stacks:Hide(0)]|r，否則變數無法在圖示上顯示。]=]
 L["ICONMENU_SHOWWHEN"] = "何時顯示圖示"
 L["ICONMENU_SHOWWHENNONE"] = "沒有結果時顯示"
 L["ICONMENU_SHOWWHENNONE_DESC"] = "勾選此項允許在單位沒有被檢查到遞減時顯示圖示."
@@ -1455,12 +1441,8 @@ L["IncreasedAP"] = "攻擊強度提高"
 L["IncreasedCrit"] = "致命等級提高"
 L["IncreasedHaste"] = "加速提高" -- Needs review
 L["IncreasedMastery"] = "精通等級提高"
-L["IncreasedMultistrike"] = "獲得多重攻擊" -- Needs review
-L["IncreasedPhysHaste"] = "攻擊加速提高"
+L["IncreasedMultistrike"] = "獲得雙擊" -- Needs review
 L["IncreasedSP"] = "法術能量提高"
-L["IncreasedSpellHaste"] = "施法加速提高"
-L["IncreasedSPsix"] = "法術能量提高 (6%)"
-L["IncreasedSPten"] = "法術能量提高 (10%)"
 L["IncreasedStats"] = "屬性提高"
 L["IncreasedVersatility"] = "獲得全能" -- Needs review
 L["INRANGE"] = "在範圍內"
@@ -1470,7 +1452,7 @@ L["ITEMINBAGS"] = "物品計數(包含使用次數)"
 L["ITEMTOCHECK"] = "要檢查的物品"
 L["ITEMTOCOMP1"] = "進行比較的第一個物品"
 L["ITEMTOCOMP2"] = "進行比較的第二個物品"
-L["LAYOUTDIRECTION"] = "Layout Direction" -- Needs review
+L["LAYOUTDIRECTION"] = "佈局方向" -- Needs review
 L["LAYOUTDIRECTION_1"] = "由右至下"
 L["LAYOUTDIRECTION_2"] = "由左至下"
 L["LAYOUTDIRECTION_3"] = "由左至上"
@@ -1479,7 +1461,7 @@ L["LAYOUTDIRECTION_5"] = "由下至右"
 L["LAYOUTDIRECTION_6"] = "由下至左"
 L["LAYOUTDIRECTION_7"] = "由上至左"
 L["LAYOUTDIRECTION_8"] = "由上至右"
-L["LAYOUTDIRECTION_DESC"] = "Sets the direction that icons will layout in the group." -- Needs review
+L["LAYOUTDIRECTION_DESC"] = "設定群組中的圖示佈局方向。" -- Needs review
 L["LDB_TOOLTIP1"] = "|cff7fffff左鍵點擊|r 鎖定圖示組"
 L["LDB_TOOLTIP2"] = "|cff7fffff右鍵點擊|r 顯示TWM選項"
 L["LEFT"] = "左"
@@ -1529,8 +1511,6 @@ L["MAINTANK"] = "主坦克"
 L["MAKENEWGROUP"] = "|cff59ff59創建|r新的群組"
 L["MAKENEWGROUP_GLOBAL"] = "|cff59ff59創建|r新的|cff00c300帳號共用|r群組"
 L["MAKENEWGROUP_PROFILE"] = "|cff59ff59創建|r新的角色設定檔分組"
-L["MELEECRIT"] = "近戰致命"
-L["MELEEHASTE"] = "近戰加速"
 L["MESSAGERECIEVE"] = "%s給你發送了一些TellMeWhen的數據! 你可以利用圖示編輯器中的 %q 下拉式選單匯入這些數據到TellMeWhen."
 L["MESSAGERECIEVE_SHORT"] = "%s給你發送了一些TellMeWhen數據!"
 L["META_ADDICON"] = "增加圖示"
@@ -1559,7 +1539,6 @@ L["MOON"] = "月蝕"
 L["MOUSEOVERCONDITION"] = "滑鼠游標停留"
 L["MOUSEOVERCONDITION_DESC"] = "此條件檢查你的滑鼠游標是否有停留在此圖示上,如果為群組條件則檢查滑鼠游標是否有停留在該群組的某個圖示上."
 L["MOUSEOVER_TOKEN_NOT_FOUND"] = "無滑鼠游標目標"
-L["MovementSlowed"] = "移動速度降低"
 L["MP5"] = "%d 5秒回藍"
 L["MUSHROOM"] = "蘑菇%d"
 L["MUSHROOMS"] = "檢查蘑菇"
@@ -1601,8 +1580,7 @@ L["PERCENTAGE"] = "百分比"
 L["PET_TYPE_CUNNING"] = "靈巧"
 L["PET_TYPE_FEROCITY"] = "兇暴"
 L["PET_TYPE_TENACITY"] = "堅毅"
-L["PhysicalDmgTaken"] = "受到的物理傷害提高"
-L["PLAYER_DESC"] = "(你)"
+L["PLAYER_DESC"] = "單位'player'是你自己。" -- Needs review
 L["Poison"] = "毒"
 L["PRESENCE"] = "領域"
 L["PROFILE_LOADED"] = "已載入設定檔: %s"
@@ -1611,17 +1589,12 @@ L["QUESTIDTOCHECK"] = "用於檢查的任務ID"
 L["RAID_WARNING_FAKE"] = "團隊警報 (假)"
 L["RAID_WARNING_FAKE_DESC"] = "輸出類似於團隊警報訊息的文字,此訊息不會被其他人看到,你不需要團隊權限,也不需要在團隊中就可使用."
 L["RaidWarningFrame"] = "團隊警告框架"
-L["RANGEDCRIT"] = "物理遠程致命"
-L["RANGEDHASTE"] = "物理遠程加速"
 L["rare"] = "稀有"
 L["rareelite"] = "稀有精英"
 L["REACTIVECNDT_DESC"] = "此條件僅檢查技能的觸發/可用情況.並非它的冷卻."
 L["REDO_ICON"] = "重作"
 L["REDO_ICON_DESC"] = "重作最近一次圖示設定的復原動作."
-L["ReducedArmor"] = "護甲值降低"
-L["ReducedCastingSpeed"] = "施法速度降低"
 L["ReducedHealing"] = "治療效果降低"
-L["ReducedPhysicalDone"] = "造成的物理傷害降低"
 L["REQFAILED_ALPHA"] = "無效時的不透明度"
 L["RESET_ICON"] = "重設"
 L["RESET_ICON_DESC"] = "重置這個圖示的所有設定為預設值。"
@@ -1703,7 +1676,7 @@ L["SOUND_EVENT_ONALPHAINC_DESC"] = [=[當圖示的不透明度提高時觸發此
 
 注意:不透明度在提高前如果為0%不會觸發此事件(如果有需要請使用"在顯示時").]=]
 L["SOUND_EVENT_ONCLEU"] = "在戰鬥事件發生時"
-L["SOUND_EVENT_ONCLEU_DESC"] = "此事件在需要圖示處理的戰鬥事件發生時觸發."
+L["SOUND_EVENT_ONCLEU_DESC"] = "此事件在圖示處理某一戰鬥事件時觸發." -- Needs review
 L["SOUND_EVENT_ONCONDITION"] = "在設定的條件通過時"
 L["SOUND_EVENT_ONCONDITION_DESC"] = "當你設定的條件通過時觸發此事件."
 L["SOUND_EVENT_ONDURATION"] = "在持續時間改變時"
@@ -1761,14 +1734,12 @@ L["SPELLCHARGES_FULLYCHARGED"] = "完全恢復"
 L["SPELLCHARGETIME"] = "法術次數恢復計時"
 L["SPELLCHARGETIME_DESC"] = "檢查像是%s或%s恢復一次充能還需多少時間."
 L["SPELLCOOLDOWN"] = "法術冷卻"
-L["SPELLCRIT"] = "法術致命"
-L["SpellDamageTaken"] = "受到的法術傷害提高"
 L["SPELL_EQUIV_REMOVE_FAILED"] = "警告：嘗試把%q從法術列表%q中移除，但是無法找到。"
-L["SPELLHASTE"] = "施法加速"
 L["SPELLREACTIVITY"] = "法術反應(激活/觸發/可用)"
 L["SPELLTOCHECK"] = "要檢查的法術"
 L["SPELLTOCOMP1"] = "進行比較的第一個法術"
 L["SPELLTOCOMP2"] = "進行比較的第二個法術"
+L["STACKALPHA_DESC"] = "設定在你要求的堆疊數量不符合時圖示需顯示的不透明度." -- Needs review
 L["STACKS"] = "堆疊數量"
 L["STACKSPANEL_TITLE2"] = "堆疊數量限定"
 L["STANCE"] = "姿態"
@@ -1818,7 +1789,6 @@ L["SUG_INSERTNAME_INTERFERE"] = [=[|TInterface\AddOns\TellMeWhen\Textures\Alert:
 L["SUG_INSERT_RIGHT"] = "|cff7fffff點擊滑鼠右鍵|r"
 L["SUG_INSERT_TAB"] = "或者按|cff7fffffTab|r鍵"
 L["SUG_INSERTTEXTSUB"] = "%s插入標籤"
-L["SUG_MATCH_WPNENCH_ENCH"] = "(.*)"
 L["SUG_MISC"] = "雜項"
 L["SUG_MSCDONBARS"] = "有效的多重狀態冷卻"
 L["SUG_NPCAURAS"] = "已知NPC的增益/減益"

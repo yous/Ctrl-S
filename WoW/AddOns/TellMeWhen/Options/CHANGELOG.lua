@@ -4,6 +4,22 @@ TMW.CHANGELOG_LASTVER="6.2.6"
 
 TMW.CHANGELOG = {
 
+[==[===v7.2.3===]==],
+[==[* The old Runes condition has been deprecated. In its place are 3 new conditions that should be much easier to use.]==],
+[==[* The Spell Cast Count condition has been deprecated. Its functionality can be replicated using the counter notification handler on a Combat Event icon.]==],
+[==[* Updated the Chi condition to support a max of 6.]==],
+[==[* You can now globally enable/disable global groups.]==],
+[==[* While Condition Set Passing-triggered animations now work on a priority system, with those notifications higher in the configuration list having priority over lower-ranked notifications if both are eligible to play at the same time. This also prevents situations where no animations will play even though one should be.]==],
+[==[* You can now customize the color of the backdrop for bar groups.]==],
+[==[]==],
+[==[====Bug Fixes====]==],
+[==[* Fixed an issue that caused Unit Conditions to not work with special units (group, maintank, mainassist, and player names).]==],
+[==[* Mark of Shadowmoon and Mark of Blackrock should now work with the Internal Cooldown icon type.]==],
+[==[* Fixed an error with power bar spell cost detection for German clients.]==],
+[==[* Removed the Monochrome font outline option because it causes crashes so often.]==],
+[==[* Resource Display icons should now correctly display partial resources.]==],
+[==[* Fixed some errors that happen when using meta icons as group controllers.]==],
+[==[]==],
 [==[===v7.2.2===]==],
 [==[* You can now easily clone an event handler by right-clicking it in the Notifications tab.]==],
 [==[* There is a new special unitID in TellMeWhen, "group" that will check raid or party depending on which you are in. It prevents the overlap that happens when checking "player; party; raid".]==],
