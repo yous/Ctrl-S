@@ -755,6 +755,7 @@ ElvDB = {
 			},
 			["layoutSet"] = "dpsMelee",
 			["unitframe"] = {
+				["unitframeType"] = 2,
 				["units"] = {
 					["boss"] = {
 						["power"] = {
@@ -1510,7 +1511,7 @@ ElvPrivateDB = {
 		},
 		["버징기 - 줄진"] = {
 			["theme"] = "classic",
-			["install_complete"] = "7.64",
+			["install_complete"] = "7.74",
 		},
 		["김롯리 - 줄진"] = {
 			["theme"] = "classic",
