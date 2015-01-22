@@ -1,10 +1,11 @@
 
 MogItDB = {
-	["profileKeys"] = {
-		["버징기 - 줄진"] = "Default",
-	},
 	["global"] = {
 		["version"] = "3.4.0",
+	},
+	["profileKeys"] = {
+		["버징기 - 줄진"] = "Default",
+		["김곱충 - 줄진"] = "Default",
 	},
 	["profiles"] = {
 		["Default"] = {
@@ -16,9 +17,12 @@ MogItDB = {
 MogItWishlist = {
 	["profileKeys"] = {
 		["버징기 - 줄진"] = "버징기 - 줄진",
+		["김곱충 - 줄진"] = "김곱충 - 줄진",
 	},
 	["profiles"] = {
 		["버징기 - 줄진"] = {
+		},
+		["김곱충 - 줄진"] = {
 		},
 	},
 }

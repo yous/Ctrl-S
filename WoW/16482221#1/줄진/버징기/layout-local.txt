@@ -1,10 +1,10 @@
 Version: 1
 Frame: ColorPickerFrame
-FrameLevel: 1
+FrameLevel: 8
 Anchor: CENTER
 X: 0
 Y: 0
-W: 365
+W: 305
 H: 240
 Frame: DBMMinimapButton
 FrameLevel: 5

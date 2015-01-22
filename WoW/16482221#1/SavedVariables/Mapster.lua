@@ -23,6 +23,9 @@ MapsterDB = {
 	},
 	["profiles"] = {
 		["Default"] = {
+			["modules"] = {
+				["BattleMap"] = false,
+			},
 		},
 	},
 }

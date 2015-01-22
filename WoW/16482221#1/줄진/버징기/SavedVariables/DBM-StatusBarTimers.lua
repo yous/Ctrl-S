@@ -1,5 +1,0 @@
-
-DBT_PersistentOptions = {
-	["DBM"] = {
-	},
-}
