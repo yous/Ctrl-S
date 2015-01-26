@@ -518,7 +518,7 @@ function TSM:GetTooltip(itemString, quantity)
 			end
 		end
 	end
-	
+
 	-- add prospect value info
 	if TSM.db.profile.prospectTooltip then
 		local prospectValue = TSM:GetProspectValue(itemString)
@@ -536,15 +536,14 @@ function TSM:GetTooltip(itemString, quantity)
 					tinsert(text, { left = "  " .. L["Prospect Value:"], right = TSMAPI:FormatTextMoney(prospectValue, "|cffffffff", true) })
 				end
 			end
-			
 			if TSM.db.profile.detailedDestroyTooltip then
 				for _, targetItem in ipairs(TSMAPI:GetConversionTargetItems("prospect")) do
 					local gems = TSMAPI:GetItemConversions(targetItem)
 					if gems[itemString] then
-						local value = (TSM:GetCustomPrice(TSM.db.profile.destroyValueSource, targetItem) or 0) * gems[itemString].rate
+						local value = (TSM:GetCustomPrice(TSM.db.profile.destroyValueSource, targetItem) or 0) * (gems[itemString].rate / 5)
 						local name, _, matQuality = TSMAPI:GetSafeItemInfo(targetItem)
 						if matQuality then
-							local colorName = format("|c%s%s%s%s|r",select(4,GetItemQualityColor(matQuality)),name, " x ", gems[itemString].rate)
+							local colorName = format("|c%s%s%s%s|r",select(4,GetItemQualityColor(matQuality)),name, " x ", (gems[itemString].rate / 5))
 							if value > 0 then
 								if moneyCoinsTooltip then
 									tinsert(text, { left = "    " .. colorName, right = TSMAPI:FormatTextMoneyIcon(value, "|cffffffff", true) })
@@ -666,7 +665,7 @@ function TSM:GetProspectValue(itemString)
 		local gems = TSMAPI:GetItemConversions(targetItem)
 		if gems[itemString] then
 			local matValue = TSM:GetCustomPrice(TSM.db.profile.destroyValueSource, targetItem)
-			value = value + (matValue or 0) * gems[itemString].rate
+			value = value + (matValue or 0) * (gems[itemString].rate /5)
 		end
 	end
 	
