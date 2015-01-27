@@ -1,6 +1,6 @@
 Version: 1
 Frame: ColorPickerFrame
-FrameLevel: 8
+FrameLevel: 1
 Anchor: CENTER
 X: 0
 Y: 0
