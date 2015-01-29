@@ -449,16 +449,16 @@ ExtraCDDB = {
 					["desc"] = "",
 				},
 				["137247"] = {
-					["class"] = "DRUID",
-					["type"] = "gem",
-					["cd"] = 0,
-					["slot"] = 1,
-					["enable"] = true,
 					["duration"] = 4,
-					["ppm"] = 1.61,
+					["type"] = "gem",
 					["gem"] = {
 						5031, -- [1]
 					},
+					["slot"] = 1,
+					["enable"] = true,
+					["class"] = "DRUID",
+					["ppm"] = 1.61,
+					["cd"] = 0,
 				},
 				["74221"] = {
 					["enchant"] = {
@@ -538,16 +538,16 @@ ExtraCDDB = {
 					["desc"] = "",
 				},
 				["137331"] = {
-					["class"] = "MONK",
-					["type"] = "gem",
-					["cd"] = 0,
-					["slot"] = 1,
-					["enable"] = true,
 					["duration"] = 4,
-					["ppm"] = 1.61,
+					["type"] = "gem",
 					["gem"] = {
 						5031, -- [1]
 					},
+					["slot"] = 1,
+					["enable"] = true,
+					["class"] = "MONK",
+					["ppm"] = 1.61,
+					["cd"] = 0,
 				},
 				["138759"] = {
 					["type"] = "item",
@@ -781,16 +781,16 @@ ExtraCDDB = {
 					["desc"] = "",
 				},
 				["137326"] = {
-					["class"] = "SHAMAN",
-					["type"] = "gem",
-					["cd"] = 0,
-					["slot"] = 1,
-					["enable"] = true,
 					["duration"] = 4,
-					["ppm"] = 1.61,
+					["type"] = "gem",
 					["gem"] = {
 						5031, -- [1]
 					},
+					["slot"] = 1,
+					["enable"] = true,
+					["class"] = "SHAMAN",
+					["ppm"] = 1.61,
+					["cd"] = 0,
 				},
 				["148899"] = {
 					["type"] = "item",
@@ -1132,16 +1132,16 @@ ExtraCDDB = {
 					["desc"] = "",
 				},
 				["137323"] = {
-					["class"] = "PRIEST",
-					["type"] = "gem",
-					["cd"] = 0,
-					["slot"] = 1,
-					["enable"] = true,
 					["duration"] = 4,
-					["ppm"] = 1.61,
+					["type"] = "gem",
 					["gem"] = {
 						5031, -- [1]
 					},
+					["slot"] = 1,
+					["enable"] = true,
+					["class"] = "PRIEST",
+					["ppm"] = 1.61,
+					["cd"] = 0,
 				},
 				["126640"] = {
 					["type"] = "item",
@@ -1581,16 +1581,16 @@ ExtraCDDB = {
 					["desc"] = "",
 				},
 				["137288"] = {
-					["class"] = "PALADIN",
-					["type"] = "gem",
-					["cd"] = 0,
-					["slot"] = 1,
-					["enable"] = true,
 					["duration"] = 4,
-					["ppm"] = 1.61,
+					["type"] = "gem",
 					["gem"] = {
 						5031, -- [1]
 					},
+					["slot"] = 1,
+					["enable"] = true,
+					["class"] = "PALADIN",
+					["ppm"] = 1.61,
+					["cd"] = 0,
 				},
 				["148896"] = {
 					["type"] = "item",
@@ -2244,16 +2244,16 @@ ExtraCDDB = {
 					["desc"] = "",
 				},
 				["137288"] = {
-					["duration"] = 4,
+					["class"] = "PALADIN",
 					["type"] = "gem",
+					["cd"] = 0,
+					["slot"] = 1,
+					["enable"] = true,
+					["duration"] = 4,
+					["ppm"] = 1.61,
 					["gem"] = {
 						5031, -- [1]
 					},
-					["slot"] = 1,
-					["enable"] = true,
-					["class"] = "PALADIN",
-					["ppm"] = 1.61,
-					["cd"] = 0,
 				},
 				["45182"] = {
 					["type"] = "talent",
@@ -2448,15 +2448,14 @@ ExtraCDDB = {
 					},
 					["desc"] = "",
 				},
-				["146218"] = {
+				["128986"] = {
 					["type"] = "item",
 					["item"] = {
-						103987, -- [1]
-						103687, -- [2]
+						79327, -- [1]
 					},
 					["enable"] = true,
-					["duration"] = 20,
-					["cd"] = 115,
+					["duration"] = 15,
+					["cd"] = 45,
 					["desc"] = "",
 				},
 				["137593"] = {
@@ -2490,35 +2489,28 @@ ExtraCDDB = {
 					["cd"] = 55,
 					["desc"] = "",
 				},
-				["126700"] = {
+				["146218"] = {
 					["type"] = "item",
 					["item"] = {
-						100505, -- [1]
-						100645, -- [2]
-						100085, -- [3]
-						99948, -- [4]
-						94415, -- [5]
-						91415, -- [6]
-						84937, -- [7]
-						91768, -- [8]
-						84495, -- [9]
+						103987, -- [1]
+						103687, -- [2]
 					},
 					["enable"] = true,
 					["duration"] = 20,
-					["cd"] = 50,
+					["cd"] = 115,
 					["desc"] = "",
 				},
 				["137247"] = {
-					["duration"] = 4,
+					["class"] = "DRUID",
 					["type"] = "gem",
+					["cd"] = 0,
+					["slot"] = 1,
+					["enable"] = true,
+					["duration"] = 4,
+					["ppm"] = 1.61,
 					["gem"] = {
 						5031, -- [1]
 					},
-					["slot"] = 1,
-					["enable"] = true,
-					["class"] = "DRUID",
-					["ppm"] = 1.61,
-					["cd"] = 0,
 				},
 				["139133"] = {
 					["item"] = {
@@ -2631,15 +2623,19 @@ ExtraCDDB = {
 					},
 					["desc"] = "",
 				},
-				["146296"] = {
+				["138895"] = {
 					["type"] = "item",
+					["cd"] = 0,
 					["item"] = {
-						103989, -- [1]
-						103689, -- [2]
+						96864, -- [1]
+						96492, -- [2]
+						96120, -- [3]
+						94522, -- [4]
+						95748, -- [5]
 					},
 					["enable"] = true,
-					["duration"] = 20,
-					["cd"] = 115,
+					["duration"] = 10,
+					["ppm"] = 3.5,
 					["desc"] = "",
 				},
 				["126657"] = {
@@ -2667,19 +2663,15 @@ ExtraCDDB = {
 					["duration"] = 15,
 					["desc"] = "",
 				},
-				["138895"] = {
+				["146296"] = {
 					["type"] = "item",
-					["cd"] = 0,
 					["item"] = {
-						96864, -- [1]
-						96492, -- [2]
-						96120, -- [3]
-						94522, -- [4]
-						95748, -- [5]
+						103989, -- [1]
+						103689, -- [2]
 					},
 					["enable"] = true,
-					["duration"] = 10,
-					["ppm"] = 3.5,
+					["duration"] = 20,
+					["cd"] = 115,
 					["desc"] = "",
 				},
 				["138703"] = {
@@ -2815,16 +2807,16 @@ ExtraCDDB = {
 					["desc"] = "",
 				},
 				["137331"] = {
-					["duration"] = 4,
+					["class"] = "MONK",
 					["type"] = "gem",
+					["cd"] = 0,
+					["slot"] = 1,
+					["enable"] = true,
+					["duration"] = 4,
+					["ppm"] = 1.61,
 					["gem"] = {
 						5031, -- [1]
 					},
-					["slot"] = 1,
-					["enable"] = true,
-					["class"] = "MONK",
-					["ppm"] = 1.61,
-					["cd"] = 0,
 				},
 				["139170"] = {
 					["item"] = {
@@ -2897,16 +2889,16 @@ ExtraCDDB = {
 					["desc"] = "",
 				},
 				["137323"] = {
-					["duration"] = 4,
+					["class"] = "PRIEST",
 					["type"] = "gem",
+					["cd"] = 0,
+					["slot"] = 1,
+					["enable"] = true,
+					["duration"] = 4,
+					["ppm"] = 1.61,
 					["gem"] = {
 						5031, -- [1]
 					},
-					["slot"] = 1,
-					["enable"] = true,
-					["class"] = "PRIEST",
-					["ppm"] = 1.61,
-					["cd"] = 0,
 				},
 				["126640"] = {
 					["type"] = "item",
@@ -3205,14 +3197,22 @@ ExtraCDDB = {
 					},
 					["cd"] = 0,
 				},
-				["128986"] = {
+				["126700"] = {
 					["type"] = "item",
 					["item"] = {
-						79327, -- [1]
+						100505, -- [1]
+						100645, -- [2]
+						100085, -- [3]
+						99948, -- [4]
+						94415, -- [5]
+						91415, -- [6]
+						84937, -- [7]
+						91768, -- [8]
+						84495, -- [9]
 					},
 					["enable"] = true,
-					["duration"] = 15,
-					["cd"] = 45,
+					["duration"] = 20,
+					["cd"] = 50,
 					["desc"] = "",
 				},
 				["148911"] = {
@@ -3308,16 +3308,16 @@ ExtraCDDB = {
 					["desc"] = "",
 				},
 				["137326"] = {
-					["duration"] = 4,
+					["class"] = "SHAMAN",
 					["type"] = "gem",
+					["cd"] = 0,
+					["slot"] = 1,
+					["enable"] = true,
+					["duration"] = 4,
+					["ppm"] = 1.61,
 					["gem"] = {
 						5031, -- [1]
 					},
-					["slot"] = 1,
-					["enable"] = true,
-					["class"] = "SHAMAN",
-					["ppm"] = 1.61,
-					["cd"] = 0,
 				},
 				["148899"] = {
 					["type"] = "item",
@@ -3793,16 +3793,16 @@ ExtraCDDB = {
 					["desc"] = "",
 				},
 				["137247"] = {
-					["class"] = "DRUID",
-					["type"] = "gem",
-					["cd"] = 0,
-					["slot"] = 1,
-					["enable"] = true,
 					["duration"] = 4,
-					["ppm"] = 1.61,
+					["type"] = "gem",
 					["gem"] = {
 						5031, -- [1]
 					},
+					["slot"] = 1,
+					["enable"] = true,
+					["class"] = "DRUID",
+					["ppm"] = 1.61,
+					["cd"] = 0,
 				},
 				["74221"] = {
 					["enchant"] = {
@@ -3882,16 +3882,16 @@ ExtraCDDB = {
 					["desc"] = "",
 				},
 				["137331"] = {
-					["class"] = "MONK",
-					["type"] = "gem",
-					["cd"] = 0,
-					["slot"] = 1,
-					["enable"] = true,
 					["duration"] = 4,
-					["ppm"] = 1.61,
+					["type"] = "gem",
 					["gem"] = {
 						5031, -- [1]
 					},
+					["slot"] = 1,
+					["enable"] = true,
+					["class"] = "MONK",
+					["ppm"] = 1.61,
+					["cd"] = 0,
 				},
 				["177046"] = {
 					["type"] = "item",
@@ -4119,16 +4119,16 @@ ExtraCDDB = {
 					["desc"] = "",
 				},
 				["137326"] = {
-					["class"] = "SHAMAN",
-					["type"] = "gem",
-					["cd"] = 0,
-					["slot"] = 1,
-					["enable"] = true,
 					["duration"] = 4,
-					["ppm"] = 1.61,
+					["type"] = "gem",
 					["gem"] = {
 						5031, -- [1]
 					},
+					["slot"] = 1,
+					["enable"] = true,
+					["class"] = "SHAMAN",
+					["ppm"] = 1.61,
+					["cd"] = 0,
 				},
 				["148899"] = {
 					["type"] = "item",
@@ -4350,16 +4350,16 @@ ExtraCDDB = {
 					["desc"] = "",
 				},
 				["137288"] = {
-					["class"] = "PALADIN",
-					["type"] = "gem",
-					["cd"] = 0,
-					["slot"] = 1,
-					["enable"] = true,
 					["duration"] = 4,
-					["ppm"] = 1.61,
+					["type"] = "gem",
 					["gem"] = {
 						5031, -- [1]
 					},
+					["slot"] = 1,
+					["enable"] = true,
+					["class"] = "PALADIN",
+					["ppm"] = 1.61,
+					["cd"] = 0,
 				},
 				["45182"] = {
 					["column"] = 1,
@@ -4477,16 +4477,16 @@ ExtraCDDB = {
 					["desc"] = "",
 				},
 				["137323"] = {
-					["class"] = "PRIEST",
-					["type"] = "gem",
-					["cd"] = 0,
-					["slot"] = 1,
-					["enable"] = true,
 					["duration"] = 4,
-					["ppm"] = 1.61,
+					["type"] = "gem",
 					["gem"] = {
 						5031, -- [1]
 					},
+					["slot"] = 1,
+					["enable"] = true,
+					["class"] = "PRIEST",
+					["ppm"] = 1.61,
+					["cd"] = 0,
 				},
 				["126640"] = {
 					["type"] = "item",
@@ -5663,16 +5663,16 @@ ExtraCDDB = {
 					["desc"] = "",
 				},
 				["137247"] = {
-					["class"] = "DRUID",
-					["type"] = "gem",
-					["cd"] = 0,
-					["slot"] = 1,
-					["enable"] = true,
 					["duration"] = 4,
-					["ppm"] = 1.61,
+					["type"] = "gem",
 					["gem"] = {
 						5031, -- [1]
 					},
+					["slot"] = 1,
+					["enable"] = true,
+					["class"] = "DRUID",
+					["ppm"] = 1.61,
+					["cd"] = 0,
 				},
 				["74221"] = {
 					["enchant"] = {
@@ -5752,16 +5752,16 @@ ExtraCDDB = {
 					["desc"] = "",
 				},
 				["137331"] = {
-					["class"] = "MONK",
-					["type"] = "gem",
-					["cd"] = 0,
-					["slot"] = 1,
-					["enable"] = true,
 					["duration"] = 4,
-					["ppm"] = 1.61,
+					["type"] = "gem",
 					["gem"] = {
 						5031, -- [1]
 					},
+					["slot"] = 1,
+					["enable"] = true,
+					["class"] = "MONK",
+					["ppm"] = 1.61,
+					["cd"] = 0,
 				},
 				["138759"] = {
 					["type"] = "item",
@@ -5993,16 +5993,16 @@ ExtraCDDB = {
 					["desc"] = "",
 				},
 				["137326"] = {
-					["class"] = "SHAMAN",
-					["type"] = "gem",
-					["cd"] = 0,
-					["slot"] = 1,
-					["enable"] = true,
 					["duration"] = 4,
-					["ppm"] = 1.61,
+					["type"] = "gem",
 					["gem"] = {
 						5031, -- [1]
 					},
+					["slot"] = 1,
+					["enable"] = true,
+					["class"] = "SHAMAN",
+					["ppm"] = 1.61,
+					["cd"] = 0,
 				},
 				["148899"] = {
 					["type"] = "item",
@@ -6224,16 +6224,16 @@ ExtraCDDB = {
 					["desc"] = "",
 				},
 				["137288"] = {
-					["class"] = "PALADIN",
-					["type"] = "gem",
-					["cd"] = 0,
-					["slot"] = 1,
-					["enable"] = true,
 					["duration"] = 4,
-					["ppm"] = 1.61,
+					["type"] = "gem",
 					["gem"] = {
 						5031, -- [1]
 					},
+					["slot"] = 1,
+					["enable"] = true,
+					["class"] = "PALADIN",
+					["ppm"] = 1.61,
+					["cd"] = 0,
 				},
 				["45182"] = {
 					["column"] = 1,
@@ -6350,16 +6350,16 @@ ExtraCDDB = {
 					["desc"] = "",
 				},
 				["137323"] = {
-					["class"] = "PRIEST",
-					["type"] = "gem",
-					["cd"] = 0,
-					["slot"] = 1,
-					["enable"] = true,
 					["duration"] = 4,
-					["ppm"] = 1.61,
+					["type"] = "gem",
 					["gem"] = {
 						5031, -- [1]
 					},
+					["slot"] = 1,
+					["enable"] = true,
+					["class"] = "PRIEST",
+					["ppm"] = 1.61,
+					["cd"] = 0,
 				},
 				["126640"] = {
 					["type"] = "item",
@@ -6448,32 +6448,6 @@ ExtraCDDB = {
 					["ppm"] = 3.5,
 					["desc"] = "",
 				},
-				["146250"] = {
-					["type"] = "item",
-					["item"] = {
-						112850, -- [1]
-						105609, -- [2]
-						104613, -- [3]
-						105360, -- [4]
-						102305, -- [5]
-						104862, -- [6]
-						105111, -- [7]
-					},
-					["enable"] = true,
-					["duration"] = 20,
-					["cd"] = 115,
-					["desc"] = "",
-				},
-				["126513"] = {
-					["type"] = "item",
-					["item"] = {
-						81138, -- [1]
-					},
-					["enable"] = true,
-					["duration"] = 30,
-					["cd"] = 105,
-					["desc"] = "",
-				},
 				["121283"] = {
 					["type"] = "talent",
 					["cd"] = 20,
@@ -6483,10 +6457,10 @@ ExtraCDDB = {
 					["enable"] = true,
 					["desc"] = "",
 				},
-				["126476"] = {
+				["126513"] = {
 					["type"] = "item",
 					["item"] = {
-						81192, -- [1]
+						81138, -- [1]
 					},
 					["enable"] = true,
 					["duration"] = 30,
@@ -6510,15 +6484,13 @@ ExtraCDDB = {
 					["ppm"] = 0.92,
 					["desc"] = "",
 				},
-				["126659"] = {
+				["126476"] = {
 					["type"] = "item",
 					["item"] = {
-						87175, -- [1]
-						86388, -- [2]
-						86907, -- [3]
+						81192, -- [1]
 					},
 					["enable"] = true,
-					["duration"] = 20,
+					["duration"] = 30,
 					["cd"] = 105,
 					["desc"] = "",
 				},
@@ -6532,6 +6504,34 @@ ExtraCDDB = {
 					["enable"] = true,
 					["duration"] = 20,
 					["cd"] = 45,
+					["desc"] = "",
+				},
+				["126659"] = {
+					["type"] = "item",
+					["item"] = {
+						87175, -- [1]
+						86388, -- [2]
+						86907, -- [3]
+					},
+					["enable"] = true,
+					["duration"] = 20,
+					["cd"] = 105,
+					["desc"] = "",
+				},
+				["146250"] = {
+					["type"] = "item",
+					["item"] = {
+						112850, -- [1]
+						105609, -- [2]
+						104613, -- [3]
+						105360, -- [4]
+						102305, -- [5]
+						104862, -- [6]
+						105111, -- [7]
+					},
+					["enable"] = true,
+					["duration"] = 20,
+					["cd"] = 115,
 					["desc"] = "",
 				},
 				["128987"] = {
@@ -7561,16 +7561,16 @@ ExtraCDDB = {
 					["cd"] = 0,
 				},
 				["137323"] = {
-					["class"] = "PRIEST",
-					["type"] = "gem",
-					["cd"] = 0,
-					["slot"] = 1,
-					["enable"] = true,
 					["duration"] = 4,
-					["ppm"] = 1.61,
+					["type"] = "gem",
 					["gem"] = {
 						5031, -- [1]
 					},
+					["slot"] = 1,
+					["enable"] = true,
+					["class"] = "PRIEST",
+					["ppm"] = 1.61,
+					["cd"] = 0,
 				},
 				["126588"] = {
 					["type"] = "item",
@@ -7595,28 +7595,28 @@ ExtraCDDB = {
 					["desc"] = "",
 				},
 				["137288"] = {
-					["class"] = "PALADIN",
-					["type"] = "gem",
-					["cd"] = 0,
-					["slot"] = 1,
-					["enable"] = true,
 					["duration"] = 4,
-					["ppm"] = 1.61,
+					["type"] = "gem",
 					["gem"] = {
 						5031, -- [1]
 					},
+					["slot"] = 1,
+					["enable"] = true,
+					["class"] = "PALADIN",
+					["ppm"] = 1.61,
+					["cd"] = 0,
 				},
 				["137247"] = {
-					["class"] = "DRUID",
-					["type"] = "gem",
-					["cd"] = 0,
-					["slot"] = 1,
-					["enable"] = true,
 					["duration"] = 4,
-					["ppm"] = 1.61,
+					["type"] = "gem",
 					["gem"] = {
 						5031, -- [1]
 					},
+					["slot"] = 1,
+					["enable"] = true,
+					["class"] = "DRUID",
+					["ppm"] = 1.61,
+					["cd"] = 0,
 				},
 				["139133"] = {
 					["item"] = {
@@ -7742,16 +7742,16 @@ ExtraCDDB = {
 					["desc"] = "",
 				},
 				["137331"] = {
-					["class"] = "MONK",
-					["type"] = "gem",
-					["cd"] = 0,
-					["slot"] = 1,
-					["enable"] = true,
 					["duration"] = 4,
-					["ppm"] = 1.61,
+					["type"] = "gem",
 					["gem"] = {
 						5031, -- [1]
 					},
+					["slot"] = 1,
+					["enable"] = true,
+					["class"] = "MONK",
+					["ppm"] = 1.61,
+					["cd"] = 0,
 				},
 				["87023"] = {
 					["column"] = 2,
@@ -7778,15 +7778,14 @@ ExtraCDDB = {
 					["ppm"] = 1.21,
 					["desc"] = "",
 				},
-				["146218"] = {
+				["128986"] = {
 					["type"] = "item",
 					["item"] = {
-						103987, -- [1]
-						103687, -- [2]
+						79327, -- [1]
 					},
 					["enable"] = true,
-					["duration"] = 20,
-					["cd"] = 115,
+					["duration"] = 15,
+					["cd"] = 45,
 					["desc"] = "",
 				},
 				["126513"] = {
@@ -7819,26 +7818,15 @@ ExtraCDDB = {
 					["cd"] = 105,
 					["desc"] = "",
 				},
-				["126700"] = {
+				["146218"] = {
 					["type"] = "item",
 					["item"] = {
-						103516, -- [1]
-						102699, -- [2]
-						102896, -- [3]
-						103319, -- [4]
-						100505, -- [5]
-						100645, -- [6]
-						100085, -- [7]
-						99948, -- [8]
-						94415, -- [9]
-						91415, -- [10]
-						84937, -- [11]
-						91768, -- [12]
-						84495, -- [13]
+						103987, -- [1]
+						103687, -- [2]
 					},
 					["enable"] = true,
 					["duration"] = 20,
-					["cd"] = 50,
+					["cd"] = 115,
 					["desc"] = "",
 				},
 				["126707"] = {
@@ -8074,23 +8062,6 @@ ExtraCDDB = {
 					["cd"] = 45,
 					["desc"] = "",
 				},
-				["148908"] = {
-					["type"] = "item",
-					["cd"] = 0,
-					["item"] = {
-						112778, -- [1]
-						105549, -- [2]
-						104553, -- [3]
-						105300, -- [4]
-						102294, -- [5]
-						104802, -- [6]
-						105051, -- [7]
-					},
-					["enable"] = true,
-					["duration"] = 10,
-					["ppm"] = 0.92,
-					["desc"] = "",
-				},
 				["126705"] = {
 					["type"] = "item",
 					["item"] = {
@@ -8111,6 +8082,23 @@ ExtraCDDB = {
 					["enable"] = true,
 					["duration"] = 20,
 					["cd"] = 50,
+					["desc"] = "",
+				},
+				["148908"] = {
+					["type"] = "item",
+					["cd"] = 0,
+					["item"] = {
+						112778, -- [1]
+						105549, -- [2]
+						104553, -- [3]
+						105300, -- [4]
+						102294, -- [5]
+						104802, -- [6]
+						105051, -- [7]
+					},
+					["enable"] = true,
+					["duration"] = 10,
+					["ppm"] = 0.92,
 					["desc"] = "",
 				},
 				["140380"] = {
@@ -8331,14 +8319,26 @@ ExtraCDDB = {
 					["cd"] = 115,
 					["desc"] = "",
 				},
-				["128986"] = {
+				["126700"] = {
 					["type"] = "item",
 					["item"] = {
-						79327, -- [1]
+						103516, -- [1]
+						102699, -- [2]
+						102896, -- [3]
+						103319, -- [4]
+						100505, -- [5]
+						100645, -- [6]
+						100085, -- [7]
+						99948, -- [8]
+						94415, -- [9]
+						91415, -- [10]
+						84937, -- [11]
+						91768, -- [12]
+						84495, -- [13]
 					},
 					["enable"] = true,
-					["duration"] = 15,
-					["cd"] = 45,
+					["duration"] = 20,
+					["cd"] = 50,
 					["desc"] = "",
 				},
 				["148911"] = {
@@ -8438,16 +8438,16 @@ ExtraCDDB = {
 					["desc"] = "",
 				},
 				["137326"] = {
-					["class"] = "SHAMAN",
-					["type"] = "gem",
-					["cd"] = 0,
-					["slot"] = 1,
-					["enable"] = true,
 					["duration"] = 4,
-					["ppm"] = 1.61,
+					["type"] = "gem",
 					["gem"] = {
 						5031, -- [1]
 					},
+					["slot"] = 1,
+					["enable"] = true,
+					["class"] = "SHAMAN",
+					["ppm"] = 1.61,
+					["cd"] = 0,
 				},
 				["148899"] = {
 					["type"] = "item",

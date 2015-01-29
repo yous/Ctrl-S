@@ -16,10 +16,10 @@ ElvDB = {
 	},
 	["gold"] = {
 		["줄진"] = {
-			["언땅에죽기"] = 2000,
+			["언땅에죽기"] = 168676,
 			["나라잃은토템"] = 2270,
 			["김곱충"] = 190507517,
-			["버징기"] = 3488021,
+			["버징기"] = 15145868,
 			["김롯리"] = 13136,
 		},
 	},
@@ -51,7 +51,7 @@ ElvDB = {
 			["galleonKilled"] = false,
 			["drovKilled"] = false,
 			["shaKilled"] = false,
-			["tarlnaKilled"] = true,
+			["tarlnaKilled"] = false,
 			["rukhmarKilled"] = false,
 			["realm"] = "줄진",
 		},
@@ -73,11 +73,11 @@ ElvDB = {
 			"|cffffd200Message:|r|cffffffff ...rface\\AddOns\\ElvUI\\modules\\unitframes\\unitframes.lua:844: No unit provided to create or update.|r\n|cffffd200Time:|r|cffffffff 01/09/15 23:34:15|r\n|cffffd200Count:|r|cffffffff 38|r\n|cffffd200Stack:|r|cffffffff Interface\\FrameXML\\RestrictedFrames.lua:600: in function <Interface\\FrameXML\\RestrictedFrames.lua:598>\n[C]: ?\n[C]: ?\nInterface\\FrameXML\\RestrictedFrames.lua:604: in function <Interface\\FrameXML\\RestrictedFrames.lua:603>\nInterface\\FrameXML\\RestrictedFrames.lua:742: in function `CallMethod'\n[string \"		local header = self:GetParent()...\"]:52: in function <[string \"		local header = self:GetParent()...\"]:1>\n(tail call): ?\n[C]: ?\nInterface\\FrameXML\\RestrictedExecution.lua:441: in function <Interface\\FrameXML\\RestrictedExecution.lua:412>\nInterface\\FrameXML\\SecureGroupHeaders.lua:116: in function <Interface\\FrameXML\\SecureGroupHeaders.lua:110>\nInterface\\FrameXML\\SecureGroupHeaders.lua:166: in function <Interface\\FrameXML\\SecureGroupHeaders.lua:123>\nInterface\\FrameXML\\SecureGroupHeaders.lua:488: in function <Interface\\FrameXML\\SecureGroupHeaders.lua:387>\n...\n...rface\\AddOns\\ElvUI\\modules\\unitframes\\unitframes.lua:617: in function `Update'\n...rface\\AddOns\\ElvUI\\modules\\unitframes\\unitframes.lua:917: in function `UpdateAllHeaders'\n...rface\\AddOns\\ElvUI\\modules\\unitframes\\unitframes.lua:435: in function `Update_AllFrames'\n...rface\\AddOns\\ElvUI\\modules\\unitframes\\unitframes.lua:1055: in function `?'\n...Ons\\libs\\CallbackHandler-1.0\\CallbackHandler-1.0.lua:147: in function <...Ons\\libs\\CallbackHandler-1.0\\CallbackHandler-1.0.lua:147>\n[string \"safecall Dispatcher[1]\"]:4: in function <[string \"safecall Dispatcher[1]\"]:4>\n[C]: ?\n[string \"safecall Dispatcher[1]\"]:13: in function `?'\n...Ons\\libs\\CallbackHandler-1.0\\CallbackHandler-1.0.lua:92: in function `Fire'\nInterface\\AddOns\\libs\\AceEvent-3.0\\AceEvent-3.0.lua:120: in function <Interface\\AddOns\\libs\\AceEvent-3.0\\AceEvent-3.0.lua:119>\n|r\n|cffffd200Locals:|r|cffffffff <none>|r", -- [1]
 		},
 		["gtData"] = {
-			["버징기-줄진"] = "해일을 막아내라:119,막가는 모험가:20,불타는 성전:149,불타는 군단 선봉대:148,샤트라스의 해방:509,값싼 노동력:20,갈색 수렁의 공포:509,벌레 잡기:65,지나친 호기심:59",
+			["버징기-줄진"] = "불타는 군단 선봉대:61,번져가는 타락:301,너희는 약탈, 우리는 강탈:61,공포의 눈:61,서슬아귀의 심장:421,고리안 전투대장:529,벌레 잡기:52",
 			["김곱충-줄진"] = "NONE",
 		},
 		["gtTime"] = {
-			["버징기-줄진"] = "2015/01/27 21:57:22",
+			["버징기-줄진"] = "2015/01/29 23:01:19",
 			["김곱충-줄진"] = "2015/01/23 01:53:28",
 		},
 		["unitframe"] = {
@@ -422,22 +422,22 @@ ElvDB = {
 			},
 			["actionbar"] = {
 				["bar3"] = {
-					["buttons"] = 12,
 					["buttonsPerRow"] = 12,
+					["buttons"] = 12,
 				},
-				["macrotext"] = true,
+				["bar5"] = {
+					["buttonsPerRow"] = 1,
+					["point"] = "TOPRIGHT",
+					["buttons"] = 12,
+				},
 				["bar2"] = {
 					["enabled"] = true,
 				},
 				["bar1"] = {
 					["heightMult"] = 3,
 				},
+				["macrotext"] = true,
 				["euiabstyle"] = "Low",
-				["bar5"] = {
-					["buttonsPerRow"] = 1,
-					["point"] = "TOPRIGHT",
-					["buttons"] = 12,
-				},
 				["bar4"] = {
 					["widthMult"] = 2,
 				},
@@ -458,20 +458,20 @@ ElvDB = {
 			},
 			["movers"] = {
 				["ElvUF_TargetTargetMover"] = "BOTTOMLEFTElvUIParentBOTTOM210125",
-				["ElvUF_FocusMover"] = "BOTTOMElvUIParentBOTTOM310432",
-				["ElvUF_Raid40Mover"] = "BOTTOMElvUIParentBOTTOM0118",
-				["ElvUF_PlayerMover"] = "BOTTOMRIGHTElvUIParentBOTTOM-210195",
-				["PetAB"] = "RIGHTElvUIParentRIGHT-800",
 				["ElvAB_1"] = "BOTTOMElvUIParentBOTTOM04",
-				["ElvAB_2"] = "BOTTOMElvUIParentBOTTOM038",
-				["ElvAB_3"] = "BOTTOMElvUIParentBOTTOM072",
-				["ElvUF_PetMover"] = "BOTTOMRIGHTElvUIParentBOTTOM-210125",
-				["ElvAB_4"] = "RIGHTElvUIParentRIGHT-40",
+				["ElvUF_Raid40Mover"] = "BOTTOMElvUIParentBOTTOM0118",
 				["ElvUF_Raid10Mover"] = "BOTTOMElvUIParentBOTTOM0118",
+				["PetAB"] = "RIGHTElvUIParentRIGHT-800",
+				["ElvUF_FocusMover"] = "BOTTOMElvUIParentBOTTOM310432",
+				["ElvAB_6"] = "BOTTOMElvUIParentBOTTOM0106",
+				["ElvAB_3"] = "BOTTOMElvUIParentBOTTOM072",
+				["ElvUF_PlayerMover"] = "BOTTOMRIGHTElvUIParentBOTTOM-210195",
+				["ElvAB_4"] = "RIGHTElvUIParentRIGHT-40",
+				["ElvUF_PetMover"] = "BOTTOMRIGHTElvUIParentBOTTOM-210125",
 				["ElvUF_Raid25Mover"] = "BOTTOMElvUIParentBOTTOM0118",
 				["ElvUF_PartyMover"] = "BOTTOMElvUIParentBOTTOM0118",
 				["ElvAB_5"] = "BOTTOMElvUIParentBOTTOM0106",
-				["ElvAB_6"] = "BOTTOMElvUIParentBOTTOM0106",
+				["ElvAB_2"] = "BOTTOMElvUIParentBOTTOM038",
 				["ElvUF_TargetMover"] = "BOTTOMLEFTElvUIParentBOTTOM210195",
 			},
 			["AuraWatch"] = {
@@ -789,8 +789,8 @@ ElvDB = {
 				["ElvAB_6"] = "BOTTOMElvUIParentBOTTOM0108",
 				["MinimapMover"] = "TOPRIGHTElvUIParentTOPRIGHT-3-3",
 				["EuiInfoBar4Mover"] = "TOPElvUIParentTOP0-2",
-				["ElvUF_PlayerMover"] = "BOTTOMElvUIParentBOTTOM-278207",
 				["ElvUF_PetMover"] = "BOTTOMElvUIParentBOTTOM0184",
+				["ElvUF_PlayerMover"] = "BOTTOMElvUIParentBOTTOM-278207",
 				["ElvUF_TargetTargetMover"] = "BOTTOMElvUIParentBOTTOM0224",
 				["ElvUF_PartyMover"] = "BOTTOMLEFTElvUIParentBOTTOMLEFT4225",
 				["EuiInfoBar3Mover"] = "TOPLEFTElvUIParentTOPLEFT2-2",
@@ -1144,10 +1144,12 @@ ElvDB = {
 				["ElvUF_RaidMover"] = "BOTTOMLEFTElvUIParentBOTTOMLEFT4195",
 				["ElvAB_2"] = "BOTTOMElvUIParentBOTTOM038",
 				["ElvAB_4"] = "RIGHTElvUIParentRIGHT-40",
+				["ElvUF_PlayerMover"] = "BOTTOMElvUIParentBOTTOM-278145",
+				["ElvAB_3"] = "BOTTOMElvUIParentBOTTOM072",
 				["ElvUF_PartyMover"] = "BOTTOMLEFTElvUIParentBOTTOMLEFT4225",
 				["ElvAB_5"] = "RIGHTElvUIParentRIGHT-380",
 				["ElvAB_1"] = "BOTTOMElvUIParentBOTTOM04",
-				["ElvAB_3"] = "BOTTOMElvUIParentBOTTOM072",
+				["ElvUF_TargetMover"] = "BOTTOMElvUIParentBOTTOM278145",
 			},
 			["AuraWatch"] = {
 				["loadDefault"] = true,
@@ -1375,6 +1377,7 @@ ElvDB = {
 					["heightMult"] = 3,
 				},
 				["bar5"] = {
+					["point"] = "TOPRIGHT",
 					["buttons"] = 12,
 					["buttonsPerRow"] = 1,
 					["backdrop"] = false,
@@ -1660,12 +1663,6 @@ ElvDB = {
 					},
 				},
 				["units"] = {
-					["boss"] = {
-						["castbar"] = {
-							["width"] = 200,
-						},
-						["width"] = 200,
-					},
 					["player"] = {
 						["health"] = {
 							["text_format"] = "[healthcolor][health:current]",
@@ -1680,6 +1677,9 @@ ElvDB = {
 							["fill"] = "fill",
 						},
 						["width"] = 200,
+					},
+					["party"] = {
+						["startOutFromCenter"] = true,
 					},
 					["pet"] = {
 						["height"] = 26,
@@ -1719,8 +1719,11 @@ ElvDB = {
 						},
 						["width"] = 200,
 					},
-					["party"] = {
-						["startOutFromCenter"] = true,
+					["boss"] = {
+						["castbar"] = {
+							["width"] = 200,
+						},
+						["width"] = 200,
 					},
 				},
 			},
