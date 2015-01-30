@@ -1,12 +1,12 @@
 
 MogItDB = {
-	["global"] = {
-		["version"] = "3.4.0",
-	},
 	["profileKeys"] = {
 		["버징기 - 줄진"] = "Default",
 		["언땅에죽기 - 줄진"] = "Default",
 		["김곱충 - 줄진"] = "Default",
+	},
+	["global"] = {
+		["version"] = "3.4.0",
 	},
 	["profiles"] = {
 		["Default"] = {
