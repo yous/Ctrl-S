@@ -1,8 +1,0 @@
-2015-01-22  ovolkov  <ovolkov>
-
-[20cac6ecc19a] [v20]
-* GarrisonMissionManager.toc, GarrisonMissionManager.txt:
-
-v20 toc + docs
-
-
