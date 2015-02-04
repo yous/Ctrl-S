@@ -1,9 +1,13 @@
-Garrison Mission Manager, v21
+Garrison Mission Manager, v22
 
 * http://www.curse.com/addons/wow/garrison-mission-manager
 * http://www.wowinterface.com/downloads/info23375-GarrisonMissionManager.html
 
 == Change log ==
+2015-02-03 v22
+ * Add support for detecting buildings if some other addon (e.g. Broker Garrison) forced Blizzard's Garrison UI to start on game load. Otherwise GMM would disable features that depend on knowing what buildings you have in your garrison - i.e salvage mode and auto-assign/remove.
+ * /run GMM_Click("StartMission") shortcut for macros.
+
 2015-02-02 v21
  * LDB module to show currently working followers.
  * Fix some more auto-assign errors with incorrect detection of free or busy best follower candidates.
@@ -34,7 +38,7 @@ Garrison Mission Manager, v21
  * Refresh shipment data when calculating alert about followers for orders, or it'd be stuck on info you've last seen on garrison landing page.
 
 2014-12-16 v13
- * Detect and alert in below follower's party portrait if there's orders ready in building this follower could boost.
+ * Detect and alert below follower's party portrait on mission page if there are orders ready in building that this follower could boost.
  * GR yield mode - add a second set of buttons with best average GR yield on relevant missions.
  * Dim missions if you don't have enough GR to start as well.
 
