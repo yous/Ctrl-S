@@ -840,6 +840,11 @@ Change Log:
 		- Fixed WoD spells for Grimrail Depot
 		- Added WoD spells for Draenor (world)		
 		- Added WoD spells for Highmaul
+	v4.35.10
+		- Added WoD spells for Brawler's Guild
+		- Added WoD spells for Highmaul
+		- Added WoD spells for Blackrock Foundry
+		
 ]]--
 GTFO = {
 	DefaultSettings = {
@@ -856,8 +861,8 @@ GTFO = {
 		IgnoreOptions = { };
 		TrivialDamagePercent = 2; -- Minimum % of HP lost required for an alert to be trivial
 	};
-	Version = "4.35.9"; -- Version number (text format)
-	VersionNumber = 43509; -- Numeric version number for checking out-of-date clients
+	Version = "4.35.10"; -- Version number (text format)
+	VersionNumber = 43510; -- Numeric version number for checking out-of-date clients
 	DataLogging = nil; -- Indicate whether or not the addon needs to run the datalogging function (for hooking)
 	DataCode = "4"; -- Saved Variable versioning, change this value to force a reset to default
 	CanTank = nil; -- The active character is capable of tanking

@@ -23,3 +23,9 @@ GTFO.FFSpellID["155718"] = {
 	tankSound = 0;
 	ignoreSelfInflicted = true;	
 };
+
+GTFO.FFSpellID["175585"] = {
+	--desc = "Living Blaze (Forgemistress Flamehand)";
+	sound = 1;
+	ignoreSelfInflicted = true;	
+};

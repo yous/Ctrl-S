@@ -1,3 +1,7 @@
+2015-02-09 (3.0.6)
+* Updated the progression module for WoD.  modules/tooltip/progression.lua
+* The progression module now shows relevant progression. It stops showing lower levels of a tier on a full clear.
+
 2014-11-24 (3.0.5)
 * Changed modules\datatexts\extratexts.lua#201 with suggested errorfix from Zamma@Curseforge related to Datatexts.  Thanks :)
 
