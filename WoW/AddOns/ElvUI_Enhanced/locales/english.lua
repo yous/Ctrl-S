@@ -5,7 +5,7 @@ local L = AceLocale:NewLocale("ElvUI", "enUS", true);
 if not L then return end
 
 -- Init
-L["ENH_LOGIN_MSG"] = "You are using |cff1784d1ElvUI Enhanced|r version %s%s|r."
+L["ENH_LOGIN_MSG"] = "You are using |cff1784d1ElvUI Enhanced|r |cffff8000(WOD)|r version %s%s|r."
 L["Your version of ElvUI is to old (required v6.51 or higher). Please, download the latest version from tukui.org."] = true
 
 -- Equipment
@@ -77,8 +77,8 @@ L["The time to wait before fading the minimap back in after combat hide. (0 = Di
 
 -- Minimap Buttons
 L["Minimap Button Bar"] = true
-L['Skin Buttons'] = true
-L['Skins the minimap buttons in Elv UI style.'] = true
+L['Skin Buttons'] = 'Enable'
+L['Skins the minimap buttons in Elv UI style.'] = 'Enable the minimap button bar and skin the buttons in ElvUI style.'
 L['Skin Style'] = true
 L['Change settings for how the minimap buttons are skinned.'] = true
 L['The size of the minimap buttons.'] = true

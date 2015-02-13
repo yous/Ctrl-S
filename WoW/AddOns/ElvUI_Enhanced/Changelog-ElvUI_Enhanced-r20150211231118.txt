@@ -1,0 +1,6 @@
+Charlie Root:
+	- 3.0.7 * Updated welcome message. * Raidmarkerbar: Updated the bar to hide when leaving a party/group. * Raidmarkerbar: Added the option "Always Visible". * Raidmarkerbar: Fixed the tooltip of the "remove marks" button. * Progression: Fixed spelling. * MinimapButtons: Added the Garrison Icon to the MinimapButtons bar * MinimapButtons: Fixed the Calendar button.
+	- 3.0.7 * Updated welcome message. * Raidmarkerbar: Updated the bar to hide when leaving a party/group. * Raidmarkerbar: Added the option "Always Visible". * Raidmarkerbar: Fixed the tooltip of the "remove marks" button. * Progression: Fixed spelling. * MinimapButtons: Added the Garrison Icon to the MinimapButtons bar * MinimapButtons: Fixed the Calendar button.
+User Nickbock:
+	- Updated the progression module for WoD.  modules/tooltip/progression.lua
+	- Initial Commit 20141124-1

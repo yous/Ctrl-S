@@ -13,7 +13,7 @@ local ignoreButtons = {
 	"ElvConfigToggle",
 	"ElvUIConfigToggle",
 	"ElvUI_ConsolidatedBuffs",
-	"GameTimeframe",
+	--"GameTimeFrame",
 	"HelpOpenTicketButton",
 	"MMHolder",
 	"DroodFocusMinimapButton",
@@ -95,6 +95,7 @@ function MB:SkinButton(frame)
 	
 	if name == "DBMMinimapButton" then frame:SetNormalTexture("Interface\\Icons\\INV_Helmet_87") end
 	if name == "SmartBuff_MiniMapButton" then frame:SetNormalTexture(select(3, GetSpellInfo(12051))) end
+	if name == "GarrisonLandingPageMinimapButton" then frame:SetScale(1) end
 
 	if not frame.isSkinned then
 		frame:HookScript('OnEnter', OnEnter)
@@ -103,6 +104,7 @@ function MB:SkinButton(frame)
 
 		for i = 1, frame:GetNumRegions() do
 			local region = select(i, frame:GetRegions())
+			--print(region:GetName()," - ", region:GetObjectType()," - ",region:GetDrawLayer())
 			frame.original = {}
 			frame.original.Width, frame.original.Height = frame:GetSize()
 			frame.original.Point, frame.original.relativeTo, frame.original.relativePoint, frame.original.xOfs, frame.original.yOfs = frame:GetPoint()
@@ -117,6 +119,14 @@ function MB:SkinButton(frame)
 				frame.original.DragEnd = frame:GetScript("OnDragEnd")
 			end
 			
+			--if (name == "GameTimeFrame") then
+			--	if (region:GetObjectType() == "FontString") then
+			--		region:SetDrawLayer("OVERLAY", 1)
+					--region:SetTextHeight(9)
+			--		region:SetPoint("CENTER",frame)
+			--	end
+			--end
+
 			if (region:GetObjectType() == "Texture") then
 				local texture = region:GetTexture()
 			
@@ -128,6 +138,22 @@ function MB:SkinButton(frame)
 					region:Point("BOTTOMRIGHT", frame, "BOTTOMRIGHT", -2, 2)
 					region:SetTexCoord( 0.1, 0.9, 0.1, 0.9 )
 					region:SetDrawLayer( "ARTWORK" )
+
+					if (name == "GameTimeFrame") then
+						if (region:GetName() == "GameTimeCalendarInvitesTexture") then
+							region:SetTexCoord( 0.03125, 0.6484375, 0.03125, 0.8671875 )
+							region:SetDrawLayer("ARTWORK", 1)
+						elseif (region:GetName() == "GameTimeCalendarInvitesGlow") then
+							region:SetTexCoord( 0.1, 0.9, 0.1, 0.9 )
+						elseif (region:GetName() == "GameTimeCalendarEventAlarmTexture") then
+							region:SetTexCoord( 0.1, 0.9, 0.1, 0.9 )
+						elseif (region:GetName() == "GameTimeTexture") then
+							region:SetTexCoord( 0.0, 0.390625, 0.0, 0.78125 )
+						else
+							region:SetTexCoord( 0.0, 0.390625, 0.0, 0.78125 )
+						end
+					end
+
 					if (name == "PS_MinimapButton") then
 						region.SetPoint = function() end
 					end
@@ -195,6 +221,7 @@ function MB:UpdateLayout()
 			frame:SetFrameStrata("LOW")
 			frame:SetFrameLevel(20)
 			frame:Size(E.minimapbuttons.db.buttonSize)
+
 			if E.minimapbuttons.db.skinStyle == 'HORIZONTAL' then
 				anchor1 = direction and 'RIGHT' or 'LEFT'
 				anchor2 = direction and 'LEFT' or 'RIGHT'
@@ -251,6 +278,7 @@ function MB:SkinMinimapButtons()
 	for i = 1, Minimap:GetNumChildren() do
 		self:SkinButton(select(i, Minimap:GetChildren()))
 	end
+	self:SkinButton(GarrisonLandingPageMinimapButton)
 	MB:UpdateLayout()
 end
 

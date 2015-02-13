@@ -4,7 +4,7 @@ local TT = E:GetModule('Tooltip')
 local tiers = { "BRF","HM" }
 local levels = { 
 	"Mythic", 
-	"Herioc", 
+	"Heroic", 
 	"Normal",
 	"LFR",
 }

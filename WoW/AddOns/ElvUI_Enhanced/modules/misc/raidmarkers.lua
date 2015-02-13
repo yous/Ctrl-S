@@ -62,7 +62,7 @@ function RM:UpdateWorldMarkersAndTooltips()
 				self:SetBackdropBorderColor(.7, .7, 0)
 				GameTooltip:SetOwner(self, "ANCHOR_BOTTOM")
 				GameTooltip:SetText(L["Raid Markers"])
-				GameTooltip:AddLine(k == 9 and ("%s\n%s"):format(L["Click to clear the mark."], (L["%sClick to remove all worldmarkers."]):format(button.modifier:upper()))
+				GameTooltip:AddLine(i == 9 and ("%s\n%s"):format(L["Click to clear the mark."], (L["%sClick to remove all worldmarkers."]):format(button.modifier:upper()))
 					or ("%s\n%s"):format(L["Click to mark the target."], (L["%sClick to place a worldmarker."]):format(button.modifier:upper())), 1, 1, 1)
 				GameTooltip:Show()
 			end)			
@@ -123,7 +123,7 @@ function RM:ToggleSettings()
 	self:UpdateWorldMarkersAndTooltips()
 	
 	if self.db.enable then
-		RegisterStateDriver(self.frame, "visibility", self.db.visibility == 'DEFAULT' and '[noexists, nogroup] hide; show' or '[group] show; hide')
+		RegisterStateDriver(self.frame, "visibility", self.db.visibility == 'DEFAULT' and '[noexists, nogroup] hide; show' or self.db.visibility == 'ALWAYS' and '[noexists, nogroup] show; show' or '[group] show; hide')
 	else
 		UnregisterStateDriver(self.frame, "visibility")
 		self.frame:Hide()
@@ -151,6 +151,7 @@ function RM:Initialize()
 
 	E:CreateMover(self.frame, "RaidMarkerBarAnchor", L['Raid Marker Bar'])
 	
+	self:RegisterEvent("GROUP_ROSTER_UPDATE", "ToggleSettings")
 	self:CreateButtons()
 	self:ToggleSettings()
 end

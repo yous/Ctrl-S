@@ -20,6 +20,7 @@ local positionValues = {
 local raidmarkerVisibility = {
 	DEFAULT = L['Use Default'],
 	INPARTY = AGGRO_WARNING_IN_PARTY,
+	ALWAYS  = L['Always Display'],
 }
 
 local function ColorizeSettingName(settingName)

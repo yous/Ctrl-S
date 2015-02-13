@@ -1,3 +1,12 @@
+3.0.7
+* Updated welcome message.
+* Raidmarkerbar: Updated the bar to hide when leaving a party/group.
+* Raidmarkerbar: Added the option "Always Visible".
+* Raidmarkerbar: Fixed the tooltip of the "remove marks" button.
+* Progression: Fixed spelling.
+* MinimapButtons: Added the Garrison Icon to the MinimapButtons bar
+* MinimapButtons: Fixed the Calendar button.
+
 2015-02-09 (3.0.6)
 * Updated the progression module for WoD.  modules/tooltip/progression.lua
 * The progression module now shows relevant progression. It stops showing lower levels of a tier on a full clear.

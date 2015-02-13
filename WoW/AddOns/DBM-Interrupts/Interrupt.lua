@@ -1,5 +1,5 @@
-local mod = DBM:NewMod("Interrupt Cooldowns", "DBM-Interrupts")
-mod:SetRevision("Revision 5.4.3")
+local mod = DBM:NewMod("A tool to display the CDs of interrupts around you.", "DBM-Interrupts")
+mod:SetRevision("Revision 2.12.2015")
 mod:RegisterEvents("SPELL_CAST_SUCCESS")
 mod:SetZone(DBM_DISABLE_ZONE_DETECTION)
 
@@ -12,7 +12,7 @@ function mod:SPELL_CAST_SUCCESS(args)
         CounterShot={     "CounterSh",  147362,  24},
         SilencingShot={   "SilenceS",   34490,   24},
         CounterSpell={    "CounterSp",  2139,    24},
-        AvengersShield={  "AvengShld",  31935,   15},
+        AvengersShield={  "AvengerSd",  31935,   15},
         Rebuke={          "Rebuke",     96231,   15},
         Silence={         "Silence",    15487,   45},
         WindShear={       "WindShr",    57994,   12},

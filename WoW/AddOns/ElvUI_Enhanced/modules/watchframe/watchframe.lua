@@ -56,7 +56,6 @@ end
 
 function WF:Initialize()
 	watchFrame = _G["WatchFrame"]
-
 	WF:UpdateSettings()
 end
 

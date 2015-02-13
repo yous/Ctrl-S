@@ -2,13 +2,17 @@
 ## Title: |cff1784d1ElvUI|r Enhanced (WOD)
 ## Author: instant
 ## X-Credits: Tristimdorio (Omega1970), Azilroka, Lockslap, Sortokk, Repooc, moresunders
-## Version: 3.0.6
+## Version: 3.0.7
 ## Notes: Plugin-Enhancements for |cff1784d1ElvUI|r.
 ## X-Category: Plugins
 ## URL: http://wow.curseforge.com/addons/elvui-enhanced-mod-wod/
 ## X-Website: http://wow.curseforge.com/addons/elvui-enhanced-mod-wod/
 ## RequiredDeps: ElvUI
 ## DefaultState: Enabled
+## X-Curse-Packaged-Version: r20150211231118
+## X-Curse-Project-Name: ElvUI Still Enhanced (WOD)
+## X-Curse-Project-ID: elvui-enhanced-mod-wod
+## X-Curse-Repository-ID: wow/elvui-enhanced-mod-wod/mainline
 
 ## OptionalDeps: LibBalancePowerTracker-1.1, LibRangeCheck-2.0
 ## X-Embeds: LibBalancePowerTracker-1.1, LibRangeCheck-2.0
