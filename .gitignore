@@ -1,3 +1,5 @@
+/.bundle/
+/Gemfile.lock
 /WoW/16482221#1/**/*.bak
 /WoW/16482221#1/**/*.old
 /WoW/16482221#1/**/cache.md5

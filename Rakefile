@@ -1,3 +1,4 @@
+# frozen_string_literal: true
 require 'pathname'
 require 'yaml'
 
@@ -61,7 +62,7 @@ namespace :wow do
     custom_path = CONFIG['wow_custom_path'] &&
       CONFIG['wow_custom_path'][os.to_s]
     custom_path = Pathname.new(custom_path) if custom_path
-    target = "WTF/Account/#{account}"
+    target = File.join('WTF', 'Account', account)
     link_path =
       case os
       when :windows
@@ -84,7 +85,19 @@ namespace :wow do
           LinkPath.new(required_path.join(target), required_path: required_path)
         end
       end
-    link_path.link("WoW/#{account}")
+    link_path.link(File.join('WoW', account))
+  end
+
+  desc 'Sort SavedVariables of the World of Warcraft account settings'
+  task :sort_variables do
+    require_relative 'sort_lua'
+    account = CONFIG['wow_account']
+    pattern = File.join('WoW', account, '**', 'SavedVariables', '*.lua')
+    Dir.glob(pattern).each do |fn|
+      path = Pathname.new(fn)
+      sorted = format_file(path)
+      File.open(path, 'w') { |f| f.write(sorted) }
+    end
   end
 
   desc 'Link the World of Warcraft addons'

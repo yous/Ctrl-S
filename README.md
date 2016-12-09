@@ -10,10 +10,11 @@ For the task list:
 rake -T
 ```
 
-Task          | Description
---------------|--------------------------------------------
-`wow:account` | Link the World of Warcraft account settings
-`wow:addons`  | Link the World of Warcraft addons
+Task                 | Description
+---------------------|--------------------------------------------------------------
+`wow:account`        | Link the World of Warcraft account settings
+`wow:sort_variables` | Sort SavedVariables of the World of Warcraft account settings
+`wow:addons`         | Link the World of Warcraft addons
 
 ## Custom settings
 
