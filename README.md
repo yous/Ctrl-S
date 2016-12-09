@@ -22,13 +22,13 @@ Task          | Description
 Set your account info to `config.yml`:
 
 ``` yaml
-wow_account: 12345678#9
+wow_account: "12345678#9"
 ```
 
 If you installed World of Warcraft to custom path, provide it to `config.yml`:
 
 ``` yaml
 wow_custom_path:
-  windows: D:/World of Warcraft
+  windows: "D:/World of Warcraft"
   # mac:
 ```
