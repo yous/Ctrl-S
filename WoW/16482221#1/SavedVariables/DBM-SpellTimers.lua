@@ -1,259 +1,259 @@
 
 DBM_SpellTimers_Settings = {
-	["enabled"] = true,
 	["active_in_pvp"] = true,
-	["showlocal"] = true,
-	["spells"] = {
-		{
-			["enabled"] = true,
-			["spell"] = 48792,
-			["cooldown"] = 12,
-			["bartext"] = "%spell on %player",
-		}, -- [1]
-		{
-			["enabled"] = true,
-			["spell"] = 61336,
-			["cooldown"] = 12,
-			["bartext"] = "%spell on %player",
-		}, -- [2]
-		{
-			["enabled"] = true,
-			["spell"] = 29166,
-			["cooldown"] = 180,
-			["bartext"] = "%spell: %player",
-		}, -- [3]
-		{
-			["enabled"] = true,
-			["spell"] = 6940,
-			["cooldown"] = 12,
-			["bartext"] = "%spell on %target",
-		}, -- [4]
-		{
-			["enabled"] = true,
-			["spell"] = 498,
-			["cooldown"] = 10,
-			["bartext"] = "%spell on %player",
-		}, -- [5]
-		{
-			["enabled"] = true,
-			["spell"] = 31850,
-			["cooldown"] = 10,
-			["bartext"] = "%spell on %player",
-		}, -- [6]
-		{
-			["enabled"] = true,
-			["spell"] = 86659,
-			["cooldown"] = 12,
-			["bartext"] = "%spell on %player",
-		}, -- [7]
-		{
-			["enabled"] = true,
-			["spell"] = 31821,
-			["cooldown"] = 180,
-			["bartext"] = "%spell: %player",
-		}, -- [8]
-		{
-			["enabled"] = true,
-			["spell"] = 6346,
-			["cooldown"] = 180,
-			["bartext"] = "%spell: %player",
-		}, -- [9]
-		{
-			["enabled"] = true,
-			["spell"] = 73325,
-			["cooldown"] = 90,
-			["bartext"] = "%spell: %player",
-		}, -- [10]
-		{
-			["enabled"] = true,
-			["spell"] = 33206,
-			["cooldown"] = 8,
-			["bartext"] = "%spell on %target",
-		}, -- [11]
-		{
-			["enabled"] = true,
-			["spell"] = 47788,
-			["cooldown"] = 10,
-			["bartext"] = "%spell on %target",
-		}, -- [12]
-		{
-			["enabled"] = true,
-			["spell"] = 62618,
-			["cooldown"] = 180,
-			["bartext"] = "%spell: %player",
-		}, -- [13]
-		{
-			["enabled"] = true,
-			["spell"] = 98008,
-			["cooldown"] = 180,
-			["bartext"] = "%spell: %player",
-		}, -- [14]
-		{
-			["enabled"] = true,
-			["spell"] = 20608,
-			["cooldown"] = 1800,
-			["bartext"] = "%spell: %player",
-		}, -- [15]
-		{
-			["enabled"] = true,
-			["spell"] = 871,
-			["cooldown"] = 12,
-			["bartext"] = "%spell on %player",
-		}, -- [16]
-		{
-			["enabled"] = true,
-			["spell"] = 12975,
-			["cooldown"] = 20,
-			["bartext"] = "%spell on %player",
-		}, -- [17]
-		{
-			["enabled"] = true,
-			["spell"] = 97462,
-			["cooldown"] = 180,
-			["bartext"] = "%spell: %player",
-		}, -- [18]
-		{
-			["enabled"] = true,
-			["spell"] = 114203,
-			["cooldown"] = 180,
-			["bartext"] = "%spell: %player",
-		}, -- [19]
-		{
-			["enabled"] = true,
-			["spell"] = 114207,
-			["cooldown"] = 180,
-			["bartext"] = "%spell: %player",
-		}, -- [20]
-		{
-			["enabled"] = true,
-			["spell"] = 22700,
-			["cooldown"] = 600,
-			["bartext"] = "%spell: %player",
-		}, -- [21]
-		{
-			["enabled"] = true,
-			["spell"] = 44389,
-			["cooldown"] = 600,
-			["bartext"] = "%spell: %player",
-		}, -- [22]
-		{
-			["enabled"] = true,
-			["spell"] = 54711,
-			["cooldown"] = 300,
-			["bartext"] = "%spell: %player",
-		}, -- [23]
-		{
-			["enabled"] = true,
-			["spell"] = 67826,
-			["cooldown"] = 600,
-			["bartext"] = "%spell: %player",
-		}, -- [24]
-	},
+	["enabled"] = true,
 	["only_from_raid"] = true,
 	["own_bargroup"] = false,
 	["portal_alliance"] = {
 		{
-			["spell"] = 10059,
-			["cooldown"] = 60,
 			["bartext"] = "%spell: %player",
+			["cooldown"] = 60,
+			["spell"] = 10059,
 		}, -- [1]
 		{
-			["spell"] = 11416,
-			["cooldown"] = 60,
 			["bartext"] = "%spell: %player",
+			["cooldown"] = 60,
+			["spell"] = 11416,
 		}, -- [2]
 		{
-			["spell"] = 11419,
-			["cooldown"] = 60,
 			["bartext"] = "%spell: %player",
+			["cooldown"] = 60,
+			["spell"] = 11419,
 		}, -- [3]
 		{
-			["spell"] = 32266,
-			["cooldown"] = 60,
 			["bartext"] = "%spell: %player",
+			["cooldown"] = 60,
+			["spell"] = 32266,
 		}, -- [4]
 		{
-			["spell"] = 33691,
-			["cooldown"] = 60,
 			["bartext"] = "%spell: %player",
+			["cooldown"] = 60,
+			["spell"] = 33691,
 		}, -- [5]
 		{
-			["spell"] = 49360,
-			["cooldown"] = 60,
 			["bartext"] = "%spell: %player",
+			["cooldown"] = 60,
+			["spell"] = 49360,
 		}, -- [6]
 		{
-			["spell"] = 53142,
-			["cooldown"] = 60,
 			["bartext"] = "%spell: %player",
+			["cooldown"] = 60,
+			["spell"] = 53142,
 		}, -- [7]
 		{
-			["spell"] = 88345,
-			["cooldown"] = 60,
 			["bartext"] = "%spell: %player",
+			["cooldown"] = 60,
+			["spell"] = 88345,
 		}, -- [8]
 		{
-			["spell"] = 132620,
-			["cooldown"] = 60,
 			["bartext"] = "%spell: %player",
+			["cooldown"] = 60,
+			["spell"] = 132620,
 		}, -- [9]
 		{
-			["spell"] = 120146,
-			["cooldown"] = 60,
 			["bartext"] = "%spell: %player",
+			["cooldown"] = 60,
+			["spell"] = 120146,
+		}, -- [10]
+	},
+	["portal_horde"] = {
+		{
+			["bartext"] = "%spell: %player",
+			["cooldown"] = 60,
+			["spell"] = 11417,
+		}, -- [1]
+		{
+			["bartext"] = "%spell: %player",
+			["cooldown"] = 60,
+			["spell"] = 11418,
+		}, -- [2]
+		{
+			["bartext"] = "%spell: %player",
+			["cooldown"] = 60,
+			["spell"] = 11420,
+		}, -- [3]
+		{
+			["bartext"] = "%spell: %player",
+			["cooldown"] = 60,
+			["spell"] = 32667,
+		}, -- [4]
+		{
+			["bartext"] = "%spell: %player",
+			["cooldown"] = 60,
+			["spell"] = 35717,
+		}, -- [5]
+		{
+			["bartext"] = "%spell: %player",
+			["cooldown"] = 60,
+			["spell"] = 49361,
+		}, -- [6]
+		{
+			["bartext"] = "%spell: %player",
+			["cooldown"] = 60,
+			["spell"] = 53142,
+		}, -- [7]
+		{
+			["bartext"] = "%spell: %player",
+			["cooldown"] = 60,
+			["spell"] = 88346,
+		}, -- [8]
+		{
+			["bartext"] = "%spell: %player",
+			["cooldown"] = 60,
+			["spell"] = 132626,
+		}, -- [9]
+		{
+			["bartext"] = "%spell: %player",
+			["cooldown"] = 60,
+			["spell"] = 120146,
 		}, -- [10]
 	},
 	["show_portal"] = true,
-	["portal_horde"] = {
+	["showlocal"] = true,
+	["spells"] = {
 		{
-			["spell"] = 11417,
-			["cooldown"] = 60,
-			["bartext"] = "%spell: %player",
+			["bartext"] = "%spell on %player",
+			["cooldown"] = 12,
+			["enabled"] = true,
+			["spell"] = 48792,
 		}, -- [1]
 		{
-			["spell"] = 11418,
-			["cooldown"] = 60,
-			["bartext"] = "%spell: %player",
+			["bartext"] = "%spell on %player",
+			["cooldown"] = 12,
+			["enabled"] = true,
+			["spell"] = 61336,
 		}, -- [2]
 		{
-			["spell"] = 11420,
-			["cooldown"] = 60,
 			["bartext"] = "%spell: %player",
+			["cooldown"] = 180,
+			["enabled"] = true,
+			["spell"] = 29166,
 		}, -- [3]
 		{
-			["spell"] = 32667,
-			["cooldown"] = 60,
-			["bartext"] = "%spell: %player",
+			["bartext"] = "%spell on %target",
+			["cooldown"] = 12,
+			["enabled"] = true,
+			["spell"] = 6940,
 		}, -- [4]
 		{
-			["spell"] = 35717,
-			["cooldown"] = 60,
-			["bartext"] = "%spell: %player",
+			["bartext"] = "%spell on %player",
+			["cooldown"] = 10,
+			["enabled"] = true,
+			["spell"] = 498,
 		}, -- [5]
 		{
-			["spell"] = 49361,
-			["cooldown"] = 60,
-			["bartext"] = "%spell: %player",
+			["bartext"] = "%spell on %player",
+			["cooldown"] = 10,
+			["enabled"] = true,
+			["spell"] = 31850,
 		}, -- [6]
 		{
-			["spell"] = 53142,
-			["cooldown"] = 60,
-			["bartext"] = "%spell: %player",
+			["bartext"] = "%spell on %player",
+			["cooldown"] = 12,
+			["enabled"] = true,
+			["spell"] = 86659,
 		}, -- [7]
 		{
-			["spell"] = 88346,
-			["cooldown"] = 60,
 			["bartext"] = "%spell: %player",
+			["cooldown"] = 180,
+			["enabled"] = true,
+			["spell"] = 31821,
 		}, -- [8]
 		{
-			["spell"] = 132626,
-			["cooldown"] = 60,
 			["bartext"] = "%spell: %player",
+			["cooldown"] = 180,
+			["enabled"] = true,
+			["spell"] = 6346,
 		}, -- [9]
 		{
-			["spell"] = 120146,
-			["cooldown"] = 60,
 			["bartext"] = "%spell: %player",
+			["cooldown"] = 90,
+			["enabled"] = true,
+			["spell"] = 73325,
 		}, -- [10]
+		{
+			["bartext"] = "%spell on %target",
+			["cooldown"] = 8,
+			["enabled"] = true,
+			["spell"] = 33206,
+		}, -- [11]
+		{
+			["bartext"] = "%spell on %target",
+			["cooldown"] = 10,
+			["enabled"] = true,
+			["spell"] = 47788,
+		}, -- [12]
+		{
+			["bartext"] = "%spell: %player",
+			["cooldown"] = 180,
+			["enabled"] = true,
+			["spell"] = 62618,
+		}, -- [13]
+		{
+			["bartext"] = "%spell: %player",
+			["cooldown"] = 180,
+			["enabled"] = true,
+			["spell"] = 98008,
+		}, -- [14]
+		{
+			["bartext"] = "%spell: %player",
+			["cooldown"] = 1800,
+			["enabled"] = true,
+			["spell"] = 20608,
+		}, -- [15]
+		{
+			["bartext"] = "%spell on %player",
+			["cooldown"] = 12,
+			["enabled"] = true,
+			["spell"] = 871,
+		}, -- [16]
+		{
+			["bartext"] = "%spell on %player",
+			["cooldown"] = 20,
+			["enabled"] = true,
+			["spell"] = 12975,
+		}, -- [17]
+		{
+			["bartext"] = "%spell: %player",
+			["cooldown"] = 180,
+			["enabled"] = true,
+			["spell"] = 97462,
+		}, -- [18]
+		{
+			["bartext"] = "%spell: %player",
+			["cooldown"] = 180,
+			["enabled"] = true,
+			["spell"] = 114203,
+		}, -- [19]
+		{
+			["bartext"] = "%spell: %player",
+			["cooldown"] = 180,
+			["enabled"] = true,
+			["spell"] = 114207,
+		}, -- [20]
+		{
+			["bartext"] = "%spell: %player",
+			["cooldown"] = 600,
+			["enabled"] = true,
+			["spell"] = 22700,
+		}, -- [21]
+		{
+			["bartext"] = "%spell: %player",
+			["cooldown"] = 600,
+			["enabled"] = true,
+			["spell"] = 44389,
+		}, -- [22]
+		{
+			["bartext"] = "%spell: %player",
+			["cooldown"] = 300,
+			["enabled"] = true,
+			["spell"] = 54711,
+		}, -- [23]
+		{
+			["bartext"] = "%spell: %player",
+			["cooldown"] = 600,
+			["enabled"] = true,
+			["spell"] = 67826,
+		}, -- [24]
 	},
 }

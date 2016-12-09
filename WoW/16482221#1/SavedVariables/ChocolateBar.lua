@@ -6,58 +6,58 @@ ChocolateBarDB = {
 	["profiles"] = {
 		["Default"] = {
 			["objSettings"] = {
+				["BlueItemInfo3"] = {
+					["align"] = "right",
+					["barName"] = "ChocolateBar1",
+					["showText"] = false,
+				},
+				["Decursive"] = {
+					["align"] = "right",
+					["barName"] = "ChocolateBar1",
+					["showText"] = false,
+				},
+				["GatherMate2"] = {
+					["align"] = "right",
+					["barName"] = "ChocolateBar1",
+					["showText"] = false,
+				},
+				["InvenCraftInfo2"] = {
+					["align"] = "right",
+					["barName"] = "ChocolateBar1",
+					["showText"] = false,
+				},
+				["MoreChocolate"] = {
+					["align"] = "right",
+					["barName"] = "ChocolateBar1",
+					["showText"] = false,
+				},
+				["Omen"] = {
+					["align"] = "right",
+					["barName"] = "ChocolateBar1",
+					["showText"] = false,
+				},
+				["RangeDisplay"] = {
+					["align"] = "right",
+					["barName"] = "ChocolateBar1",
+					["showText"] = false,
+				},
+				["SavedInstances"] = {
+					["align"] = "right",
+					["barName"] = "ChocolateBar1",
+					["showText"] = false,
+				},
 				["Skada"] = {
 					["barName"] = "ChocolateBar1",
 				},
-				["RangeDisplay"] = {
-					["showText"] = false,
-					["barName"] = "ChocolateBar1",
+				["TellMeWhen"] = {
 					["align"] = "right",
-				},
-				["MoreChocolate"] = {
-					["showText"] = false,
 					["barName"] = "ChocolateBar1",
-					["align"] = "right",
+					["showText"] = false,
 				},
 				["TradeSkillMaster"] = {
-					["showText"] = false,
-					["barName"] = "ChocolateBar1",
 					["align"] = "right",
-				},
-				["GatherMate2"] = {
-					["showText"] = false,
 					["barName"] = "ChocolateBar1",
-					["align"] = "right",
-				},
-				["Decursive"] = {
 					["showText"] = false,
-					["barName"] = "ChocolateBar1",
-					["align"] = "right",
-				},
-				["BlueItemInfo3"] = {
-					["showText"] = false,
-					["barName"] = "ChocolateBar1",
-					["align"] = "right",
-				},
-				["InvenCraftInfo2"] = {
-					["showText"] = false,
-					["barName"] = "ChocolateBar1",
-					["align"] = "right",
-				},
-				["TellMeWhen"] = {
-					["showText"] = false,
-					["barName"] = "ChocolateBar1",
-					["align"] = "right",
-				},
-				["Omen"] = {
-					["showText"] = false,
-					["barName"] = "ChocolateBar1",
-					["align"] = "right",
-				},
-				["SavedInstances"] = {
-					["showText"] = false,
-					["barName"] = "ChocolateBar1",
-					["align"] = "right",
 				},
 			},
 		},

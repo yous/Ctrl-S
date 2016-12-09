@@ -1,63 +1,63 @@
 
 Omen3DB = {
 	["profileKeys"] = {
+		["김곱충 - 줄진"] = "김곱충 - 줄진",
+		["김롯리 - 줄진"] = "김롯리 - 줄진",
 		["나라잃은토템 - 줄진"] = "나라잃은토템 - 줄진",
 		["버징기 - 줄진"] = "버징기 - 줄진",
-		["김롯리 - 줄진"] = "김롯리 - 줄진",
-		["김곱충 - 줄진"] = "김곱충 - 줄진",
 	},
 	["profiles"] = {
-		["나라잃은토템 - 줄진"] = {
-			["PositionY"] = 307.999816894531,
-			["PositionW"] = 200.000061035156,
-			["PositionH"] = 82.0000152587891,
-			["Shown"] = true,
+		["김곱충 - 줄진"] = {
 			["Background"] = {
-				["EdgeSize"] = 1,
 				["BarInset"] = 2,
+				["EdgeSize"] = 2,
 			},
-			["PositionX"] = 1556.5009765625,
 			["Bar"] = {
 				["Spacing"] = 1,
 			},
-		},
-		["버징기 - 줄진"] = {
-			["PositionW"] = 200.000061035156,
 			["PositionH"] = 81.9999923706055,
-			["PositionY"] = 407.000030517578,
-			["Background"] = {
-				["EdgeSize"] = 1,
-				["BarInset"] = 2,
-			},
-			["PositionX"] = 1557.50073242188,
-			["Shown"] = false,
-			["Bar"] = {
-				["Spacing"] = 1,
-			},
+			["PositionW"] = 200.000061035156,
+			["PositionX"] = 1481.00024414063,
+			["PositionY"] = 324.999420166016,
 		},
 		["김롯리 - 줄진"] = {
 			["Background"] = {
 				["BarInset"] = 2,
 				["EdgeSize"] = 2,
 			},
-			["PositionY"] = 614.999938964844,
+			["Bar"] = {
+				["Spacing"] = 1,
+			},
 			["PositionX"] = 847.5,
-			["Bar"] = {
-				["Spacing"] = 1,
-			},
+			["PositionY"] = 614.999938964844,
 		},
-		["김곱충 - 줄진"] = {
-			["PositionY"] = 324.999420166016,
-			["PositionW"] = 200.000061035156,
-			["Bar"] = {
-				["Spacing"] = 1,
-			},
+		["나라잃은토템 - 줄진"] = {
 			["Background"] = {
 				["BarInset"] = 2,
-				["EdgeSize"] = 2,
+				["EdgeSize"] = 1,
 			},
-			["PositionX"] = 1481.00024414063,
+			["Bar"] = {
+				["Spacing"] = 1,
+			},
+			["PositionH"] = 82.0000152587891,
+			["PositionW"] = 200.000061035156,
+			["PositionX"] = 1556.5009765625,
+			["PositionY"] = 307.999816894531,
+			["Shown"] = true,
+		},
+		["버징기 - 줄진"] = {
+			["Background"] = {
+				["BarInset"] = 2,
+				["EdgeSize"] = 1,
+			},
+			["Bar"] = {
+				["Spacing"] = 1,
+			},
 			["PositionH"] = 81.9999923706055,
+			["PositionW"] = 200.000061035156,
+			["PositionX"] = 1557.50073242188,
+			["PositionY"] = 407.000030517578,
+			["Shown"] = false,
 		},
 	},
 }

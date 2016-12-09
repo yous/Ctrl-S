@@ -1,49 +1,37 @@
 
 DataStore_CraftsDB = {
-	["profileKeys"] = {
-		["나라잃은토템 - 줄진"] = "나라잃은토템 - 줄진",
-		["김롯리 - 줄진"] = "김롯리 - 줄진",
-		["김곱충 - 줄진"] = "김곱충 - 줄진",
-	},
 	["global"] = {
 		["Characters"] = {
-			["Default.줄진.김롯리"] = {
-				["lastUpdate"] = 1400341153,
-				["Professions"] = {
-					["요리"] = {
-						["FullLink"] = "|cffffd000|Htrade:1800000055BA5B9:2550:185|h[요리]|h|r",
-						["MaxRank"] = 75,
-						["Rank"] = 1,
-					},
-				},
-			},
-			["Default.줄진.나라잃은토템"] = {
-				["lastUpdate"] = 1417531694,
-			},
 			["Default.줄진.김곱충"] = {
 				["ArcheologyItems"] = {
-					[90433] = true,
-					[89893] = true,
+					[88929] = true,
+					[88930] = true,
 					[89009] = true,
+					[89012] = true,
+					[89014] = true,
+					[89696] = true,
+					[89711] = true,
+					[89893] = true,
+					[89894] = true,
 					[89895] = true,
 					[89896] = true,
-					[89012] = true,
-					[89711] = true,
-					[89014] = true,
-					[89894] = true,
+					[90433] = true,
+					[90493] = true,
 					[93441] = true,
 					[93442] = true,
 					[93443] = true,
-					[88929] = true,
-					[88930] = true,
-					[89696] = true,
-					[90493] = true,
 				},
+				["Prof1"] = "재봉술",
+				["Prof2"] = "기계공학",
 				["Professions"] = {
-					["응급치료"] = {
-						["FullLink"] = "|cffffd000|Htrade:18000000508A236:7924:129|h[응급치료]|h|r",
+					["고고학"] = {
 						["MaxRank"] = 225,
 						["Rank"] = 194,
+					},
+					["기계공학"] = {
+						["FullLink"] = "|cffffd000|Htrade:18000000508A236:4036:202|h[기계공학]|h|r",
+						["MaxRank"] = 75,
+						["Rank"] = 16,
 					},
 					["낚시"] = {
 						["MaxRank"] = 600,
@@ -54,10 +42,12 @@ DataStore_CraftsDB = {
 						["MaxRank"] = 600,
 						["Rank"] = 577,
 					},
+					["응급치료"] = {
+						["FullLink"] = "|cffffd000|Htrade:18000000508A236:7924:129|h[응급치료]|h|r",
+						["MaxRank"] = 225,
+						["Rank"] = 194,
+					},
 					["재봉술"] = {
-						["FullLink"] = "|cffffd000|Htrade:18000000508A236:51309:197|h[재봉술]|h|r",
-						["NumCrafts"] = 144,
-						["MaxRank"] = 450,
 						["Crafts"] = {
 							"재료", -- [1]
 							223596, -- [2]
@@ -218,22 +208,32 @@ DataStore_CraftsDB = {
 							223592, -- [157]
 							125840, -- [158]
 						},
+						["FullLink"] = "|cffffd000|Htrade:18000000508A236:51309:197|h[재봉술]|h|r",
+						["MaxRank"] = 450,
+						["NumCrafts"] = 144,
 						["Rank"] = 395,
 					},
-					["고고학"] = {
-						["MaxRank"] = 225,
-						["Rank"] = 194,
-					},
-					["기계공학"] = {
-						["FullLink"] = "|cffffd000|Htrade:18000000508A236:4036:202|h[기계공학]|h|r",
+				},
+				["lastUpdate"] = 1400873565,
+			},
+			["Default.줄진.김롯리"] = {
+				["Professions"] = {
+					["요리"] = {
+						["FullLink"] = "|cffffd000|Htrade:1800000055BA5B9:2550:185|h[요리]|h|r",
 						["MaxRank"] = 75,
-						["Rank"] = 16,
+						["Rank"] = 1,
 					},
 				},
-				["Prof2"] = "기계공학",
-				["lastUpdate"] = 1400873565,
-				["Prof1"] = "재봉술",
+				["lastUpdate"] = 1400341153,
+			},
+			["Default.줄진.나라잃은토템"] = {
+				["lastUpdate"] = 1417531694,
 			},
 		},
+	},
+	["profileKeys"] = {
+		["김곱충 - 줄진"] = "김곱충 - 줄진",
+		["김롯리 - 줄진"] = "김롯리 - 줄진",
+		["나라잃은토템 - 줄진"] = "나라잃은토템 - 줄진",
 	},
 }

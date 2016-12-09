@@ -3,8 +3,8 @@ TradeSkillMaster_AuctioningDB = {
 	["factionrealm"] = {
 		["Horde - 줄진"] = {
 			["player"] = {
-				["버징기"] = true,
 				["나라잃은토템"] = true,
+				["버징기"] = true,
 			},
 		},
 	},

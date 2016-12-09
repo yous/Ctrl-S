@@ -1,13 +1,26 @@
 
 Quartz3DB = {
 	["namespaces"] = {
-		["Swing"] = {
-		},
 		["Buff"] = {
+		},
+		["EnemyCasts"] = {
+		},
+		["Flight"] = {
+		},
+		["Focus"] = {
+			["profiles"] = {
+				["Default"] = {
+					["x"] = 860,
+				},
+			},
+		},
+		["GCD"] = {
 		},
 		["Interrupt"] = {
 		},
-		["Flight"] = {
+		["Latency"] = {
+		},
+		["Mirror"] = {
 		},
 		["Pet"] = {
 			["profiles"] = {
@@ -23,16 +36,9 @@ Quartz3DB = {
 				},
 			},
 		},
-		["EnemyCasts"] = {
+		["Range"] = {
 		},
-		["GCD"] = {
-		},
-		["Focus"] = {
-			["profiles"] = {
-				["Default"] = {
-					["x"] = 860,
-				},
-			},
+		["Swing"] = {
 		},
 		["Target"] = {
 			["profiles"] = {
@@ -40,12 +46,6 @@ Quartz3DB = {
 					["x"] = 860,
 				},
 			},
-		},
-		["Mirror"] = {
-		},
-		["Range"] = {
-		},
-		["Latency"] = {
 		},
 	},
 	["profileKeys"] = {

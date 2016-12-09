@@ -1,16 +1,16 @@
 
 WoWProCharDB = {
+	["AutoHideInsideInstances"] = true,
 	["DebugLevel"] = 0,
-	["Taxi"] = {
-	},
+	["Enabled"] = false,
 	["Guide"] = {
+	},
+	["Taxi"] = {
 	},
 	["Trades"] = {
 	},
 	["completedQIDs"] = {
 	},
-	["Enabled"] = false,
 	["skippedQIDs"] = {
 	},
-	["AutoHideInsideInstances"] = true,
 }

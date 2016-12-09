@@ -1,19 +1,19 @@
 
-AtlasMajorCities_DB = {
-}
-AtlasMajorCities_Continent = {
+AtlasMajorCities_Adds = {
 }
 AtlasMajorCities_City = {
 }
-AtlasMajorCities_Zone = {
+AtlasMajorCities_Comment = {
+}
+AtlasMajorCities_Continent = {
+}
+AtlasMajorCities_DB = {
+}
+AtlasMajorCities_NPC = {
 }
 AtlasMajorCities_Shop = {
 }
 AtlasMajorCities_Title = {
 }
-AtlasMajorCities_NPC = {
-}
-AtlasMajorCities_Comment = {
-}
-AtlasMajorCities_Adds = {
+AtlasMajorCities_Zone = {
 }

@@ -1,59 +1,52 @@
 
 ReforgeLiteDB = {
-	["windowHeight"] = 564,
 	["activeWindowTitle"] = {
 		0.8, -- [1]
 		0, -- [2]
 		0, -- [3]
 	},
-	["windowY"] = 731.9999389648438,
-	["reforgeCheat"] = 5,
+	["customPresets"] = {
+	},
+	["inactiveWindowTitle"] = {
+		0.5, -- [1]
+		0.5, -- [2]
+		0.5, -- [3]
+	},
+	["itemSize"] = 24,
+	["openOnReforge"] = true,
 	["profiles"] = {
-		["김롯리 - 줄진"] = {
-			["caps"] = {
-				{
-					["stat"] = 0,
-					["points"] = {
-						{
-							["value"] = 0,
-							["preset"] = 1,
-							["method"] = 1,
-							["after"] = 0,
-						}, -- [1]
-					},
-				}, -- [1]
-				{
-					["stat"] = 0,
-					["points"] = {
-						{
-							["value"] = 0,
-							["preset"] = 1,
-							["method"] = 1,
-							["after"] = 0,
-						}, -- [1]
-					},
-				}, -- [2]
-			},
-			["ilvlCap"] = 0,
-			["targetLevel"] = 3,
-			["weights"] = {
-				0, -- [1]
-				0, -- [2]
-				0, -- [3]
-				0, -- [4]
-				0, -- [5]
-				0, -- [6]
-				0, -- [7]
-				0, -- [8]
-			},
+		["김곱충 - 줄진"] = {
 			["buffs"] = {
 			},
-			["itemsLocked"] = {
+			["caps"] = {
+				{
+					["points"] = {
+						{
+							["after"] = 0,
+							["method"] = 1,
+							["preset"] = 3,
+							["value"] = 5100,
+						}, -- [1]
+					},
+					["stat"] = 4,
+				}, -- [1]
+				{
+					["points"] = {
+						{
+							["after"] = 0,
+							["method"] = 1,
+							["preset"] = 1,
+							["value"] = 0,
+						}, -- [1]
+					},
+					["stat"] = 0,
+				}, -- [2]
 			},
 			["customMethodPresets"] = {
 			},
-		},
-		["김곱충 - 줄진"] = {
+			["ilvlCap"] = 0,
+			["itemsLocked"] = {
+			},
 			["method"] = {
 				["items"] = {
 					{
@@ -61,60 +54,60 @@ ReforgeLiteDB = {
 					{
 					}, -- [2]
 					{
-						["src"] = 6,
-						["reforge"] = 42,
-						["dst"] = 8,
 						["amount"] = 340,
+						["dst"] = 8,
+						["reforge"] = 42,
+						["src"] = 6,
 					}, -- [3]
 					{
-						["src"] = 6,
-						["reforge"] = 40,
-						["dst"] = 5,
 						["amount"] = 260,
+						["dst"] = 5,
+						["reforge"] = 40,
+						["src"] = 6,
 					}, -- [4]
 					{
 					}, -- [5]
 					{
-						["src"] = 4,
-						["reforge"] = 25,
-						["dst"] = 5,
 						["amount"] = 347,
+						["dst"] = 5,
+						["reforge"] = 25,
+						["src"] = 4,
 					}, -- [6]
 					{
-						["src"] = 6,
-						["reforge"] = 40,
-						["dst"] = 5,
 						["amount"] = 436,
+						["dst"] = 5,
+						["reforge"] = 40,
+						["src"] = 6,
 					}, -- [7]
 					{
-						["src"] = 6,
-						["reforge"] = 42,
-						["dst"] = 8,
 						["amount"] = 400,
+						["dst"] = 8,
+						["reforge"] = 42,
+						["src"] = 6,
 					}, -- [8]
 					{
-						["src"] = 6,
-						["reforge"] = 40,
-						["dst"] = 5,
 						["amount"] = 574,
+						["dst"] = 5,
+						["reforge"] = 40,
+						["src"] = 6,
 					}, -- [9]
 					{
-						["src"] = 6,
-						["reforge"] = 40,
-						["dst"] = 5,
 						["amount"] = 351,
+						["dst"] = 5,
+						["reforge"] = 40,
+						["src"] = 6,
 					}, -- [10]
 					{
-						["src"] = 4,
-						["reforge"] = 28,
-						["dst"] = 8,
 						["amount"] = 357,
+						["dst"] = 8,
+						["reforge"] = 28,
+						["src"] = 4,
 					}, -- [11]
 					{
-						["src"] = 6,
-						["reforge"] = 42,
-						["dst"] = 8,
 						["amount"] = 333,
+						["dst"] = 8,
+						["reforge"] = 42,
+						["src"] = 6,
 					}, -- [12]
 					{
 					}, -- [13]
@@ -136,6 +129,33 @@ ReforgeLiteDB = {
 					15459, -- [8]
 				},
 			},
+			["prio"] = {
+				{
+					["capped"] = true,
+					["preset"] = 3,
+					["stat"] = 4,
+					["value"] = 5100,
+				}, -- [1]
+				{
+					["capped"] = false,
+					["preset"] = 1,
+					["stat"] = 8,
+					["value"] = 0,
+				}, -- [2]
+				{
+					["capped"] = false,
+					["preset"] = 1,
+					["stat"] = 5,
+					["value"] = 0,
+				}, -- [3]
+				{
+					["capped"] = false,
+					["preset"] = 1,
+					["stat"] = 6,
+					["value"] = 0,
+				}, -- [4]
+			},
+			["targetLevel"] = 3,
 			["weights"] = {
 				0, -- [1]
 				0, -- [2]
@@ -146,75 +166,55 @@ ReforgeLiteDB = {
 				0, -- [7]
 				160, -- [8]
 			},
-			["caps"] = {
-				{
-					["stat"] = 4,
-					["points"] = {
-						{
-							["value"] = 5100,
-							["preset"] = 3,
-							["method"] = 1,
-							["after"] = 0,
-						}, -- [1]
-					},
-				}, -- [1]
-				{
-					["stat"] = 0,
-					["points"] = {
-						{
-							["value"] = 0,
-							["preset"] = 1,
-							["method"] = 1,
-							["after"] = 0,
-						}, -- [1]
-					},
-				}, -- [2]
-			},
-			["ilvlCap"] = 0,
-			["targetLevel"] = 3,
-			["customMethodPresets"] = {
-			},
+		},
+		["김롯리 - 줄진"] = {
 			["buffs"] = {
 			},
-			["itemsLocked"] = {
-			},
-			["prio"] = {
+			["caps"] = {
 				{
-					["value"] = 5100,
-					["preset"] = 3,
-					["stat"] = 4,
-					["capped"] = true,
+					["points"] = {
+						{
+							["after"] = 0,
+							["method"] = 1,
+							["preset"] = 1,
+							["value"] = 0,
+						}, -- [1]
+					},
+					["stat"] = 0,
 				}, -- [1]
 				{
-					["value"] = 0,
-					["preset"] = 1,
-					["capped"] = false,
-					["stat"] = 8,
+					["points"] = {
+						{
+							["after"] = 0,
+							["method"] = 1,
+							["preset"] = 1,
+							["value"] = 0,
+						}, -- [1]
+					},
+					["stat"] = 0,
 				}, -- [2]
-				{
-					["value"] = 0,
-					["preset"] = 1,
-					["capped"] = false,
-					["stat"] = 5,
-				}, -- [3]
-				{
-					["value"] = 0,
-					["preset"] = 1,
-					["capped"] = false,
-					["stat"] = 6,
-				}, -- [4]
+			},
+			["customMethodPresets"] = {
+			},
+			["ilvlCap"] = 0,
+			["itemsLocked"] = {
+			},
+			["targetLevel"] = 3,
+			["weights"] = {
+				0, -- [1]
+				0, -- [2]
+				0, -- [3]
+				0, -- [4]
+				0, -- [5]
+				0, -- [6]
+				0, -- [7]
+				0, -- [8]
 			},
 		},
 	},
+	["reforgeCheat"] = 5,
+	["windowHeight"] = 564,
 	["windowWidth"] = 800,
-	["itemSize"] = 24,
-	["openOnReforge"] = true,
-	["inactiveWindowTitle"] = {
-		0.5, -- [1]
-		0.5, -- [2]
-		0.5, -- [3]
-	},
-	["customPresets"] = {
-	},
 	["windowX"] = 320.0000915527344,
+	["windowY"] = 731.9999389648438,
 }

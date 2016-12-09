@@ -1,12 +1,12 @@
 
 WoWProCharDB = {
-	["Enabled"] = true,
 	["AutoHideInsideInstances"] = true,
+	["DebugLevel"] = 0,
+	["EnableGrail"] = true,
+	["Enabled"] = true,
 	["Guide"] = {
 		["JiyDur0105"] = {
-			["total"] = 47,
 			["Version"] = "6.0.1T",
-			["progress"] = 45,
 			["completion"] = {
 				true, -- [1]
 				true, -- [2]
@@ -58,42 +58,42 @@ WoWProCharDB = {
 				true, -- [48]
 				true, -- [49]
 			},
+			["progress"] = 45,
 			["skipped"] = {
 			},
+			["total"] = 47,
 		},
-	},
-	["EnableGrail"] = true,
-	["Trades"] = {
 	},
 	["Taxi"] = {
 	},
+	["Trades"] = {
+	},
 	["completedQIDs"] = {
-		[25135] = true,
-		[25136] = true,
-		[25152] = true,
-		[25168] = true,
-		["25134"] = true,
-		["25132"] = true,
-		[37446] = true,
-		[25172] = true,
+		[3089] = true,
 		[25126] = true,
 		[25127] = true,
-		[25143] = true,
 		[25128] = true,
-		[3089] = true,
-		[25165] = true,
-		[25130] = true,
-		[25169] = true,
-		[25131] = true,
-		[25167] = true,
-		[25132] = true,
-		[25170] = true,
-		[25133] = true,
-		["25133"] = true,
-		[25134] = true,
 		[25129] = true,
+		[25130] = true,
+		[25131] = true,
+		[25132] = true,
+		[25133] = true,
+		[25134] = true,
+		[25135] = true,
+		[25136] = true,
+		[25143] = true,
+		[25152] = true,
+		[25165] = true,
+		[25167] = true,
+		[25168] = true,
+		[25169] = true,
+		[25170] = true,
+		[25172] = true,
+		[37446] = true,
+		["25132"] = true,
+		["25133"] = true,
+		["25134"] = true,
 	},
 	["skippedQIDs"] = {
 	},
-	["DebugLevel"] = 0,
 }

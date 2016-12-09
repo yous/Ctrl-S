@@ -1,2 +1,1 @@
 
-SV_GarrisonMissionManager = nil

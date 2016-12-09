@@ -1,8 +1,6 @@
 
 AtlasLootDB = {
 	["namespaces"] = {
-		["WishList"] = {
-		},
 		["AtlasLootPanel"] = {
 		},
 		["DefaultFrame"] = {
@@ -14,13 +12,15 @@ AtlasLootDB = {
 		},
 		["Filter"] = {
 		},
+		["WishList"] = {
+		},
 	},
 	["profileKeys"] = {
 		["김곱충 - 줄진"] = "김곱충 - 줄진",
 	},
-	["showWarning"] = true,
 	["profiles"] = {
 		["김곱충 - 줄진"] = {
 		},
 	},
+	["showWarning"] = true,
 }
