@@ -126,7 +126,13 @@ def format_value(value)
       value.to_s
     end
   when String
-    value.inspect
+    escaped = value
+      .gsub("\\") { "\\\\" }
+      .gsub('"', '\\"')
+      .gsub("\t", "\\t")
+      .gsub("\r", "\\r")
+      .gsub("\n", "\\n")
+    "\"#{escaped}\""
   when nil
     'nil'
   else
