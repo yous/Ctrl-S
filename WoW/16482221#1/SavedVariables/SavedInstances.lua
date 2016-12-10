@@ -206,7 +206,8 @@ SavedInstancesDB = {
 			["RecLevel"] = 90,
 			["Show"] = "saved",
 			["김곱충 - 줄진"] = {
-				[2] = {
+				nil, -- [1]
+				{
 					[1] = false,
 					[2] = false,
 					[3] = false,
@@ -221,7 +222,7 @@ SavedInstancesDB = {
 					[12] = false,
 					["Expires"] = 1401300001,
 					["ID"] = -12,
-				},
+				}, -- [2]
 			},
 		},
 		["공격대 찾기: 셰크지르의 악몽"] = {
@@ -254,7 +255,8 @@ SavedInstancesDB = {
 			["RecLevel"] = 90,
 			["Show"] = "saved",
 			["김곱충 - 줄진"] = {
-				[2] = {
+				nil, -- [1]
+				{
 					[1] = true,
 					[2] = true,
 					[3] = true,
@@ -271,7 +273,7 @@ SavedInstancesDB = {
 					[14] = false,
 					["Expires"] = 1401300001,
 					["ID"] = -14,
-				},
+				}, -- [2]
 			},
 		},
 		["공격대 찾기: 응보의 성문"] = {
@@ -281,7 +283,8 @@ SavedInstancesDB = {
 			["RecLevel"] = 90,
 			["Show"] = "saved",
 			["김곱충 - 줄진"] = {
-				[2] = {
+				nil, -- [1]
+				{
 					[1] = false,
 					[2] = false,
 					[3] = false,
@@ -298,7 +301,7 @@ SavedInstancesDB = {
 					[14] = false,
 					["Expires"] = 1401300001,
 					["ID"] = -14,
-				},
+				}, -- [2]
 			},
 		},
 		["공격대 찾기: 잊혀진 심연"] = {
@@ -308,7 +311,8 @@ SavedInstancesDB = {
 			["RecLevel"] = 90,
 			["Show"] = "saved",
 			["김곱충 - 줄진"] = {
-				[2] = {
+				nil, -- [1]
+				{
 					[1] = false,
 					[2] = false,
 					[3] = false,
@@ -323,7 +327,7 @@ SavedInstancesDB = {
 					[12] = false,
 					["Expires"] = 1401300001,
 					["ID"] = -12,
-				},
+				}, -- [2]
 			},
 		},
 		["공격대 찾기: 잔달라 부족 최후의 저항"] = {
@@ -333,7 +337,8 @@ SavedInstancesDB = {
 			["RecLevel"] = 90,
 			["Show"] = "saved",
 			["김곱충 - 줄진"] = {
-				[2] = {
+				nil, -- [1]
+				{
 					[1] = true,
 					[2] = true,
 					[3] = true,
@@ -348,7 +353,7 @@ SavedInstancesDB = {
 					[12] = false,
 					["Expires"] = 1401300001,
 					["ID"] = -12,
-				},
+				}, -- [2]
 			},
 		},
 		["공격대 찾기: 지하요새"] = {
@@ -376,7 +381,8 @@ SavedInstancesDB = {
 			["RecLevel"] = 90,
 			["Show"] = "saved",
 			["김곱충 - 줄진"] = {
-				[2] = {
+				nil, -- [1]
+				{
 					[1] = false,
 					[2] = false,
 					[3] = false,
@@ -391,7 +397,7 @@ SavedInstancesDB = {
 					[12] = true,
 					["Expires"] = 1401300001,
 					["ID"] = -12,
-				},
+				}, -- [2]
 			},
 		},
 		["공포의 심장"] = {
@@ -1103,13 +1109,14 @@ SavedInstancesDB = {
 			["RecLevel"] = 88,
 			["Show"] = "saved",
 			["김곱충 - 줄진"] = {
-				[2] = {
+				nil, -- [1]
+				{
 					["Expires"] = 0,
 					["Extended"] = false,
 					["ID"] = 309375172,
 					["Link"] = "|cffff8000|Hinstancelock:018000000508A236:959:2:15|h[음영파 수도원]|h|r",
 					["Locked"] = false,
-				},
+				}, -- [2]
 			},
 		},
 		["응보의 성문"] = {

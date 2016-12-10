@@ -2496,7 +2496,8 @@ TMWOptDB = {
 									["ShowWhen"] = 3,
 									["Type"] = "cooldown",
 								}, -- [4]
-								[6] = {
+								nil, -- [5]
+								{
 									["Enabled"] = true,
 									["Events"] = {
 										[1] = {
@@ -2519,8 +2520,8 @@ TMWOptDB = {
 									["ShowTimerTextnoOCC"] = true,
 									["ShowWhen"] = 3,
 									["Type"] = "cooldown",
-								},
-								[7] = {
+								}, -- [6]
+								{
 									["Enabled"] = true,
 									["Events"] = {
 										[1] = {
@@ -2544,8 +2545,8 @@ TMWOptDB = {
 									["ShowTimerTextnoOCC"] = true,
 									["ShowWhen"] = 3,
 									["Type"] = "cooldown",
-								},
-								[8] = {
+								}, -- [7]
+								{
 									["Enabled"] = true,
 									["Events"] = {
 										[1] = {
@@ -2584,8 +2585,8 @@ TMWOptDB = {
 									["ShowTimerTextnoOCC"] = true,
 									["ShowWhen"] = 3,
 									["Type"] = "cooldown",
-								},
-								[9] = {
+								}, -- [8]
+								{
 									["Enabled"] = true,
 									["Events"] = {
 										[1] = {
@@ -2624,8 +2625,8 @@ TMWOptDB = {
 									["ShowTimerTextnoOCC"] = true,
 									["ShowWhen"] = 3,
 									["Type"] = "cooldown",
-								},
-								[10] = {
+								}, -- [9]
+								{
 									["Conditions"] = {
 										[1] = {
 											["Level"] = 35,
@@ -2664,7 +2665,7 @@ TMWOptDB = {
 									["ShowTimerTextnoOCC"] = true,
 									["ShowWhen"] = 3,
 									["Type"] = "cooldown",
-								},
+								}, -- [10]
 							},
 							["Point"] = {
 								["y"] = 150,

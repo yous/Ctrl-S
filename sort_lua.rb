@@ -46,8 +46,19 @@ def format_table(table, level = 1)
     list = []
     seq = 1
     is_seq = true
-    table.each do |k, v|
-      is_seq = false if is_seq && k != seq
+    hash.keys.sort.each do |k|
+      v = hash[k]
+      if is_seq
+        if k == 0
+          list << [k, v]
+          next
+        elsif k == seq + 1
+          list << nil
+          seq += 1
+        elsif k != seq
+          is_seq = false
+        end
+      end
       return format_hash(hash, level) if !is_seq && seq == 1
 
       if is_seq
@@ -93,7 +104,8 @@ end
 
 def format_list(list, level)
   result = "{\r\n"
-  list.each_with_index do |v, i|
+  index = 1
+  list.each do |v|
     result << "\t" * level
     if v.is_a?(Array)
       new_k, new_v = v
@@ -110,7 +122,8 @@ def format_list(list, level)
       else
         result << format_value(v)
       end
-      result << ", -- [#{i + 1}]\r\n"
+      result << ", -- [#{index}]\r\n"
+      index += 1
     end
   end
   result << "\t" * (level - 1) if level > 1
