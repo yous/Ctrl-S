@@ -62,7 +62,7 @@ namespace :wow do
     custom_path = CONFIG['wow_custom_path'] &&
       CONFIG['wow_custom_path'][os.to_s]
     custom_path = Pathname.new(custom_path) if custom_path
-    target = File.join('WTF', 'Account', account)
+    target = File.join('_retail_', 'WTF', 'Account', account)
     link_path =
       case os
       when :windows
@@ -106,7 +106,7 @@ namespace :wow do
     custom_path = CONFIG['wow_custom_path'] &&
       CONFIG['wow_custom_path'][os.to_s]
     custom_path = Pathname.new(custom_path) if custom_path
-    target = 'Interface/AddOns'
+    target = File.join('_retail_', 'Interface', 'AddOns')
     link_path =
       case os
       when :windows
@@ -129,6 +129,6 @@ namespace :wow do
           LinkPath.new(required_path.join(target), required_path: required_path)
         end
       end
-    link_path.link('WoW/AddOns')
+    link_path.link(File.join('WoW', 'AddOns'))
   end
 end
