@@ -1,9 +1,8 @@
 local mod	= DBM:NewMod("BoTrash", "DBM-BastionTwilight")
 local L		= mod:GetLocalizedStrings()
 
-mod:SetRevision(("$Revision: 145 $"):sub(12, -3))
+mod:SetRevision("20200806141910")
 mod:SetModelID(37193)
-mod:SetZone()
 mod.isTrashMod = true
 
 mod:RegisterEvents(
@@ -25,9 +24,6 @@ local specWarnFlameStrike	= mod:NewSpecialWarningMove(93362)
 local yellFlamestrike		= mod:NewYell(93362)
 
 local timerVolcanicWrath	= mod:NewBuffActiveTimer(9, 87903)--Maybe need a Guid based targettimer since most pulls have 2 of these?
-
-mod:RemoveOption("HealthFrame")
-mod:RemoveOption("SpeedKillTimer")
 
 local flamestrikeRunning = false
 

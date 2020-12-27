@@ -32,8 +32,7 @@ L:SetWarningLocalization{
 L:SetOptionLocalization{
 	WarnAddsSoon		= "為新的小怪出現顯示預先警告",
 	WarnReanimating		= "當小怪再活化時顯示警告",
-	TimerAdds			= "為新的小怪顯示計時器",
-	ShieldHealthFrame	= "為$spell:70842顯示首領血量框架"
+	TimerAdds			= "為新的小怪顯示計時器"
 }
 
 L:SetMiscLocalization{
@@ -87,8 +86,7 @@ L:SetGeneralLocalization{
 
 L:SetOptionLocalization{
 	RangeFrame				= "顯示距離框 (12碼)",
-	RunePowerFrame			= "顯示首領血量及$spell:72371條",
-	BeastIcons				= "為血獸設置標記"
+	RunePowerFrame			= "顯示首領血量及$spell:72371條"
 }
 
 L:SetMiscLocalization{
@@ -135,8 +133,7 @@ L:SetWarningLocalization{
 L:SetOptionLocalization{
 	WarnOozeSpawn		= "為小軟泥的出現顯示警告",
 	SpecWarnLittleOoze	= "當你被小軟泥怪盯上時顯示特別警告",
-	RangeFrame			= "顯示距離框(8碼)",
-	TankArrow			= "為大軟泥怪副坦顯示DBM箭頭"
+	RangeFrame			= "顯示距離框(8碼)"
 }
 
 L:SetMiscLocalization{
@@ -154,8 +151,7 @@ L:SetGeneralLocalization{
 }
 
 L:SetOptionLocalization{
-	MalleableGooIcon	= "為第一個中$spell:72295的目標設置標記",
-	GooArrow			= "當你附近的人中了$spell:72295時顯示DBM箭頭"
+	MalleableGooIcon	= "為第一個中$spell:72295的目標設置標記"
 }
 
 ----------------------------
@@ -181,8 +177,7 @@ L:SetOptionLocalization{
 	WarnTargetSwitchSoon	= "為轉換目標顯示預先警告",
 	TimerTargetSwitch		= "為轉換目標顯示冷卻計時器",
 	ActivePrinceIcon		= "設置標記在強化的親王身上(頭顱)",
-	RangeFrame				= "顯示距離框(12碼)",
-	VortexArrow				= "當你附近的人中了$spell:72037時顯示DBM箭頭"
+	RangeFrame				= "顯示距離框(12碼)"
 }
 
 L:SetMiscLocalization{
@@ -313,7 +308,6 @@ L:SetOptionLocalization{
 	PhaseTransition			= "為轉換階段顯示計時器",
 	ValkyrWarning			= "提示誰給華爾琪影衛抓住了",
 	SpecWarnYouAreValkd		= "當你給華爾琪影衛抓住時顯示特別警告",
-	ValkyrIcon				= "為華爾琪影衛設置標記",
 	AnnounceValkGrabs		= "提示誰被華爾琪影衛抓住到團隊頻道<br/>(需開啟團隊廣播及助理權限)",
 	SpecWarnValkyrLow		= "當華爾琪血量低於55%時顯示特別警告",
 	AnnouncePlagueStack		= "提示$spell:73912層數到團隊頻道 (10層, 10層後每5層提示一次)<br/>(需開啟助理權限)"

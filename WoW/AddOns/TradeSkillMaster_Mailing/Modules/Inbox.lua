@@ -9,152 +9,203 @@
 local TSM = select(2, ...)
 local Inbox = TSM:NewModule("Inbox", "AceEvent-3.0", "AceHook-3.0")
 local L = LibStub("AceLocale-3.0"):GetLocale("TradeSkillMaster_Mailing") -- loads the localization table
-
-local private = { recheckTime = 1, allowTimerStart = true, lootIndex = 1, freeSlots = true }
+local private = {recheckTime=1, allowTimerStart=true, moneyCollected=0, threadId=nil, frame=nil, mode=nil, modeModified=nil}
 
 
 function Inbox:OnEnable()
 	Inbox:RegisterEvent("MAIL_SHOW")
-	TSMAPI:CreateEventBucket("MAIL_INBOX_UPDATE", private.InboxUpdate, 0.2)
+	Inbox:RegisterEvent("MAIL_INBOX_UPDATE", function() TSMAPI.Delay:AfterTime("mailingInboxUpdate", 0.2, private.InboxUpdate) end)
 	Inbox:RegisterEvent("MAIL_CLOSED")
 end
 
-function Inbox:CreateTab(parent)
-	local frame = CreateFrame("Frame", nil, parent)
-	frame:Hide()
-	frame:SetAllPoints()
-	frame:SetScript("OnHide", function() private:StopAutoLooting() end)
-	frame:SetScript("OnShow", private.InboxUpdate)
+function Inbox:CreateTab()
+	local BFC = TSMAPI.GUI:GetBuildFrameConstants()
+	local frameInfo = {
+		type = "Frame",
+		key = "inboxTab",
+		hidden = true,
+		points = "ALL",
+		scripts = {"OnShow", "OnHide"},
+		children = {
+			{
+				type = "Text",
+				key = "topLabel",
+				text = "",
+				textFont = {TSMAPI.Design:GetContentFont("small")},
+				justify = {"CENTER", "MIDDLE"},
+				size = {0, 15},
+				points = {{"TOPLEFT", 5, -5}, {"TOPRIGHT", -5, -5}},
+			},
+			{
+				type = "HLine",
+				offset = -25,
+			},
+			{
+				type = "ScrollingTableFrame",
+				key = "st",
+				points = {{"TOPLEFT", 5, -30}, {"BOTTOMRIGHT", -5, 55}},
+				scripts = {"OnClick"},
+			},
+			{
+				type = "Button",
+				key = "allBtn",
+				text = L["Open All Mail"],
+				textHeight = 18,
+				tooltip = L["Opens all mail in your inbox. If you have more than 50 items in your inbox, the opening will automatically continue when the inbox refreshes."].."\n\n"..TSMAPI.Design:GetInlineColor("link")..L["Shift-Click|r to leave mail with gold."],
+				size = {0, 20},
+				points = {{"BOTTOMLEFT", 5, 30}, {"BOTTOMRIGHT", -5, 30}},
+				scripts = {"OnClick"},
+			},
+			{
+				type = "Text",
+				key = "ahMailLabel",
+				text = L["AH Mail:"],
+				textFont = {TSMAPI.Design:GetContentFont("normal")},
+				justify = {"RIGHT", "CENTER"},
+				size = {70, 20},
+				points = {{"BOTTOMLEFT", 5, 5}},
+			},
+			{
+				type = "Button",
+				key = "salesBtn",
+				text = L["Sales"],
+				textHeight = 18,
+				tooltip = L["Opens all mail containing gold from sales."].."\n\n"..format(L["%sShift-Click|r to continue opening after an inbox refresh if you have more than 50 items in your inbox."], TSMAPI.Design:GetInlineColor("link")),
+				size = {70, 20},
+				points = {{"BOTTOMLEFT", BFC.PREV, "BOTTOMRIGHT", 5, 0}},
+				scripts = {"OnClick"},
+			},
+			{
+				type = "Button",
+				key = "buysBtn",
+				text = L["Buys"],
+				tooltip = L["Opens all mail containing items you have bought."].."\n\n"..format(L["%sShift-Click|r to continue opening after an inbox refresh if you have more than 50 items in your inbox."], TSMAPI.Design:GetInlineColor("link")),
+				textHeight = 18,
+				size = {70, 20},
+				points = {{"BOTTOMLEFT", BFC.PREV, "BOTTOMRIGHT", 5, 0}},
+				scripts = {"OnClick"},
+			},
+			{
+				type = "Button",
+				key = "cancelsBtn",
+				text = L["Cancels"],
+				textHeight = 18,
+				tooltip = L["Opens all mail containing canceled auctions."].."\n\n"..format(L["%sShift-Click|r to continue opening after an inbox refresh if you have more than 50 items in your inbox."], TSMAPI.Design:GetInlineColor("link")),
+				size = {70, 20},
+				points = {{"BOTTOMLEFT", BFC.PREV, "BOTTOMRIGHT", 5, 0}},
+				scripts = {"OnClick"},
+			},
+			{
+				type = "Button",
+				key = "expiresBtn",
+				text = L["Expires"],
+				textHeight = 18,
+				tooltip = L["Opens all mail containing expired auctions."].."\n\n"..format(L["%sShift-Click|r to continue opening after an inbox refresh if you have more than 50 items in your inbox."], TSMAPI.Design:GetInlineColor("link")),
+				size = {0, 20},
+				points = {{"BOTTOMLEFT", BFC.PREV, "BOTTOMRIGHT", 5, 0}, {"BOTTOMRIGHT", -5, 5}},
+				scripts = {"OnClick"},
+			},
+			{
+				type = "Button",
+				key = "reloadBtn",
+				text = RELOADUI,
+				textHeight = 16,
+				size = {150, 20},
+				points = {{"CENTER"}},
+				scripts = {"OnClick"},
+			},
+		},
+		handlers = {
+			OnShow = function(self)
+				private.frame = self
+				self.reloadBtn:SetFrameStrata("HIGH")
+				self.reloadBtn:Hide()
 
-	local label = TSMAPI.GUI:CreateLabel(frame, "small")
-	label:SetPoint("TOPLEFT", 5, -5)
-	label:SetPoint("TOPRIGHT", -5, -5)
-	label:SetHeight(15)
-	label:SetJustifyH("CENTER")
-	label:SetJustifyV("CENTER")
-	frame.topLabel = label
+				if not self.helpBtn then
+					local TOTAL_WIDTH = private.frame:GetParent():GetWidth()
+					local helpPlateInfo = {
+						FramePos = {x = 0, y = 70},
+						FrameSize = {width = TOTAL_WIDTH, height = private.frame:GetHeight()},
+						{
+							ButtonPos = {x = 100, y = -20},
+							HighLightBox = {x = 70, y = -35, width = TOTAL_WIDTH-70, height = 30},
+							ToolTipDir = "DOWN",
+							ToolTipText = L["These buttons change what is shown in the mailbox frame. You can view your inbox, automatically mail items in groups, quickly send items to other characters, and more in the various tabs."],
+						},
+						{
+							ButtonPos = {x = 200, y = -200},
+							HighLightBox = {x = 0, y = -65, width = TOTAL_WIDTH, height = 305},
+							ToolTipDir = "RIGHT",
+							ToolTipText = L["This is where the items in your inbox are listed in an information and easy to read format."],
+						},
+						{
+							ButtonPos = {x = 300, y = -360},
+							HighLightBox = {x = 0, y = -370, width = TOTAL_WIDTH, height = 55},
+							ToolTipDir = "RIGHT",
+							ToolTipText = L["The 'Open All Mail' button will open all mail in your inbox (including beyond the 50-mail limit). The AH mail buttons below that will open specific types of mail from your inbox."],
+						},
+					}
 
-	TSMAPI.GUI:CreateHorizontalLine(frame, -25)
-
-	local stContainer = CreateFrame("Frame", nil, frame)
-	stContainer:SetPoint("TOPLEFT", 5, -35)
-	stContainer:SetPoint("BOTTOMRIGHT", -5, 55)
-	TSMAPI.Design:SetFrameColor(stContainer)
-
-	local handlers = {
-		OnClick = function(_, data)
-			if IsShiftKeyDown() and select(6, GetInboxHeaderInfo(data.index)) <= 0 then
-				if private:CanLootMailIndex(data.index) then
-					private:LootMailItem(data.index)
-				else
-					TSM:Print(L["Could not loot item from mail because your bags are full."])
+					self.helpBtn = CreateFrame("Button", nil, private.frame, "MainHelpPlateButton")
+					self.helpBtn:SetPoint("TOPLEFT", 50, 100)
+					self.helpBtn:SetScript("OnClick", function() TSM.MailTab:ToggleHelpPlate(private.frame, helpPlateInfo, self.helpBtn, true) end)
+					self.helpBtn:SetScript("OnHide", function() if HelpPlate_IsShowing(helpPlateInfo) then TSM.MailTab:ToggleHelpPlate(private.frame, helpPlateInfo, self.helpBtn, false) end end)
+					if not TSM.db.global.helpPlatesShown.inbox then
+						TSM.db.global.helpPlatesShown.inbox = true
+						TSM.MailTab:ToggleHelpPlate(private.frame, helpPlateInfo, self.helpBtn, false)
+					end
 				end
-			end
 
-			if InboxFrame.openMailID ~= data.index then
-				InboxFrame.openMailID = data.index
-				OpenMailFrame.updateButtonPositions = true
-				OpenMail_Update()
-				ShowUIPanel(OpenMailFrame)
-				OpenMailFrameInset:SetPoint("TOPLEFT", 4, -80)
-				PlaySound("igSpellBookOpen")
-			else
-				InboxFrame.openMailID = 0
-				HideUIPanel(OpenMailFrame)
-			end
-			InboxFrame_Update()
-		end,
-		OnEnter = function(_, data, self)
-		end,
-		OnLeave = function()
-		end,
+				private:InboxUpdate()
+			end,
+			OnHide = private.MailThreadDone,
+			st = {
+				OnClick = function(_, data)
+					if IsShiftKeyDown() and select(6, GetInboxHeaderInfo(data.index)) <= 0 then
+						if private:CanLootMailIndex(data.index, true) then
+							private:PrintOpenMailMessage(data.index)
+							AutoLootMailItem(data.index)
+						else
+							TSM:Print(L["Could not loot item from mail because your bags are full."])
+						end
+					end
+
+					if InboxFrame.openMailID ~= data.index then
+						InboxFrame.openMailID = data.index
+						OpenMailFrame.updateButtonPositions = true
+						OpenMail_Update()
+						ShowUIPanel(OpenMailFrame)
+						OpenMailFrameInset:SetPoint("TOPLEFT", 4, -80)
+						PlaySound(SOUNDKIT["IG_SPELLBOOK_OPEN"])
+					else
+						InboxFrame.openMailID = 0
+						HideUIPanel(OpenMailFrame)
+					end
+					InboxFrame_Update()
+				end,
+			},
+			allBtn = {
+				OnClick = function() private:StartOpenMail("all") end,
+			},
+			buysBtn = {
+				OnClick = function() private:StartOpenMail("buys") end,
+			},
+			salesBtn = {
+				OnClick = function() private:StartOpenMail("sales") end,
+			},
+			cancelsBtn = {
+				OnClick = function() private:StartOpenMail("cancels") end,
+			},
+			expiresBtn = {
+				OnClick = function() private:StartOpenMail("expires") end,
+			},
+			reloadBtn = {
+				OnClick = ReloadUI,
+			},
+		},
 	}
-
-	local st = TSMAPI:CreateScrollingTable(stContainer, nil, handlers)
-	st:SetData({})
-	frame.st = st
-
-	local btn = TSMAPI.GUI:CreateButton(frame, 18)
-	btn:SetPoint("BOTTOMLEFT", 5, 30)
-	btn:SetPoint("BOTTOMRIGHT", -5, 30)
-	btn:SetHeight(20)
-	btn:SetText(L["Open All Mail"])
-	btn:SetScript("OnClick", function() private:StartAutoLooting("all") end)
-	frame.allBtn = btn
-
-	local label = TSMAPI.GUI:CreateLabel(frame, "normal")
-	label:SetPoint("BOTTOMLEFT", 5, 5)
-	label:SetHeight(20)
-	label:SetJustifyH("LEFT")
-	label:SetJustifyV("CENTER")
-	label:SetText(L["AH Mail:"])
-
-	local btnWidth = (frame:GetWidth() - label:GetWidth() - 25) / 4
-
-	local btn = TSMAPI.GUI:CreateButton(frame, 18)
-	btn:SetPoint("BOTTOMLEFT", label, "BOTTOMRIGHT", 5, 0)
-	btn:SetWidth(btnWidth)
-	btn:SetHeight(20)
-	btn:SetText(L["Sales"])
-	btn:SetScript("OnClick", function() private:StartAutoLooting("sales") end)
-	frame.salesBtn = btn
-
-	local btn = TSMAPI.GUI:CreateButton(frame, 18)
-	btn:SetPoint("BOTTOMLEFT", frame.salesBtn, "BOTTOMRIGHT", 5, 0)
-	btn:SetWidth(btnWidth)
-	btn:SetHeight(20)
-	btn:SetText(L["Buys"])
-	btn:SetScript("OnClick", function() private:StartAutoLooting("buys") end)
-	frame.buysBtn = btn
-
-	local btn = TSMAPI.GUI:CreateButton(frame, 18)
-	btn:SetPoint("BOTTOMLEFT", frame.buysBtn, "BOTTOMRIGHT", 5, 0)
-	btn:SetWidth(btnWidth)
-	btn:SetHeight(20)
-	btn:SetText(L["Cancels"])
-	btn:SetScript("OnClick", function() private:StartAutoLooting("cancels") end)
-	frame.cancelsBtn = btn
-
-	local btn = TSMAPI.GUI:CreateButton(frame, 18)
-	btn:SetPoint("BOTTOMLEFT", frame.cancelsBtn, "BOTTOMRIGHT", 5, 0)
-	btn:SetPoint("BOTTOMRIGHT", -5, 5)
-	btn:SetHeight(20)
-	btn:SetText(L["Expires"])
-	btn:SetScript("OnClick", function() private:StartAutoLooting("expires") end)
-	frame.expiresBtn = btn
-
-	local btn = TSMAPI.GUI:CreateButton(frame, 16)
-	btn:SetFrameStrata("HIGH")
-	btn:SetPoint("CENTER")
-	btn:SetHeight(30)
-	btn:SetWidth(150)
-	btn:SetText(L["Reload UI"])
-	btn:SetScript("OnClick", ReloadUI)
-	btn:Hide()
-	frame.reloadBtn = btn
-
-	frame.EnableButtons = function(self)
-		self.allBtn:Enable()
-		self.salesBtn:Enable()
-		self.buysBtn:Enable()
-		self.cancelsBtn:Enable()
-		self.expiresBtn:Enable()
-		self.buttonsEnabled = true
-	end
-	frame.DisableButtons = function(self)
-		self.allBtn:Disable()
-		self.salesBtn:Disable()
-		self.buysBtn:Disable()
-		self.cancelsBtn:Disable()
-		self.expiresBtn:Disable()
-		self.buttonsEnabled = nil
-	end
-	frame.buttonsEnabled = true
-
-	private.frame = frame
-	return frame
+	return frameInfo
 end
-
 
 local function CacheFrameOnUpdate(self, elapsed)
 	if not private.waitingForData then
@@ -166,8 +217,6 @@ local function CacheFrameOnUpdate(self, elapsed)
 			if TSM.db.global.autoCheck then
 				private.waitingForData = true
 				self.timeLeft = private.recheckTime
-				private.lootIndex = 1
-				private.resetIndex = nil
 				CheckInbox()
 				private.frame.reloadBtn:Hide()
 			else
@@ -181,8 +230,6 @@ local function CacheFrameOnUpdate(self, elapsed)
 		self.timeLeft = self.timeLeft - elapsed
 		if self.timeLeft <= 0 then
 			self.timeLeft = private.recheckTime
-			private.lootIndex = 1
-			private.resetIndex = nil
 			CheckInbox()
 			private.frame.reloadBtn:Hide()
 		end
@@ -190,11 +237,25 @@ local function CacheFrameOnUpdate(self, elapsed)
 end
 
 function Inbox:MAIL_SHOW()
+	TSMAPI.Delay:AfterTime("mailingGetSellers", 0.1, private.RequestSellerInfo, 0.1)
 	if not private.cacheFrame then
 		-- Timer for mailbox cache updates
 		private.cacheFrame = CreateFrame("Frame", nil, MailFrame)
 		private.cacheFrame:Hide()
 		private.cacheFrame:SetScript("OnUpdate", CacheFrameOnUpdate)
+	end
+end
+
+function private:RequestSellerInfo()
+	local isDone = true
+	for i=1, GetInboxNumItems() do
+		local invoiceType, _, seller = GetInboxInvoiceInfo(i)
+		if invoiceType and seller == "" then
+			isDone = false
+		end
+	end
+	if isDone and GetInboxNumItems() > 0 then
+		TSMAPI.Delay:Cancel("mailingGetSellers")
 	end
 end
 
@@ -224,7 +285,7 @@ function private:UpdateTopLabel()
 
 	local collectGold = private.collectGold or 0
 	if collectGold > 0 then
-		tinsert(parts, format(L["%s to collect."], TSMAPI:FormatTextMoney(collectGold)))
+		tinsert(parts, format(L["%s to collect."], TSMAPI:MoneyToString(collectGold)))
 	end
 
 	local nextRefresh = private.cacheFrame:IsVisible() and private.cacheFrame.endTime
@@ -240,7 +301,6 @@ end
 
 function private:InboxUpdate()
 	if not private.frame or not private.frame:IsVisible() then return end
-	TSMAPI:CancelFrame("inboxLootTextDelay")
 
 	local numMail, totalMail = GetInboxNumItems()
 
@@ -249,16 +309,16 @@ function private:InboxUpdate()
 	local collectGold = 0
 	for i = 1, numMail do
 		mailInfo[i] = ""
-		local isInvoice = select(4, GetInboxText(i))
+		local isInvoice = select(5, GetInboxText(i))
 		local _, _, sender, subject, money, cod, daysLeft, hasItem = GetInboxHeaderInfo(i)
 		if isInvoice then
 			local invoiceType, itemName, playerName, bid, _, _, ahcut, _, _, _, quantity = GetInboxInvoiceInfo(i)
 			if invoiceType == "buyer" then
-				local itemLink = GetInboxItemLink(i, 1) or itemName
-				mailInfo[i] = format(L["Buy: %s (%d) | %s | %s"], itemLink, quantity, TSMAPI:FormatTextMoney(bid, redColor), FormatDaysLeft(daysLeft, i))
+				local itemLink = private:GetFirstInboxItemLink(i) or itemName
+				mailInfo[i] = format(L["Buy: %s (%d) | %s | %s"], itemLink, quantity, TSMAPI:MoneyToString(bid, redColor), FormatDaysLeft(daysLeft, i))
 			elseif invoiceType == "seller" then
 				collectGold = collectGold + bid - ahcut
-				mailInfo[i] = format(L["Sale: %s (%d) | %s | %s"], itemName, quantity, TSMAPI:FormatTextMoney(bid - ahcut, greenColor), FormatDaysLeft(daysLeft, i))
+				mailInfo[i] = format(L["Sale: %s (%d) | %s | %s"], itemName, quantity, TSMAPI:MoneyToString(bid - ahcut, greenColor), FormatDaysLeft(daysLeft, i))
 			end
 		elseif hasItem then
 			local itemLink
@@ -266,27 +326,31 @@ function private:InboxUpdate()
 			for j = 1, hasItem do
 				local link = GetInboxItemLink(i, j)
 				itemLink = itemLink or link
-				quantity = quantity + select(3, GetInboxItem(i, j))
-				if TSMAPI:GetItemString(itemLink) ~= TSMAPI:GetItemString(link) then
+				quantity = quantity + (select(4, GetInboxItem(i, j)) or 0)
+				if TSMAPI.Item:ToItemString(itemLink) ~= TSMAPI.Item:ToItemString(link) then
 					itemLink = L["Multiple Items"]
 					quantity = -1
 					break
 				end
 			end
+			if hasItem == 1 then
+				itemLink = private:GetFirstInboxItemLink(i) or itemLink
+			end
 			local itemDesc = (quantity > 0 and format("%s (%d)", itemLink, quantity)) or (quantity == -1 and L["Multiple Items"]) or "---"
 
-			if hasItem == 1 and itemLink and strfind(subject, "^" .. TSMAPI:StrEscape(format(AUCTION_EXPIRED_MAIL_SUBJECT, TSMAPI:GetSafeItemInfo(itemLink)))) then
+			local name = TSMAPI.Item:GetName(itemLink) or "?"
+			if hasItem == 1 and itemLink and strfind(subject, "^" .. TSMAPI.Util:StrEscape(format(AUCTION_EXPIRED_MAIL_SUBJECT, name))) then
 				mailInfo[i] = format(L["Expired: %s | %s"], itemDesc, FormatDaysLeft(daysLeft, i))
 			elseif cod > 0 then
-				mailInfo[i] = format(L["COD: %s | %s | %s | %s"], itemDesc, TSMAPI:FormatTextMoney(cod, redColor), sender or "---", FormatDaysLeft(daysLeft, i))
+				mailInfo[i] = format(L["COD: %s | %s | (%s) | %s | %s"], itemDesc, TSMAPI:MoneyToString(cod, redColor), quantity > 0 and TSMAPI:MoneyToString(floor(cod / quantity + 0.5), redColor) or "---", sender or "---", FormatDaysLeft(daysLeft, i))
 			elseif money > 0 then
 				collectGold = collectGold + money
-				mailInfo[i] = format("%s + %s | %s | %s", itemDesc, TSMAPI:FormatTextMoney(money, greenColor), sender or "---", FormatDaysLeft(daysLeft, i))
+				mailInfo[i] = format("%s + %s | %s | %s", itemDesc, TSMAPI:MoneyToString(money, greenColor), sender or "---", FormatDaysLeft(daysLeft, i))
 			else
 				mailInfo[i] = format("%s | %s | %s", itemDesc, sender or "---", FormatDaysLeft(daysLeft, i))
 			end
 		elseif money > 0 then
-			mailInfo[i] = format("%s | %s | %s | %s", subject, TSMAPI:FormatTextMoney(money, greenColor), sender or "---", FormatDaysLeft(daysLeft, i))
+			mailInfo[i] = format("%s | %s | %s | %s", subject, TSMAPI:MoneyToString(money, greenColor), sender or "---", FormatDaysLeft(daysLeft, i))
 		else
 			mailInfo[i] = format("%s | %s | %s", subject, sender or "---", FormatDaysLeft(daysLeft, i))
 		end
@@ -299,229 +363,50 @@ function private:InboxUpdate()
 	end
 	private.frame.st:SetData(stData)
 
+	if numMail > 0 then
+		private.frame.reloadBtn:Hide()
+	end
 	private:UpdateTopLabel()
 
-	-- Yay nothing else to loot, so nothing else to update the cache for!
 	if private.cacheFrame.endTime and numMail == totalMail and private.lastTotal ~= totalMail then
+		-- Yay nothing else to loot, so nothing else to update the cache for!
 		private.cacheFrame.endTime = nil
 		private.cacheFrame:Hide()
-		-- Start a timer since we're over the limit of 50 items before waiting for it to recache
 	elseif (private.cacheFrame.endTime and numMail >= 50 and private.lastTotal ~= totalMail) or (numMail >= 50 and private.allowTimerStart) then
-		private.resetIndex = nil
+		-- Start a timer since we're over the limit of 50 items before waiting for it to recache
 		private.allowTimerStart = nil
 		private.waitingForData = nil
 		private.lastTotal = totalMail
 		private.cacheFrame.endTime = GetTime() + 60
 		private.cacheFrame:Show()
 	end
-
-	-- The last item we setup to auto loot is finished, time for the next one
-	if not private.frame.buttonsEnabled then
-		if private.autoLootTotal ~= numMail then
-			private.autoLootTotal = GetInboxNumItems()
-
-			-- If we're auto checking mail when new data is available, will wait and continue auto looting, otherwise we just stop now
-			if numMail == 0 and (not TSM.db.global.autoCheck or totalMail == 0) then
-				private:StopAutoLooting()
-			else
-				private:AutoLoot()
-			end
-		else
-			TSMAPI:CreateTimeDelay("mailSkipDelay", 1, function()
-				local money, _, _, hasItem, _, _, _, canReply = select(5, GetInboxHeaderInfo(private.lootIndex))
-				if not hasItem and money == 0 then
-					private.lootIndex = private.lootIndex + 1
-					return private:AutoLoot()
-				end
-			end)
-		end
-	end
-end
-
-function private:ShouldOpenMail(index)
-	local shouldOpen
-	if private.mode == "all" then
-		return true
-	elseif private.mode == "sales" then
-		local money = select(5, GetInboxHeaderInfo(index))
-		if money > 0 and GetInboxInvoiceInfo(index) == "seller" then
-			return true
-		end
-	elseif private.mode == "buys" then
-		local hasItem = select(8, GetInboxHeaderInfo(index))
-		if hasItem and GetInboxInvoiceInfo(index) == "buyer" then
-			return true
-		end
-	elseif private.mode == "cancels" then
-		local isInvoice = select(4, GetInboxText(index))
-		local subject, _, _, _, hasItem = select(4, GetInboxHeaderInfo(index))
-		if not isInvoice and hasItem == 1 then
-			local itemLink = GetInboxItemLink(index, 1)
-			if itemLink then
-				local itemName = TSMAPI:GetSafeItemInfo(itemLink)
-				local quantity = select(3, GetInboxItem(index, 1))
-				if quantity and quantity > 0 and (subject == format(AUCTION_REMOVED_MAIL_SUBJECT.." (%d)", itemName, quantity) or subject == format(AUCTION_REMOVED_MAIL_SUBJECT, itemName)) then
-					return true
-				end
-			end
-		end
-	elseif private.mode == "expires" then
-		local isInvoice = select(4, GetInboxText(index))
-		local subject, _, _, _, hasItem = select(4, GetInboxHeaderInfo(index))
-		if not isInvoice and hasItem == 1 then
-			local itemLink = GetInboxItemLink(index, 1)
-			if itemLink and strfind(subject, "^" .. TSMAPI:StrEscape(format(AUCTION_EXPIRED_MAIL_SUBJECT, TSMAPI:GetSafeItemInfo(itemLink)))) then
-				return true
-			end
-		end
-	end
 end
 
 
-
--- Deals with auto looting of mail!
-function private:StartAutoLooting(mode)
-	private.mode = mode
-	local canCollectMail
-	if private.mode == "all" then
-		local total
-		private.autoLootTotal, total = GetInboxNumItems()
-		canCollectMail = not (private.autoLootTotal == 0 and total == 0)
-	else
-		for i = 1, GetInboxNumItems() do
-			if private:ShouldOpenMail(i) then
-				canCollectMail = true
-				break
-			end
-		end
-	end
-	if not canCollectMail then
-		private.mode = nil
-		return
-	end
-
-	Inbox:RegisterEvent("UI_ERROR_MESSAGE")
-	private.frame:DisableButtons()
-	private.moneyCollected = 0
-	private.mode = mode
-	private.lootIndex = 1
-	private:AutoLoot()
-end
-
-function private:AutoLoot()
-	TSMAPI:CancelFrame("mailSkipDelay")
-
-	-- Already looted everything after the invalid indexes we had, so fail it
-	if private.lootIndex > 1 and private.lootIndex > GetInboxNumItems() then
-		if private.resetIndex then
-			private:StopAutoLooting()
-		else
-			private.resetIndex = true
-			private.lootIndex = 1
-			private:AutoLoot()
-		end
-		return
-	end
-
-	local money, cod, _, items, _, _, _, _, isGM = select(5, GetInboxHeaderInfo(private.lootIndex))
-	if not isGM and (not cod or cod <= 0) and ((money and money > 0) or (items and items > 0)) then
-		TSMAPI:CancelFrame("mailWaitDelay")
-		if private.mode == "all" then
-			if money > 0 then
-				if TSM.db.global.openAllLeaveGold then
-					private.lootIndex = private.lootIndex + 1
-					return private:AutoLoot()
-				end
-			end
-			if private:CanLootMailIndex(private.lootIndex) then
-				if money > 0 then
-					private.moneyCollected = private.moneyCollected + money
-				end
-				private:LootMailItem(private.lootIndex)
-			else
-				private.lootIndex = private.lootIndex + 1
-				return private:AutoLoot()
-			end
-		else
-			if private:CanLootMailIndex(private.lootIndex) and private:ShouldOpenMail(private.lootIndex) then
-				if money > 0 then
-					private.moneyCollected = private.moneyCollected + money
-				end
-				private:LootMailItem(private.lootIndex)
-			else
-				private.lootIndex = private.lootIndex + 1
-				return private:AutoLoot()
-			end
-		end
-		-- Can't grab the first mail, so increase it and try again
-	elseif GetInboxNumItems() >= private.lootIndex then
-		private.lootIndex = private.lootIndex + 1
-		private:AutoLoot()
-	end
-end
-
-function private:LootMailItem(index)
-	if TSM.db.global.inboxMessages then
-		local _, _, sender, subject, money, cod, _, hasItem = GetInboxHeaderInfo(index)
-		sender = sender or "?"
-		if select(4, GetInboxText(index)) then
-			-- it's an invoice
-			local invoiceType, itemName, playerName, bid, _, _, ahcut, _, _, _, quantity = GetInboxInvoiceInfo(index)
-			if invoiceType == "buyer" then
-				local itemLink = GetInboxItemLink(index, 1) or itemName
-				TSM:Printf(L["Collected purchase of %s (%d) for %s."], itemLink, quantity, TSMAPI:FormatTextMoney(bid, redColor))
-			elseif invoiceType == "seller" then
-				TSM:Printf(L["Collected sale of %s (%d) for %s."], itemName, quantity, TSMAPI:FormatTextMoney(bid - ahcut, greenColor))
-			end
-		elseif hasItem then
-			local itemLink
-			local quantity = 0
-			for i = 1, hasItem do
-				local link = GetInboxItemLink(index, i)
-				itemLink = itemLink or link
-				quantity = quantity + select(3, GetInboxItem(index, i))
-				if TSMAPI:GetItemString(itemLink) ~= TSMAPI:GetItemString(link) then
-					itemLink = L["Multiple Items"]
-					quantity = -1
-					break
-				end
-			end
-			local itemDesc = (quantity > 0 and format("%s (%d)", itemLink, quantity)) or (quantity == -1 and "Multiple Items") or "?"
-			if hasItem == 1 and itemLink and strfind(subject, "^" .. TSMAPI:StrEscape(format(AUCTION_EXPIRED_MAIL_SUBJECT, TSMAPI:GetSafeItemInfo(itemLink)))) then
-				TSM:Printf(L["Collected expired auction of %s"], itemDesc)
-			elseif cod > 0 then
-				TSM:Printf(L["Collected COD of %s from %s for %s."], itemDesc, sender, TSMAPI:FormatTextMoney(cod, redColor))
-			elseif money > 0 then
-				TSM:Printf(L["Collected %s and %s from %s."], itemDesc, TSMAPI:FormatTextMoney(money, greenColor), sender)
-			else
-				TSM:Printf(L["Collected %s from %s."], itemDesc, sender)
-			end
-		elseif money > 0 then
-			TSM:Printf(L["Collected %s from %s."], TSMAPI:FormatTextMoney(money, greenColor), sender)
-		else
-			TSM:Printf(L["Collected mail from %s with a subject of '%s'."], sender, subject)
-		end
-	end
-	AutoLootMailItem(index)
-end
-
-function private:CanLootMailIndex(index)
-	local hasItem = select(8, GetInboxHeaderInfo(index))
+function private:CanLootMailIndex(index, force)
+	local money, cod, _, hasItem = select(5, GetInboxHeaderInfo(index))
+	-- check if this would put them over the gold cap
+	money = (money or 0) + (cod or 0)
+    local MAX_COPPER = 99999999999
+	local currentMoney = GetMoney()
+	TSMAPI:Assert(currentMoney <= MAX_COPPER)
+	if currentMoney + money > MAX_COPPER then return end
 	if not hasItem or hasItem == 0 then return true end
 
-	if not TSM.db.global.keepMailSpace or TSM.db.global.keepMailSpace == 0 then
+	if force or not TSM.db.global.keepMailSpace or TSM.db.global.keepMailSpace == 0 then
 		for j = 1, ATTACHMENTS_MAX_RECEIVE do
-			local itemString = TSMAPI:GetItemString(GetInboxItemLink(index, j))
-			local quantity = select(3, GetInboxItem(index, j))
+			local link = GetInboxItemLink(index, j)
+			local itemString = TSMAPI.Item:ToItemString(link)
+			local quantity = select(4, GetInboxItem(index, j)) or 0
 			local space = 0
 			if itemString then
 				for bag = 0, NUM_BAG_SLOTS do
-					if TSMAPI:ItemWillGoInBag(itemString, bag) then
+					if TSMAPI.Inventory:ItemWillGoInBag(link, bag) then
 						for slot = 1, GetContainerNumSlots(bag) do
-							local iString = TSMAPI:GetItemString(GetContainerItemLink(bag, slot))
+							local iString = TSMAPI.Item:ToItemString(GetContainerItemLink(bag, slot))
 							if iString == itemString then
 								local stackSize = select(2, GetContainerItemInfo(bag, slot))
-								local maxStackSize = select(8, TSMAPI:GetSafeItemInfo(itemString))
+								local maxStackSize = TSMAPI.Item:GetMaxStack(itemString) or 1
 								if (maxStackSize - stackSize) >= quantity then
 									return true
 								end
@@ -531,6 +416,10 @@ function private:CanLootMailIndex(index)
 						end
 					end
 				end
+
+				-- Cannot loot the first item, so return.
+				private.inventoryFull = true
+				return
 			end
 		end
 	else
@@ -538,17 +427,18 @@ function private:CanLootMailIndex(index)
 		local genericSpace, uniqueSpace, partSlots = private:GetBagSlots()
 		local usedSlots = {}
 		for j = 1, ATTACHMENTS_MAX_RECEIVE do
-			local itemString = TSMAPI:GetItemString(GetInboxItemLink(index, j))
-			local quantity = select(3, GetInboxItem(index, j))
+			local link = GetInboxItemLink(index, j)
+			local itemString = TSMAPI.Item:ToItemString(link)
+			local quantity = select(4, GetInboxItem(index, j)) or 0
 			local isDone = false
 			if itemString then
 				for bag = 0, NUM_BAG_SLOTS do
-					if TSMAPI:ItemWillGoInBag(itemString, bag) then
+					if TSMAPI.Inventory:ItemWillGoInBag(link, bag) then
 						for slot = 1, GetContainerNumSlots(bag) do
-							local iString = TSMAPI:GetItemString(GetContainerItemLink(bag, slot))
+							local iString = TSMAPI.Item:ToItemString(GetContainerItemLink(bag, slot))
 							if iString == itemString and (partSlots[bag] and partSlots[bag][slot]) then
 								local stackSize = select(2, GetContainerItemInfo(bag, slot))
-								local maxStackSize = select(8, TSMAPI:GetSafeItemInfo(itemString))
+								local maxStackSize = TSMAPI.Item:GetMaxStack(itemString)
 								if (maxStackSize - stackSize - (usedSlots[bag] and usedSlots[bag][slot] or 0)) >= quantity then
 									if stackSize + quantity == maxStackSize then
 										if partSlots[bag] and partSlots[bag][slot] then
@@ -564,7 +454,7 @@ function private:CanLootMailIndex(index)
 									break
 								end
 							else
-								local itemFamily = GetItemFamily(itemString)
+								local itemFamily = GetItemFamily(TSMAPI.Item:ToItemID(itemString)) or 0
 								local bagFamily = GetItemFamily(GetBagName(bag)) or 0
 								if itemFamily and bagFamily and bagFamily > 0 and bit.band(itemFamily, bagFamily) > 0 and (uniqueSpace[bag] and uniqueSpace[bag] > 0) then
 									uniqueSpace[bag] = uniqueSpace[bag] - 1 -- remove one empty slot from the bag
@@ -601,29 +491,6 @@ function private:CanLootMailIndex(index)
 	end
 end
 
-function private:StopAutoLooting(failed)
-	if failed and (not private.frame or not private.frame:IsVisible()) then
-		TSM:Print(L["Cannot finish auto looting, inventory is full or too many unique items."])
-	end
-
-	if private.keepFreeSlots then
-		TSM:Printf(L["Cannot finish auto looting, keeping %s slots free."], TSM.db.global.keepMailSpace)
-		private.keepFreeSlots = false
-	end
-
-	private.mode = nil
-	private.resetIndex = nil
-	private.autoLootTotal = nil
-	if not private.frame then return end
-	private.frame:EnableButtons()
-
-	--Tell user how much money has been collected if they don't have it turned off in TradeSkillMaster_Mailing options
-	if private.moneyCollected and private.moneyCollected > 0 and TSM.db.global.displayMoneyCollected then
-		TSM:Printf(L["%s total gold collected!"], TSMAPI:FormatTextMoney(private.moneyCollected))
-		private.moneyCollected = 0
-	end
-end
-
 function private:GetBagSlots()
 	local genericSpace, uniqueSpace, partSlots = {}, {}, {}
 	for bag = 0, NUM_BAG_SLOTS do
@@ -645,32 +512,275 @@ function private:GetBagSlots()
 	return genericSpace, uniqueSpace, partSlots
 end
 
-function Inbox:UI_ERROR_MESSAGE(event, msg)
-	if msg == ERR_MAIL_DATABASE_ERROR then
-		-- recover from internal mail error
-		TSMAPI:CreateTimeDelay("mailWaitDelay", 1, private.AutoLoot)
-	elseif msg == ERR_INV_FULL or msg == ERR_ITEM_MAX_COUNT then
-		-- Try the next index in case we can still loot more such as in the case of glyphs
-		private.lootIndex = private.lootIndex + 1
+function Inbox:MAIL_CLOSED()
+	private.allowTimerStart = true
+	private.waitingForData = nil
+	TSMAPI.Delay:Cancel("mailingGetSellers")
+	private:MailThreadDone()
+end
 
-		-- If we've exhausted all slots, but we still have <50 and more mail pending, wait until new data comes and keep looting it
-		local current, total = GetInboxNumItems()
-		if private.lootIndex > current then
-			if private.lootIndex > total and total <= 50 then
-				private:StopAutoLooting(true)
-			end
-			return
+function private:ShouldDeleteMail(index)
+	local subject, money, cod, numItems, wasReturned, canReply, isGM = TSMAPI.Util:Select({4, 5, 6, 8, 10, 12, 13}, GetInboxHeaderInfo(index))
+	if not TSM.db.global.deleteEmptyNPCMail then return false end
+	if isGM then return false end
+	if canReply then return false end
+	if numItems then return false end
+	if cod > 0 then return false end
+	if money > 0 then return false end
+	if wasReturned then return false end
+	return true
+end
+
+function private:ShouldOpenMail(index)
+	local _, _, _, subject, money, cod, _, numItems, _, _, _, _, isGM = GetInboxHeaderInfo(index)
+	cod = cod or 0
+	money = money or 0
+	numItems = numItems or 0
+
+	if isGM or cod > 0 or (money == 0 and numItems == 0) then return end
+	if not private:CanLootMailIndex(index) then return end
+
+	if private.mode == "all" then
+		if private.modeModified then
+			return money == 0
+		else
+			return true
 		end
-
-		TSMAPI:CreateTimeDelay("mailWaitDelay", 0.3, private.AutoLoot)
+	elseif private.mode == "sales" then
+		return money > 0 and GetInboxInvoiceInfo(index) == "seller"
+	elseif private.mode == "buys" then
+		return numItems > 0 and GetInboxInvoiceInfo(index) == "buyer"
+	elseif private.mode == "cancels" then
+		local isInvoice = select(5, GetInboxText(index))
+		if not isInvoice and numItems == 1 then
+			local itemName = TSMAPI.Item:GetName(private:GetFirstInboxItemLink(index))
+			if itemName then
+				local quantity = select(4, GetInboxItem(index, 1))
+				if quantity and quantity > 0 and (subject == format(AUCTION_REMOVED_MAIL_SUBJECT.." (%d)", itemName, quantity) or subject == format(AUCTION_REMOVED_MAIL_SUBJECT, itemName)) then
+					return true
+				end
+			end
+		end
+	elseif private.mode == "expires" then
+		local isInvoice = select(5, GetInboxText(index))
+		if not isInvoice and numItems == 1 then
+			local itemName = TSMAPI.Item:GetName(private:GetFirstInboxItemLink(index))
+			if itemName and strfind(subject, "^" .. TSMAPI.Util:StrEscape(format(AUCTION_EXPIRED_MAIL_SUBJECT, itemName))) then
+				return true
+			end
+		end
 	end
 end
 
-function Inbox:MAIL_CLOSED()
-	private.resetIndex = nil
-	private.allowTimerStart = true
-	private.waitingForData = nil
-	private:StopAutoLooting()
-	TSMAPI:CancelFrame("inboxLootTextDelay")
-	TSMAPI:CancelFrame("mailSkipDelay")
+function private:PrintOpenMailMessage(index)
+	if not TSM.db.global.inboxMessages then return end
+	local _, _, sender, subject, money, cod, _, hasItem = GetInboxHeaderInfo(index)
+	local greenColor, redColor = "|cff00ff00", "|cffff0000"
+	sender = sender or "?"
+	if select(5, GetInboxText(index)) then
+		-- it's an invoice
+		local invoiceType, itemName, playerName, bid, _, _, ahcut, _, _, _, quantity = GetInboxInvoiceInfo(index)
+		playerName = playerName or "?"
+		if invoiceType == "buyer" then
+			local itemLink = private:GetFirstInboxItemLink(index) or itemName
+			TSM:Printf(L["Bought %sx%d for %s from %s"], itemLink, quantity, TSMAPI:MoneyToString(bid, redColor), playerName)
+		elseif invoiceType == "seller" then
+			TSM:Printf(L["Sold [%s]x%d for %s to %s"], itemName, quantity, TSMAPI:MoneyToString(bid - ahcut, greenColor), playerName)
+		end
+	elseif hasItem then
+		local itemLink
+		local quantity = 0
+		for i = 1, hasItem do
+			local link = GetInboxItemLink(index, i)
+			itemLink = itemLink or link
+			quantity = quantity + (select(4, GetInboxItem(index, i)) or 0)
+			if TSMAPI.Item:ToItemString(itemLink) ~= TSMAPI.Item:ToItemString(link) then
+				itemLink = L["Multiple Items"]
+				quantity = -1
+				break
+			end
+		end
+		if hasItem == 1 then
+			itemLink = private:GetFirstInboxItemLink(index) or itemLink
+		end
+		local itemName = TSMAPI.Item:GetName(itemLink) or "?"
+		local itemDesc = (quantity > 0 and format("%s (%d)", itemLink, quantity)) or (quantity == -1 and "Multiple Items") or "?"
+		if hasItem == 1 and itemLink and strfind(subject, "^" .. TSMAPI.Util:StrEscape(format(AUCTION_EXPIRED_MAIL_SUBJECT, itemName))) then
+			TSM:Printf(L["Your auction of %s expired"], itemDesc)
+		elseif hasItem == 1 and quantity > 0 and (subject == format(AUCTION_REMOVED_MAIL_SUBJECT.." (%d)", itemName, quantity) or subject == format(AUCTION_REMOVED_MAIL_SUBJECT, itemName)) then
+			TSM:Printf(L["Cancelled auction of %sx%d"], itemLink, quantity)
+		elseif cod > 0 then
+			TSM:Printf(L["%s sent you a COD of %s for %s"], sender, TSMAPI:MoneyToString(cod, redColor), itemDesc)
+		elseif money > 0 then
+			TSM:Printf(L["%s sent you %s and %s"], sender, itemDesc, TSMAPI:MoneyToString(money, greenColor))
+		else
+			TSM:Printf(L["%s sent you %s"], sender, itemDesc)
+		end
+	elseif money > 0 then
+		TSM:Printf(L["%s sent you %s"], sender, TSMAPI:MoneyToString(money, greenColor))
+	else
+		TSM:Printf(L["%s sent you a message: %s"], sender, subject)
+	end
+end
+
+function private.OpenMailThread(self)
+	self:SetThreadName("MAILING_OPEN_MAIL")
+
+	local eventStatus = nil
+	self:RegisterEvent("UI_ERROR_MESSAGE", function(_, msg)
+		if msg == ERR_MAIL_DATABASE_ERROR or msg == ERR_INV_FULL or msg == ERR_ITEM_MAX_COUNT then
+			-- internal mail error, inventory full, or too many unique items
+			eventStatus = "ERROR"
+		end
+	end)
+	self:RegisterEvent("MAIL_INBOX_UPDATE", function() eventStatus = "UPDATE" end)
+	private.frame.allBtn:Disable()
+	private.frame.salesBtn:Disable()
+	private.frame.buysBtn:Disable()
+	private.frame.cancelsBtn:Disable()
+	private.frame.expiresBtn:Disable()
+
+	-- wait for any pending mail to arrive
+	while select(2, GetInboxNumItems()) == 0 and HasNewMail() do self:Yield(true) end
+
+	private.moneyCollected = 0
+	local attemptedToOpenMail = true
+	local shouldWait = false
+	while attemptedToOpenMail do
+		attemptedToOpenMail = nil
+		local encounteredError = nil
+		local numMail, totalMail = GetInboxNumItems()
+		for index=numMail, 1, -1 do
+			if private:ShouldOpenMail(index) then
+				if shouldWait then
+					-- this isn't the first time through the loop, so give the pending opens some times to clear out
+					self:Sleep(2)
+					shouldWait = nil
+					attemptedToOpenMail = true
+					break
+				end
+				local money = select(5, GetInboxHeaderInfo(index)) or 0
+				local numItems = select(8, GetInboxHeaderInfo(index)) or 0
+				local numInboxItems = GetInboxNumItems()
+
+				-- auto-loot the mail
+				private:PrintOpenMailMessage(index)
+				AutoLootMailItem(index)
+
+				-- wait for an inbox event
+				eventStatus = nil
+				local triedDeleting = nil
+				while not eventStatus do self:Yield(true) end
+				if eventStatus == "UPDATE" then
+					-- wait for the number of mails to go down by 1 (for at most 1 second per item)
+					local waitEndTime = debugprofilestop() + (max(numItems, 1) * 1000)
+					while debugprofilestop() < waitEndTime do
+						if GetInboxNumItems() == numInboxItems - 1 then break end
+						if not triedDeleting and private:ShouldDeleteMail(index) then
+							DeleteInboxItem(index)
+							triedDeleting = true
+						end
+						if eventStatus == "ERROR" then
+							TSM:LOG_ERR("Encountered error at index %d (triedDeleting=%s)", index, tostring(triedDeleting))
+							encounteredError = true
+							break
+						end
+						self:Yield(true)
+					end
+
+					if not encounteredError then
+						attemptedToOpenMail = true
+					end
+				elseif eventStatus == "ERROR" then
+					-- there was an error trying to open this mail, so skip it silently and try again
+					encounteredError = true
+				end
+
+				-- track money collected
+				private.moneyCollected = private.moneyCollected + money
+			elseif private:ShouldDeleteMail(index) then
+				-- wait for an inbox event
+				DeleteInboxItem(index)
+				eventStatus = nil
+				while not eventStatus do self:Yield(true) end
+
+				if eventStatus == "UPDATE" then
+					attemptedToOpenMail = true
+				elseif eventStatus == "ERROR" then
+					encounteredError = true
+				end
+			end
+		end
+		local numMail, totalMail = GetInboxNumItems()
+		if attemptedToOpenMail and totalMail > numMail and numMail < 50 and (private.mode == "all" or private.modeModified) then
+			-- wait for the inbox to update and then continue
+			while true do
+				local numMail, totalMail = GetInboxNumItems()
+				if numMail == 50 or numMail == totalMail then break end
+				self:Sleep(0.5)
+			end
+			self:Sleep(1)
+		elseif not attemptedToOpenMail and encounteredError then
+			TSM:Print(L["Cannot finish auto looting, inventory is full or too many unique items."])
+		else
+			shouldWait = true
+		end
+	end
+
+	-- check if we ran out of
+	if private.keepFreeSlots then
+		TSM:Printf(L["Stopped opening mail to keep %d slots free."], TSM.db.global.keepMailSpace)
+		private.keepFreeSlots = nil
+	end
+
+	if private.inventoryFull then
+		TSM:Print(L["Cannot finish auto looting, inventory is full or too many unique items."])
+		private.inventoryFull = nil
+	end
+
+	-- play sound
+	TSMAPI:DoPlaySound(TSM.db.global.openMailSound)
+end
+
+function private:MailThreadDone()
+	if not private.threadId then return end
+	-- Tell user how much money has been collected if enabled
+	if private.moneyCollected > 0 and TSM.db.global.displayMoneyCollected then
+		TSM:Printf(L["Total Gold Collected: %s"], TSMAPI:MoneyToString(private.moneyCollected))
+		private.moneyCollected = 0
+	end
+
+	TSMAPI.Threading:Kill(private.threadId)
+	private.threadId = nil
+	private.mode = nil
+	private.modeModified = nil
+	private.frame.allBtn:Enable()
+	private.frame.salesBtn:Enable()
+	private.frame.buysBtn:Enable()
+	private.frame.cancelsBtn:Enable()
+	private.frame.expiresBtn:Enable()
+end
+
+function private:StartOpenMail(mode)
+	private:MailThreadDone()
+	private.mode = mode
+	private.modeModified = IsShiftKeyDown()
+	private.threadId = TSMAPI.Threading:Start(private.OpenMailThread, 0.7, private.MailThreadDone)
+end
+
+function private:GetFirstInboxItemLink(index)
+	if not TSMMailingInboxTooltip then
+		CreateFrame("GameTooltip", "TSMMailingInboxTooltip", UIParent, "GameTooltipTemplate")
+	end
+	TSMMailingInboxTooltip:SetOwner(UIParent, "ANCHOR_NONE")
+	TSMMailingInboxTooltip:ClearLines()
+	local _, speciesId, level, breedQuality, maxHealth, power, speed, name = TSMMailingInboxTooltip:SetInboxItem(index)
+	local link = nil
+	if (speciesId or 0) > 0 then
+		link = TSMAPI.Item:GetLink(strjoin(":", "p", speciesId, level, breedQuality, maxHealth, power, speed))
+	else
+		link = GetInboxItemLink(index, 1)
+	end
+	TSMMailingInboxTooltip:Hide()
+	return link
 end

@@ -19,8 +19,9 @@ local CYAN = "|cff99ffff"
 
 local info = {
 	post = {
-		invalid = {L["Item/Group is invalid."], RED},
-		notEnough = {L["Not enough items in bags."], ORANGE},
+		invalid = {L["Item/Group is invalid (see chat)."], RED, true},
+		notEnough = {L["Not enough items in bags."], ORANGE, true},
+		maxExpires = {L["Above max expires."], ORANGE, true},
 		belowMinPrice = {L["Cheapest auction below min price."], ORANGE},
 		tooManyPosted = {L["Maximum amount already posted."], CYAN},
 		postingNormal = {L["Posting at normal price."], GREEN},
@@ -30,6 +31,7 @@ local info = {
 		aboveMaxMin = {L["Above max price. Posting at min price."], GREEN},
 		aboveMaxMax = {L["Above max price. Posting at max price."], GREEN},
 		aboveMaxNormal = {L["Above max price. Posting at normal price."], GREEN},
+		aboveMaxNoPost = {L["Above max price. Not posting."], ORANGE},
 		postingPlayer = {L["Posting at your current price."], GREEN},
 		postingWhitelist = {L["Posting at whitelisted player's price."], GREEN},
 		notPostingWhitelist = {L["Lowest auction by whitelisted player."], ORANGE},
@@ -38,7 +40,8 @@ local info = {
 		undercuttingBlacklist = {L["Undercutting blacklisted player."], GREEN},
 	},
 	cancel = {
-		bid = {L["Auction has been bid on."], CYAN},
+		invalid = {L["Item/Group is invalid (see chat)."], RED, true},
+		bid = {L["Auction has been bid on."], CYAN, true},
 		atReset = {L["Not canceling auction at reset price."], GREEN},
 		reset = {L["Canceling to repost at reset price."], CYAN},
 		belowMinPrice = {L["Not canceling auction below min price."], ORANGE},
@@ -48,7 +51,7 @@ local info = {
 		atAboveMax = {L["At above max price and not undercut."], GREEN},
 		repost = {L["Canceling to repost at higher price."], CYAN},
 		notUndercut = {L["Your auction has not been undercut."], GREEN},
-		cancelAll = {L["Canceling all auctions."], CYAN},
+		cancelAll = {L["Canceling all auctions."], CYAN, true},
 		notLowest = {L["Canceling auction which you've undercut."], CYAN},
 		invalidSeller = {L["Invalid seller data returned by server."], RED},
 		atWhitelist = {L["Posted at whitelisted player's price."], GREEN},
@@ -66,6 +69,7 @@ end
 
 function Log:AddLogRecord(itemString, mode, action, reason, operation, buyout)
 	local info = Log:GetInfo(mode, reason)
+	TSMAPI:Assert(itemString and operation, "Assertion Failed: "..tostring(itemString))
 	local record = {itemString=itemString, info=info, action=action, mode=mode, reason=reason, operation=operation, buyout=buyout}
 	tinsert(records, record)
 end
@@ -84,4 +88,8 @@ end
 
 function Log:Clear()
 	wipe(records)
+end
+
+function Log:IsNoScanReason(mode, reason)
+	return mode and reason and info[mode] and info[mode][reason] and info[mode][reason][3]
 end

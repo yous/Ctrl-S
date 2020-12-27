@@ -1,4 +1,12 @@
 local addon_name, addon_env = ...
+if not addon_env.load_this then return end
+
+-- [AUTOLOCAL START]
+local C_Garrison = C_Garrison
+local LE_FOLLOWER_TYPE_GARRISON_6_0 = Enum.GarrisonFollowerType.FollowerType_6_0
+local LE_GARRISON_TYPE_6_0 = Enum.GarrisonType.Type_6_0
+local wipe = wipe
+-- [AUTOLOCAL END]
 
 local getters = {}
 local cache = setmetatable({}, { __index = function(t, key)
@@ -8,7 +16,10 @@ local cache = setmetatable({}, { __index = function(t, key)
 end})
 addon_env.c_garrison_cache = cache
 
-getters.GetBuildings = C_Garrison.GetBuildings
+local GetBuildings = C_Garrison.GetBuildings
+getters.GetBuildings = function()
+   return GetBuildings(LE_GARRISON_TYPE_6_0)
+end
 
 local salvage_yard_level_building_id = { [52]  = 1, [140] = 2, [141] = 3 }
 getters.salvage_yard_level = function()
@@ -20,3 +31,18 @@ getters.salvage_yard_level = function()
    end
    return false
 end
+
+local GetPossibleFollowersForBuilding = C_Garrison.GetPossibleFollowersForBuilding
+local cache_GetPossibleFollowersForBuilding = setmetatable({}, { __index = function(t, key)
+   local result = GetPossibleFollowersForBuilding(LE_FOLLOWER_TYPE_GARRISON_6_0, key)
+   t[key] = result
+   return result
+end})
+
+getters.GetPossibleFollowersForBuilding = function()
+   wipe(cache_GetPossibleFollowersForBuilding)
+   return cache_GetPossibleFollowersForBuilding
+end
+
+-- wipe removes all entries, but leaves MT alone, as this test shows
+-- WIPE_META_TEST = setmetatable({}, { __index = function(t, key) return "test" end})

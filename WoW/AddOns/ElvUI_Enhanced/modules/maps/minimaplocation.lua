@@ -28,7 +28,7 @@ local function CreateEnhancedMaplocation()
 	panel = CreateFrame('Frame', 'EnhancedLocationPanel', _G['MinimapCluster'])
 	panel:SetFrameStrata("BACKGROUND")
 	panel:Point("CENTER", E.UIParent, "CENTER", 0, 0)
-	panel:Size(320, 22)
+	panel:Size(206, 22)
 
 	xMap = CreateFrame('Frame', "MapCoordinatesX", panel)
 	xMap:SetTemplate('Transparent')
@@ -42,7 +42,7 @@ local function CreateEnhancedMaplocation()
 	location = CreateFrame('Frame', "EnhancedLocationText", panel)
 	location:SetTemplate('Transparent')
 	location:Point('CENTER', panel, 'CENTER', 0, 0)
-	location:Size(200, 22)
+	location:Size(126, 22)
 	
 	location.text = location:CreateFontString(nil, "OVERLAY")
 	location.text:FontTemplate(E.media.font, 12, "OUTLINE")
@@ -110,11 +110,10 @@ hooksecurefunc(M, 'UpdateSettings', function()
 	end
 
 	local holder = _G['MMHolder']
-	panel:SetPoint('BOTTOMLEFT', holder, 'TOPLEFT', -(E.PixelMode and 1 or 2), -(E.PixelMode and 1 or 2))
-	panel:Size(holder:GetWidth() + (E.PixelMode and 3 or 5), 22) -- changed 2 to 3 (20141026)
+	panel:SetPoint('BOTTOMLEFT', holder, 'TOPLEFT', -(E.PixelMode and 3 or 4), -(E.PixelMode and 3 or 2))
+	panel:Size(holder:GetWidth() + (E.PixelMode and 5 or 7), 22) 
 	panel:Show()
-	
-	location:Width(holder:GetWidth() - 82)
+	location:Width(holder:GetWidth() - 77)
 
 	local point, relativeTo, relativePoint, xOfs, yOfs = holder:GetPoint()
 	if E.db.general.minimap.locationText == 'ABOVE' then

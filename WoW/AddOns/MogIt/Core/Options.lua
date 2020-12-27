@@ -1,4 +1,4 @@
-﻿local MogIt,mog = ...;
+local MogIt,mog = ...;
 local L = mog.L;
 
 local LBR = LibStub("LibBabble-Race-3.0"):GetUnstrictLookupTable();
@@ -42,6 +42,10 @@ function mog.createOptions()
 				mog.tooltip:SetWidth(value);
 			elseif info.arg == "tooltipHeight" then
 				mog.tooltip:SetHeight(value);
+			elseif info.arg == "alwaysShowCollected" then
+				C_TransmogCollection.SetShowMissingSourceInItemTooltips(value);
+			elseif info.arg == "wishlistCheckAlts" then
+				mog:BuildList();
 			elseif info.arg == "rows" or info.arg == "columns" then
 				mog:UpdateGUI();
 			end
@@ -68,19 +72,96 @@ function mog.createOptions()
 				width = "full",
 				arg = "minimap",
 			},
-			sortWishlist = {
-				type = "toggle",
-				order = 2,
-				name = L["Sort wishlist sets alphabetically"],
-				width = "full",
-				arg = "sortWishlist",
-			},
 			tooltipItemID = {
 				type = "toggle",
-				order = 3,
+				order = 2,
 				name = L["Show item ID in tooltips"],
 				width = "full",
 				arg = "tooltipItemID",
+			},
+			alwaysShowCollected = {
+				type = "toggle",
+				order = 2.4,
+				name = L["Always indicate collected appearance in tooltip"],
+				width = "full",
+				arg = "alwaysShowCollected",
+			},
+			tooltipAlwaysShowOwned = {
+				type = "toggle",
+				order = 2.5,
+				name = L["Always indicate owned item in tooltip"],
+				width = "full",
+				arg = "tooltipAlwaysShowOwned",
+			},
+			wishlistCheckAlts = {
+				type = "toggle",
+				order = 2.8,
+				name = L["Check alts for wishlist items"],
+				width = "full",
+				arg = "wishlistCheckAlts",
+			},
+			tooltipWishlistDetail = {
+				type = "toggle",
+				order = 2.9,
+				name = L["Detailed info for wishlist items"],
+				width = "full",
+				arg = "tooltipWishlistDetail",
+				disabled = function()
+					return not mog.db.profile.wishlistCheckAlts;
+				end,
+			},
+			loadModules = {
+				type = "toggle",
+				order = 2.95,
+				name = L["Load base modules on login"],
+				width = "full",
+				arg = "loadModulesDefault",
+			},
+			catalogue = {
+				type = "group",
+				order = 3,
+				name = L["Catalogue"],
+				inline = true,
+				args = {
+					noAnim = {
+						type = "toggle",
+						order = 1,
+						name = L["No animation"],
+						width = "double",
+						arg = "noAnim",
+					},
+					url = {
+						type = "select",
+						order = 2.5,
+						name = L["URL website"],
+						values = function()
+							local tbl = {};
+							for k,v in pairs(mog.url) do
+								tbl[k] = (v.fav and "\124T"..v.fav..":16\124t " or "")..k;
+							end
+							return tbl;
+						end,
+						arg = "url",
+					},
+					rows = {
+						type = "range",
+						order = 4,
+						name = L["Rows"],
+						step = 1,
+						min = 1,
+						max = 10,
+						arg = "rows",
+					},
+					columns = {
+						type = "range",
+						order = 5,
+						name = L["Columns"],
+						step = 1,
+						min = 1,
+						max = 15,
+						arg = "columns",
+					},
+				},
 			},
 			preview = {
 				type = "group",
@@ -125,51 +206,37 @@ function mog.createOptions()
 							return not (mog.db.profile.singlePreview and mog.db.profile.previewUIPanel);
 						end,
 					},
+					previewConfirmClose = {
+						type = "toggle",
+						order = 5,
+						name = L["Confirm closing multi previews"],
+						width = "full",
+						arg = "previewConfirmClose",
+						disabled = function()
+							return mog.db.profile.singlePreview;
+						end,
+					},
 				},
 			},
-			catalogue = {
+			wishlist = {
 				type = "group",
 				order = 5,
-				name = L["Catalogue"],
+				name = L["Wishlist"],
 				inline = true,
 				args = {
-					noAnim = {
+					sortSets = {
 						type = "toggle",
 						order = 1,
-						name = L["No animation"],
-						width = "double",
-						arg = "noAnim",
+						name = L["Sort wishlist sets alphabetically"],
+						width = "full",
+						arg = "sortWishlist",
 					},
-					url = {
-						type = "select",
-						order = 2.5,
-						name = L["URL website"],
-						values = function()
-							local tbl = {};
-							for k,v in pairs(mog.url) do
-								tbl[k] = (v.fav and "\124T"..v.fav..":16\124t " or "")..k;
-							end
-							return tbl;
-						end,
-						arg = "url",
-					},
-					rows = {
-						type = "range",
-						order = 4,
-						name = L["Rows"],
-						step = 1,
-						min = 1,
-						max = 10,
-						arg = "rows",
-					},
-					columns = {
-						type = "range",
-						order = 5,
-						name = L["Columns"],
-						step = 1,
-						min = 1,
-						max = 15,
-						arg = "columns",
+					loadModules = {
+						type = "toggle",
+						order = 2,
+						name = L["Load base modules with wishlist"],
+						width = "full",
+						arg = "loadModulesWishlist",
 					},
 				},
 			},
@@ -296,6 +363,16 @@ function mog.createOptions()
 				disabled = function()
 					return not mog.db.profile.tooltipCustomModel;
 				end,
+			},
+			anchor = {
+				type = "select",
+				order = 12,
+				name = L["Anchor point"],
+				values = {
+					vertical = "Top/bottom",
+					horizontal = "Left/right",
+				},
+				arg = "tooltipAnchor",
 			},
 		},
 	};

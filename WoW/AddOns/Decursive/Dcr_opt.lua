@@ -1,23 +1,30 @@
 --[[
     This file is part of Decursive.
-    
-    Decursive (v 2.7.3.6) add-on for World of Warcraft UI
-    Copyright (C) 2006-2014 John Wellesz (archarodim AT teaser.fr) ( http://www.2072productions.com/to/decursive.php )
 
-    Starting from 2009-10-31 and until said otherwise by its author, Decursive
-    is no longer free software, all rights are reserved to its author (John Wellesz).
+    Decursive (v 2.7.8) add-on for World of Warcraft UI
+    Copyright (C) 2006-2019 John Wellesz (Decursive AT 2072productions.com) ( http://www.2072productions.com/to/decursive.php )
 
-    The only official and allowed distribution means are www.2072productions.com, www.wowace.com and curse.com.
-    To distribute Decursive through other means a special authorization is required.
-    
+    Decursive is free software: you can redistribute it and/or modify
+    it under the terms of the GNU General Public License as published by
+    the Free Software Foundation, either version 3 of the License, or
+    (at your option) any later version.
+
+    Decursive is distributed in the hope that it will be useful,
+    but WITHOUT ANY WARRANTY; without even the implied warranty of
+    MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+    GNU General Public License for more details.
+
+    You should have received a copy of the GNU General Public License
+    along with Decursive.  If not, see <https://www.gnu.org/licenses/>.
+
 
     Decursive is inspired from the original "Decursive v1.9.4" by Patrick Bohnet (Quu).
     The original "Decursive 1.9.4" is in public domain ( www.quutar.com )
 
     Decursive is distributed in the hope that it will be useful,
     but WITHOUT ANY WARRANTY.
-    
-    This file was last updated on 2014-10-13T09:20:46Z
+
+    This file was last updated on 2020-11-21T20:42:18Z
 --]]
 -------------------------------------------------------------------------------
 
@@ -69,13 +76,13 @@ local GetNumPartyMembers= _G.GetNumSubgroupMembers;
 local InCombatLockdown  = _G.InCombatLockdown;
 local GetSpellBookItemInfo = _G.GetSpellBookItemInfo;
 local GetSpellInfo      = _G.GetSpellInfo;
-local IsSpellKnown      = _G.IsSpellKnown;
 local _;
 -- Default values for the option
 
 
 function D:GetDefaultsSettings()
     local DS = DC.DS;
+    local DSI = DC.DSI;
 
     return {
         -- default settings {{{
@@ -98,11 +105,16 @@ function D:GetDefaultsSettings()
                     Pet = false,
                     Disabled = true,
                     IsDefault = true,
+                    IsItem = false,
                 },
             },
         },
 
         global = {
+            SRTLerrors = {
+                ["total"] = 0
+                -- "file:line" = {date, ...}
+            },
             debug = false,
             NonRelease = false,
             TocExpiredDetection = false,
@@ -129,6 +141,14 @@ function D:GetDefaultsSettings()
                 "alt-%s1",
                 "alt-%s2",
                 "alt-%s3",
+                "*%s4",
+                "ctrl-%s4",
+                "shift-%s4",
+                "alt-%s4",
+                "*%s5",
+                "ctrl-%s5",
+                "shift-%s5",
+                "alt-%s5",
                 "*%s3",       -- the last two entries are always target and focus
                 "ctrl-%s3",
             },
@@ -198,7 +218,7 @@ function D:GetDefaultsSettings()
             -- Center text displayed on MUFs, defaults to time left
             CenterTextDisplay = '1_TLEFT',
 
-            -- this is wether or not to show the live-list  
+            -- this is wether or not to show the live-list
             HideLiveList = false,
 
             LiveListAlpha = 0.7,
@@ -213,7 +233,7 @@ function D:GetDefaultsSettings()
             -- This will turn on and off the sending of messages to the default chat frame
             Print_ChatFrame = true,
 
-            -- this will send the messages to a custom frame that is moveable       
+            -- this will send the messages to a custom frame that is moveable
             Print_CustomFrame = true,
 
             -- this will disable error messages
@@ -279,7 +299,7 @@ function D:GetDefaultsSettings()
             DisableMacroCreation = false,
 
             -- Allow Decursive's macro editing
-	    AllowMacroEdit = false,
+            AllowMacroEdit = false,
 
             -- Those are the different colors used for the MUFs main textures
             MF_colors = {
@@ -298,6 +318,16 @@ function D:GetDefaultsSettings()
                 ["COLORCHRONOS"]    =   { 0.6 , 0.1 , 0.2  ,   .6   }, -- medium red
             },
 
+            TypeColors = {
+                [DC.MAGIC]      = "FF1887DD",
+                [DC.ENEMYMAGIC] = "FF98F9FF",
+                [DC.CURSE]      = "FFDD22DD",
+                [DC.POISON]     = "FF22DD22",
+                [DC.DISEASE]    = "FF995533",
+                [DC.CHARMED]    = "FFFF0000",
+                [DC.NOTYPE]     = "FFAAAAAA",
+            },
+
             -- Debuffs {{{
             -- those debuffs prevent us from curing the unit
             DebuffsToIgnore = {
@@ -309,26 +339,35 @@ function D:GetDefaultsSettings()
             BuffDebuff = {
                 [DS["DREAMLESSSLEEP"]]          = true,
                 [DS["GDREAMLESSSLEEP"]]         = true,
-                [DS["MDREAMLESSSLEEP"]]         = true,
+                [(not DC.WOWC) and DS["MDREAMLESSSLEEP"] or "NONE"]         = (not DC.WOWC) and true or nil,
                 [DS["DCR_LOC_MINDVISION"]]      = true,
                 [DS["MUTATINGINJECTION"]]       = true,
-                [DS["Arcane Blast"]]            = true,
+                [(not DC.WOWC) and DS["Arcane Blast"] or "NONE"]            = (not DC.WOWC) and true or nil,
             },
 
             DebuffAlwaysSkipList = {
             },
-
             DebuffsSkipList = {
-                DS["DCR_LOC_SILENCE"],
-                DS["ANCIENTHYSTERIA"],
-                DS["IGNITE"],
-                DS["TAINTEDMIND"],
-                DS["MAGMASHAKLES"],
-                DS["CRIPLES"],
-                DS["DUSTCLOUD"],
-                DS["WIDOWSEMBRACE"],
-                DS["SONICBURST"],
-                DS["DELUSIONOFJINDO"]
+                [DS["ANCIENTHYSTERIA"]] =
+                DSI["ANCIENTHYSTERIA"],
+                [DS["CRIPLES"]]         =
+                DSI["CRIPLES"],
+                [DS["DELUSIONOFJINDO"]] =
+                DSI["DELUSIONOFJINDO"],
+                [DS["DUSTCLOUD"]]       =
+                DSI["DUSTCLOUD"],
+                [DS["IGNITE"]]          =
+                DSI["IGNITE"],
+                [DS["MAGMASHAKLES"]]    =
+                DSI["MAGMASHAKLES"],
+                [DS["DCR_LOC_SILENCE"]] =
+                DSI["DCR_LOC_SILENCE"],
+                [DS["SONICBURST"]]      =
+                DSI["SONICBURST"],
+                [DS["TAINTEDMIND"]]     =
+                DSI["TAINTEDMIND"],
+                [DS["WIDOWSEMBRACE"]]   =
+                DSI["WIDOWSEMBRACE"],
             },
 
             skipByClass = {
@@ -386,13 +425,15 @@ function D:GetDefaultsSettings()
                 ["DEATHKNIGHT"] = {
                 },
                 ["MONK"] = {
+                },
+                ["DEMONHUNTER"] = {
                 }
             },
             -- }}}
-        
-        
-            
-        
+
+
+
+
         }
     } -- }}}
 end
@@ -483,44 +524,54 @@ local function GetStaticOptions ()
 
     local function validateSpellInput(info, v)  -- {{{
 
+        D:Debug("Validating spell id", v);
         local error = function (m) D:ColorPrint(1, 0, 0, m); return m; end;
+
+        local isItem = nil;
+        local isPetAbility = nil;
 
         -- We got a spell ID directly
         if tonumber(v) then
             v = tonumber(v);
             -- test if it's valid
-            if not (GetSpellInfo(v)) then
+            if not (GetSpellInfo(v)) and not (GetItemInfo(v)) then
                 return error(L["OPT_INPUT_SPELL_BAD_INPUT_ID"]);
             end
 
-        elseif v:find('|Hspell:%d+') then
+            isItem = not (GetSpellInfo(v));
+
+        elseif D:GetSpellFromLink(v) then
             -- We got a spell link!
-            v = D:GetSpellFromLink(v);
+            v, isPetAbility = D:GetSpellFromLink(v);
+        elseif D:GetItemFromLink(v) then
+            -- We got a item link!
+            isItem = true;
+            v = D:GetItemFromLink(v);
         elseif type(v) == 'string' and (GetSpellBookItemInfo(v)) then -- not a number, not a spell link, then a spell name?
-            local _;
-            _, v = GetSpellBookItemInfo(v);
+            -- We got a spell name!
+            D:Debug(v, "is a spell name in our book:", GetSpellBookItemInfo(v));
+            local SPItype, id = GetSpellBookItemInfo(v);
+            v = id;
+            isPetAbility = SPItype == "PETACTION" and true or false;
+        elseif type(v) == 'string' and (GetItemInfo(v)) then
+            D:Debug(v, "is a item name:", GetItemInfo(v));
+            -- We got an item name!
+            isItem = true;
+            v = D:GetItemFromLink(select(2, GetItemInfo(v)));
         else
             return error(L["OPT_INPUT_SPELL_BAD_INPUT_NOT_SPELL"]);
         end
 
-        --[=[
-        -- Not a string or not a known spell
-        if type(v) ~= 'string' or not GetSpellInfo(v) then
-            D:Debug(v, GetSpellInfo(v));
-            return error(L["OPT_INPUT_SPELL_BAD_INPUT_NOT_SPELL"]);
+        if not isItem and v > 0xffffff then
+            v = bit.band(0xffffff, v);
         end
-        --]=]
 
-        --[=[
-        -- Normalize the name since spells are not case sensitive
-        if select(2, GetSpellInfo(v)) ~= "" then -- it as a rank!!
-            v = ("%s(%s)"):format(GetSpellInfo(v)); 
-        else
-            v = (GetSpellInfo(v));
+        -- avoid spellID/itemID collisions
+        if isItem then
+            v = -1 * v;
         end
-        --]=]
 
-        -- The user is stupid or it's a deleted default spell
+        -- It's a deleted default spell
         if D.classprofile.UserSpells[v] and not D.classprofile.UserSpells[v].Hidden then
             D:Debug(v);
             return error(L["OPT_INPUT_SPELL_BAD_INPUT_ALREADY_HERE"]);
@@ -531,14 +582,14 @@ local function GetStaticOptions ()
             return error(L["OPT_INPUT_SPELL_BAD_INPUT_DEFAULT_SPELL"]);
         end
 
-        return 0, v;
+        return 0, v, isItem, isPetAbility;
     end -- }}}
 
     return {
         -- {{{
         type = "group",
         name = D.name,
-       
+
         get = D.GetHandler,
         set = D.SetHandler,
         hidden = function () return not D:IsEnabled(); end,
@@ -582,7 +633,7 @@ local function GetStaticOptions ()
             },
             -- Atticus Ross rules!
             -- }}}
- 
+
             general = {
                 -- {{{
                 type = 'group',
@@ -644,7 +695,7 @@ local function GetStaticOptions ()
                         disabled = function() return D.profile.HideLiveList and not D.profile.ShowDebuffsFrame and D.profile.AutoHideMUFs == 1 or not D:IsEnabled(); end,
                         name = L["PLAY_SOUND"],
                         desc = L["OPT_PLAYSOUND_DESC"],
-                        
+
                         order = 10,
                     },
                     AfflictionTooltips = {
@@ -721,13 +772,13 @@ local function GetStaticOptions ()
                         desc = L["DECURSIVE_DEBUG_REPORT_SHOW_DESC"],
                         func = function ()
                             LibStub("AceConfigDialog-3.0"):Close(D.name);
-                            GameTooltip:Hide();
+                            if GameTooltip:IsShown() then GameTooltip:Hide(); end
                             T._ShowDebugReport();
                         end,
                         hidden = function() return  #T._DebugTextTable < 1 end,
                         order = 1000
                     },
- 
+
                     GlorfindalMemorium = {
                         type = "execute",
                         name = D:ColorText(L["GLOR1"], "FF" .. D:GetClassHexColor( "WARRIOR" )),
@@ -736,7 +787,7 @@ local function GetStaticOptions ()
 
                         -- {{{
                             LibStub("AceConfigDialog-3.0"):Close(D.name);
-                            GameTooltip:Hide();
+                            if GameTooltip:IsShown() then GameTooltip:Hide(); end
                             if not D.MemoriumFrame then
                                 D.MemoriumFrame = CreateFrame("Frame", nil, UIParent);
                                 local f = D.MemoriumFrame;
@@ -977,7 +1028,7 @@ local function GetStaticOptions ()
                         name = L["OPT_LLALPHA"],
                         desc = L["OPT_LLALPHA_DESC"],
                         get = function() return 1 - D.profile.LiveListAlpha end,
-                        set = function(info,v) 
+                        set = function(info,v)
                             if (v ~= D.profile.LiveListAlpha) then
                                 D.profile.LiveListAlpha = 1 - v;
                                 DecursiveMainBar:SetAlpha(D.profile.LiveListAlpha);
@@ -1183,7 +1234,7 @@ local function GetStaticOptions ()
                                 name = L["OPT_TESTLAYOUTUNUM"],
                                 desc = L["OPT_TESTLAYOUTUNUM_DESC"],
                                 get = function() return D.Status.TestLayoutUNum end,
-                                set = function(info,v) 
+                                set = function(info,v)
                                     D.Status.TestLayoutUNum = v;
                                     D:GroupChanged("Test Layout num changed");
                                 end,
@@ -1228,7 +1279,7 @@ local function GetStaticOptions ()
                                         name = L["OPT_BORDERTRANSP"],
                                         desc = L["OPT_BORDERTRANSP_DESC"],
                                         get = function() return 1 - D.profile.DebuffsFrameElemBorderAlpha end,
-                                        set = function(info,v) 
+                                        set = function(info,v)
                                             D.SetHandler(info,1 - v);
                                         end,
                                         disabled = function() return D.profile.DebuffsFrameElemTieTransparency end,
@@ -1243,7 +1294,7 @@ local function GetStaticOptions ()
                                         name = L["OPT_CENTERTRANSP"],
                                         desc = L["OPT_CENTERTRANSP_DESC"],
                                         get = function() return 1 - D.profile.DebuffsFrameElemAlpha end,
-                                        set = function(info,v) 
+                                        set = function(info,v)
                                             D.SetHandler(info,1 - v);
 
                                             if D.profile.DebuffsFrameElemTieTransparency then
@@ -1283,7 +1334,7 @@ local function GetStaticOptions ()
                                         type = 'range',
                                         name = L["OPT_XSPACING"],
                                         desc = L["OPT_XSPACING_DESC"],
-                                        set = function(info,v) 
+                                        set = function(info,v)
                                             D.SetHandler(info, v);
                                             if D.profile.DebuffsFrameTieSpacing then
                                                 D.profile.DebuffsFrameYSpacing = v;
@@ -1299,7 +1350,7 @@ local function GetStaticOptions ()
                                         type = 'range',
                                         name = L["OPT_YSPACING"],
                                         desc = L["OPT_YSPACING_DESC"],
-                                        set = function(info,v) 
+                                        set = function(info,v)
                                             D.SetHandler(info, v);
 
                                             D.MicroUnitF:ResetAllPositions ();
@@ -1563,8 +1614,8 @@ local function GetStaticOptions ()
                         width = 'double',
                         set = function(info, v)
 
-                            local errorn;
-                            errorn, v = validateSpellInput(info, v);
+                            local errorn, isItem, isPetAbility;
+                            errorn, v, isItem, isPetAbility = validateSpellInput(info, v);
                             if errorn ~= 0 then D:Debug("XXXX AHHHHHHHHHHHHHHH!!!!!", errorn); return false end
 
                             if not D.classprofile.UserSpells[v] or D.classprofile.UserSpells[v].Hidden and CustomSpellMacroEditingAllowed then
@@ -1572,13 +1623,17 @@ local function GetStaticOptions ()
                                 D.classprofile.UserSpells[v] = {
                                     Types = {},
                                     Better = 10,
-                                    Pet = false,
+                                    Pet = isPetAbility,
                                     Disabled = false,
+                                    IsItem = isItem,
                                 };
 
                                 if CustomSpellMacroEditingAllowed then
 
-                                    D.classprofile.UserSpells[v].MacroText = "/stopcasting\n/cast [@UNITID,help][@UNITID,harm]" .. (GetSpellInfo(v));
+                                    D.classprofile.UserSpells[v].MacroText = ("/stopcasting\n/%s [@UNITID,help][@UNITID,harm]%s"):format(
+                                        isItem and "use" or "cast",
+                                        D.GetSpellOrItemInfo(v)
+                                    );
 
                                     -- If it's a default spell, then copy the spell settings
                                     if DC.SpellsToUse[v] then
@@ -1587,6 +1642,10 @@ local function GetStaticOptions ()
                                         D.classprofile.UserSpells[v].EnhancedBy         = DC.SpellsToUse[v].EnhancedBy;
                                         D.classprofile.UserSpells[v].EnhancedByCheck    = DC.SpellsToUse[v].EnhancedByCheck;
                                         D.classprofile.UserSpells[v].Enhancements       = DC.SpellsToUse[v].Enhancements;
+                                        if DC.SpellsToUse[v].UnitFiltering then
+                                            D.classprofile.UserSpells[v].UnitFiltering = {};
+                                            D:tcopy(D.classprofile.UserSpells[v].UnitFiltering, DC.SpellsToUse[v].UnitFiltering) -- UnitFiltering is a table, protect the original
+                                        end
                                     end
 
                                 end
@@ -1612,7 +1671,7 @@ local function GetStaticOptions ()
                         set = function(info, v) CustomSpellMacroEditingAllowed = v; end,
                     },
 
-                    
+
 
                     CustomSpellsHolder = {
                         type = 'group',
@@ -1631,7 +1690,7 @@ local function GetStaticOptions ()
                 name = D:ColorText(L["OPT_DEBUFFFILTER"], "FF99CCAA"),
                 desc = L["OPT_DEBUFFFILTER_DESC"],
                 order = 60,
-                childGroups= "select",
+                childGroups= "tab",
                 args = {}
             }, -- }}}
 
@@ -1668,7 +1727,7 @@ local function GetStaticOptions ()
                         disabled = function () return D.profile.DisableMacroCreation end,
                         order = 300
                     },
-		    AllowMacroEdit = {
+                    AllowMacroEdit = {
                         type = "toggle",
                         name = L["OPT_ALLOWMACROEDIT"],
                         desc = L["OPT_ALLOWMACROEDIT_DESC"],
@@ -1700,15 +1759,17 @@ local function GetStaticOptions ()
                                     "\n\n|cFFDDDD00 %s|r:\n   %s"..
                                     "\n\n|cFFDDDD00 %s|r:\n   %s"..
                                     "\n\n|cFFDDDD00 %s|r:\n   %s"..
-                                    "\n\n|cFFDDDD00 %s|r:\n   %s"
+                                    "\n\n|cFFDDDD00 %s|r:\n   %s\n\n   %s"
                                 ):format(
-                                    "2.7.3.6", "John Wellesz", ("2014-11-09T16:51:53Z"):sub(1,10),
+                                    "2.7.8", "John Wellesz", ("2020-11-21T20:45:59Z"):sub(1,10),
                                     L["ABOUT_NOTES"],
-                                    L["ABOUT_LICENSE"],         GetAddOnMetadata("Decursive", "X-License") or 'MoP is buggy',
-                                    L["ABOUT_SHAREDLIBS"],      GetAddOnMetadata("Decursive", "X-Embeds") or 'MoP is buggy',
-                                    L["ABOUT_OFFICIALWEBSITE"], GetAddOnMetadata("Decursive", "X-Website") or 'MoP is buggy',
-                                    L["ABOUT_AUTHOREMAIL"],     GetAddOnMetadata("Decursive", "X-eMail") or 'MoP is buggy',
-                                    L["ABOUT_CREDITS"],         GetAddOnMetadata("Decursive", "X-Credits") or 'MoP is buggy'
+                                    L["ABOUT_LICENSE"],         GetAddOnMetadata("Decursive", "X-License") or 'All Rights Reserved',
+                                    L["ABOUT_SHAREDLIBS"],      GetAddOnMetadata("Decursive", "X-Embeds")  or 'GetAddOnMetadata() failure',
+                                    L["ABOUT_OFFICIALWEBSITE"], GetAddOnMetadata("Decursive", "X-Website") or 'GetAddOnMetadata() failure',
+                                    L["ABOUT_AUTHOREMAIL"],     GetAddOnMetadata("Decursive", "X-eMail")   or 'GetAddOnMetadata() failure',
+                                    L["ABOUT_CREDITS"]
+                                    ,    "Decursive is inspired from the original \"Decursive v1.9.4\" released in 2006 by Patrick Bohnet (Quutar of Earthen Ring (US))"
+                                    ,    GetAddOnMetadata("Decursive", "X-Credits") or 'GetAddOnMetadata() failure'
                                 ),
                         order = 0,
                     },
@@ -1722,7 +1783,10 @@ local function GetStaticOptions ()
                         name = L["OPT_CHECKOTHERPLAYERS"],
                         desc = L["OPT_CHECKOTHERPLAYERS_DESC"],
                         disabled = function () return InCombatLockdown() or GetTime() - T.LastVCheck < 60; end,
-                        func = function () if D:AskVersion() then D.versions = false; end GameTooltip:Hide(); end,
+                        func = function ()
+                            if D:AskVersion() then D.versions = false; end
+                            if GameTooltip:IsShown() then GameTooltip:Hide(); end
+                        end,
                         order = 10,
                     },
                     VersionsDisplay = {
@@ -1731,7 +1795,7 @@ local function GetStaticOptions ()
                         hidden = function () return not D.versions; end,
                         order = 30,
                     },
-                   
+
                 },
             }, -- }}}
         },
@@ -1757,9 +1821,11 @@ local function GetOptions()
     end
 
     -- create per class filters menus
-    options.args.DebuffSkip.args = D:CreateDropDownFiltersMenu();
+    options.args.DebuffSkip.args = D:CreateFiltersMenu();
     -- create MUF color configuration menus
     D:CreateDropDownMUFcolorsMenu(options.args.MicroFrameOpt.args.MUFsColors.args);
+    -- add the affliction color pickers there too
+    D:CreateAfflictionColorsMenu(options.args.MicroFrameOpt.args.MUFsColors.args);
     -- create MUF's mouse buttons configuration menus
     options.args.MicroFrameOpt.args.MUFsMouseButtons.args = D:CreateModifierOptionMenu();
     -- create curring spells addition submenus
@@ -1779,13 +1845,13 @@ end
 function D:ExportOptions ()
     -- Export the option table to Blizz option UI and to Ace3 option UI
 
-    T._CatchAllErrors = "ExportOptions"; 
+    T._CatchAllErrors = "ExportOptions";
     LibStub("AceConfig-3.0"):RegisterOptionsTable(D.name,  GetOptions, 'dcr');
-    T._CatchAllErrors = false; 
+    T._CatchAllErrors = false;
 
-    
+
     -- Don't feed the interface option panel until Blizz fixes the taint issue...
-    --[=[ 
+    --[=[
     LibStub("AceConfigDialog-3.0"):AddToBlizOptions(D.name, D.name, nil, "general");
 
     local SubGroups_ToBlizzOptions = {
@@ -1910,7 +1976,7 @@ function D:SetCureOrder (ToChange)
     end
 
     local LostSpells = {}; -- an orphanage for the lost spells :'(
-    local FoundSpell = 0; -- we wouldn't need that if #table was always returning something meaningful...
+    local FoundSpell = 0;
 
     -- re-compute the position of each spell type
     for Type, Num in pairs (CureOrder) do
@@ -1925,7 +1991,7 @@ function D:SetCureOrder (ToChange)
     end
 
    -- take care of the lost spells here
-   -- Sort the lost spells so that they can be readded in the correct order
+   -- Sort the lost spells so that they can be read in the correct order
    LostSpells =  D:tSortUsingKeys(LostSpells);
 
    -- Place the lost spells after the found ones but with <0 values so they
@@ -1969,7 +2035,10 @@ function D:SetCureOrder (ToChange)
     end
 
     -- Set the spells shortcut (former decurse key)
-    D:UpdateMacro();
+    D:AddDelayedFunctionCall(
+        "UpdateMacro", self.UpdateMacro,  -- dangerous call many add-ons hook APIs call there this should be delayed
+        self)
+
     D:Debug("Spell changed");
     D.Status.SpellsChanged = GetTime();
 
@@ -2045,15 +2114,21 @@ end --}}}
 do -- All this block predates Ace3, it could be recoded in a much more effecicent and cleaner way now (memory POV) thanks to the "info" table given to all callbacks in Ace3.
    -- A good example would be the code creating the MUF color configuration menu or the click assigment settings right after this block.
 
-    local DebuffsSkipList, DefaultDebuffsSkipList, skipByClass, AlwaysSkipList, DefaultSkipByClass;
+    local DebuffsSkipList, DefaultDebuffsSkipList, skipByClass, DebuffAlwaysSkipList, DefaultSkipByClass;
 
     local spacer = function(num) return { name="",type="header", order = 100 + num } end;
 
+    local error = function (...) D:ColorPrint(1, 0, 0, ...); end;
+
     local RemoveFunc = function (handler)
-        D:Debug("Removing '%s'...", handler["Debuff"]);
 
 
-        D:tremovebyval(D.profile.DebuffsSkipList, handler["Debuff"])
+        if DefaultDebuffsSkipList[handler["Debuff"]] then
+            D.profile.DebuffsSkipList[handler["Debuff"]] = false;
+        else
+            D.profile.DebuffsSkipList[handler["Debuff"]] = nil;
+        end
+        D:Debug("Removing ", handler["Debuff"], D.profile.DebuffsSkipList[handler["Debuff"]], DefaultDebuffsSkipList[handler["Debuff"]]);
 
         skipByClass  = D.profile.skipByClass;
         for class, debuffs in pairs (skipByClass) do
@@ -2067,7 +2142,7 @@ do -- All this block predates Ace3, it could be recoded in a much more effecicen
     end
 
     local AddToAlwaysSkippFunc = function (handler, v)
-        AlwaysSkipList[handler["Debuff"]] = v;
+        DebuffAlwaysSkipList[handler["Debuff"]] = v;
     end
 
     local ResetFunc = function (handler)
@@ -2085,43 +2160,14 @@ do -- All this block predates Ace3, it could be recoded in a much more effecicen
         end
     end
 
-    local function ClassCheckbox (Class, DebuffName, num)
-        local CheckedByDefault = false;
-
-        if (DefaultSkipByClass[Class][DebuffName]) then
-            CheckedByDefault = true;
-        end
-
-        return {
-            type = "toggle",
-            name = D:ColorText( LC[Class], "FF"..DC.HexClassColor[Class]) ..
-            (CheckedByDefault and D:ColorText("  *", "FFFFAA00") or ""),
-            desc = str_format(L["OPT_AFFLICTEDBYSKIPPED"], LC[Class], DebuffName) ..
-            (CheckedByDefault and D:ColorText(L["OPT_DEBCHECKEDBYDEF"], "FFFFAA00") or "");
-            handler = {
-                ["Debuff"]=DebuffName,
-                ["Class"]=Class,
-                ["get"] = function  (handler)
-                    skipByClass = D.profile.skipByClass;
-                    return skipByClass[handler["Class"]][handler["Debuff"]]; 
-                end,
-                ["set"] = function  (handler, info, v)
-                    skipByClass = D.profile.skipByClass;
-                    skipByClass[handler["Class"]][string.trim(handler["Debuff"])] = v;
-                end
-            },
-            get = "get",
-            set = "set",
-            order = 100 + num;
-        }
-    end
-
     local function ClassValues(DebuffName)
         local values = {};
 
         for i, class in pairs (DC.ClassNumToUName) do
-            values[i] = D:ColorText( LC[class], "FF"..DC.HexClassColor[class]) ..
-            (DefaultSkipByClass[class][DebuffName] and D:ColorText("  *", "FFFFAA00") or "");
+            if LC[class] ~= class then -- skip non existant classes in WoW classic
+                values[i] = D:ColorText( LC[class], "FF"..DC.HexClassColor[class]) ..
+                (DefaultSkipByClass[class][DebuffName] and D:ColorText("  *", "FFFFAA00") or "");
+            end
         end
 
         --D:Debug(unpack (values));
@@ -2129,14 +2175,43 @@ do -- All this block predates Ace3, it could be recoded in a much more effecicen
 
     end
 
-    local function DebuffSubmenu (DebuffName, num)
+    local function DebuffSubmenu (DebuffName, num, spellID)
         local classes = {};
 
-        classes["header"] = {
+        classes["header1"] = {
             type = "description",
             name = (L["OPT_FILTEROUTCLASSES_FOR_X"]):format(D:ColorText(DebuffName, "FF77CC33")),
-            order = 0,
+            order = num,
         }
+        num = num + 1;
+
+        classes["header2"] = {
+            type = "description",
+            name = function ()
+                local spellDesc = GetSpellDescription(spellID);
+                local desc;
+
+                --D:Debug("Dealing with spell description for ", spellID);
+                if spellID ~= 0 then
+                    if spellDesc == "" then
+                        if not C_Spell.IsSpellDataCached(spellID) then
+                            C_Spell.RequestLoadSpellData(spellID);
+                            desc = L["OPT_SPELL_DESCRIPTION_LOADING"];
+                        else
+                            desc = L["OPT_SPELL_DESCRIPTION_UNAVAILABLE"];
+                        end
+                    else
+                        desc = spellDesc;
+                    end
+                else
+                    desc = L["OPT_SPELLID_MISSING_READD"];
+                end
+
+                return "\n" .. D:ColorText(desc, "FFD09050");
+            end,
+            order = num,
+        }
+        num = num + 1;
 
         skipByClass = D.profile.skipByClass;
          classes[DebuffName] = {
@@ -2151,7 +2226,7 @@ do -- All this block predates Ace3, it could be recoded in a much more effecicen
              handler = {
                 ["Debuff"]=DebuffName,
                 ["get"] = function  (handler, info, Classnum)
-                    return skipByClass[DC.ClassNumToUName[Classnum]][handler["Debuff"]]; 
+                    return skipByClass[DC.ClassNumToUName[Classnum]][handler["Debuff"]];
                 end,
                 ["set"] = function  (handler, info, Classnum, state)
                     skipByClass[DC.ClassNumToUName[Classnum]][string.trim(handler["Debuff"])] = state;
@@ -2171,7 +2246,7 @@ do -- All this block predates Ace3, it could be recoded in a much more effecicen
             handler = {
                 ["Debuff"] = DebuffName,
                 ["get"] = function (handler)
-                    return AlwaysSkipList[handler["Debuff"]];
+                    return DebuffAlwaysSkipList[handler["Debuff"]];
                 end,
                 ["set"] = function (handler,info,v) AddToAlwaysSkippFunc(handler,v) end,
             },
@@ -2209,7 +2284,7 @@ do -- All this block predates Ace3, it could be recoded in a much more effecicen
 
         local resetDisabled = false;
 
-        if (not D:tcheckforval(DefaultDebuffsSkipList, DebuffName)) then
+        if not DefaultDebuffsSkipList[DebuffName] then
             resetDisabled = true;
         end
 
@@ -2238,32 +2313,35 @@ do -- All this block predates Ace3, it could be recoded in a much more effecicen
 
 
     --Entry Templates
-    local function DebuffEntryGroup (DebuffName, num)
-        local IsADefault = D:tcheckforval(DefaultDebuffsSkipList, DebuffName);
+    local function DebuffEntryGroup (DebuffName, num, spellID)
+        local IsADefault = DefaultDebuffsSkipList[DebuffName] and true;
         return {
             type = "group",
             name = IsADefault and D:ColorText(DebuffName, "FFFFFFFF") or D:ColorText(DebuffName, "FF99FFFF"),
             desc = L["OPT_DEBUFFENTRY_DESC"],
             order = num,
-            args = DebuffSubmenu(DebuffName, num),
+            args = DebuffSubmenu(DebuffName, num, spellID),
         }
     end
 
-    local AddFunc = function (NewDebuff)
-        if (not D:tcheckforval(DebuffsSkipList, NewDebuff)) then
-            table.insert(DebuffsSkipList, strtrim(NewDebuff));
-            D:Debug("'%s' added to debuff skip list", strtrim(NewDebuff));
+    local AddFunc = function (spellID)
+        local newDebuff = GetSpellInfo(spellID);
+        if newDebuff then
+            DebuffsSkipList[newDebuff] = spellID;
+            D:Debug("'%s' added to debuff skip list", newDebuff, spellID);
+        elseif not newDebuff then
+            error("Can't add debuff, invalid spellID:", spellID);
         end
     end
 
 
     local ReAddDefaultsDebuffs = function ()
 
-        for _, Debuff in ipairs(DefaultDebuffsSkipList) do
+        for Debuff, spellID in pairs(DefaultDebuffsSkipList) do
 
-            if (not D:tcheckforval(DebuffsSkipList, Debuff)) then
+            if not DebuffsSkipList[Debuff] then
 
-                table.insert(DebuffsSkipList, Debuff);
+                DebuffsSkipList[Debuff] = spellID;
 
                 ResetFunc({["Debuff"] = Debuff});
 
@@ -2273,9 +2351,8 @@ do -- All this block predates Ace3, it could be recoded in a much more effecicen
     end
 
     local CheckDefaultsPresence = function ()
-        for _, Debuff in ipairs(DefaultDebuffsSkipList) do
-            if (not D:tcheckforval(DebuffsSkipList, Debuff)) then
-
+        for Debuff, _ in pairs(DefaultDebuffsSkipList) do
+            if not DebuffsSkipList[Debuff] then
                 return false;
             end
         end
@@ -2286,41 +2363,96 @@ do -- All this block predates Ace3, it could be recoded in a much more effecicen
     local First = "";
 
     local GetHistoryDebuff = function ()
-        local DebuffName, exists, index;
+        local coloredDebuffName, exists, spellID, index;
 
         for index=1, DC.DebuffHistoryLength do
-            DebuffName, exists = D:Debuff_History_Get (index, true);
+            coloredDebuffName, spellID, exists = D:Debuff_History_Get (index, true);
 
-            if not exists or index == 1 and DebuffName == First then
+            if not exists or index == 1 and coloredDebuffName == First then
                 break;
             end
 
             if index == 1 then
-                First = DebuffName;
+                First = coloredDebuffName;
             end
 
-            DebuffHistTable[index] = DebuffName;
+            DebuffHistTable[index] = {coloredDebuffName, spellID};
             index = index + 1;
         end
 
         return DebuffHistTable;
     end
 
-    function D:CreateDropDownFiltersMenu()
+    local updateFilteredDebuffNames_ONCE;
+    local noop = function() D:Debug("no op"); end;
+    updateFilteredDebuffNames_ONCE = function ()
+        local debuffSkipListCopy = {};
+        local realName;
+        D:tcopy(debuffSkipListCopy, DebuffsSkipList);
+        for debuffName, spellID in pairs(debuffSkipListCopy) do
+            if spellID ~= false then -- leave removed default spells
+                if spellID ~= 0 and not C_Spell.DoesSpellExist(spellID) then
+                    RemoveFunc({["Debuff"] = debuffName});
+                else
+                    realName = (GetSpellInfo(spellID));
+                    if realName and realName ~= debuffName then
+                        DebuffsSkipList[debuffName] = nil;
+                        DebuffsSkipList[realName] = spellID;
+                        D:Debug(debuffName, "replaced by", realName, "for DebuffsSkipList");
+
+                        if DebuffAlwaysSkipList[debuffName] then
+                            DebuffAlwaysSkipList[debuffName] = nil;
+                            DebuffAlwaysSkipList[realName] = true;
+                            D:Debug(debuffName, "replaced by", realName, "for DebuffAlwaysSkipList");
+                        end
+
+                        for class, debuffs in pairs(skipByClass) do
+                            if debuffs[debuffName] then
+                                debuffs[debuffName] = nil;
+                                debuffs[realName] = true;
+                                D:Debug(debuffName, "replaced by", realName, "for class:", class);
+                            end
+                        end
+
+                        D:Print((L["OPT_FILTERED_DEBUFF_RENAMED"]):format(debuffName, realName, spellID));
+                    elseif not realName then
+                        D:Debug(realName, "no name for spell ID", spellID, (GetSpellInfo(spellID)))
+                    end
+                end
+            end
+        end
+        debuffSkipListCopy = nil;
+        if realName then
+            updateFilteredDebuffNames_ONCE = noop;
+        end
+    end
+
+    function D:CreateFiltersMenu()
         DebuffsSkipList             = D.profile.DebuffsSkipList;
         DefaultDebuffsSkipList      = D.defaults.profile.DebuffsSkipList;
 
         skipByClass                 = D.profile.skipByClass;
-        AlwaysSkipList              = D.profile.DebuffAlwaysSkipList;
+        DebuffAlwaysSkipList        = D.profile.DebuffAlwaysSkipList;
         DefaultSkipByClass          = D.defaults.profile.skipByClass;
 
         local DebuffsSubMenu = {};
         local num = 1;
 
 
-        for _, Debuff in ipairs(DebuffsSkipList) do
-            DebuffsSubMenu[str_gsub(Debuff, " ", "")] = DebuffEntryGroup(Debuff, num);
-            num = num + 1;
+        DebuffsSubMenu["debuffHolder"] = {
+            name = L["OPT_DEBUFFFILTER"],
+            type = "group",
+            order = 200,
+            args = {}
+        }
+
+       updateFilteredDebuffNames_ONCE();
+
+        for debuffName, spellID in pairs(DebuffsSkipList) do
+            if false ~= spellID then
+                DebuffsSubMenu.debuffHolder.args[str_gsub(debuffName, " ", "")] = DebuffEntryGroup(debuffName, num, spellID);
+                num = num + 1;
+            end
         end
 
         DebuffsSubMenu["description"] = {
@@ -2336,7 +2468,15 @@ do -- All this block predates Ace3, it could be recoded in a much more effecicen
             desc = L["OPT_ADDDEBUFF_DESC"],
             usage = L["OPT_ADDDEBUFF_USAGE"],
             get = false,
-            set = function(info,value) AddFunc(value) end,
+            set = function(info,v) AddFunc(tonumber(v)) end,
+            validate = function(info, v)
+
+                if tonumber(v) and C_Spell.DoesSpellExist(tonumber(v)) then
+                    return 0;
+                else
+                    return error("'", v, "'", L["OPT_ISNOTVALID_SPELLID"]);
+                end
+            end,
             order = 100 + num,
         };
 
@@ -2345,12 +2485,14 @@ do -- All this block predates Ace3, it could be recoded in a much more effecicen
         DebuffsSubMenu["addFromHist"] = {
             type = "select",
             name = L["OPT_ADDDEBUFFFHIST"], --"Add from Debuff history",
-            desc = L["OPT_ADDDEBUFFFHIST_DESC"], --"Add a recently seen debuff",
+            desc = L["OPT_ADDDEBUFFFHIST_DESC"], --"Add a recently dispelled debuff",
             disabled = function () GetHistoryDebuff(); return (#DebuffHistTable == 0) end,
-            values = GetHistoryDebuff;
+            values = function () return D:tMap(GetHistoryDebuff(), function (debuff) return debuff[1] end) end;
             get = function() GetHistoryDebuff(); return false; end,
             set = function(info,value)
-                AddFunc(D:RemoveColor(GetHistoryDebuff()[value])); end,
+                local debuffName, spellID = unpack(GetHistoryDebuff()[value]);
+                AddFunc(spellID ~= 0 and spellID or (D:RemoveColor(debuffName) == "Test item" and 1243 or 0));
+            end,
             order = 100 + num,
         };
 
@@ -2430,7 +2572,7 @@ do
     local retrieveColorReason = function(info)
         local ColorReason = str_sub(info[#info], 2);
 
-        if tonumber(ColorReason) then 
+        if tonumber(ColorReason) then
             return tonumber(ColorReason);
         else
             return ColorReason;
@@ -2482,7 +2624,6 @@ do
     function D:CreateDropDownMUFcolorsMenu(MUFsColors_args)
         L_MF_colors = D.profile.MF_colors;
 
-
         for ColorReason, Color in pairs(L_MF_colors) do
 
             if not L_MF_colors[ColorReason][4] then
@@ -2501,9 +2642,69 @@ do
 
 
             MUFsColors_args["c"..ColorReason] = ColorPicker;
-            
+
         end
     end
+end
+do
+    local infoPrefix = "cAffliction_";
+    local orderStart = 2048 + 200;
+
+    local function retrieveAffTypeFromInfo(info)
+        return tonumber((info[#info]):sub(#infoPrefix + 1));
+    end
+
+    local function GetAffTypeName(info)
+        return L[DC.TypeToLocalizableTypeNames[retrieveAffTypeFromInfo(info)]];
+    end
+
+    local function GetAffTypeDesc(info)
+        local affName = L[DC.TypeToLocalizableTypeNames[retrieveAffTypeFromInfo(info)]];
+        return L["OPT_SETAFFTYPECOLOR_DESC"]:format(affName);
+    end
+
+    local function GetAffTypeOrder(info)
+        return orderStart + retrieveAffTypeFromInfo(info);
+    end
+
+    local function GetAffTypeColor(info)
+        return unpack( D:HexColorToNum(D.profile.TypeColors[retrieveAffTypeFromInfo(info)]));
+    end
+
+    local function SetAffTypeColor(info, r, g, b, a)
+        local affType = retrieveAffTypeFromInfo(info);
+
+        D.profile.TypeColors[affType] = D:NumToHexColor({r, g, b, (a and a or 1)});
+        D:Debug("Affliction type color ", affType, "set to", D.profile.TypeColors[affType]);
+    end
+
+    local afflictionColorPicker = {
+        type = "color",
+        name = GetAffTypeName,
+        desc = GetAffTypeDesc,
+        hasAlpha = true,
+        order = GetAffTypeOrder,
+
+        get = GetAffTypeColor,
+        set = SetAffTypeColor,
+    };
+
+    function D:CreateAfflictionColorsMenu(MUFsColors_args)
+        local TypeColors = D.profile.TypeColors;
+
+        MUFsColors_args[infoPrefix.."0"] = {
+            type = "header",
+            name = "",
+            order = GetAffTypeOrder,
+        }
+
+        for afflictionType, Color in pairs(TypeColors) do
+            if afflictionType ~= DC.NOTYPE then
+                MUFsColors_args[infoPrefix..afflictionType] = afflictionColorPicker;
+            end
+        end
+    end
+
 end
 
 -- Modifiers order choosing dynamic menu creation
@@ -2617,10 +2818,24 @@ end
 
 do
 
+    local t_insert      = _G.table.insert;
+    local tonumber      = _G.tonumber;
+    local IsSpellKnown  = nil; -- use D:isSpellReady instead
+    local TN            = function(string) return tonumber(string) or nil; end;
+
     local order = 160;
-    local t_insert = _G.table.insert;
-    local tonumber = _G.tonumber;
-    local TN = function(string) return tonumber(string) or nil; end;
+
+    local function isSpellUSable (spellID)
+
+        local spell = D.classprofile.UserSpells[spellID];
+
+        if not spell.IsItem and spellID > 0 then
+            return D:isSpellReady(spellID, spell.Pet)
+        else
+            return D:isItemUsable(spellID * -1)
+        end
+    end
+
 
     local function GetColoredName(spellID)
         local spell = D.classprofile.UserSpells[spellID];
@@ -2630,23 +2845,23 @@ do
             return tostring(spellID);
         end
 
-        local spellName = GetSpellInfo(spellID);
+        local name = D.GetSpellOrItemInfo(spellID) or "WTF!?!";
         local color = 'FFFFFFFF';
 
         if spell.Disabled then
             color = 'FFAA0000';
-        elseif not D.Status.CuringSpellsPrio[spellName] then
+        elseif not D.Status.CuringSpellsPrio[name] then
             color = 'FF909090';
         else
             color = 'FF00D000';
         end
 
-        if not IsSpellKnown(spellID, spell.Pet) then
-            spellName = ("(%s) %s"):format(L["OPT_CUSTOM_SPELL_UNAVAILABLE"], spellName);
+        if not isSpellUSable(spellID) then
+            name = ("(%s) %s"):format(L["OPT_CUSTOM_SPELL_UNAVAILABLE"], name);
             color = 'FF606060';
         end
 
-        return D:ColorText(spellName .. ((D.classprofile.UserSpells[spellID] and D.classprofile.UserSpells[spellID].MacroText) and "|cFFFF0000*|r" or ""), color);
+        return D:ColorText(name .. ((spell and spell.MacroText) and "|cFFFF0000*|r" or ""), color);
 
     end
 
@@ -2665,24 +2880,62 @@ do
                 t_insert(spellTableTypes, curetype)
             elseif not v then
                 D:tremovebyval(spellTableTypes, curetype);
+                -- also clear the unit filtering settings if it exists
+                if D.classprofile.UserSpells[TN(info[#info-2])].UnitFiltering then
+                    D.classprofile.UserSpells[TN(info[#info-2])].UnitFiltering[DC.LocalizableTypeNamesToTypes[info[#info]]] = nil;
+                end
             end
-            if not D.classprofile.UserSpells[TN(info[#info-2])].Disabled and IsSpellKnown(TN(info[#info-2]), D.classprofile.UserSpells[TN(info[#info-2])].Pet) then
+            if not D.classprofile.UserSpells[TN(info[#info-2])].Disabled and isSpellUSable(TN(info[#info-2])) then
                 D:ScheduleDelayedCall("Dcr_Delayed_Configure", D.Configure, 2, D);
             end
         end,
         disabled = function (info) -- disable types edition if an enhancement is active (default types are not used in that case)
             if D.classprofile.UserSpells[TN(info[#info-2])] and D.classprofile.UserSpells[TN(info[#info-2])].EnhancedByCheck then
-
                 return D.classprofile.UserSpells[TN(info[#info-2])].EnhancedByCheck();
             end
 
-            if DC.SpellsToUse[TN(info[#info-2])] and D:tcheckforval(DC.SpellsToUse[TN(info[#info-2])].Types, DC.LocalizableTypeNamesToTypes[info[#info]]) then
-                return true;
-            end
+            --if DC.SpellsToUse[TN(info[#info-2])] and D:tcheckforval(DC.SpellsToUse[TN(info[#info-2])].Types, DC.LocalizableTypeNamesToTypes[info[#info]]) then
+            --    return true;
+            --end
 
             return false;
-        end, 
+        end,
         order = function() return order; end,
+    }
+
+    local typeUnitFilteringOption = {
+        type = 'select',
+        style = "dropdown",
+        name = function(info) return L[info[#info]] end,
+        desc = L["OPT_CUSTOM_SPELL_UNIT_FILTER_DESC"],
+        values = {[0] = L["OPT_CUSTOM_SPELL_UNIT_FILTER_NONE"], [1] = L["OPT_CUSTOM_SPELL_UNIT_FILTER_PLAYER"], [2] = L["OPT_CUSTOM_SPELL_UNIT_FILTER_NONPLAYER"]},
+        order = function() return order; end,
+
+        hidden = function (info)
+            -- hide the option when the type is not enabled for this spell
+            return not D:tcheckforval(D.classprofile.UserSpells[TN(info[#info-2])].Types,  DC.LocalizableTypeNamesToTypes[info[#info]])
+        end,
+
+        get = function(info)
+            if not D.classprofile.UserSpells[TN(info[#info-2])].UnitFiltering
+                or not D.classprofile.UserSpells[TN(info[#info-2])].UnitFiltering[DC.LocalizableTypeNamesToTypes[info[#info]]] then
+                return 0;
+            else
+                return D.classprofile.UserSpells[TN(info[#info-2])].UnitFiltering[DC.LocalizableTypeNamesToTypes[info[#info]]];
+            end
+        end,
+        set = function(info, v)
+            if not D.classprofile.UserSpells[TN(info[#info-2])].UnitFiltering then
+                D.classprofile.UserSpells[TN(info[#info-2])].UnitFiltering = {};
+            end
+
+            D.classprofile.UserSpells[TN(info[#info-2])].UnitFiltering[DC.LocalizableTypeNamesToTypes[info[#info]]] = v ~= 0 and v or nil;
+
+            if not D.classprofile.UserSpells[TN(info[#info-2])].Disabled and isSpellUSable(TN(info[#info-2])) then
+                D:ScheduleDelayedCall("Dcr_Delayed_Configure", D.Configure, 2, D);
+            end
+        end,
+
     }
 
     local SpellSubOptions = {
@@ -2699,7 +2952,7 @@ do
             -- an enable checkbox
             header = {
                 type = 'header',
-                name = function (info) return GetColoredName(TN(info[#info - 1])); end,
+                name = function (info) return ("%s  (id: %d)"):format(GetColoredName(TN(info[#info - 1])), TN(info[#info - 1])); end,
                 order = 0,
             },
             enable = {
@@ -2712,7 +2965,7 @@ do
                         return;
                     end
 
-                    if IsSpellKnown(TN(info[#info-1]), D.classprofile.UserSpells[TN(info[#info-1])].Pet or nil) then
+                    if isSpellUSable(TN(info[#info-1])) then
                         D:ReConfigure();
                     end
                 end,
@@ -2721,13 +2974,41 @@ do
                 end,
                 order = 100
             },
+            isPet = {
+                type = "toggle",
+                name = L["OPT_CUSTOM_SPELL_ISPET"],
+                desc = L["OPT_CUSTOM_SPELL_ISPET_DESC"];
+                set = function(info,v)
+
+                    D.classprofile.UserSpells[TN(info[#info-1])].Pet = v;
+
+                    --if isSpellUSable(TN(info[#info-1])) then
+                    D:ScheduleDelayedCall("Dcr_Delayed_Configure", D.Configure, 2, D);
+                    --end
+                end,
+                get = function(info,v)
+                    return D.classprofile.UserSpells[TN(info[#info-1])].Pet;
+                end,
+                hidden = function (info) return D.classprofile.UserSpells[TN(info[#info-1])].IsItem end,
+                order = 105
+            },
             cureTypes = {
                 type = 'group',
                 name = L["OPT_CUSTOM_SPELL_CURE_TYPES"],
                 order = 105,
                 inline = true,
-                
+
                 args={},
+                order = 106
+            },
+            UnitFiltering = {
+                type = 'group',
+                name = L["OPT_CUSTOM_SPELL_UNIT_FILTER"],
+                order = 107,
+                inline = true,
+
+                args={},
+                order = 107
             },
             priority = {
                 type = 'range',
@@ -2745,23 +3026,8 @@ do
                 step = 1,
                 order = 110,
             },
-            
-            isPet = {
-                type = "toggle",
-                name = L["OPT_CUSTOM_SPELL_ISPET"],
-                desc = L["OPT_CUSTOM_SPELL_ISPET_DESC"];
-                set = function(info,v)
-                    D.classprofile.UserSpells[TN(info[#info-1])].Pet = v;
-                    if IsSpellKnown(TN(info[#info-1]), v or nil) then
-                        D:ScheduleDelayedCall("Dcr_Delayed_Configure", D.Configure, 2, D);
-                    end
-                end,
-                get = function(info,v)
-                    return D.classprofile.UserSpells[TN(info[#info-1])].Pet;
-                end,
-                -- hidden = function(info,v) return D.classprofile.UserSpells[TN(info[#info-1])].MacroText end,
-                order = 112
-            },
+
+
             MacroEdition = {
                 type = 'input',
                 name = L["OPT_CUSTOM_SPELL_MACRO_TEXT"],
@@ -2778,8 +3044,8 @@ do
                     if v:find("UNITID") and (v:gsub("UNITID", "PARTYPET5")):len() < 256 then
                         D.classprofile.UserSpells[TN(info[#info-1])].MacroText = v;
 
-                        if D.Status.FoundSpells[GetSpellInfo(TN(info[#info - 1]))] then
-                            D.Status.FoundSpells[GetSpellInfo(TN(info[#info-1]))][5] = v;
+                        if D.Status.FoundSpells[D.GetSpellOrItemInfo(TN(info[#info - 1]))] then
+                            D.Status.FoundSpells[D.GetSpellOrItemInfo(TN(info[#info-1]))][5] = v;
                             D.Status.SpellsChanged = GetTime(); -- will force an update of all MUFs attributes
                             D:Debug("Attribute update triggered");
                         end
@@ -2790,7 +3056,7 @@ do
                     local error = function (m) D:ColorPrint(1, 0, 0, m); return m; end;
 
                     if type(v) ~= 'string' then -- this should be impossible
-                        return error("What did you do ?!?");
+                        return error("What did you do?!?");
                     end
 
                     local length = (v:gsub("UNITID", "PARTYPET5")):len()
@@ -2803,8 +3069,8 @@ do
                         return error(L["OPT_CUSTOM_SPELL_MACRO_MISSING_UNITID_KEYWORD"]);
                     end
 
-                    if not v:find(GetSpellInfo(TN(info[#info-1])), 0, true) then
-                        T._ShowNotice(error((L["OPT_CUSTOM_SPELL_MACRO_MISSING_NOMINAL_SPELL"]):format((GetSpellInfo(TN(info[#info-1]))))));
+                    if not v:find(D.GetSpellOrItemInfo(TN(info[#info-1])), 0, true) then
+                        T._ShowNotice(error((L["OPT_CUSTOM_SPELL_MACRO_MISSING_NOMINAL_SPELL"]):format((D.GetSpellOrItemInfo(TN(info[#info-1]))))));
                     end
 
                     return 0;
@@ -2815,7 +3081,7 @@ do
             -- a delete button
             delete = {
                 type = 'execute',
-                name = function(info) return ("%s %q"):format(L["OPT_DELETE_A_CUSTOM_SPELL"], GetSpellInfo(TN(info[#info - 1]))) end,
+                name = function(info) return ("%s %q"):format(L["OPT_DELETE_A_CUSTOM_SPELL"], D.GetSpellOrItemInfo(TN(info[#info - 1])) or "BAD SPELL!") end,
                 confirm = true,
                 width = 'double',
                 func = function (info)
@@ -2828,7 +3094,7 @@ do
                             D.classprofile.UserSpells[TN(info[#info - 1])] = nil;
                         end
 
-                        if D.Status.FoundSpells[GetSpellInfo(TN(info[#info - 1]))] then
+                        if D.Status.FoundSpells[D.GetSpellOrItemInfo(TN(info[#info - 1]))] then
                             D:Configure();
                         end
                     end
@@ -2842,6 +3108,7 @@ do
 
     function D:CreateAddedSpellsOptionMenu (where)
 
+        -- create type slectors
         local TypesSelector = {};
 
         for localizableTypeName, curetype in pairs(DC.LocalizableTypeNamesToTypes) do
@@ -2851,6 +3118,16 @@ do
 
         SpellSubOptions.args.cureTypes.args = TypesSelector;
 
+        -- create unitFiltering by type
+        local UnitFilteringTypeSelector = {};
+        for localizableTypeName, curetype in pairs(DC.LocalizableTypeNamesToTypes) do
+            UnitFilteringTypeSelector[localizableTypeName] = typeUnitFilteringOption;
+            order = order + 1;
+        end
+
+        SpellSubOptions.args.UnitFiltering.args = UnitFilteringTypeSelector;
+
+        -- create each spell option table
         for spellID, spellTable in pairs(self.classprofile.UserSpells) do
             if not spellTable.Hidden then
                 where[tostring(spellID)] = SpellSubOptions;
@@ -2863,6 +3140,7 @@ end
 
 -- to test on 2.3 : /script D:PrintLiteral(GetBindingAction(D.db.global.MacroBind));
 -- to test on 2.3 : /script D:PrintLiteral(GetBindingKey(D.CONF.MACROCOMMAND));
+local SaveBindings = _G.SaveBindings or _G.AttemptToSaveBindings; -- was renamed for WOW Classic, it might happen too on retail...
 
 function D:SetMacroKey ( key )
 
@@ -2939,7 +3217,7 @@ function D:AutoHideShowMUFs ()
     end
 
     if D.profile.AutoHideMUFs == 1 then
-        return;
+        return false;
     else
         -- if we want to hide the MUFs when in solo or not in raid
         local InGroup = (GetNumRaidMembers() ~= 0 or (D.profile.AutoHideMUFs ~= 3 and GetNumPartyMembers() ~= 0) );
@@ -2960,6 +3238,8 @@ function D:AutoHideShowMUFs ()
                 D:ShowHideDebuffsFrame ();
             end
         end
+
+        return true;
     end
 end
 
@@ -2989,6 +3269,6 @@ function D:QuickAccess (CallingObject, button) -- {{{
 end -- }}}
 
 
-T._LoadedFiles["Dcr_opt.lua"] = "2.7.3.6";
+T._LoadedFiles["Dcr_opt.lua"] = "2.7.8";
 
 -- Closer

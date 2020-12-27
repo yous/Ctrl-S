@@ -23,8 +23,7 @@ L:SetOptionLocalization{
 	WarnMark		= "Show warning for Marks",
 	WarnPhase		= "Show warning for next phase",
 	SpecWarnMark	= "Show warning when Marks debuff damage over 100%",
-	TimerMark		= "Show timer for next Marks",
-	RangeFrame		= DBM_CORE_AUTO_RANGE_OPTION_TEXT_SHORT:format(10)
+	TimerMark		= "Show timer for next Marks"
 }
 
 L:SetMiscLocalization{
@@ -77,8 +76,7 @@ L:SetTimerLocalization{
 
 L:SetOptionLocalization{
 	WarnPhase		= "Show warning for next phase",
-	TimerPhase		= "Show time for next phase",
-	DemonIcon		= DBM_CORE_AUTO_ICONS_OPTION_TEXT:format(37676)
+	TimerPhase		= "Show time for next phase"
 }
 
 L:SetMiscLocalization{
@@ -107,7 +105,6 @@ L:SetOptionLocalization{
 }
 
 L:SetMiscLocalization{
-	YellPull	= "Guards, attention! We have visitors....",
 	Caribdis	= "Fathom-Guard Caribdis",
 	Tidalvess	= "Fathom-Guard Tidalvess",
 	Sharkkis	= "Fathom-Guard Sharkkis"
@@ -123,7 +120,6 @@ L:SetGeneralLocalization{
 }
 
 L:SetWarningLocalization{
-	WarnMurlocs		= "Murlocs",
 	SpecWarnMurlocs	= "Murlocs Coming!"
 }
 
@@ -132,10 +128,9 @@ L:SetTimerLocalization{
 }
 
 L:SetOptionLocalization{
-	WarnMurlocs		= "Show warning when Murlocs spawning",
 	SpecWarnMurlocs	= "Show special warning when Murlocs spawning",
 	TimerMurlocs	= "Show timer for Murlocs spawning",
-	GraveIcon		= DBM_CORE_AUTO_ICONS_OPTION_TEXT:format(38049)
+	GraveIcon		= DBM_CORE_L.AUTO_ICONS_OPTION_TEXT:format(38049)
 }
 
 L:SetMiscLocalization{
@@ -177,8 +172,7 @@ L:SetOptionLocalization{
 	TimerStrider		= "Show timer for next Strider",
 	TimerNaga			= "Show timer for next Naga",
 	SpecWarnElemental	= "Show special warning when Tainted Elemental coming",
-	RangeFrame			= "Show range frame (10 yards)",
-	ChargeIcon			= DBM_CORE_AUTO_ICONS_OPTION_TEXT:format(38280),
+	ChargeIcon			= DBM_CORE_L.AUTO_ICONS_OPTION_TEXT:format(38280),
 	AutoChangeLootToFFA	= "Switch loot mode to Free for All in Phase 2"
 }
 

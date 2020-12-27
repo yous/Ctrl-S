@@ -1,384 +1,542 @@
-﻿-- ------------------------------------------------------------------------------ --
+-- ------------------------------------------------------------------------------ --
 --                                TradeSkillMaster                                --
---                http://www.curse.com/addons/wow/tradeskill-master               --
---                                                                                --
---             A TradeSkillMaster Addon (http://tradeskillmaster.com)             --
---    All Rights Reserved* - Detailed license information included with addon.    --
+--                          https://tradeskillmaster.com                          --
+--    All Rights Reserved - Detailed license information included with addon.     --
 -- ------------------------------------------------------------------------------ --
 
 -- This is the main TSM file that holds the majority of the APIs that modules will use.
 
--- register this file with Ace libraries
-local TSM = select(2, ...)
-TSM = LibStub("AceAddon-3.0"):NewAddon(TSM, "TradeSkillMaster", "AceEvent-3.0", "AceConsole-3.0", "AceHook-3.0")
-TSM.moduleObjects = {}
-TSM.moduleNames = {}
-
-local L = LibStub("AceLocale-3.0"):GetLocale("TradeSkillMaster") -- loads the localization table
-TSM._version = GetAddOnMetadata("TradeSkillMaster", "X-Curse-Packaged-Version") or GetAddOnMetadata("TradeSkillMaster", "Version") -- current version of the addon
-
-
-TSMAPI = {}
-
-TSM.designDefaults = {
-	frameColors = {
-		frameBG = { backdrop = { 24, 24, 24, .93 }, border = { 30, 30, 30, 1 } },
-		frame = { backdrop = { 24, 24, 24, 1 }, border = { 255, 255, 255, 0.03 } },
-		content = { backdrop = { 42, 42, 42, 1 }, border = { 0, 0, 0, 0 } },
-	},
-	textColors = {
-		iconRegion = { enabled = { 249, 255, 247, 1 } },
-		text = { enabled = { 255, 254, 250, 1 }, disabled = { 147, 151, 139, 1 } },
-		label = { enabled = { 216, 225, 211, 1 }, disabled = { 150, 148, 140, 1 } },
-		title = { enabled = { 132, 219, 9, 1 } },
-		link = { enabled = { 49, 56, 133, 1 } },
-	},
-	inlineColors = {
-		link = { 153, 255, 255, 1 },
-		link2 = { 153, 255, 255, 1 },
-		category = { 36, 106, 36, 1 },
-		category2 = { 85, 180, 8, 1 },
-		tooltip = { 130, 130, 250, 1 },
-		advanced = { 255, 30, 0, 1 },
-	},
-	edgeSize = 1.5,
-	fonts = {
-		content = "Fonts\\ARIALN.TTF",
-		bold = "Interface\\Addons\\TradeSkillMaster\\Media\\DroidSans-Bold.ttf",
-	},
-	fontSizes = {
-		normal = 15,
-		medium = 13,
-		small = 12,
-	},
+local _, TSM = ...
+TSMAPI = {} -- FIXME: this is still needed for AppHelper
+local ClassicRealms = TSM.Include("Data.ClassicRealms")
+local Log = TSM.Include("Util.Log")
+local Analytics = TSM.Include("Util.Analytics")
+local Math = TSM.Include("Util.Math")
+local Money = TSM.Include("Util.Money")
+local ItemString = TSM.Include("Util.ItemString")
+local Wow = TSM.Include("Util.Wow")
+local Theme = TSM.Include("Util.Theme")
+local TempTable = TSM.Include("Util.TempTable")
+local ObjectPool = TSM.Include("Util.ObjectPool")
+local ErrorHandler = TSM.Include("Service.ErrorHandler")
+local SlashCommands = TSM.Include("Service.SlashCommands")
+local Threading = TSM.Include("Service.Threading")
+local Settings = TSM.Include("Service.Settings")
+local ItemInfo = TSM.Include("Service.ItemInfo")
+local CustomPrice = TSM.Include("Service.CustomPrice")
+local BlackMarket = TSM.Include("Service.BlackMarket")
+local Inventory = TSM.Include("Service.Inventory")
+local LibRealmInfo = LibStub("LibRealmInfo")
+local LibDBIcon = LibStub("LibDBIcon-1.0")
+local L = TSM.Include("Locale").GetTable()
+local private = {
+	settings = nil,
+	appInfo = nil,
 }
-
-local savedDBDefaults = {
-	global = {
-		vendorItems = {},
-		ignoreRandomEnchants = nil,
-		globalOperations = false,
-		operations = {},
-		customPriceSources = {},
-		bankUITab = "Warehousing",
-		chatFrame = "",
-		infoMessage = 1000,
-		bankUIframeScale = 1,
-		frameStatus = {},
-		customPriceTooltips = {},
-		groupImportHistory = {}
-	},
-	profile = {
-		minimapIcon = {
-			-- minimap icon position and visibility
-			hide = false,
-			minimapPos = 220,
-			radius = 80,
-		},
-		auctionFrameMovable = true,
-		auctionFrameScale = 1,
-		showBids = false,
-		openAllBags = true,
-		auctionResultRows = 12,
-		groups = {},
-		items = {},
-		operations = {},
-		groupTreeStatus = {},
-		customPriceSourceTreeStatus = {},
-		directSubgroupAdd = true,
-		pricePerUnit = true,
-		moneyCoinsTooltip = true,
-		moneyTextTooltip = false,
-		tooltip = true,
-		postDuration = 3,
-		destroyValueSource = "DBMarket",
-		detailedDestroyTooltip = true,
-		deTooltip = true,
-		millTooltip = true,
-		prospectTooltip = true,
-		vendorBuyTooltip = true,
-		vendorSellTooltip = true,
-		isBankui = true,
-		defaultAuctionTab = "Shopping",
-		gotoNewGroup = true,
-		gotoNewCustomPriceSource = true,
-		defaultGroupTab = 1,
-		moveImportedItems = false,
-		importParentOnly = false,
-		keepInParent = true,
-		savedThemes = {},
-		groupTreeCollapsedStatus = {},
-		groupTreeSelectedGroupStatus = {},
-		exportSubGroups = false,
-		colorGroupName = true,
-		embeddedTooltip = true,
-	},
-	factionrealm = {
-		accountKey = nil,
-		characters = {},
-		syncAccounts = {},
-		bankUIBankFramePosition = {100, 300},
-		bankUIGBankFramePosition = {100, 300},
-	},
-	realm = {
-		numPagesCache = {}
-	},
-}
-
--- Called once the player has loaded WOW.
-function TSM:OnInitialize()
-	TSMAPI:RegisterForTracing(TSMAPI, "TSMAPI")
-	
-	TSM.moduleObjects = nil
-	TSM.moduleNames = nil
-
-	-- load the savedDB into TSM.db
-	TSM.db = LibStub:GetLibrary("AceDB-3.0"):New("TradeSkillMasterDB", savedDBDefaults, true)
-	TSM.db:RegisterCallback("OnProfileChanged", TSM.UpdateModuleProfiles)
-	TSM.db:RegisterCallback("OnProfileCopied", TSM.UpdateModuleProfiles)
-	TSM.db:RegisterCallback("OnProfileReset", TSM.UpdateModuleProfiles)
-	TSM.db:RegisterCallback("OnDatabaseShutdown", TSM.ModuleOnDatabaseShutdown)
-	if TSM.db.global.globalOperations then
-		TSM.operations = TSM.db.global.operations
-	else
-		TSM.operations = TSM.db.profile.operations
+local APP_INFO_REQUIRED_KEYS = { "version", "lastSync", "message", "news" }
+local LOGOUT_TIME_WARNING_THRESHOLD_MS = 20
+do
+	-- show a message if we were updated
+	if GetAddOnMetadata("TradeSkillMaster", "Version") ~= "v4.10.26" then
+		Wow.ShowBasicMessage("TSM was just updated and may not work properly until you restart WoW.")
 	end
-	
-	-- update for 6.0.1
-	if type(TSM.db.factionrealm.numPagesCache) == "table" then
-		wipe(TSM.db.factionrealm.numPagesCache)
-		TSM.db.factionrealm.numPagesCache = nil
-	end
-	
-	TSM:RegisterEvent("BLACK_MARKET_ITEM_UPDATE", "ScanBMAH")
-	
-	-- Prepare the TradeSkillMasterAppDB database
-	-- We're not using AceDB here on purpose due to bugs in AceDB, but are emulating the parts of it that we need.
-	local json = TradeSkillMasterAppDB
-	TradeSkillMasterAppDB = nil
-	if type(json) == "table" then
-		json = table.concat(json)
-	end
-	if type(json) == "string" then
-		json = gsub(json, "%[", "{")
-		json = gsub(json, "%]", "}")
-		json = gsub(json, "\"([a-zA-Z]+)\":", "%1=")
-		json = gsub(json, "\"([^\"]+)\":", "[\"%1\"]=")
-		local func, err = loadstring("TSM_APP_DATA_TMP = " .. json .. "")
-		if func then
-			func()
-			TradeSkillMasterAppDB = TSM_APP_DATA_TMP
-			TSM_APP_DATA_TMP = nil
-		end
-	end
-	TradeSkillMasterAppDB = TradeSkillMasterAppDB or {realm={}, profiles={}, global={}}
-	TradeSkillMasterAppDB.version = max(TradeSkillMasterAppDB.version or 0, 7)
-	TradeSkillMasterAppDB.region = GetCVar("portal") == "public-test" and "PTR" or GetCVar("portal")
-	local realmKey = GetRealmName()
-	local profileKey = TSM.db:GetCurrentProfile()
-	TradeSkillMasterAppDB.factionrealm = nil
-	TradeSkillMasterAppDB.global = TradeSkillMasterAppDB.global or {}
-	TradeSkillMasterAppDB.realm = TradeSkillMasterAppDB.realm or {}
-	TradeSkillMasterAppDB.realm[realmKey] = TradeSkillMasterAppDB.realm[realmKey] or {}
-	TradeSkillMasterAppDB.profiles[profileKey] = TradeSkillMasterAppDB.profiles[profileKey] or {}
-	TSM.appDB = {}
-	TSM.appDB.realm = TradeSkillMasterAppDB.realm[realmKey]
-	TSM.appDB.profile = TradeSkillMasterAppDB.profiles[profileKey]
-	TSM.appDB.profile.groupTest = nil
-	TSM.appDB.global = TradeSkillMasterAppDB.global
-	TSM.appDB.keys = {profile=profileKey, realm=realmKey}
-
-	for name, module in pairs(TSM.modules) do
-		TSM[name] = module
-	end
-
-	-- TSM core must be registered as a module just like the modules
-	TSM:RegisterModule()
-
-	-- create account key for multi-account syncing if necessary
-	TSM.db.factionrealm.accountKey = TSM.db.factionrealm.accountKey or (GetRealmName() .. random(time()))
-	-- add this character to the list of characters on this realm
-	TSM.db.factionrealm.characters[UnitName("player")] = true
-
-	if not TSM.db.profile.design then
-		TSM:LoadDefaultDesign()
-	end
-	TSM:SetDesignDefaults(TSM.designDefaults, TSM.db.profile.design)
-
-	-- create / register the minimap button
-	TSM.LDBIcon = LibStub("LibDataBroker-1.1", true) and LibStub("LibDBIcon-1.0", true)
-	local TradeSkillMasterLauncher = LibStub("LibDataBroker-1.1", true):NewDataObject("TradeSkillMasterMinimapIcon", {
-		icon = "Interface\\Addons\\TradeSkillMaster\\Media\\TSM_Icon",
-		OnClick = function(_, button) -- fires when a user clicks on the minimap icon
-			if button == "LeftButton" then
-				-- does the same thing as typing '/tsm'
-				TSM.Modules:ChatCommand("")
-			end
-		end,
-		OnTooltipShow = function(tt) -- tooltip that shows when you hover over the minimap icon
-			local cs = "|cffffffcc"
-			local ce = "|r"
-			tt:AddLine("TradeSkillMaster " .. TSM._version)
-			tt:AddLine(format(L["%sLeft-Click%s to open the main window"], cs, ce))
-			tt:AddLine(format(L["%sDrag%s to move this button"], cs, ce))
-		end,
-	})
-	TSM.LDBIcon:Register("TradeSkillMaster", TradeSkillMasterLauncher, TSM.db.profile.minimapIcon)
-	local TradeSkillMasterLauncher2 = LibStub("LibDataBroker-1.1", true):NewDataObject("TradeSkillMaster", {
-		type = "launcher",
-		icon = "Interface\\Addons\\TradeSkillMaster\\Media\\TSM_Icon2",
-		OnClick = function(_, button) -- fires when a user clicks on the minimap icon
-			if button == "LeftButton" then
-				-- does the same thing as typing '/tsm'
-				TSM.Modules:ChatCommand("")
-			end
-		end,
-		OnTooltipShow = function(tt) -- tooltip that shows when you hover over the minimap icon
-			local cs = "|cffffffcc"
-			local ce = "|r"
-			tt:AddLine("TradeSkillMaster " .. TSM._version)
-			tt:AddLine(format(L["%sLeft-Click%s to open the main window"], cs, ce))
-			tt:AddLine(format(L["%sDrag%s to move this button"], cs, ce))
-		end,
-	})
-
-	-- create the main TSM frame
-	TSM:CreateMainFrame()
-
-	-- fix any items with spaces in them
-	for itemString, groupPath in pairs(TSM.db.profile.items) do
-		if strfind(itemString, " ") then
-			local newItemString = gsub(itemString, " ", "")
-			TSM.db.profile.items[newItemString] = groupPath
-			TSM.db.profile.items[itemString] = nil
-		end
-	end
-	
-	if TSM.db.profile.deValueSource then
-		TSM.db.profile.destroyValueSource = TSM.db.profile.deValueSource
-		TSM.db.profile.deValueSource = nil
-	end
-	
-	-- Cache battle pet names
-	for i=1, C_PetJournal.GetNumPets() do C_PetJournal.GetPetInfoByIndex(i) end
-	-- force a garbage collection
-	collectgarbage()
-	
-	TSMAPI:CreateTimeDelay(3, TSM.App.LoadData)
 end
 
-function TSM:RegisterModule()
-	TSM.icons = {
-		{ side = "options", desc = L["TSM Status / Options"], callback = "LoadOptions", icon = "Interface\\Icons\\Achievement_Quests_Completed_04" },
-		{ side = "options", desc = L["Groups"], callback = "LoadGroupOptions", slashCommand = "groups", icon = "Interface\\Icons\\INV_DataCrystal08" },
-		{ side = "options", desc = L["Module Operations / Options"], slashCommand = "operations", callback = "LoadOperationOptions", icon = "Interface\\Icons\\INV_Misc_Enggizmos_33" },
-		{ side = "options", desc = L["Tooltip Options"], slashCommand = "tooltips", callback = "LoadTooltipOptions", icon = "Interface\\Icons\\PET_Type_Mechanical" },
-		{ side = "options", desc = "TSM Application", slashCommand = "app", callback = "App:LoadTSMAppOptions", icon = "Interface\\Icons\\Achievement_Faction_GoldenLotus" },
-	}
 
-	TSM.priceSources = {}
-	-- Auctioneer
-	if select(4, GetAddOnInfo("Auc-Advanced")) and AucAdvanced then
+
+-- ============================================================================
+-- Module Functions
+-- ============================================================================
+
+function TSM.OnInitialize()
+	-- load settings
+	TSM.db = Settings.GetDB()
+	private.settings = Settings.NewView()
+		:AddKey("global", "coreOptions", "chatFrame")
+		:AddKey("global", "coreOptions", "destroyValueSource")
+		:AddKey("global", "coreOptions", "minimapIcon")
+		:AddKey("global", "debug", "chatLoggingEnabled")
+		:AddKey("global", "internalData", "appMessageId")
+		:AddKey("global", "internalData", "lastCharacter")
+		:AddKey("sync", "internalData", "classKey")
+		:RegisterCallback("destroyValueSource", private.DestroyValueUpdated)
+
+	-- set the last character we logged into for display in the app
+	private.settings.lastCharacter = UnitName("player").." - "..GetRealmName()
+
+	-- configure the logger
+	Log.SetChatFrame(private.settings.chatFrame)
+	Log.SetLoggingToChatEnabled(private.settings.chatLoggingEnabled)
+	Log.SetCurrentThreadNameFunction(Threading.GetCurrentThreadName)
+
+	-- store the class of this character
+	private.settings.classKey = select(2, UnitClass("player"))
+
+	-- core price sources
+	ItemInfo.RegisterInfoChangeCallback(function(itemString)
+		CustomPrice.OnSourceChange("VendorBuy", itemString)
+		CustomPrice.OnSourceChange("VendorSell", itemString)
+		CustomPrice.OnSourceChange("ItemQuality", itemString)
+		CustomPrice.OnSourceChange("ItemLevel", itemString)
+		CustomPrice.OnSourceChange("RequiredLevel", itemString)
+	end)
+	CustomPrice.RegisterSource("TSM", "VendorBuy", L["Buy from Vendor"], ItemInfo.GetVendorBuy)
+	CustomPrice.RegisterSource("TSM", "VendorSell", L["Sell to Vendor"], ItemInfo.GetVendorSell)
+	local function GetDestroyValue(itemString)
+		return CustomPrice.GetConversionsValue(itemString, private.settings.destroyValueSource)
+	end
+	CustomPrice.RegisterSource("TSM", "Destroy", L["Destroy Value"], GetDestroyValue)
+	CustomPrice.RegisterSource("TSM", "ItemQuality", L["Item Quality"], ItemInfo.GetQuality)
+	CustomPrice.RegisterSource("TSM", "ItemLevel", L["Item Level"], ItemInfo.GetItemLevel)
+	CustomPrice.RegisterSource("TSM", "RequiredLevel", L["Required Level"], ItemInfo.GetMinLevel)
+	CustomPrice.RegisterSource("TSM", "NumInventory", L["Total Inventory Quantity"], Inventory.GetTotalQuantity)
+
+	-- Auctioneer price sources
+	if Wow.IsAddonEnabled("Auc-Advanced") and AucAdvanced then
+		local registeredAuctioneerSources = {}
+		hooksecurefunc(AucAdvanced, "SendProcessorMessage", function(msg)
+			if msg == "scanfinish" then
+				for _, source in ipairs(registeredAuctioneerSources) do
+					CustomPrice.OnSourceChange(source)
+				end
+			end
+		end)
 		if AucAdvanced.Modules.Util.Appraiser and AucAdvanced.Modules.Util.Appraiser.GetPrice then
-			tinsert(TSM.priceSources, { key = "AucAppraiser", label = L["Auctioneer - Appraiser"], callback = AucAdvanced.Modules.Util.Appraiser.GetPrice })
+			CustomPrice.RegisterSource("External", "AucAppraiser", L["Auctioneer - Appraiser"], AucAdvanced.Modules.Util.Appraiser.GetPrice, true)
+			tinsert(registeredAuctioneerSources, "AucAppraiser")
 		end
 		if AucAdvanced.Modules.Util.SimpleAuction and AucAdvanced.Modules.Util.SimpleAuction.Private.GetItems then
-			tinsert(TSM.priceSources, { key = "AucMinBuyout", label = L["Auctioneer - Minimum Buyout"], callback = function(itemLink) return select(6, AucAdvanced.Modules.Util.SimpleAuction.Private.GetItems(itemLink)) end })
+			local function GetAucMinBuyout(itemLink)
+				return select(6, AucAdvanced.Modules.Util.SimpleAuction.Private.GetItems(itemLink)) or nil
+			end
+			CustomPrice.RegisterSource("External", "AucMinBuyout", L["Auctioneer - Minimum Buyout"], GetAucMinBuyout, true)
+			tinsert(registeredAuctioneerSources, "AucMinBuyout")
 		end
 		if AucAdvanced.API.GetMarketValue then
-			tinsert(TSM.priceSources, { key = "AucMarket", label = L["Auctioneer - Market Value"], callback = AucAdvanced.API.GetMarketValue })
+			CustomPrice.RegisterSource("External", "AucMarket", L["Auctioneer - Market Value"], AucAdvanced.API.GetMarketValue, true)
+			tinsert(registeredAuctioneerSources, "AucMarket")
 		end
 	end
-	
-	-- Auctionator
-	if select(4, GetAddOnInfo("Auctionator")) and Atr_GetAuctionBuyout then
-		tinsert(TSM.priceSources, { key = "AtrValue", label = L["Auctionator - Auction Value"], callback = Atr_GetAuctionBuyout })
+
+	-- Auctionator price sources
+	if Wow.IsAddonEnabled("Auctionator") and Auctionator and Auctionator.API and Auctionator.API.v1 and Auctionator.API.v1.RegisterForDBUpdate then
+		-- retail version
+		Auctionator.API.v1.RegisterForDBUpdate("TradeSkillMaster", function()
+			CustomPrice.OnSourceChange("AtrValue")
+		end)
+		local function GetAuctionatorPrice(itemLink)
+			return Auctionator.API.v1.GetAuctionPriceByItemLink("TradeSkillMaster", itemLink)
+		end
+		CustomPrice.RegisterSource("External", "AtrValue", L["Auctionator - Auction Value"], GetAuctionatorPrice, true)
+	elseif Wow.IsAddonEnabled("Auctionator") and Atr_GetAuctionBuyout and Atr_RegisterFor_DBupdated then
+		-- classic version
+		Atr_RegisterFor_DBupdated(function()
+			CustomPrice.OnSourceChange("AtrValue")
+		end)
+		CustomPrice.RegisterSource("External", "AtrValue", L["Auctionator - Auction Value"], Atr_GetAuctionBuyout, true)
 	end
-	
-	-- TheUndermineJournal
-	if select(4, GetAddOnInfo("TheUndermineJournal")) and TUJMarketInfo then
-		tinsert(TSM.priceSources, { key = "TUJMarket", label = L["TUJ Realm Price"], callback = function(itemLink) return (TUJMarketInfo(TSMAPI:GetItemID(itemLink)) or {}).market end })
-		tinsert(TSM.priceSources, { key = "TUJGlobalMean", label = L["TUJ Global Mean"], callback = function(itemLink) return (TUJMarketInfo(TSMAPI:GetItemID(itemLink)) or {}).globalMean end })
-		tinsert(TSM.priceSources, { key = "TUJGlobalMedian", label = L["TUJ Global Median"], callback = function(itemLink) return (TUJMarketInfo(TSMAPI:GetItemID(itemLink)) or {}).globalMedian end })
+
+	-- TheUndermineJournal and BootyBayGazette price sources
+	if Wow.IsAddonEnabled("TheUndermineJournal") and TUJMarketInfo then
+		local function GetTUJPrice(itemLink, arg)
+			local data = TUJMarketInfo(itemLink)
+			return data and data[arg] or nil
+		end
+		CustomPrice.RegisterSource("External", "TUJRecent", L["TUJ 3-Day Price"], GetTUJPrice, true, "recent")
+		CustomPrice.RegisterSource("External", "TUJMarket", L["TUJ 14-Day Price"], GetTUJPrice, true, "market")
+		CustomPrice.RegisterSource("External", "TUJGlobalMean", L["TUJ Global Mean"], GetTUJPrice, true, "globalMean")
+		CustomPrice.RegisterSource("External", "TUJGlobalMedian", L["TUJ Global Median"], GetTUJPrice, true, "globalMedian")
+	elseif Wow.IsAddonEnabled("BootyBayGazette") and TUJMarketInfo then
+		local function GetBBGPrice(itemLink, arg)
+			local data = TUJMarketInfo(itemLink)
+			return data and data[arg] or nil
+		end
+		CustomPrice.RegisterSource("External", "BBGRecent", L["BBG 3-Day Price"], GetBBGPrice, true, "recent")
+		CustomPrice.RegisterSource("External", "BBGMarket", L["BBG 14-Day Price"], GetBBGPrice, true, "market")
+		CustomPrice.RegisterSource("External", "BBGGlobalMean", L["BBG Global Mean"], GetBBGPrice, true, "globalMean")
+		CustomPrice.RegisterSource("External", "BBGGlobalMedian", L["BBG Global Median"], GetBBGPrice, true, "globalMedian")
 	end
-	
-	-- Vendor Buy Price
-	tinsert(TSM.priceSources, { key = "VendorBuy", label = L["Buy from Vendor"], callback = function(itemLink) return TSMAPI:GetVendorCost(TSMAPI:GetItemString(itemLink)) end })
 
-	-- Vendor Buy Price
-	tinsert(TSM.priceSources, { key = "VendorSell", label = L["Sell to Vendor"], callback = function(itemLink) local sell = select(11, GetItemInfo(itemLink)) return (sell or 0) > 0 and sell or nil end })
+	-- AHDB price sources
+	if Wow.IsAddonEnabled("AuctionDB") and AuctionDB and AuctionDB.AHGetAuctionInfoByLink then
+		hooksecurefunc(AuctionDB, "AHendOfScanCB", function()
+			CustomPrice.OnSourceChange("AHDBMinBuyout")
+			CustomPrice.OnSourceChange("AHDBMinBid")
+		end)
+		local function GetAHDBPrice(itemLink, arg)
+			local info = AuctionDB:AHGetAuctionInfoByLink(itemLink)
+			return info and info[arg] or nil
+		end
+		CustomPrice.RegisterSource("External", "AHDBMinBuyout", L["AHDB Minimum Buyout"], GetAHDBPrice, true, "minBuyout")
+		CustomPrice.RegisterSource("External", "AHDBMinBid", L["AHDB Minimum Bid"], GetAHDBPrice, true, "minBid")
+	end
 
-	-- Disenchant Value
-	tinsert(TSM.priceSources, { key = "Disenchant", label = L["Disenchant Value"], callback = "GetDisenchantValue" })
+	-- module price sources
+	CustomPrice.RegisterSource("Accounting", "AvgSell", L["Avg Sell Price"], TSM.Accounting.Transactions.GetAverageSalePrice)
+	CustomPrice.RegisterSource("Accounting", "MaxSell", L["Max Sell Price"], TSM.Accounting.Transactions.GetMaxSalePrice)
+	CustomPrice.RegisterSource("Accounting", "MinSell", L["Min Sell Price"], TSM.Accounting.Transactions.GetMinSalePrice)
+	CustomPrice.RegisterSource("Accounting", "AvgBuy", L["Avg Buy Price"], TSM.Accounting.Transactions.GetAverageBuyPrice, nil, false)
+	CustomPrice.RegisterSource("Accounting", "SmartAvgBuy", L["Smart Avg Buy Price"], TSM.Accounting.Transactions.GetAverageBuyPrice, nil, true)
+	CustomPrice.RegisterSource("Accounting", "MaxBuy", L["Max Buy Price"], TSM.Accounting.Transactions.GetMaxBuyPrice)
+	CustomPrice.RegisterSource("Accounting", "MinBuy", L["Min Buy Price"], TSM.Accounting.Transactions.GetMinBuyPrice)
+	CustomPrice.RegisterSource("Accounting", "NumExpires", L["Expires Since Last Sale"], TSM.Accounting.Auctions.GetNumExpiresSinceSale)
+	CustomPrice.RegisterSource("Accounting", "SaleRate", L["Sale Rate"], TSM.Accounting.GetSaleRate)
+	CustomPrice.RegisterSource("AuctionDB", "DBMarket", L["AuctionDB - Market Value"], TSM.AuctionDB.GetRealmItemData, false, "marketValue")
+	CustomPrice.RegisterSource("AuctionDB", "DBMinBuyout", L["AuctionDB - Minimum Buyout"], TSM.AuctionDB.GetRealmItemData, false, "minBuyout")
+	CustomPrice.RegisterSource("AuctionDB", "DBHistorical", L["AuctionDB - Historical Price (via TSM App)"], TSM.AuctionDB.GetRealmItemData, false, "historical")
+	CustomPrice.RegisterSource("AuctionDB", "DBRegionMinBuyoutAvg", L["AuctionDB - Region Minimum Buyout Average (via TSM App)"], TSM.AuctionDB.GetRegionItemData, false, "regionMinBuyout")
+	CustomPrice.RegisterSource("AuctionDB", "DBRegionMarketAvg", L["AuctionDB - Region Market Value Average (via TSM App)"], TSM.AuctionDB.GetRegionItemData, false, "regionMarketValue")
+	CustomPrice.RegisterSource("AuctionDB", "DBRegionHistorical", L["AuctionDB - Region Historical Price (via TSM App)"], TSM.AuctionDB.GetRegionItemData, false, "regionHistorical")
+	CustomPrice.RegisterSource("AuctionDB", "DBRegionSaleAvg", L["AuctionDB - Region Sale Average (via TSM App)"], TSM.AuctionDB.GetRegionItemData, false, "regionSale")
+	CustomPrice.RegisterSource("AuctionDB", "DBRegionSaleRate", L["AuctionDB - Region Sale Rate (via TSM App)"], TSM.AuctionDB.GetRegionSaleInfo, false, "regionSalePercent")
+	CustomPrice.RegisterSource("AuctionDB", "DBRegionSoldPerDay", L["AuctionDB - Region Sold Per Day (via TSM App)"], TSM.AuctionDB.GetRegionSaleInfo, false, "regionSoldPerDay")
+	CustomPrice.RegisterSource("Crafting", "Crafting", L["Crafting Cost"], TSM.Crafting.Cost.GetLowestCostByItem, nil, nil, true)
+	CustomPrice.RegisterSource("Crafting", "MatPrice", L["Crafting Material Cost"], TSM.Crafting.Cost.GetMatCost, nil, nil, true)
 
-	TSM.slashCommands = {
-		{ key = "version", label = L["Prints out the version numbers of all installed modules"], callback = function() TSM:Print(L["TSM Version Info:"]) local chatFrame = TSMAPI:GetChatFrame() for _, module in ipairs(TSM.Modules:GetInfo()) do chatFrame:AddMessage(module.name.." |cff99ffff"..module.version.."|r") end end },
-		{ key = "freset", label = L["Resets the position, scale, and size of all applicable TSM and module frames."], callback = "ResetFrames" },
-		{ key = "bankui", label = L["Toggles the bankui"], callback = "toggleBankUI" },
-		{ key = "sources", label = L["Prints out the available price sources for use in custom price boxes."], callback = "PrintPriceSources" },
-		{ key = "price", label = L["Allows for testing of custom prices."], callback = "TestPriceSource" },
-		{ key = "assist", label = L["Opens the TradeSkillMaster Assistant window."], callback = "Assistant:Open" },
-	}
+	-- operation-based price sources
+	CustomPrice.RegisterSource("Operations", "auctioningopmin", L["First Auctioning Operation Min Price"], TSM.Operations.Auctioning.GetMinPrice)
+	CustomPrice.RegisterSource("Operations", "auctioningopmax", L["First Auctioning Operation Max Price"], TSM.Operations.Auctioning.GetMaxPrice)
+	CustomPrice.RegisterSource("Operations", "auctioningopnormal", L["First Auctioning Operation Normal Price"], TSM.Operations.Auctioning.GetNormalPrice)
+	CustomPrice.RegisterSource("Operations", "shoppingopmax", L["Shopping Operation Max Price"], TSM.Operations.Shopping.GetMaxPrice)
+	CustomPrice.RegisterSource("Operations", "sniperopmax", L["Sniper Operation Below Price"], TSM.Operations.Sniper.GetBelowPrice)
 
-	TSM.moduleAPIs = {
-		{ key = "deValue", callback = "GetDisenchantValue" },
-	}
+	-- slash commands
+	SlashCommands.Register("", TSM.MainUI.Toggle, L["Toggles the main TSM window"])
+	SlashCommands.Register("help", SlashCommands.PrintHelp, L["Prints the slash command help listing"])
+	SlashCommands.Register("version", private.PrintVersions, L["Prints out the version numbers of all installed modules"])
+	SlashCommands.Register("sources", CustomPrice.PrintSources, L["Prints out the available price sources for use in custom prices"])
+	SlashCommands.Register("price", private.TestPriceSource, L["Allows for testing of custom prices"])
+	SlashCommands.Register("profile", private.ChangeProfile, L["Changes to the specified profile (i.e. '/tsm profile Default' changes to the 'Default' profile)"])
+	SlashCommands.Register("debug", private.DebugSlashCommandHandler)
+	SlashCommands.Register("destroy", TSM.UI.DestroyingUI.Toggle, L["Opens the Destroying frame if there's stuff in your bags to be destroyed."])
+	SlashCommands.Register("crafting", TSM.UI.CraftingUI.Toggle, L["Toggles the TSM Crafting UI."])
+	SlashCommands.Register("tasklist", TSM.UI.TaskListUI.Toggle, L["Toggles the TSM Task List UI"])
+	SlashCommands.Register("bankui", TSM.UI.BankingUI.Toggle, L["Toggles the TSM Banking UI if either the bank or guild bank is currently open."])
+	SlashCommands.Register("get", TSM.Banking.GetByFilter, L["Gets items from the bank or guild bank matching the item or partial text entered."])
+	SlashCommands.Register("put", TSM.Banking.PutByFilter, L["Puts items matching the item or partial text entered into the bank or guild bank."])
+	SlashCommands.Register("restock_help", TSM.Crafting.RestockHelp, L["Tells you why a specific item is not being restocked and added to the queue."])
+	if TSM.IsWowClassic() then
+		SlashCommands.Register("scan", TSM.AuctionDB.RunScan, L["Performs a full, manual scan of the AH to populate some AuctionDB data if none is otherwise available."])
+	end
 
-	TSM.sync = { callback = "SyncCallback" }
+	-- create / register the minimap button
+	local dataObj = LibStub("LibDataBroker-1.1"):NewDataObject("TradeSkillMaster", {
+		type = "launcher",
+		icon = "Interface\\Addons\\TradeSkillMaster\\Media\\TSM_Icon2",
+		OnClick = function(_, button)
+			if button ~= "LeftButton" then return end
+			TSM.MainUI.Toggle()
+		end,
+		OnTooltipShow = function(tooltip)
+			local cs = Theme.GetColor("INDICATOR_ALT"):GetTextColorPrefix()
+			local ce = "|r"
+			tooltip:AddLine("TradeSkillMaster " .. TSM.GetVersion())
+			tooltip:AddLine(format(L["%sLeft-Click%s to open the main window"], cs, ce))
+			tooltip:AddLine(format(L["%sDrag%s to move this button"], cs, ce))
+		end,
+	})
+	LibDBIcon:Register("TradeSkillMaster", dataObj, private.settings.minimapIcon)
 
-	TSMAPI:NewModule(TSM)
+	-- cache battle pet names
+	if not TSM.IsWowClassic() then
+		for i = 1, C_PetJournal.GetNumPets() do
+			C_PetJournal.GetPetInfoByIndex(i)
+		end
+	end
+
+	-- force a garbage collection
+	collectgarbage()
 end
 
-function TSM:OnTSMDBShutdown()
-	local function GetOperationPrice(module, settingKey, itemString)
-		local operations = TSMAPI:GetItemOperation(itemString, module)
-		local operation = operations and operations[1] ~= "" and operations[1] and TSM.operations[module][operations[1]]
-		if operation and operation[settingKey] then
-			if type(operation[settingKey]) == "number" and operation[settingKey] > 0 then
-				return operation[settingKey]
-			elseif type(operation[settingKey]) == "string" then
-				local func = TSMAPI:ParseCustomPrice(operation[settingKey])
-				local value = func and func(itemString)
-				if not value or value <= 0 then return end
-				return value
-			else
+function TSM.OnEnable()
+	for i = 1, GetNumAddOns() do
+		local name = GetAddOnInfo(i)
+		if strmatch(name, "^TradeSkillMaster") and name ~= "TradeSkillMaster" and name ~= "TradeSkillMaster_AppHelper" and name ~= "TradeSkillMaster_StringConverter" then
+			Wow.ShowBasicMessage(format(L["An old TSM addon was found installed. Please remove %s and any other old TSM addons to avoid issues."], name))
+			break
+		end
+	end
+
+	if not Wow.IsAddonInstalled("TradeSkillMaster_AppHelper") then
+		return
+	end
+
+	if not Wow.IsAddonEnabled("TradeSkillMaster_AppHelper") then
+		-- TSM_AppHelper is disabled
+		StaticPopupDialogs["TSM_APP_DATA_ERROR"] = {
+			text = L["The TradeSkillMaster_AppHelper addon is installed, but not enabled. TSM has enabled it and requires a reload."],
+			button1 = L["Reload"],
+			timeout = 0,
+			whileDead = true,
+			OnAccept = function()
+				EnableAddOn("TradeSkillMaster_AppHelper")
+				ReloadUI()
+			end,
+		}
+		Wow.ShowStaticPopupDialog("TSM_APP_DATA_ERROR")
+		return
+	end
+
+	assert(TSMAPI.AppHelper)
+	local appInfo = TSMAPI.AppHelper:FetchData("APP_INFO")
+	if not appInfo then
+		-- The app hasn't run yet or isn't pointing at the right WoW directory
+		StaticPopupDialogs["TSM_APP_DATA_ERROR"] = {
+			text = L["TSM is missing important information from the TSM Desktop Application. Please ensure the TSM Desktop Application is running and is properly configured."],
+			button1 = OKAY,
+			timeout = 0,
+			whileDead = true,
+		}
+		Wow.ShowStaticPopupDialog("TSM_APP_DATA_ERROR")
+		return
+	end
+
+	-- load the app info
+	assert(#appInfo == 1 and #appInfo[1] == 2 and appInfo[1][1] == "Global")
+	private.appInfo = assert(loadstring(appInfo[1][2]))()
+	for _, key in ipairs(APP_INFO_REQUIRED_KEYS) do
+		assert(private.appInfo[key])
+	end
+
+	if private.appInfo.message and private.appInfo.message.id > private.settings.appMessageId then
+		-- show the message from the app
+		private.settings.appMessageId = private.appInfo.message.id
+		StaticPopupDialogs["TSM_APP_MESSAGE"] = {
+			text = private.appInfo.message.msg,
+			button1 = OKAY,
+			timeout = 0,
+		}
+		Wow.ShowStaticPopupDialog("TSM_APP_MESSAGE")
+	end
+
+	if time() - private.appInfo.lastSync > 60 * 60 then
+		-- the app hasn't been running for over an hour
+		StaticPopupDialogs["TSM_APP_DATA_ERROR"] = {
+			text = L["TSM is missing important information from the TSM Desktop Application. Please ensure the TSM Desktop Application is running and is properly configured."],
+			button1 = OKAY,
+			timeout = 0,
+			whileDead = true,
+		}
+		Wow.ShowStaticPopupDialog("TSM_APP_DATA_ERROR")
+	end
+
+	if private.appInfo.news then
+		-- clean up the news content strings
+		for _, info in ipairs(private.appInfo.news) do
+			-- for some reason the data is missing a few newlines before bold headings, so add one
+			info.content = gsub(info.content, "(<strong>)", "\n\n%1")
+			info.content = gsub(info.content, "<br%s+/>", "\n")
+			info.content = gsub(info.content, "<strong>(.-)</strong>", "%1")
+			info.content = gsub(info.content, "<a href='.-'>(.-)</a>", "%1")
+			info.content = gsub(info.content, "&#8211;", "-")
+			info.content = gsub(info.content, "&#8216;", "'")
+		end
+	end
+end
+
+function TSM.OnDisable()
+	local originalProfile = TSM.db:GetCurrentProfile()
+	-- erroring here would cause the profile to be reset, so use pcall
+	local startTime = debugprofilestop()
+	local success, errMsg = pcall(private.SaveAppData)
+	local timeTaken = debugprofilestop() - startTime
+	if timeTaken > LOGOUT_TIME_WARNING_THRESHOLD_MS then
+		Log.Warn("private.SaveAppData took %0.2fms", timeTaken)
+	end
+	if not success then
+		Log.Err("private.SaveAppData hit an error: %s", tostring(errMsg))
+		-- force ourselves back to the original profile
+		TSM.db:SetProfile(originalProfile, true)
+		error("Error while saving app data: "..tostring(errMsg))
+	end
+end
+
+
+
+-- ============================================================================
+-- General Slash-Command Handlers
+-- ============================================================================
+
+function private.TestPriceSource(price)
+	local _, endIndex, link = strfind(price, "(\124c[0-9a-f]+\124H[^\124]+\124h%[[^%]]+%]\124h\124r)")
+	price = link and strtrim(strsub(price, endIndex + 1))
+	if not price or price == "" then
+		Log.PrintUser(L["Usage: /tsm price <Item Link> <Custom String>"])
+		return
+	end
+
+	local isValid, err = CustomPrice.Validate(price)
+	if not isValid then
+		Log.PrintfUser(L["%s is not a valid custom price and gave the following error: %s"], Log.ColorUserAccentText(price), err)
+		return
+	end
+
+	local itemString = ItemString.Get(link)
+	if not itemString then
+		Log.PrintfUser(L["%s is a valid custom price but %s is an invalid item."], Log.ColorUserAccentText(price), link)
+		return
+	end
+
+	local value = CustomPrice.GetValue(price, itemString)
+	if not value then
+		Log.PrintfUser(L["%s is a valid custom price but did not give a value for %s."], Log.ColorUserAccentText(price), link)
+		return
+	end
+
+	Log.PrintfUser(L["A custom price of %s for %s evaluates to %s."], Log.ColorUserAccentText(price), link, Money.ToString(value))
+end
+
+function private.ChangeProfile(targetProfile)
+	targetProfile = strtrim(targetProfile)
+	local profiles = TSM.db:GetProfiles()
+	if targetProfile == "" then
+		Log.PrintfUser(L["No profile specified. Possible profiles: '%s'"], table.concat(profiles, "', '"))
+	else
+		for _, profile in ipairs(profiles) do
+			if profile == targetProfile then
+				if profile ~= TSM.db:GetCurrentProfile() then
+					TSM.db:SetProfile(profile)
+				end
+				Log.PrintfUser(L["Profile changed to '%s'."], profile)
 				return
 			end
 		end
-	end
-
-	-- save group info into TSM.appDB
-	for profile in TSMAPI:GetTSMProfileIterator() do
-		local profileGroupData = {}
-		for itemString, groupPath in pairs(TSM.db.profile.items) do
-			if strfind(itemString, "item") then
-				local shortItemString = gsub(gsub(itemString, "item:", ""), ":0:0:0:0:0:", ":")
-				local itemPrices = {}
-				itemPrices.sm = GetOperationPrice("Shopping", "maxPrice", itemString)
-				itemPrices.am = GetOperationPrice("Auctioning", "minPrice", itemString)
-				itemPrices.an = GetOperationPrice("Auctioning", "normalPrice", itemString)
-				itemPrices.ax = GetOperationPrice("Auctioning", "maxPrice", itemString)
-				if next(itemPrices) then
-					itemPrices.gr = groupPath
-					local itemID, rand = (":"):split(shortItemString)
-					if rand == "0" then
-						shortItemString = itemID
-					end
-					profileGroupData[shortItemString] = itemPrices
-				end
-			end
-		end
-		if next(profileGroupData) then
-			TSM.appDB.profile.groupInfo = profileGroupData
-			TSM.appDB.profile.lastUpdate = time()
-		end
+		Log.PrintfUser(L["Could not find profile '%s'. Possible profiles: '%s'"], targetProfile, table.concat(profiles, "', '"))
 	end
 end
 
+function private.DebugSlashCommandHandler(arg)
+	if arg == "fstack" then
+		TSM.UI.FrameStack.Toggle()
+	elseif arg == "error" then
+		ErrorHandler.ShowManual()
+	elseif arg == "logging" then
+		private.settings.chatLoggingEnabled = not private.settings.chatLoggingEnabled
+		Log.SetLoggingToChatEnabled(private.settings.chatLoggingEnabled)
+		if private.settings.chatLoggingEnabled then
+			Log.PrintfUser("Logging to chat enabled")
+		else
+			Log.PrintfUser("Logging to chat disabled")
+		end
+	elseif arg == "db" then
+		TSM.UI.DBViewer.Toggle()
+	elseif arg == "logout" then
+		TSM.AddonTestLogout()
+	elseif arg == "clearitemdb" then
+		ItemInfo.ClearDB()
+	elseif arg == "leaks" then
+		TempTable.EnableLeakDebug()
+		ObjectPool.EnableLeakDebug()
+	end
+end
 
-function TSMAPI:GetTSMProfileIterator()
+function private.PrintVersions()
+	Log.PrintUser(L["TSM Version Info:"])
+	Log.PrintUserRaw("TradeSkillMaster "..Log.ColorUserAccentText(TSM.GetVersion()))
+	local appHelperVersion = GetAddOnMetadata("TradeSkillMaster_AppHelper", "Version")
+	if appHelperVersion then
+		-- use strmatch so that our sed command doesn't replace this string
+		if strmatch(appHelperVersion, "^@tsm%-project%-version@$") then
+			appHelperVersion = "Dev"
+		end
+		Log.PrintUserRaw("TradeSkillMaster_AppHelper "..Log.ColorUserAccentText(appHelperVersion))
+	end
+end
+
+function private.SaveAppData()
+	if not TSMAPI.AppHelper then
+		return
+	end
+
+	TradeSkillMaster_AppHelperDB = TradeSkillMaster_AppHelperDB or {}
+	local appDB = TradeSkillMaster_AppHelperDB
+
+	-- store region
+	local region = TSM.GetRegion()
+	appDB.region = region
+
+	-- save errors
+	ErrorHandler.SaveReports(appDB)
+
+	local function GetShoppingMaxPrice(itemString)
+		local value = TSM.Operations.Shopping.GetMaxPrice(itemString)
+		return value and value > 0 and value or nil
+	end
+
+	-- save TSM_Shopping max prices in the app DB for the current profile
+	appDB.shoppingMaxPrices = {}
+	local profile = TSM.db:GetCurrentProfile()
+	local profileGroupData = {}
+	for _, itemString, groupPath in TSM.Groups.ItemIterator() do
+		local itemId = tonumber(strmatch(itemString, "^i:([0-9]+)$"))
+		if itemId then
+			local maxPrice = GetShoppingMaxPrice(itemString)
+			if maxPrice then
+				if not profileGroupData[groupPath] then
+					profileGroupData[groupPath] = {}
+				end
+				tinsert(profileGroupData[groupPath], "["..table.concat({itemId, maxPrice}, ",").."]")
+			end
+		end
+	end
+	if next(profileGroupData) then
+		appDB.shoppingMaxPrices[profile] = {}
+		for groupPath, data in pairs(profileGroupData) do
+			appDB.shoppingMaxPrices[profile][groupPath] = "["..table.concat(data, ",").."]"
+		end
+		appDB.shoppingMaxPrices[profile].updateTime = time()
+	end
+
+	-- save black market data
+	local realmName = GetRealmName()
+	appDB.blackMarket = appDB.blackMarket or {}
+	local blackMarketData, blackMarketTime = BlackMarket.GetScanData()
+	if blackMarketData then
+		appDB.blackMarket[realmName] = {
+			data = blackMarketData,
+			key = Math.CalculateHash(blackMarketData..":"..blackMarketTime),
+			updateTime = blackMarketTime
+		}
+	end
+
+	-- save analytics
+	Analytics.Save(appDB)
+end
+
+function private.DestroyValueUpdated()
+	CustomPrice.OnSourceChange("Destroy")
+end
+
+
+
+-- ============================================================================
+-- General Module Functions
+-- ============================================================================
+
+function TSM.GetAppNews()
+	return private.appInfo and private.appInfo.news
+end
+
+function TSM.GetAppUpdateTime()
+	return private.appInfo and private.appInfo.lastSync or 0
+end
+
+function TSM.GetRegion()
+	local cVar = GetCVar("Portal")
+	local region = nil
+	if TSM.IsWowClassic() then
+		local currentRealmName = gsub(GetRealmName(), "\226", "'")
+		region = ClassicRealms.GetRegion(currentRealmName) or (cVar ~= "public-test" and cVar) or "PTR"
+		region = region.."-Classic"
+	else
+		region = LibRealmInfo:GetCurrentRegion() or (cVar ~= "public-test" and cVar) or "PTR"
+	end
+	return region
+end
+
+function TSM.GetTSMProfileIterator()
 	local originalProfile = TSM.db:GetCurrentProfile()
-	local profiles = CopyTable(TSM.db:GetProfiles())
+	local profiles = TSM.db:GetProfiles()
 
 	return function()
 		local profile = tremove(profiles)
@@ -388,359 +546,4 @@ function TSMAPI:GetTSMProfileIterator()
 		end
 		TSM.db:SetProfile(originalProfile)
 	end
-end
-
-function TSMAPI:AddPriceSource(key, label, callback)
-	assert(type(key) == "string", "Invalid type of key: " .. type(key))
-	assert(type(label) == "string", "Invalid type of label: " .. type(label))
-	assert(type(callback) == "function", "Invalid type of callback: " .. type(callback))
-
-	tinsert(TSM.priceSources, { key = key, label = label, callback = callback })
-end
-
-function TSM:GetTooltip(itemString, quantity)
-	local text = {}
-	quantity = max(quantity or 0, 1)
-	if TSM.db.profile.tooltip then
-		local base
-		local path = TSM.db.profile.items[itemString]
-		if not path then
-			path = TSM.db.profile.items[TSMAPI:GetBaseItemString(itemString)]
-			base = true
-		end
-		if path and TSM.db.profile.groups[path] then
-			if not base then
-				tinsert(text, { left = "  " .. L["Group:"], right = "|cffffffff" .. TSMAPI:FormatGroupPath(path) })
-			else
-				tinsert(text, { left = "  " .. L["Group(Base Item):"], right = "|cffffffff" .. TSMAPI:FormatGroupPath(path) })
-			end
-			local modules = {}
-			for module, operations in pairs(TSM.db.profile.groups[path]) do
-				if operations[1] and operations[1] ~= "" then
-					tinsert(modules, { module = module, operations = table.concat(operations, ", ") })
-				end
-			end
-			sort(modules, function(a, b) return a.module < b.module end)
-			for _, info in ipairs(modules) do
-				tinsert(text, { left = "  " .. format(L["%s operation(s):"], info.module), right = "|cffffffff" .. info.operations .. "|r" })
-			end
-		end
-	end
-
-	local moneyCoinsTooltip = TSMAPI:GetMoneyCoinsTooltip()
-
-	-- add disenchant value info
-	if TSM.db.profile.deTooltip then
-		local deValue = TSM:GetDisenchantValue(itemString)
-		if deValue then
-			if moneyCoinsTooltip then
-				if IsShiftKeyDown() then
-					tinsert(text, { left = "  " .. format(L["Disenchant Value x%s:"], quantity), right = TSMAPI:FormatTextMoneyIcon(deValue * quantity, "|cffffffff", true) })
-				else
-					tinsert(text, { left = "  " .. L["Disenchant Value:"], right = TSMAPI:FormatTextMoneyIcon(deValue, "|cffffffff", true) })
-				end
-			else
-				if IsShiftKeyDown() then
-					tinsert(text, { left = "  " .. format(L["Disenchant Value x%s:"], quantity), right = TSMAPI:FormatTextMoney(deValue * quantity, "|cffffffff", true) })
-				else
-					tinsert(text, { left = "  " .. L["Disenchant Value:"], right = TSMAPI:FormatTextMoney(deValue, "|cffffffff", true) })
-				end
-			end
-			
-			if TSM.db.profile.detailedDestroyTooltip then
-				local _, itemLink, quality, ilvl, _, iType = TSMAPI:GetSafeItemInfo(itemString)
-				local itemString = TSMAPI:GetItemString(itemLink)
-				local WEAPON, ARMOR = GetAuctionItemClasses()
-
-				for _, data in ipairs(TSMAPI.DisenchantingData.disenchant) do
-					for item, itemData in pairs(data) do
-						if item ~= "desc" and itemData.itemTypes[iType] and itemData.itemTypes[iType][quality] then
-							for _, deData in ipairs(itemData.itemTypes[iType][quality]) do
-								if ilvl >= deData.minItemLevel and ilvl <= deData.maxItemLevel then
-									local matValue = TSM:GetCustomPrice(TSM.db.profile.destroyValueSource, item)
-									local value = (matValue or 0) * deData.amountOfMats
-									local name, _, matQuality = TSMAPI:GetSafeItemInfo(item)
-									if matQuality then
-										local colorName = format("|c%s%s%s%s|r",select(4,GetItemQualityColor(matQuality)),name, " x ", deData.amountOfMats)
-										if value > 0 then
-											if moneyCoinsTooltip then
-												tinsert(text, { left = "    " .. colorName, right = TSMAPI:FormatTextMoneyIcon(value, "|cffffffff", true) })
-											else
-												tinsert(text, { left = "    " .. colorName, right = TSMAPI:FormatTextMoney(value, "|cffffffff", true) })
-											end
-										end
-									end
-								end
-							end
-						end
-					end
-				end
-			end
-		end
-	end
-	
-	-- add mill value info
-	if TSM.db.profile.millTooltip then
-		local millValue = TSM:GetMillValue(itemString)
-		if millValue then
-			if moneyCoinsTooltip then
-				if IsShiftKeyDown() then
-					tinsert(text, { left = "  " .. format(L["Mill Value x%s:"], quantity), right = TSMAPI:FormatTextMoneyIcon(millValue * quantity, "|cffffffff", true) })
-				else
-					tinsert(text, { left = "  " .. L["Mill Value:"], right = TSMAPI:FormatTextMoneyIcon(millValue, "|cffffffff", true) })
-				end
-			else
-				if IsShiftKeyDown() then
-					tinsert(text, { left = "  " .. format(L["Mill Value x%s:"], quantity), right = TSMAPI:FormatTextMoney(millValue * quantity, "|cffffffff", true) })
-				else
-					tinsert(text, { left = "  " .. L["Mill Value:"], right = TSMAPI:FormatTextMoney(millValue, "|cffffffff", true) })
-				end
-			end
-			
-			if TSM.db.profile.detailedDestroyTooltip then
-				for _, targetItem in ipairs(TSMAPI:GetConversionTargetItems("mill")) do
-					local herbs = TSMAPI:GetItemConversions(targetItem)
-					if herbs[itemString] then
-						local value = (TSM:GetCustomPrice(TSM.db.profile.destroyValueSource, targetItem) or 0) * herbs[itemString].rate
-						local name, _, matQuality = TSMAPI:GetSafeItemInfo(targetItem)
-						if matQuality then
-							local colorName = format("|c%s%s%s%s|r",select(4,GetItemQualityColor(matQuality)),name, " x ", herbs[itemString].rate)
-							if value > 0 then
-								if moneyCoinsTooltip then
-									tinsert(text, { left = "    " .. colorName, right = TSMAPI:FormatTextMoneyIcon(value, "|cffffffff", true) })
-								else
-									tinsert(text, { left = "    " .. colorName, right = TSMAPI:FormatTextMoney(value, "|cffffffff", true) })
-								end
-							end
-						end
-					end
-				end
-			end
-		end
-	end
-
-	-- add prospect value info
-	if TSM.db.profile.prospectTooltip then
-		local prospectValue = TSM:GetProspectValue(itemString)
-		if prospectValue then
-			if moneyCoinsTooltip then
-				if IsShiftKeyDown() then
-					tinsert(text, { left = "  " .. format(L["Prospect Value x%s:"], quantity), right = TSMAPI:FormatTextMoneyIcon(prospectValue * quantity, "|cffffffff", true) })
-				else
-					tinsert(text, { left = "  " .. L["Prospect Value:"], right = TSMAPI:FormatTextMoneyIcon(prospectValue, "|cffffffff", true) })
-				end
-			else
-				if IsShiftKeyDown() then
-					tinsert(text, { left = "  " .. format(L["Prospect Value x%s:"], quantity), right = TSMAPI:FormatTextMoney(prospectValue * quantity, "|cffffffff", true) })
-				else
-					tinsert(text, { left = "  " .. L["Prospect Value:"], right = TSMAPI:FormatTextMoney(prospectValue, "|cffffffff", true) })
-				end
-			end
-			if TSM.db.profile.detailedDestroyTooltip then
-				for _, targetItem in ipairs(TSMAPI:GetConversionTargetItems("prospect")) do
-					local gems = TSMAPI:GetItemConversions(targetItem)
-					if gems[itemString] then
-						local value = (TSM:GetCustomPrice(TSM.db.profile.destroyValueSource, targetItem) or 0) * (gems[itemString].rate / 5)
-						local name, _, matQuality = TSMAPI:GetSafeItemInfo(targetItem)
-						if matQuality then
-							local colorName = format("|c%s%s%s%s|r",select(4,GetItemQualityColor(matQuality)),name, " x ", (gems[itemString].rate / 5))
-							if value > 0 then
-								if moneyCoinsTooltip then
-									tinsert(text, { left = "    " .. colorName, right = TSMAPI:FormatTextMoneyIcon(value, "|cffffffff", true) })
-								else
-									tinsert(text, { left = "    " .. colorName, right = TSMAPI:FormatTextMoney(value, "|cffffffff", true) })
-								end
-							end
-						end
-					end
-				end
-			end
-		end
-	end
-
-	-- add Vendor Buy Price
-	if TSM.db.profile.vendorBuyTooltip then
-		local vendorValue = TSMAPI:GetVendorCost(itemString) or 0
-		if vendorValue and vendorValue > 0 then
-			if quantity then
-				if moneyCoinsTooltip then
-					if IsShiftKeyDown() then
-						tinsert(text, { left = "  " .. format(L["Vendor Buy Price x%s:"], quantity), right = TSMAPI:FormatTextMoneyIcon(vendorValue * quantity, "|cffffffff", true) })
-					else
-						tinsert(text, { left = "  " .. L["Vendor Buy Price:"], right = TSMAPI:FormatTextMoneyIcon(vendorValue, "|cffffffff", true) })
-					end
-				else
-					if IsShiftKeyDown() then
-						tinsert(text, { left = "  " .. format(L["Vendor Buy Price x%s:"], quantity), right = TSMAPI:FormatTextMoney(vendorValue * quantity, "|cffffffff", true) })
-					else
-						tinsert(text, { left = "  " .. L["Vendor Buy Price:"], right = TSMAPI:FormatTextMoney(vendorValue, "|cffffffff", true) })
-					end
-				end
-			end
-		end
-	end
-
-	-- add Vendor sell Price
-	if TSM.db.profile.vendorSellTooltip then
-		local vendorValue = select(11, TSMAPI:GetSafeItemInfo(itemString))
-		if vendorValue and vendorValue > 0 then
-			if quantity then
-				if moneyCoinsTooltip then
-					if IsShiftKeyDown() then
-						tinsert(text, { left = "  " .. format(L["Vendor Sell Price x%s:"], quantity), right = TSMAPI:FormatTextMoneyIcon(vendorValue * quantity, "|cffffffff", true) })
-					else
-						tinsert(text, { left = "  " .. L["Vendor Sell Price:"], right = TSMAPI:FormatTextMoneyIcon(vendorValue, "|cffffffff", true) })
-					end
-				else
-					if IsShiftKeyDown() then
-						tinsert(text, { left = "  " .. format(L["Vendor Sell Price x%s:"], quantity), right = TSMAPI:FormatTextMoney(vendorValue * quantity, "|cffffffff", true) })
-					else
-						tinsert(text, { left = "  " .. L["Vendor Sell Price:"], right = TSMAPI:FormatTextMoney(vendorValue, "|cffffffff", true) })
-					end
-				end
-			end
-		end
-	end
-	
-	for name, method in pairs(TSM.db.global.customPriceSources) do
-		if TSM.db.global.customPriceTooltips[name] then
-			local price = TSM:GetCustomPrice(name, itemString)
-			if price then
-				tinsert(text, {left="  "..L["Custom Price Source"].." '"..name.."':", right=TSMAPI:FormatTextMoney(price, "|cffffffff", true)})
-			end
-		end
-	end
-
-	-- add heading
-	if #text > 0 then
-		tinsert(text, 1, "|cffffff00" .. L["TradeSkillMaster Info:"])
-		return text
-	end
-end
-
-
-function TSM:GetDisenchantValue(link)
-	local _, itemLink, quality, ilvl, _, iType = TSMAPI:GetSafeItemInfo(link)
-	local itemString = TSMAPI:GetItemString(itemLink)
-	local WEAPON, ARMOR = GetAuctionItemClasses()
-	if not itemString or TSMAPI.DisenchantingData.notDisenchantable[itemString] or not (iType == ARMOR or iType == WEAPON) then return end
-
-	local value = 0
-	for _, data in ipairs(TSMAPI.DisenchantingData.disenchant) do
-		for item, itemData in pairs(data) do
-			if item ~= "desc" and itemData.itemTypes[iType] and itemData.itemTypes[iType][quality] then
-				for _, deData in ipairs(itemData.itemTypes[iType][quality]) do
-					if ilvl >= deData.minItemLevel and ilvl <= deData.maxItemLevel then
-						local matValue = TSM:GetCustomPrice(TSM.db.profile.destroyValueSource, item)
-						value = value + (matValue or 0) * deData.amountOfMats
-					end
-				end
-			end
-		end
-	end
-	
-	value = floor(value)
-	return value > 0 and value or nil
-end
-
-function TSM:GetMillValue(itemString)
-	local value = 0
-	
-	for _, targetItem in ipairs(TSMAPI:GetConversionTargetItems("mill")) do
-		local herbs = TSMAPI:GetItemConversions(targetItem)
-		if herbs[itemString] then
-			local matValue = TSM:GetCustomPrice(TSM.db.profile.destroyValueSource, targetItem)
-			value = value + (matValue or 0) * herbs[itemString].rate
-		end
-	end
-	
-	value = floor(value)
-	return value > 0 and value or nil
-end
-
-function TSM:GetProspectValue(itemString)
-	local value = 0
-	
-	for _, targetItem in ipairs(TSMAPI:GetConversionTargetItems("prospect")) do
-		local gems = TSMAPI:GetItemConversions(targetItem)
-		if gems[itemString] then
-			local matValue = TSM:GetCustomPrice(TSM.db.profile.destroyValueSource, targetItem)
-			value = value + (matValue or 0) * (gems[itemString].rate /5)
-		end
-	end
-	
-	value = floor(value)
-	return value > 0 and value or nil
-end
-
-function TSM:PrintPriceSources()
-	TSM:Printf(L["Below are your currently available price sources. The %skey|r is what you would type into a custom price box."], TSMAPI.Design:GetInlineColor("link"))
-	local lines = {}
-	for key, label in pairs(TSMAPI:GetPriceSources()) do
-		tinsert(lines, { key = key, label = label })
-	end
-	sort(lines, function(a, b) return strlower(a.key) < strlower(b.key) end)
-	local chatFrame = TSMAPI:GetChatFrame()
-	for _, info in ipairs(lines) do
-		chatFrame:AddMessage(format("%s (%s)", TSMAPI.Design:GetInlineColor("link") .. info.key .. "|r", info.label))
-	end
-end
-
-function TSM:TestPriceSource(price)
-	local link = select(3, strfind(price, "(\124c.+\124r)"))
-	if not link then return TSM:Print(L["Usage: /tsm price <ItemLink> <Price String>"]) end
-	price = gsub(price, TSMAPI:StrEscape(link), ""):trim()
-	if price == "" then return TSM:Print(L["Usage: /tsm price <ItemLink> <Price String>"]) end
-	local func, err = TSMAPI:ParseCustomPrice(price)
-	if err then
-		TSM:Printf(L["%s is not a valid custom price and gave the following error: %s"], TSMAPI.Design:GetInlineColor("link") .. price .. "|r", err)
-	else
-		local itemString = TSMAPI:GetItemString(link)
-		if not itemString then return TSM:Printf(L["%s is a valid custom price but %s is an invalid item."], TSMAPI.Design:GetInlineColor("link") .. price .. "|r", link) end
-		local value = func(itemString)
-		if not value then return TSM:Printf(L["%s is a valid custom price but did not give a value for %s."], TSMAPI.Design:GetInlineColor("link") .. price .. "|r", link) end
-		TSM:Printf(L["A custom price of %s for %s evaluates to %s."], TSMAPI.Design:GetInlineColor("link") .. price .. "|r", link, TSMAPI:FormatTextMoney(value))
-	end
-end
-
-function TSM:GetCustomPrice(priceMethod, itemString)
-	local func = TSMAPI:ParseCustomPrice(priceMethod)
-	return func and func(itemString)
-end
-
-function TSMAPI:GetChatFrame()
-	local chatFrame = DEFAULT_CHAT_FRAME
-	for i = 1, NUM_CHAT_WINDOWS do
-		local name = strlower(GetChatWindowInfo(i) or "")
-		if name ~= "" and name == strlower(TSM.db.global.chatFrame) then
-			chatFrame = _G["ChatFrame" .. i]
-			break
-		end
-	end
-	return chatFrame
-end
-
-function TSM:GetAuctionPlayer(player, player_full)
-	local realm = GetRealmName() or ""
-	if player_full and strjoin("-", player, realm) ~= player_full then
-		return player_full
-	else
-		return player
-	end
-end
-
-function TSM:ScanBMAH()
-	TSM.appDB.realm.bmah = nil
-	local items = {}
-	for i=1, C_BlackMarket.GetNumItems() do
-		local quantity, minBid, minIncr, currBid, numBids, timeLeft, itemLink, bmId = TSMAPI:Select({3, 9, 10, 11, 13, 14, 15, 16}, C_BlackMarket.GetItemInfoByIndex(i))
-		local itemID = TSMAPI:GetItemID(TSMAPI:GetItemString(itemLink))
-		if itemID then
-			minBid = floor(minBid/COPPER_PER_GOLD)
-			minIncr = floor(minIncr/COPPER_PER_GOLD)
-			currBid = floor(currBid/COPPER_PER_GOLD)
-			tinsert(items, {bmId, itemID, quantity, timeLeft, minBid, minIncr, currBid, numBids, time()})
-		end
-	end
-	TSM.appDB.realm.blackMarket = items
 end

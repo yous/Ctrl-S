@@ -3,6 +3,7 @@ local MB = E:NewModule('MinimapButtons', 'AceHook-3.0', 'AceEvent-3.0', 'AceTime
 
 -- Based on Square Minimap Buttons
 -- Original authors:  Azilroka, Sinaris
+-- Updated for WOD & Legion by Feraldin
 
 local sub, len, find = string.sub, string.len, string.find
 
@@ -49,6 +50,40 @@ local whiteList = {
 local moveButtons = {}
 local minimapButtonBarAnchor, minimapButtonBar
 
+local function print_r ( t )  
+    local print_r_cache={}
+    local function sub_print_r(t,indent)
+        if (print_r_cache[tostring(t)]) then
+            print(indent.."*"..tostring(t))
+        else
+            print_r_cache[tostring(t)]=true
+            if (type(t)=="table") then
+                for pos,val in pairs(t) do
+                    if (type(val)=="table") then
+                        print(indent.."["..pos.."] => "..tostring(t).." {")
+                        sub_print_r(val,indent..string.rep(" ",string.len(pos)+8))
+                        print(indent..string.rep(" ",string.len(pos)+6).."}")
+                    elseif (type(val)=="string") then
+                        print(indent.."["..pos..'] => "'..val..'"')
+                    else
+                        print(indent.."["..pos.."] => "..tostring(val))
+                    end
+                end
+            else
+                print(indent..tostring(t))
+            end
+        end
+    end
+    if (type(t)=="table") then
+        print(tostring(t).." {")
+        sub_print_r(t,"  ")
+        print("}")
+    else
+        sub_print_r(t,"  ")
+    end
+    print()
+end
+
 local function OnEnter(self)
 	if not E.minimapbuttons.db.mouseover or E.minimapbuttons.db.skinStyle == 'NOANCHOR' then return end
 	UIFrameFadeIn(MinimapButtonBar, 0.2, MinimapButtonBar:GetAlpha(), 1)
@@ -66,6 +101,10 @@ local function OnLeave(self)
 end
 
 function MB:SkinButton(frame)
+	if not E.minimapbuttons.db.mbcalendar then
+		table.insert(ignoreButtons, "GameTimeFrame")
+	end
+
 	if frame == nil or frame:GetName() == nil or (frame:GetObjectType() ~= "Button") or not frame:IsVisible() then return end
 	
 	local name = frame:GetName()
@@ -89,22 +128,22 @@ function MB:SkinButton(frame)
 		end
 	end
 	
-	frame:SetPushedTexture(nil)
+	if name ~= "GarrisonLandingPageMinimapButton" then 
+		frame:SetPushedTexture(nil)
+		frame:SetDisabledTexture(nil)
+	end
 	frame:SetHighlightTexture(nil)
-	frame:SetDisabledTexture(nil)
 	
 	if name == "DBMMinimapButton" then frame:SetNormalTexture("Interface\\Icons\\INV_Helmet_87") end
 	if name == "SmartBuff_MiniMapButton" then frame:SetNormalTexture(select(3, GetSpellInfo(12051))) end
-	if name == "GarrisonLandingPageMinimapButton" then frame:SetScale(1) end
-
+	if name == "GarrisonLandingPageMinimapButton" and E.minimapbuttons.db.mbgarrison then frame:SetScale(1) end
+	
 	if not frame.isSkinned then
 		frame:HookScript('OnEnter', OnEnter)
 		frame:HookScript('OnLeave', OnLeave)
 		frame:HookScript('OnClick', MB.DelayedUpdateLayout)
-
 		for i = 1, frame:GetNumRegions() do
 			local region = select(i, frame:GetRegions())
-			--print(region:GetName()," - ", region:GetObjectType()," - ",region:GetDrawLayer())
 			frame.original = {}
 			frame.original.Width, frame.original.Height = frame:GetSize()
 			frame.original.Point, frame.original.relativeTo, frame.original.relativePoint, frame.original.xOfs, frame.original.yOfs = frame:GetPoint()
@@ -115,22 +154,13 @@ function MB:SkinButton(frame)
 			if frame:HasScript("OnDragStart") then
 				frame.original.DragStart = frame:GetScript("OnDragStart")
 			end
-			if frame:HasScript("OnDragEnd") then
-				frame.original.DragEnd = frame:GetScript("OnDragEnd")
+			if frame:HasScript("OnDragStop") then
+				frame.original.DragEnd = frame:GetScript("OnDragStop")
 			end
-			
-			--if (name == "GameTimeFrame") then
-			--	if (region:GetObjectType() == "FontString") then
-			--		region:SetDrawLayer("OVERLAY", 1)
-					--region:SetTextHeight(9)
-			--		region:SetPoint("CENTER",frame)
-			--	end
-			--end
-
 			if (region:GetObjectType() == "Texture") then
 				local texture = region:GetTexture()
-			
-				if (texture and (texture:find("Border") or texture:find("Background") or texture:find("AlphaMask"))) then
+
+				if (texture and (type(texture) ~= "number") and (texture:find("Border") or texture:find("Background") or texture:find("AlphaMask"))) then
 					region:SetTexture(nil)
 				else
 					region:ClearAllPoints()
@@ -138,7 +168,6 @@ function MB:SkinButton(frame)
 					region:Point("BOTTOMRIGHT", frame, "BOTTOMRIGHT", -2, 2)
 					region:SetTexCoord( 0.1, 0.9, 0.1, 0.9 )
 					region:SetDrawLayer( "ARTWORK" )
-
 					if (name == "GameTimeFrame") then
 						if (region:GetName() == "GameTimeCalendarInvitesTexture") then
 							region:SetTexCoord( 0.03125, 0.6484375, 0.03125, 0.8671875 )
@@ -168,7 +197,30 @@ function MB:SkinButton(frame)
 end
 
 function MB:DelayedUpdateLayout()
-	MB:ScheduleTimer("UpdateLayout", .05)
+	if E.minimapbuttons.db.skinStyle ~= 'NOANCHOR' then
+		MB:ScheduleTimer("UpdateLayout", .05)
+	end
+end
+
+function MB:UpdateSkinStyle()
+	local doreload = 0
+	if E.minimapbuttons.db.skinStyle == 'NOANCHOR' then 
+		if E.minimapbuttons.db.mbgarrison then
+			E.minimapbuttons.db.mbgarrison = false
+			doreload = 1
+		end
+		if E.minimapbuttons.db.mbcalendar then 
+			E.minimapbuttons.db.mbcalendar = false
+			doreload = 1
+		end
+		if doreload == 1 then
+			E:StaticPopup_Show("PRIVATE_RL")
+		else 
+			self:UpdateLayout()
+		end
+	else
+		self:UpdateLayout()
+	end
 end
 
 function MB:UpdateLayout()
@@ -203,10 +255,15 @@ function MB:UpdateLayout()
 			if frame.original.DragEnd then
 				frame:SetScript("OnDragStop", frame.original.DragEnd)
 			end
-
 			frame:ClearAllPoints()
 			frame:SetSize(frame.original.Width, frame.original.Height)
-			frame:SetPoint(frame.original.Point, frame.original.relativeTo, frame.original.relativePoint, frame.original.xOfs, frame.original.yOfs)
+			--if frame:GetName() == "LibDBIcon10_TradeSkillMaster" then
+			--end
+			if frame.original.Point ~= nil then
+				frame:SetPoint(frame.original.Point, frame.original.relativeTo, frame.original.relativePoint, frame.original.xOfs, frame.original.yOfs)
+			else
+				frame:SetPoint("CENTER", Minimap, "CENTER", -80, -34)
+			end
 			frame:SetFrameStrata(frame.original.FrameStrata)
 			frame:SetFrameLevel(frame.original.FrameLevel)
 			frame:SetScale(frame.original.Scale)
@@ -278,7 +335,9 @@ function MB:SkinMinimapButtons()
 	for i = 1, Minimap:GetNumChildren() do
 		self:SkinButton(select(i, Minimap:GetChildren()))
 	end
-	self:SkinButton(GarrisonLandingPageMinimapButton)
+	if E.minimapbuttons.db.mbgarrison then
+		self:SkinButton(GarrisonLandingPageMinimapButton)
+	end
 	MB:UpdateLayout()
 end
 
@@ -291,11 +350,11 @@ end
 function MB:CreateFrames()
 	minimapButtonBarAnchor = CreateFrame("Frame", "MinimapButtonBarAnchor", E.UIParent)
 	
-	if E.db.auras.consolidatedBuffs.enable then
-		minimapButtonBarAnchor:Point("TOPRIGHT", ElvConfigToggle, "BOTTOMRIGHT", 0, -2)
-	else
-		minimapButtonBarAnchor:Point("TOPRIGHT", RightMiniPanel, "BOTTOMRIGHT", 0, -2)
-	end
+	--if E.db.auras.consolidatedBuffs.enable then
+	--	minimapButtonBarAnchor:Point("TOPRIGHT", ElvConfigToggle, "BOTTOMRIGHT", 0, -2)
+	--else
+	minimapButtonBarAnchor:Point("TOPRIGHT", RightMiniPanel, "BOTTOMRIGHT", 0, -2)
+	--end
 	minimapButtonBarAnchor:Size(200, 32)
 	minimapButtonBarAnchor:SetFrameStrata("BACKGROUND")
 	

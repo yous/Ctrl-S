@@ -7,7 +7,7 @@
 --		Banjankri of Blackrock, Predeter of Proudmoore, Xenyr of Aszune
 
 -- Currently maintained by
--- Cybeloras of Aerie Peak/Detheroc/Mal'Ganis
+-- Cybeloras of Aerie Peak
 -- --------------------
 
 
@@ -223,6 +223,10 @@ function HELP:ShowNext()
 
 	HELP.Arrow:Show()
 
+	-- Seems to help fix issues where the background won't show up initially.
+	HELP.Frame:Hide()
+	HELP.Frame:Show()
+
 
 	-- if the help had a setting associated, set it now
 	if help.onlyOnceSetting then
@@ -248,7 +252,7 @@ end
 
 
 
-TMW:RegisterCallback("TMW_ICON_TYPE_CHANGED", function(event, icon, typeData, typeData_old)
+TMW:RegisterCallback("TMW_CONFIG_ICON_TYPE_CHANGED", function(event, icon)
 	if TMW.CI.icon then
 		HELP:HideForIcon(TMW.CI.icon)
 	end
@@ -263,10 +267,6 @@ TMW:RegisterCallback("TMW_ICON_SETTINGS_RESET", function(event, icon)
 end)	
 
 TMW:RegisterCallback("TMW_CONFIG_TAB_CLICKED", function(event, tab, oldTab)
-	HELP:ShowNext()
-end)	
-
-TMW:RegisterCallback("TMW_CONFIG_ICON_LOADED", function(event, icon)
 	HELP:ShowNext()
 end)
 

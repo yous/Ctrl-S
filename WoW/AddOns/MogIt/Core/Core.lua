@@ -6,8 +6,6 @@ local ItemInfo = LibStub("LibItemInfo-1.0");
 
 LibStub("Libra"):Embed(mog);
 
-local character = DataStore_Containers and DataStore:GetCharacter();
-
 mog.frame = CreateFrame("Frame","MogItFrame",UIParent,"ButtonFrameTemplate");
 mog.list = {};
 
@@ -108,7 +106,7 @@ function mog:BuildList(top,module)
 	if (module and mog.active and mog.active.name ~= module) then return end;
 	mog.list = mog.active and mog.active.BuildList and mog.active:BuildList() or {};
 	mog:SortList(nil,true);
-	mog.scroll:update(top and 1);
+	mog:UpdateScroll(top and 1);
 	mog.filt.models:SetText(#mog.list);
 end
 --//
@@ -166,24 +164,99 @@ end
 ItemInfo.RegisterCallback(mog, "OnItemInfoReceivedBatch", "ItemInfoReceived");
 --//
 
-function mog:HasItem(itemID)
-	itemID = self:ToNumberItem(itemID)
-	return GetItemCount(itemID, true) > 0 or (character and select(3, DataStore:GetContainerItemCount(character, itemID)) > 0)
+local sourceItemLink = {}
+
+function mog:GetItemLinkFromSource(source)
+	if not sourceItemLink[source] then
+		local _, _, _, _, _, link = C_TransmogCollection.GetAppearanceSourceInfo(source)
+		sourceItemLink[source] = link
+	end
+	return sourceItemLink[source]
+end
+
+local itemSourceID = {}
+
+local model = CreateFrame("DressUpModel")
+model:SetAutoDress(false)
+
+function mog:GetSourceFromItem(item)
+	if not itemSourceID[item] then
+		local visualID, sourceID = C_TransmogCollection.GetItemInfo(item)
+		itemSourceID[item] = sourceID
+		if not itemSourceID[item] then
+			model:SetUnit("player")
+			model:Undress()
+			model:TryOn(item)
+			for i = 1, 19 do
+				local source = model:GetSlotTransmogSources(i)
+				if source ~= 0 then
+					itemSourceID[item] = source
+					break
+				end
+			end
+		end
+	end
+	return itemSourceID[item]
+end
+
+function mog:HasItem(sourceID, includeAlternate)
+	if not sourceID then return end
+	local found = false;
+	local sourceInfo = C_TransmogCollection.GetSourceInfo(sourceID)
+	if not sourceInfo then return end
+	found = sourceInfo.isCollected
+	if includeAlternate then
+		local _, _, _, _, _, itemClassID, itemSubclassID = GetItemInfoInstant(sourceInfo.itemID);
+		local sources = C_TransmogCollection.GetAllAppearanceSources(sourceInfo.visualID)
+		for i, sourceID in ipairs(sources) do
+			local sourceInfo = C_TransmogCollection.GetSourceInfo(sourceID)
+			local _, _, _, _, _, itemClassID2, itemSubclassID2 = GetItemInfoInstant(sourceInfo.itemID);
+			if itemSubclassID2 == itemSubclassID and sourceInfo.isCollected then
+				found = true
+				break
+			end
+		end
+	end
+	return found
 end
 
 
 --// Events
 local defaults = {
 	profile = {
-		sortWishlist = false,
 		tooltipItemID = false,
+		alwaysShowCollected = true,
+		tooltipAlwaysShowOwned = true,
+		wishlistCheckAlts = true,
+		tooltipWishlistDetail = true,
+		loadModulesDefault = false,
+		
+		noAnim = false,
+		url = "Battle.net",
+		
 		dressupPreview = false,
 		singlePreview = false,
 		previewUIPanel = false,
 		previewFixedSize = false,
-		noAnim = false,
+		previewConfirmClose = true,
+		
+		sortWishlist = false,
+		loadModulesWishlist = false,
+		
+		tooltip = true,
+		tooltipWidth = 300,
+		tooltipHeight = 300,
+		tooltipMouse = false,
+		tooltipDress = false,
+		tooltipRotate = true,
+		tooltipMog = true,
+		tooltipMod = "None",
+		tooltipCustomModel = false,
+		tooltipRace = 1,
+		tooltipGender = 0,
+		tooltipAnchor = "vertical",
+		
 		minimap = {},
-		url = "Battle.net",
 		
 		point = "CENTER",
 		gridWidth = 600,
@@ -200,17 +273,7 @@ local defaults = {
 			}
 		},
 		
-		tooltip = true,
-		tooltipWidth = 300,
-		tooltipHeight = 300,
-		tooltipMouse = false,
-		tooltipDress = false,
-		tooltipRotate = true,
-		tooltipMog = true,
-		tooltipMod = "None",
-		tooltipCustomModel = false,
-		tooltipRace = 1,
-		tooltipGender = 0,
+		slotLabels = {},
 	}
 }
 
@@ -226,15 +289,24 @@ function mog.LoadSettings()
 	mog.tooltip:SetSize(mog.db.profile.tooltipWidth, mog.db.profile.tooltipHeight);
 	mog.tooltip.rotate:SetShown(mog.db.profile.tooltipRotate);
 	
-	mog.scroll:update();
+	mog:UpdateScroll();
 	
 	mog:SetSinglePreview(mog.db.profile.singlePreview);
+end
+
+function mog:LoadBaseModules()
+	for i, module in ipairs(self.baseModules) do
+		if GetAddOnEnableState(myName, module) > 0 and not IsAddOnLoaded(module) then
+			LoadAddOn(module)
+		end
+	end
 end
 
 mog.frame:RegisterEvent("ADDON_LOADED");
 mog.frame:RegisterEvent("PLAYER_LOGIN");
 mog.frame:RegisterEvent("GET_ITEM_INFO_RECEIVED");
 mog.frame:RegisterEvent("PLAYER_EQUIPMENT_CHANGED");
+mog.frame:RegisterEvent("TRANSMOG_SEARCH_UPDATED");
 mog.frame:SetScript("OnEvent", function(self, event, ...)
 	return mog[event] and mog[event](mog, ...)
 end);
@@ -260,45 +332,287 @@ function mog:ADDON_LOADED(addon)
 				module:MogItLoaded()
 			end
 		end
+		
+		C_TransmogCollection.SetShowMissingSourceInItemTooltips(mog.db.profile.alwaysShowCollected)
+
+		if mog.db.profile.loadModulesDefault then
+			mog:LoadBaseModules()
+		end
 	elseif mog.modules[addon] then
+		mog:LoadDB(addon)
 		mog.modules[addon].loaded = true;
 		if mog.menu.active == mog.menu.modules then
 			mog.menu:Rebuild(1)
 		end
+	elseif addon == "Blizzard_Collections" then
+		for i, model in ipairs(WardrobeCollectionFrame.ItemsCollectionFrame.Models) do
+			model:SetScript("OnMouseDown", function(self, button)
+				if IsControlKeyDown() and button == "RightButton" then
+					local link
+					local sources = WardrobeCollectionFrame_GetSortedAppearanceSources(self.visualInfo.visualID)
+					if WardrobeCollectionFrame.tooltipSourceIndex then
+						local index = WardrobeUtils_GetValidIndexForNumSources(WardrobeCollectionFrame.tooltipSourceIndex, #sources)
+						link = select(6, C_TransmogCollection.GetAppearanceSourceInfo(sources[index].sourceID))
+					end
+					mog:AddToPreview(link)
+					return
+				end
+				self:OnMouseDown(button)
+			end)
+		end
+		local orig_OnMouseUp = WardrobeCollectionFrame.SetsCollectionFrame.ScrollFrame.buttons[1]:GetScript("OnMouseUp")
+		for i, button in ipairs(WardrobeCollectionFrame.SetsCollectionFrame.ScrollFrame.buttons) do
+			button:SetScript("OnMouseUp", function(self, button)
+				if IsControlKeyDown() and button == "RightButton" then
+					local preview = mog:GetPreview()
+					for source in pairs(C_TransmogSets.GetSetSources(self.setID)) do
+						mog:AddToPreview(select(6, C_TransmogCollection.GetAppearanceSourceInfo(source)), preview)
+					end
+					return
+				end
+				orig_OnMouseUp(self, button)
+			end)
+		end
+		-- WardrobeCollectionFrame.SetsCollectionFrame.DetailsFrame.itemFramesPool.resetterFunc = function(self, obj) obj:RegisterForDrag("LeftButton", "RightButton") end
 	end
 end
 
-local function sortCharacters(a, b)
-	local characterA, realmA = a:match("(.+) %- (.+)");
-	local characterB, realmB = b:match("(.+) %- (.+)");
-	if realmA ~= realmB then
-		-- your own realm gets sorted before others
-		if realmA == myRealm then
-			return true;
+
+local SLOTS = {
+	[Enum.TransmogCollectionType["Head"]] = "Head",
+	[Enum.TransmogCollectionType["Shoulder"]] = "Shoulder",
+	[Enum.TransmogCollectionType["Back"]] = "Back",
+	[Enum.TransmogCollectionType["Chest"]] = "Chest",
+	[Enum.TransmogCollectionType["Shirt"]] = "Shirt",
+	[Enum.TransmogCollectionType["Tabard"]] = "Tabard",
+	[Enum.TransmogCollectionType["Wrist"]] = "Wrist",
+	[Enum.TransmogCollectionType["Hands"]] = "Hands",
+	[Enum.TransmogCollectionType["Waist"]] = "Waist",
+	[Enum.TransmogCollectionType["Legs"]] = "Legs",
+	[Enum.TransmogCollectionType["Feet"]] = "Feet",
+	[Enum.TransmogCollectionType["Wand"]] = "Wand",
+	[Enum.TransmogCollectionType["OneHAxe"]] = "1H-axe",
+	[Enum.TransmogCollectionType["OneHSword"]] = "1H-sword",
+	[Enum.TransmogCollectionType["OneHMace"]] = "1H-mace",
+	[Enum.TransmogCollectionType["Dagger"]] = "Dagger",
+	[Enum.TransmogCollectionType["Fist"]] = "Fist",
+	[Enum.TransmogCollectionType["Shield"]] = "Shield",
+	[Enum.TransmogCollectionType["Holdable"]] = "Holdable",
+	[Enum.TransmogCollectionType["TwoHAxe"]] = "2H-axe",
+	[Enum.TransmogCollectionType["TwoHSword"]] = "2H-sword",
+	[Enum.TransmogCollectionType["TwoHMace"]] = "2H-mace",
+	[Enum.TransmogCollectionType["Staff"]] = "Staff",
+	[Enum.TransmogCollectionType["Polearm"]] = "Polearm",
+	[Enum.TransmogCollectionType["Bow"]] = "Bow",
+	[Enum.TransmogCollectionType["Gun"]] = "Gun",
+	[Enum.TransmogCollectionType["Crossbow"]] = "Crossbow",
+	[Enum.TransmogCollectionType["Warglaives"]] = "Warglaives",
+	[Enum.TransmogCollectionType["Paired"]] = "ArtifactLegion",
+}
+
+local SLOT_MODULES = {
+	[Enum.TransmogCollectionType["Back"]] = "Other",
+	[Enum.TransmogCollectionType["Shirt"]] = "Other",
+	[Enum.TransmogCollectionType["Tabard"]] = "Other",
+	[Enum.TransmogCollectionType["Wand"]] = "Ranged",
+	[Enum.TransmogCollectionType["OneHAxe"]] = "OneHanded",
+	[Enum.TransmogCollectionType["OneHSword"]] = "OneHanded",
+	[Enum.TransmogCollectionType["OneHMace"]] = "OneHanded",
+	[Enum.TransmogCollectionType["Dagger"]] = "OneHanded",
+	[Enum.TransmogCollectionType["Fist"]] = "OneHanded",
+	[Enum.TransmogCollectionType["Shield"]] = "Other",
+	[Enum.TransmogCollectionType["Holdable"]] = "Other",
+	[Enum.TransmogCollectionType["TwoHAxe"]] = "TwoHanded",
+	[Enum.TransmogCollectionType["TwoHSword"]] = "TwoHanded",
+	[Enum.TransmogCollectionType["TwoHMace"]] = "TwoHanded",
+	[Enum.TransmogCollectionType["Staff"]] = "TwoHanded",
+	[Enum.TransmogCollectionType["Polearm"]] = "TwoHanded",
+	[Enum.TransmogCollectionType["Bow"]] = "Ranged",
+	[Enum.TransmogCollectionType["Gun"]] = "Ranged",
+	[Enum.TransmogCollectionType["Crossbow"]] = "Ranged",
+	[Enum.TransmogCollectionType["Warglaives"]] = "OneHanded",
+	[Enum.TransmogCollectionType["Paired"]] = "Artifact",
+}
+
+mog.relevantCategories = {}
+
+function mog:TRANSMOG_SEARCH_UPDATED()
+	-- local t = debugprofilestop()
+	
+	local ARMOR_CLASSES = {
+		WARRIOR = "Plate",
+		DEATHKNIGHT = "Plate",
+		PALADIN = "Plate",
+		MONK = "Leather",
+		PRIEST = "Cloth",
+		SHAMAN = "Mail",
+		DRUID = "Leather",
+		ROGUE = "Leather",
+		MAGE = "Cloth",
+		WARLOCK = "Cloth",
+		HUNTER = "Mail",
+		DEMONHUNTER = "Leather",
+	}
+	
+	local FACTIONS = {
+		["Alliance"] = 1,
+		["Horde"] = 2,
+		-- hack for neutral pandaren, the items they can see are for both factions
+		["Neutral"] = 3,
+	}
+	
+	local _, playerClass = UnitClass("player")
+	local faction = UnitFactionGroup("player")
+	
+	local armorClass = ARMOR_CLASSES[playerClass]
+	
+	mog.relevantCategories[armorClass] = true
+	
+	LoadAddOn("MogIt_"..armorClass)
+	LoadAddOn("MogIt_Other")
+	LoadAddOn("MogIt_OneHanded")
+	LoadAddOn("MogIt_TwoHanded")
+	LoadAddOn("MogIt_Ranged")
+	LoadAddOn("MogIt_Artifact")
+	
+	local ArmorDB = _G["MogIt_"..armorClass.."DB"] or {}
+	MogIt_OtherDB = MogIt_OtherDB or {}
+	MogIt_OneHandedDB = MogIt_OneHandedDB or {}
+	MogIt_TwoHandedDB = MogIt_TwoHandedDB or {}
+	MogIt_RangedDB = MogIt_RangedDB or {}
+	MogIt_ArtifactDB = MogIt_ArtifactDB or {}
+	
+	_G["MogIt_"..armorClass.."DB"] = ArmorDB
+	
+	local GetAppearanceSources = C_TransmogCollection.GetAppearanceSources
+	local GetAppearanceSourceDrops = C_TransmogCollection.GetAppearanceSourceDrops
+	local bor = bit.bor
+	
+	for i = 1, Enum.TransmogCollectionTypeMeta.NumValues do
+		local name, isWeapon, canEnchant, canMainHand, canOffHand = C_TransmogCollection.GetCategoryInfo(i)
+		if name then
+			name = SLOTS[i - 1]
+			local db = db
+			if isWeapon then
+				mog.relevantCategories[name] = true
+			end
+			if SLOT_MODULES[i - 1] then
+				db = _G["MogIt_"..SLOT_MODULES[i - 1].."DB"]
+			else
+				db = ArmorDB
+			end
+			db[name] = db[name] or {}
+			-- required to include all artifacts
+			local exclusionCategory
+			if canMainHand then
+				exclusionCategory = 2
+			elseif canOffHand then
+				exclusionCategory = 1
+			end
+			for i, appearance in ipairs(C_TransmogCollection.GetCategoryAppearances(i, exclusionCategory)) do
+				if not appearance.isHideVisual then
+					local v = db[name][appearance.visualID] or {}
+					db[name][appearance.visualID] = v
+					if v[1] and v[1].sourceID then
+						db[name][appearance.visualID] = {}
+					end
+					for i, source in ipairs(GetAppearanceSources(appearance.visualID)) do
+						local s = v[source.sourceID] or {}
+						v[source.sourceID] = s
+						s.sourceType = source.sourceType
+						s.drops = GetAppearanceSourceDrops(source.sourceID)
+						s.classes = bor(s.classes or 0, L.classBits[playerClass])
+						s.faction = bor(s.faction or 0, FACTIONS[faction])
+					end
+				end
+			end
 		end
-		if realmB == myRealm then
-			return false;
+	end
+	
+	self:LoadDB("MogIt_"..armorClass)
+	self:LoadDB("MogIt_Other")
+	self:LoadDB("MogIt_OneHanded")
+	self:LoadDB("MogIt_TwoHanded")
+	self:LoadDB("MogIt_Ranged")
+	self:LoadDB("MogIt_Artifact")
+	
+	self.frame:UnregisterEvent("TRANSMOG_SEARCH_UPDATED")
+	
+	-- print(format("MogIt modules loaded in %d ms.", debugprofilestop() - t))
+end
+
+
+function mog:LoadDB(addon)
+	if not IsAddOnLoaded(addon) then return end
+	local SOURCE_TYPES = {
+		[1] = 1,
+		[2] = 3,
+		[3] = 4,
+		[4] = 1,
+		[5] = 6,
+		[6] = 5,
+	}
+	
+	local module = mog:GetModule(addon)
+	local moduleDB = _G[addon.."DB"]
+	
+	-- won't exist if module was never loaded
+	if not moduleDB then return end
+	
+	for slot, appearances in pairs(moduleDB) do
+		local list = {}
+		module.slots[slot] = {
+			label = slot,
+			list = list,
+		}
+		wipe(module.slotList)
+		for visualID, appearance in pairs(appearances) do
+			for sourceID, source in pairs(appearance) do
+				local id = source.sourceID or sourceID
+				tinsert(list, id)
+				mog:AddData("item", id, "display", visualID)
+				-- mog:AddData("item", id, "level", lvl)
+				mog:AddData("item", id, "faction", source.faction)
+				mog:AddData("item", id, "class", source.classes)
+				mog:AddData("item", id, "source", SOURCE_TYPES[source.sourceType])
+				-- mog:AddData("item", id, "sourceid", sourceid)
+				mog:AddData("item", id, "sourceinfo", source.drops)
+				-- mog:AddData("item", id, "zone", zone)
+			end
 		end
-		return realmA < realmB;
-	else
-		return characterA < characterB;
+	end
+	
+	for i = 1, Enum.TransmogCollectionTypeMeta.NumValues do
+		local slotID = SLOTS[i - 1]
+		if moduleDB[slotID] then
+			tinsert(module.slotList, slotID)
+		end
 	end
 end
+
+
+function mog:TRANSMOG_COLLECTION_SOURCE_ADDED(sourceID)
+end
+
 
 function mog:PLAYER_LOGIN()
-	self.realmCharacters = {};
-	for characterKey in pairs(mog.wishlist.db.sv.profileKeys) do
-		local character, realm = characterKey:match("(.+) %- (.+)");
-		if self:IsConnectedRealm(realm, true) then
-			table.insert(self.realmCharacters, characterKey);
+	--[[
+	C_Timer.After(1, function()
+		-- this function doesn't yield correct results immediately, so we delay it
+		for slot, v in pairs(mog.mogSlots) do
+			local isTransmogrified, _, _, _, _, _, _, visibleItemID = C_Transmog.GetSlotInfo(slot, Enum.TransmogType.Appearance);
+			if isTransmogrified then
+				-- we need an item ID here if we still need to cache these at all
+				-- mog:GetItemInfo(visibleItemID);
+			end
 		end
-	end
-	sort(self.realmCharacters, sortCharacters);
+	end)
+	]]
 	
-	for slot in pairs(mog.mogSlots) do
-		local isTransmogrified, _, _, _, _, visibleItemID = GetTransmogrifySlotInfo(slot);
-		if transmogrified then
-			mog:GetItemInfo(visibleItemID);
+	for k, slot in pairs(SLOTS) do
+		local name = C_TransmogCollection.GetCategoryInfo(k + 1)
+		if name then
+			mog.db.profile.slotLabels[slot] = name
 		end
 	end
 	
@@ -310,29 +624,30 @@ function mog:PLAYER_LOGIN()
 	end)
 end
 
-function mog:PLAYER_EQUIPMENT_CHANGED(slot, hasItem)
-	local visibleItem;
-	if mog.mogSlots[slot] then
-		local isTransmogrified, _, _, _, _, visibleItemID = GetTransmogrifySlotInfo(slot);
+function mog:PLAYER_EQUIPMENT_CHANGED(slot)
+	local slotName = mog.mogSlots[slot];
+	local item = GetInventoryItemLink("player", slot);
+	if slotName then
+		local transmogLocation = TransmogUtil.GetTransmogLocation(slot, Enum.TransmogType.Appearance, Enum.TransmogModification.None);
+		local baseSourceID, baseVisualID, appliedSourceID, appliedVisualID = C_Transmog.GetSlotVisualInfo(transmogLocation);
+		local isTransmogrified, _, _, _, _, _, isHideVisual, texture = C_Transmog.GetSlotInfo(transmogLocation);
 		if isTransmogrified then
-			mog:GetItemInfo(visibleItemID);
-			visibleItem = visibleItemID;
+			-- we need an item ID here if we still need to cache these at all
+			-- mog:GetItemInfo(visibleItemID);
+			item = appliedSourceID;
+			itemAppearanceModID = visibleItemAppearanceModID;
 		end
 	end
 	-- don't do anything if the slot is not visible (necklace, ring, trinket)
 	if mog.db.profile.gridDress == "equipped" then
 		for i, frame in ipairs(mog.models) do
-			local item = frame.data.item;
-			if item then
-				local slotName = mog.mogSlots[slot];
-				if hasItem then
-					if (slot ~= INVSLOT_HEAD or ShowingHelm()) and (slot ~= INVSLOT_BACK or ShowingCloak()) then
-						frame:TryOn(visibleItem or GetInventoryItemID("player", slot), slotName);
-					end
+			if frame.data.item then
+				if item then
+					frame:TryOn(item, slotName, itemAppearanceModID);
 				else
 					frame:UndressSlot(slot);
 				end
-				frame:TryOn(item);
+				frame:TryOn(frame.data.item);
 			end
 		end
 	end
@@ -380,19 +695,18 @@ function mog:GetData(data, id, key)
 end
 
 mog.itemStringShort = "item:%d:0";
-mog.itemStringLong = "item:%d:0:0:0:0:0:0:0:0:0:0:%d:%d";
+mog.itemStringLong = "item:%d:0::::::::::%d:1:%d";
 
-function mog:ToStringItem(id, bonus)
+function mog:ToStringItem(id, bonus, diff)
 	-- itemID, enchantID, instanceDifficulty, numBonusIDs, bonusID1
-	if bonus then
-		return format(mog.itemStringLong, id, bonus and 1, bonus);
+	if (bonus and bonus ~= 0) or (diff and diff ~= 0) then
+		return format(mog.itemStringLong, id, diff or 0, bonus or 0);
 	else
 		return format(mog.itemStringShort, id);
 	end
 end
 
 local bonusDiffs = {
-	[0] = true,
 	-- MoP
 	[451] = true, -- Raid Finder
 	[449] = true, -- Heroic (Raid)
@@ -404,36 +718,56 @@ local bonusDiffs = {
 	[521] = true, -- dungeon-level-up-4
 	[522] = true, -- dungeon-normal
 	[524] = true, -- dungeon-heroic
-	[525] = true, -- trade-skill
-	[526] = true, -- trade-skill
-	[527] = true, -- trade-skill
-	[558] = true, -- trade-skill
-	[559] = true, -- trade-skill
+	[525] = true, -- trade-skill (tier 1)
+	[526] = true, -- trade-skill (armor tier 2)
+	[527] = true, -- trade-skill (armor tier 3)
+	[558] = true, -- trade-skill (weapon tier 2)
+	[559] = true, -- trade-skill (weapon tier 3)
 	[566] = true, -- raid-heroic
 	[567] = true, -- raid-mythic
+	[593] = true, -- trade-skill (armor tier 4)
+	[594] = true, -- trade-skill (weapon tier 4)
+	[615] = true, -- timewalker
+	[617] = true, -- trade-skill (armor tier 5)
+	[618] = true, -- trade-skill (armor tier 6)
+	[619] = true, -- trade-skill (weapon tier 5)
+	[620] = true, -- trade-skill (weapon tier 6)
+	[642] = true, -- dungeon-mythic
+	[648] = true, -- baleful (675)
+	[651] = true, -- baleful empowered (695)
+	[1798] = true, -- ???
+	[1799] = true, -- ???
+	[1805] = true, -- raid-heroic
+	[1806] = true, -- raid-mythic
+	[3379] = true, -- ???
+	[3444] = true, -- ???
+	[3445] = true, -- ???
+	[3446] = true, -- ???
+	
+	[3524] = true, -- magical bonus ID for items that instead use the instance difficulty ID parameter
 };
 
-mog.itemStringPattern = "item:(%d+):%d+:%d+:%d+:%d+:%d+:%d+:%d+:%d+:%d+:%d+:(%d+):([%d:]+)";
+mog.itemStringPattern = "item:(%d+):%d*:%d*:%d*:%d*:%d*:%d*:%d*:%d*:%d*:%d*:(%d*):%d*:([%d:]+)";
 
 function mog:ToNumberItem(item)
 	if type(item) == "string" then
-		local id, numBonusIDs, bonus = item:match(mog.itemStringPattern);
-		if numBonusIDs then
-			numBonusIDs = tonumber(numBonusIDs);
-			if numBonusIDs == 1 and not bonusDiffs[tonumber(bonus)] then
-				bonus = nil;
-			elseif numBonusIDs > 1 then
+		local id, diff, bonus = item:match(mog.itemStringPattern);
+		-- bonus ID can also be warforged, socketed, etc
+		-- if there is more than one bonus ID, need to check all
+		if bonus then
+			if not tonumber(bonus) then
 				for bonusID in gmatch(bonus, "%d+") do
-					bonusID = tonumber(bonusID);
-					if bonusDiffs[bonusID] then
+					if bonusDiffs[tonumber(bonusID)] then
 						bonus = bonusID;
 						break;
 					end
 				end
+			elseif not bonusDiffs[tonumber(bonus)] then
+				bonus = nil;
 			end
 		end
 		id = id or item:match("item:(%d+)");
-		return tonumber(id), tonumber(bonus);
+		return tonumber(id), tonumber(bonus), tonumber(diff);
 	elseif type(item) == "number" then
 		return item;
 	end
@@ -491,6 +825,8 @@ mog.mogSlots = {
 	[INVSLOT_SHOULDER] = "ShoulderSlot",
 	[INVSLOT_BACK] = "BackSlot",
 	[INVSLOT_CHEST] = "ChestSlot",
+	[INVSLOT_BODY] = "ShirtSlot",
+	[INVSLOT_TABARD] = "TabardSlot",
 	[INVSLOT_WRIST] = "WristSlot",
 	[INVSLOT_HAND] = "HandsSlot",
 	[INVSLOT_WAIST] = "WaistSlot",

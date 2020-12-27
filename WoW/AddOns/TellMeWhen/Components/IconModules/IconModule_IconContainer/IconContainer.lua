@@ -7,7 +7,7 @@
 --		Banjankri of Blackrock, Predeter of Proudmoore, Xenyr of Aszune
 
 -- Currently maintained by
--- Cybeloras of Aerie Peak/Detheroc/Mal'Ganis
+-- Cybeloras of Aerie Peak
 -- --------------------
 
 
@@ -26,7 +26,7 @@ function IconContainer:OnNewInstance_IconContainer(icon)
 	
 	container:SetHighlightTexture("Interface\\Buttons\\ButtonHilight-Square")
 	container:SetPushedTexture("Interface\\Buttons\\UI-Quickslot-Depress")
-	
+
 	self.container = container
 	
 	container:EnableMouse(false)
@@ -36,13 +36,32 @@ function IconContainer:OnEnable()
 	local icon = self.icon
 	local container = self.container
 	
-	container:Show()
+	if not container:IsShown() then
+		container:Show()
+	end
 	
 	container:SetFrameLevel(icon:GetFrameLevel())
 end
 
 function IconContainer:OnDisable()
+	self:SetBorder(0, "ffffffff")
+end
+
+function IconContainer:OnDisableDelayed()
 	self.container:Hide()
+end
+
+function IconContainer:SetBorder(size, color, inset)
+	if not self.border and size ~= 0 then
+		self.border = CreateFrame("Frame", nil, self.container, "TellMeWhen_GenericBorder")
+	end
+
+	if inset then size = -size end
+
+	if self.border then
+		self.border:SetBorderSize(size)
+		self.border:SetColor(TMW:StringToRGBA(color))
+	end
 end
 
 
@@ -127,12 +146,14 @@ IconContainer:RegisterEventHandlerData("Animations", 60, "ACTVTNGLOW", {
 	ConfigFrames = {
 		"Duration",
 		"Infinite",
+		"Scale"
 	},
 
 	Play = function(icon, eventSettings)
 		icon:Animations_Start{
 			eventSettings = eventSettings,
 			Start = TMW.time,
+			Scale = eventSettings.Scale,
 			Duration = eventSettings.Infinite and math.huge or eventSettings.Duration,
 		}
 	end,
@@ -149,6 +170,7 @@ IconContainer:RegisterEventHandlerData("Animations", 60, "ACTVTNGLOW", {
 		IconModule_IconContainer:ShowOverlayGlow()
 		
 		-- overlay is a field created by IconModule_IconContainer:ShowOverlayGlow()
+		container.overlay:SetScale(table.Scale)
 		container.overlay:SetFrameLevel(icon:GetFrameLevel() + 3)
 	end,
 	OnStop = function(icon, table)

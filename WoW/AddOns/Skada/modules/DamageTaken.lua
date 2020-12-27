@@ -1,5 +1,5 @@
-
-Skada:AddLoadableModule("DamageTaken", function(Skada, L)
+local _, Skada = ...
+Skada:AddLoadableModule("DamageTaken", nil, function(Skada, L)
 	if Skada.db.profile.modulesBlocked.DamageTaken then return end
 
 	local mod = Skada:NewModule(L["Damage taken"])
@@ -16,7 +16,7 @@ Skada:AddLoadableModule("DamageTaken", function(Skada, L)
 
 			-- Add spell to player if it does not exist.
 			if not player.damagetakenspells[dmg.spellname] or not player.damagetakenspells[dmg.spellname]['absorbed'] then
-				player.damagetakenspells[dmg.spellname] = {id = dmg.spellid, name = dmg.spellname, damage = 0, totalhits = 0, min = nil, max = nil, crushing = 0, glancing = 0, resisted = 0, critical = 0, absorbed = 0, blocked = 0, multistrike = 0}
+				player.damagetakenspells[dmg.spellname] = {id = dmg.spellid, name = dmg.spellname, damage = 0, totalhits = 0, min = nil, max = nil, crushing = 0, glancing = 0, resisted = 0, critical = 0, absorbed = 0, blocked = 0, school = dmg.school}
 			end
 
 			-- Add to player total damage.
@@ -29,10 +29,6 @@ Skada:AddLoadableModule("DamageTaken", function(Skada, L)
 
 			if spell.max == nil or dmg.amount > spell.max then
 				spell.max = dmg.amount
-			end
-
-			if dmg.multistrike then
-				spell.multistrike = (spell.multistrike or 0) + 1
 			end
 
 			if dmg.crushing then
@@ -70,7 +66,7 @@ Skada:AddLoadableModule("DamageTaken", function(Skada, L)
 	local dmg = {}
 
 	local function SpellDamage(timestamp, eventtype, srcGUID, srcName, srcFlags, dstGUID, dstName, dstFlags, ...)
-		local spellId, spellName, spellSchool, samount, soverkill, sschool, sresisted, sblocked, sabsorbed, scritical, sglancing, scrushing, soffhand, smultistrike = ...
+		local spellId, spellName, spellSchool, samount, soverkill, sschool, sresisted, sblocked, sabsorbed, scritical, sglancing, scrushing, soffhand, _ = ...
 
 		dmg.playerid = dstGUID
 		dmg.playername = dstName
@@ -84,7 +80,7 @@ Skada:AddLoadableModule("DamageTaken", function(Skada, L)
 		dmg.glancing = sglancing
 		dmg.crushing = scrushing
 		dmg.offhand = soffhand
-		dmg.multistrike = smultistrike
+		dmg.school = sschool
 
 		log_damage_taken(Skada.current, dmg)
 		log_damage_taken(Skada.total, dmg)
@@ -92,7 +88,7 @@ Skada:AddLoadableModule("DamageTaken", function(Skada, L)
 
 	local function SwingDamage(timestamp, eventtype, srcGUID, srcName, srcFlags, dstGUID, dstName, dstFlags, ...)
 		-- White melee.
-		local samount, soverkill, sschool, sresisted, sblocked, sabsorbed, scritical, sglancing, scrushing, soffhand, smultistrike = ...
+		local samount, soverkill, sschool, sresisted, sblocked, sabsorbed, scritical, sglancing, scrushing, soffhand, _ = ...
 
 		dmg.playerid = dstGUID
 		dmg.playername = dstName
@@ -106,7 +102,7 @@ Skada:AddLoadableModule("DamageTaken", function(Skada, L)
 		dmg.glancing = sglancing
 		dmg.crushing = scrushing
 		dmg.offhand = soffhand
-		dmg.multistrike = smultistrike
+		dmg.school = 0x01
 
 		log_damage_taken(Skada.current, dmg)
 		log_damage_taken(Skada.total, dmg)
@@ -121,7 +117,7 @@ Skada:AddLoadableModule("DamageTaken", function(Skada, L)
 			if player.damagetaken > 0 then
 				for name, spell in pairs(player.damagetakenspells) do
 					if not tmp[name] then
-						tmp[name] = {id = spell.id, damage = spell.damage}
+						tmp[name] = {id = spell.id, damage = spell.damage, school = spell.school}
 					else
 						tmp[name].damage = tmp[name].damage + spell.damage
 					end
@@ -140,6 +136,10 @@ Skada:AddLoadableModule("DamageTaken", function(Skada, L)
 			d.id = name
 			local _, _, icon = GetSpellInfo(spell.id)
 			d.icon = icon
+			if spell.school then
+				d.spellschool = spell.school
+			end
+
 			d.spellid = spell.id
 
 			if spell.damage > max then
@@ -197,10 +197,10 @@ Skada:AddLoadableModule("DamageTaken", function(Skada, L)
 				d.value = player.damagetaken
 
 				d.valuetext = Skada:FormatValueText(
-												Skada:FormatNumber(player.damagetaken), self.metadata.columns.Damage,
-												string.format("%02.1f", dtps), self.metadata.columns.DTPS,
-												string.format("%02.1f%%", player.damagetaken / set.damagetaken * 100), self.metadata.columns.Percent
-											)
+					Skada:FormatNumber(player.damagetaken), self.metadata.columns.Damage,
+					string.format("%02.1f", dtps), self.metadata.columns.DTPS,
+					string.format("%02.1f%%", player.damagetaken / set.damagetaken * 100), self.metadata.columns.Percent
+				)
 				d.id = player.id
 				d.class = player.class
 				d.role = player.role
@@ -241,6 +241,9 @@ Skada:AddLoadableModule("DamageTaken", function(Skada, L)
 				d.id = spellname
 				d.spellid = spell.id
 				d.valuetext = Skada:FormatNumber(spell.damage)..(" (%02.1f%%)"):format(spell.damage / player.damagetaken * 100)
+				if spell.school then
+					d.spellschool = spell.school
+				end
 
 				max = math.max(max, spell.damage)
 				nr = nr + 1
@@ -258,12 +261,16 @@ Skada:AddLoadableModule("DamageTaken", function(Skada, L)
 			local spell = player.damagetakenspells[label]
 			if spell then
 				tooltip:AddLine(player.name.." - "..label)
+				if spell.school then
+					local c = CombatLog_Color_ColorArrayBySchool(spell.school)
+					if c then
+						tooltip:AddLine(GetSchoolString(spell.school), c.r, c.g, c.b)
+					end
+				end
+
 				tooltip:AddDoubleLine(L["Hit"]..":", spell.totalhits, 255,255,255,255,255,255)
 				if spell.critical > 0 then
 					tooltip:AddDoubleLine(L["Critical"]..":", spell.critical, 255,255,255,255,255,255)
-				end
-				if spell.multistrike > 0 then
-					tooltip:AddDoubleLine(L["Multistrike"]..":", spell.multistrike, 255,255,255,255,255,255)
 				end
 				if spell.glancing > 0 then
 					tooltip:AddDoubleLine(L["Glancing"]..":", spell.glancing, 255,255,255,255,255,255)
@@ -291,9 +298,9 @@ Skada:AddLoadableModule("DamageTaken", function(Skada, L)
 
 
 	function mod:OnEnable()
-		playermod.metadata 		= {tooltip = playerspell_tooltip}
-		mod.metadata 			= {click1 = playermod, showspots = true, columns = {Damage = true, DTPS = true, Percent = true}}
-		spelloverview.metadata	= {click1 = spellplayers, showspots = true}
+		playermod.metadata = {tooltip = playerspell_tooltip}
+		mod.metadata = {click1 = playermod, showspots = true, columns = {Damage = true, DTPS = true, Percent = true}, icon = "Interface\\Icons\\Inv_shield_06"}
+		spelloverview.metadata = {click1 = spellplayers, showspots = true, icon = "Interface\\Icons\\Inv_shield_07"}
 
 		Skada:RegisterForCL(SpellDamage, 'SPELL_DAMAGE', {dst_is_interesting_nopets = true})
 		Skada:RegisterForCL(SpellDamage, 'SPELL_PERIODIC_DAMAGE', {dst_is_interesting_nopets = true})
@@ -302,8 +309,8 @@ Skada:AddLoadableModule("DamageTaken", function(Skada, L)
 
 		Skada:RegisterForCL(SwingDamage, 'SWING_DAMAGE', {dst_is_interesting_nopets = true})
 
-		Skada:AddMode(self)
-		Skada:AddMode(spelloverview)
+		Skada:AddMode(self, L["Damage"])
+		Skada:AddMode(spelloverview, L["Damage"])
 	end
 
 	function mod:OnDisable()
@@ -329,4 +336,3 @@ Skada:AddLoadableModule("DamageTaken", function(Skada, L)
 		return Skada:FormatNumber(set.damagetaken)
 	end
 end)
-

@@ -7,7 +7,7 @@
 --		Banjankri of Blackrock, Predeter of Proudmoore, Xenyr of Aszune
 
 -- Currently maintained by
--- Cybeloras of Aerie Peak/Detheroc/Mal'Ganis
+-- Cybeloras of Aerie Peak
 -- --------------------
 
 
@@ -76,7 +76,7 @@ function Module:Entry_AddToList_1(f, index)
 				if color.colorStr then
 					color = "|c" .. color.colorStr
 				else
-					color = ("|cff%02x%02x%02x"):format(color.r * 0xFF, color.g * 0xFF, color.b * 0xFF)
+					color = "|c" .. TMW:RGBATableToStringWithoutFlags(color)
 				end
 			end
 	
@@ -96,7 +96,7 @@ function Module:Entry_AddToList_1(f, index)
 	end
 end
 
-function Module:Table_GetNormalSuggestions(suggestions, tbl, ...)
+function Module:Table_GetNormalSuggestions(suggestions, tbl)
 	local atBeginning = SUG.atBeginning
 	
 	for index, unitData in pairs(tbl) do
@@ -106,7 +106,7 @@ function Module:Table_GetNormalSuggestions(suggestions, tbl, ...)
 	end
 end
 
-function Module:Table_GetSpecialSuggestions_1(suggestions, tbl, ...)
+function Module:Table_GetSpecialSuggestions_1(suggestions)
 	local atBeginning = SUG.atBeginning
 	self:UpdateGroupedPlayersMap()
 	

@@ -1,5 +1,5 @@
 --[[
-Copyright (c) 2009-2014, Hendrik "Nevcairiel" Leppkes < h.leppkes@gmail.com >
+Copyright (c) 2009-2016, Hendrik "Nevcairiel" Leppkes < h.leppkes@gmail.com >
 All rights reserved.
 ]]
 
@@ -10,8 +10,6 @@ local MODNAME = "GroupIcons"
 local GroupIcons = Mapster:NewModule(MODNAME, "AceEvent-3.0", "AceHook-3.0")
 
 local fmt = string.format
-local sub = string.sub
-local find = string.find
 
 local _G = _G
 

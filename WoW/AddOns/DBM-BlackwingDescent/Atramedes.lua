@@ -1,12 +1,11 @@
 local mod	= DBM:NewMod(171, "DBM-BlackwingDescent", nil, 73)
 local L		= mod:GetLocalizedStrings()
 
-mod:SetRevision(("$Revision: 145 $"):sub(12, -3))
+mod:SetRevision("20200806141910")
 mod:SetCreatureID(41442)
 mod:SetEncounterID(1022)
-mod:SetZone()
 mod:SetUsedIcons(8)
-mod:SetModelSound("Sound\\Creature\\Nefarian\\VO_BD_Nefarian_AtramedesIntro.wav", "Sound\\Creature\\Atramedes\\VO_BD_Atramedes_Event03.wav")
+--mod:SetModelSound("Sound\\Creature\\Nefarian\\VO_BD_Nefarian_AtramedesIntro.ogg", "Sound\\Creature\\Atramedes\\VO_BD_Atramedes_Event03.ogg")
 --Long: Atramedes, are you going deaf as well as blind? Hurry up and kill them all.
 --Short: Death waits in the darkness!
 
@@ -44,8 +43,8 @@ local specWarnAddTargetable	= mod:NewSpecialWarningSwitch("ej3082", "Ranged")
 local timerSonarPulseCD		= mod:NewCDTimer(10, 77672)
 local timerSonicBreath		= mod:NewCDTimer(41, 78075)
 local timerSearingFlame		= mod:NewCDTimer(45, 77840)
-local timerAirphase			= mod:NewNextTimer(85, "ej3081", nil, nil, nil, "Interface\\AddOns\\DBM-Core\\textures\\CryptFiendUnBurrow.blp")--These both need more work
-local timerGroundphase		= mod:NewNextTimer(31.5, "ej3061", nil, nil, nil, "Interface\\AddOns\\DBM-Core\\textures\\CryptFiendBurrow.blp")--I just never remember to log and /yell at right times since they lack most accurate triggers.
+local timerAirphase			= mod:NewNextTimer(85, "ej3081", nil, nil, nil, nil, "Interface\\AddOns\\DBM-Core\\textures\\CryptFiendUnBurrow.blp")--These both need more work
+local timerGroundphase		= mod:NewNextTimer(31.5, "ej3061", nil, nil, nil, nil, "Interface\\AddOns\\DBM-Core\\textures\\CryptFiendBurrow.blp")--I just never remember to log and /yell at right times since they lack most accurate triggers.
 
 local berserkTimer			= mod:NewBerserkTimer(600)
 
@@ -53,9 +52,9 @@ mod:AddBoolOption("TrackingIcon")
 mod:AddBoolOption("InfoFrame")
 
 local shieldsLeft = 10
-local pestered = GetSpellInfo(92685)
+local pestered = DBM:GetSpellInfo(92685)
 local pesteredWarned = false
-local SoundLevel = EJ_GetSectionInfo(3072)
+local SoundLevel = DBM:EJ_GetSectionInfo(3072)
 
 local function groundphase()
 	timerAirphase:Start()
@@ -85,7 +84,7 @@ function mod:OnCombatEnd()
 	if self.Options.InfoFrame then
 		DBM.InfoFrame:Hide()
 	end
-end 
+end
 
 function mod:SPELL_AURA_APPLIED(args)
 	if args.spellId == 78092 then
@@ -155,7 +154,7 @@ end
 
 function mod:UNIT_AURA(uId)
 	if pesteredWarned then return end
-	if UnitDebuff("player", pestered) then
+	if DBM:UnitDebuff("player", pestered) then
 		pesteredWarned = true--This aura is a periodic trigger, so we don't want to spam warn for it.
 		specWarnPestered:Show()
 		yellPestered:Yell()

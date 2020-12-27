@@ -1,5 +1,4 @@
 ﻿if GetLocale() ~= "esES" and GetLocale() ~= "esMX" then return end
-
 local L
 
 --Maulgar
@@ -33,15 +32,12 @@ L:SetGeneralLocalization{
 	name = "Magtheridon"
 }
 
-L:SetWarningLocalization{
-}
-
 L:SetTimerLocalization{
-	timerP2	= "Phase 2"
+	timerP2	= "Fase 2"
 }
 
 L:SetOptionLocalization{
-	timerP2	= "Mostrar tiempo para el inicio de Fase 2"
+	timerP2	= "Mostrar temporizador para el cambio a Fase 2"
 }
 
 L:SetMiscLocalization{
@@ -57,15 +53,8 @@ L:SetGeneralLocalization{
 	name = "Señor de fatalidad Kazzak"
 }
 
-L:SetWarningLocalization{
-}
-
-L:SetOptionLocalization{
-	SetIconOnMark		= DBM_CORE_AUTO_ICONS_OPTION_TEXT:format(32960)
-}
-
 L:SetMiscLocalization{
-	DBM_KAZZAK_EMOTE_ENRAGE		= "%s becomes enraged!"--Probalby won't be used, at least not long. Once spellid replaces it
+	DBM_KAZZAK_EMOTE_ENRAGE		= "¡%s se enfurece!"--Probalby won't be used, at least not long. Once spellid replaces it
 }
 
 -- Doomwalker
@@ -75,15 +64,6 @@ L:SetGeneralLocalization{
 	name = "Caminante del Destino"
 }
 
-L:SetWarningLocalization{
-}
-
-L:SetTimerLocalization{
-}
-
-L:SetOptionLocalization{
-}
-
 L:SetMiscLocalization{
-	DBM_DOOMW_EMOTE_ENRAGE	= "%s becomes enraged!"--Probalby won't be used, at least not long. Once spellid replaces it
+	DBM_DOOMW_EMOTE_ENRAGE	= "¡%s se enfurece!"--Probalby won't be used, at least not long. Once spellid replaces it
 }

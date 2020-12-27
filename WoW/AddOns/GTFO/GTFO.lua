@@ -3,848 +3,9 @@
 --------------------------------------------------------------------------
 --[[
 GTFO
-Author: Zensunim of Dragonblight
+Author: Zensunim of Dragonblight [Retail], Myzrael [Classic]
 
 Usage: /GTFO or go to Interface->Add-ons->GTFO
-
-Note: Place your own custom spells and setups in GTFO_Custom.lua
-
-Special thanks: 
-		Smacker (Power Auras)
-		Freydis88, GusBackus, and Zaephyr81 (German Translations)
-		pcki11 D_Angel, and user_kh (Russian Translations)
-		lsjyzjl, Wowuicn, and xazhaoyang (Simplified and Traditional Chinese Translations)
-		Blubibulga and TrAsHeR (French Translations)
-		Sunyruru and Maknae (Korean Translations)
-		Pablous (Spanish Translations)
-		Andyca, and BNSSNB (Traditional Chinese Translations)
-		Phalk and Omukeka (Brazilian Portuguese Translations)
-
-
-Change Log:
-	v0.1
-		- Beta Release
-		- Added menu options
-	v0.2
-		- Put spells in its own area
-	v0.3
-		- Updated for Wrath spells
-	v0.3.1
-		- Updated for Naxx spells
-	v0.3.2
-		- More spells
-	v0.3.3
-		- More spells
-	v1.0
-		- Public Release
-		- More spells
-		- High/Low options
-	v1.0.1
-		- Added spells, replaced names with spell IDs
-	v1.1
-		- Bug fixes
-		- Added "test" buttons to the menu option
-		- Added spells, replaced names with spell IDs
-		- Sound spam prevention
-		- Alerts on "afflicted by" event
-	v1.1.1
-		- Spell fixes, new spells, replaced names with spell IDs
-		- Added the ability to alert only on DoT application
-		- Fixed "afflicted by" alerts to support stacking debuffs
-	v1.1.2
-		- Added spells
-	v1.1.3
-		- Added spells
-	v1.1.4
-		- Added spells
-	v1.2
-		- Patch 3.3 Compatible
-		- Added version checking and update notification
-		- Added spells
-	v1.2.1
-		- Added spells
-	v1.2.2
-		- Added spells
-		- Casting Hellfire no longer triggers alerts
-	v1.2.3
-		- Added spells
-	v1.2.4
-		- Added spells
-	v1.2.5
-		- Added spells
-		- Fixed bug in version updates
-	v1.2.6
-		- Added spells
-	v2.0
-		- Added "Fail" mode/sound
-		- Added spells
-	v2.0.1
-		- Added spells
-	v2.0.2
-		- Added spells
-	v2.0.3
-		- Added spells
-	v2.0.4
-		- Added spells
-	v2.0.5
-		- Added/fixed spells
-	v2.1
-		- Added Power Auras Integration
-	v2.2
-		- Added volume control
-		- Added "/gtfo options" command
-		- Added melee hit/miss detection
-	v2.2.1
-		- Added spells
-	v2.2.2
-		- Fixed spells
-	v2.2.3
-		- Reduced memory footprint
-		- Added spells
-		- Improved help documentation
-	v2.3
-		- Added tank vs. non-tank alert support (alerts coming soon!)
-		- Added Cataclysm beta spells (requires test mode)
-		- Added test mode for untested alerts
-		- Fixed a crash with users running a very old version of Power Auras Classic
-	v2.4
-		- Added Cataclysm compatibility
-		- WAV sound effects converted to MP3s for Cataclysm support
-		- Added Cataclysm beta spells
-		- Removed test mode status of tested Cataclysm beta spells 
-	v2.5
-		- Added localization support
-		- Split spell files into multiple sections
-		- Added spells
-		- Removed test mode status of tested Cataclysm beta spells 
-	v2.5.1
-		- Added Cataclysm spells from Blackrock Depths, Vortex Pinnacle, Grim Batol, Twilight Highlands
-		- Added Classic spells from Molten Core
-		- Added Wrath spells from Icecrown Citadel, Obsidian Sanctum, Ruby Sanctum
-	v2.5.2
-		- Added Cataclysm spells for Halls of Origination
-		- Added Cataclysm spells for Lost City of the Tol'vir
-		- Added Cataclysm spells for Blackrock Depths (Heroic)
-		- Added Cataclysm spells for Throne of the Tides (Heroic)
-		- Added Cataclysm spells for Vortex Pinnacle (Heroic)
-		- Added Cataclysm spells for Grim Batol (Heroic)
-	v2.5.3
-		- Added Cataclysm spells for Halls of Origination
-		- Added Cataclysm spells for Grim Batol
-		- Added Cataclysm spells for Deadmines (Heroic)
-		- Added Cataclysm spells for Shadowfang Keep (Heroic)
-		- Added Wrath spells for Halls of Reflection
-		- Added Wrath spells for Icecrown Citadel
-	v2.6
-		- WAV sound effects converted to OGGs for Cataclysm support and better sound quality
-		- Updated for 4.0 compatibility
-	v2.7
-		- Changed Death Knight tank detection to look for Blood Presence instead of Frost
-		- Fixed Paladin tank detection to look for tanking shields only
-	v2.8
-		- Fixed "You're not in a raid" spam in battlegrounds
-	v2.8.1
-		- Added German localization - Thanks Freydis88
-		- Added Russian localization - Thanks pcki11
-	v2.8.2
-		- Added new player 4.x spells
-	v2.9
-		- Removed "3.x vs. 4.x" support code
-		- Optimized sound code
-		- Added Wrath spells for Icecrown Citadel
-		- Fixed Wrath spells for Icecrown Citadel
-	v2.9.1
-		- Added Wrath spells for Icecrown Citadel
-		- Added Burning Crusade spells for Hellfire Ramparts
-		- Added Burning Crusade spells for Blood Furnace
-		- Added Classic spells for Molten Core
-		- Added Generic spells (Rain of Fire)
-	v3.0
-		- General code optimizations
-		- Added Simplified Chinese localization - Thanks Wowuicn
-		- Added Traditional Chinese localization - Thanks Wowuicn
-		- Enabled optimized sound code added in 2.9 (oops!)
-		- Added 5th volume level
-		- Added the ability to hear sounds when game sounds are normally muted
-		- Added support for "always alert" spells to ignore absorb/immune/missed
-		- Added support for vehicle spell alerts (Malygos, Flame Leviathan)
-		- Fixed all "English only" alerts to support all clients
-		- Added Burning Crusade spells (Untested)
-		- Added Wrath spells for Ulduar
-		- Added Wrath spells for Icecrown Citadel
-		- Added Wrath spells for Eye of Eternity
-	v3.0.1
-		- Added Burning Crusade spells for Karazhan
-		- Added Burning Crusade spells for Slave Pens
-		- Added Burning Crusade spells for the Underbog
-		- Added Burning Crusade spells for the Steamvaults
-		- Added Burning Crusade spells for Sethekk Halls
-		- Added Burning Crusade spells for Shadow Labyrinth
-		- Added Burning Crusade spells for Old Hillsbrad Foothills
-		- Added Burning Crusade spells for Black Morass
-		- Added Burning Crusade spells for Hyjal Summit
-		- Added Burning Crusade spells for Black Temple
-		- Added Burning Crusade spells for Auchenai Crypts
-		- Updated Cataclysm spells for Deadmines (Heroic)
-	v3.0.2
-		- Added Cataclysm spells for Baradin Hold
-		- Added Cataclysm spells for the Bastion of Twilight
-		- Added Classic spells
-		- Added comments to the LUA code
-	v3.1
-		- Added "friendly fire" alert and sound
-		- Added experimental/beta mode option in config
-		- Added trivial alert mode option in config
-		- Added "minimum stacks" variable to alerts
-		- Added "level" variable to determine trivial alerts
-		- Added friendly pop-up message for first-time users and version upgraders
-		- Updated Wrath spells for Icecrown Citadel
-		- Added Wrath spells for Nexus
-		- Added Wrath spells for Azjol-Nerub
-		- Added Wrath spells for Ulduar
-		- Updated Cataclysm spells for Bastion of Twilight
-		- Added Cataclysm spells for Blackwing Descent
-		- Added Cataclysm spells for Throne of the Four Winds
-		- Added Cataclysm spells for Shadowfang Keep (Heroic)
-		- Updated German localization - Thanks Freydis88
-	v3.2
-		- Added French localization - Thanks Blubibulga
-		- Fixed Mob GUID function
-		- Added "specific mob" variable to alerts
-		- Added Burning Crusade spells for Sethekk Halls
-		- Added Burning Crusade spells for Shattered Halls
-		- Added Burning Crusade spells for Black Temple
-		- Added Burning Crusade spells for Serpentshrine Cavern
-		- Added Burning Crusade spells for Arcatraz
-		- Added Burning Crusade spells for Mechanar
-		- Added Burning Crusade spells for Shadow Labyrinth
-		- Added Burning Crusade spells for Botanica
-		- Added Classic spells for Molten Core
-		- Added Wrath spells for Onyxia's Lair
-	v3.2.1
-		- Removed GTFO_Custom.lua reference
-		- Added and updated Wrath spells for Icecrown Citadel
-		- Added generic spells
-		- Added Classic spells for Blackrock Spire
-		- Added Classic spells for Deadmines
-		- Added Classic spells for Stockades
-		- Added Classic spells for Scholomance
-		- Added Classic spells for Stratholme
-		- Added Classic spells for Shadowfang Keep
-		- Added Burning Crusade spells for Magtheridon's Lair
-		- Added Burning Crusade spells for Gruul's Lair
-		- Added Wrath spells for Naxxramas
-		- Added Wrath spells for Nexus
-	v3.2.2
-		- Activated Chinese and French translations (oops!)
-		- Fixed a bug with missing translations
-	v3.2.3
-		- Fixed a bug with tanking shield detection during load
-		- Added Classic spells for Gnomeregan
-		- Added Classic spells for Scarlet Monastery
-		- Added Classic spells for Maraudon
-	v3.2.4
-		- Added Classic spells for Scarlet Monastery
-		- Added Classic spells for Maraudon
-		- Added Classic spells for Molten Core
-		- Added Burning Crusade for Karazhan
-	v3.2.5
-		- Updated Cataclysm spells for Blackrock Caverns
-		- Added Cataclysm spells for Vashj'ir
-		- Added Cataclysm spells for Uldum
-		- Added Cataclysm spells for Vortex Pinnacle
-		- Added Cataclysm spells for Throne of the Tides
-		- Added Wrath spells for Nexus
-		- Added Wrath spells for Utgarde Pinnacle
-		- Added Wrath spells for Obsidian Sanctum
-		- Added Classic spells for Blackrock Spire
-		- Added Classic spells for Sunken Temple
-	v3.2.6
-		- Added Cataclysm spells for Twilight Highlands
-		- Added Cataclysm spells for Uldum
-		- Added Cataclysm spells for Lost City of the Tol'vir
-		- Added Cataclysm spells for Vortex Pinnacle
-		- Added Cataclysm spells for Deepholm
-		- Added Cataclysm spells for Tol Barad
-		- Added Cataclysm spells for Hyjal
-	v3.2.7
-		- Added Cataclysm spells for Halls of Origination (Heroic)
-		- Added Cataclysm spells for Blackrock Caverns
-		- Added Cataclysm spells for Hyjal
-		- Added Cataclysm spells for Stonecore (Heroic)
-		- Added Cataclysm spells for Grim Batol (Heroic)
-	v3.3
-		- Added Cataclysm spells for Halls of Origination (Heroic)
-		- Added Cataclysm spells for Deadmines (Heroic)
-		- Added Cataclysm spells for Stonecore (Heroic)
-		- Added Cataclysm spells for Throne of the Tides (Heroic)
-		- Updated Cataclysm spells for Blackwing Descent
-		- Updated Cataclysm spells for Throne of the Four Winds
-		- Updated Cataclysm spells for Bastion of Twilight
-		- Updated Cataclysm spells for Baradin Hold
-		- Updated Traditional Chinese localization - Thanks Wowuicn
-		- Updated Russian localization - Thanks D_Angel
-	v3.3.1
-		- Added Cataclysm spells for Blackwing Descent
-		- Updated Cataclysm spells for Shadowfang Keep (Heroic)
-		- Added Cataclysm spells for Vortex Pinnacle
-	v3.3.2
-		- Added Cataclysm spells for Blackwing Descent
-		- Added Cataclysm spells for Bastion of Twilight
-	v3.4
-		- Added support to detect "energize" events
-		- Added Cataclysm spells for Blackwing Descent
-		- Added Cataclysm spells for Grim Batol
-		- Updated Cataclysm spells for Throne of the Tides
-	v3.4.1
-		- Fixed Cataclysm spells for Bastion of Twilight
-	v3.4.2
-		- Updated French localization - Thanks Blubibulga
-		- Removed Cataclysm spells for Bastion of Twilight
-	v3.5
-		- Added alert for Fatigue
-		- Updated alert for Drowning
-		- Added Cataclysm spells for Bastion of Twilight
-		- Added Cataclysm spells for Blackwing Descent
-		- Added Cataclysm spells for Hyjal
-		- Added Cataclysm spells for Twilight Highlands
-		- Added Cataclysm spells for Stonecore
-	v3.5.1
-		- Added Cataclysm spells for Bastion of Twilight
-		- Updated German localization - Thanks GusBackus
-		- Added Korean localization - Thanks Sunyruru
-	v3.5.2
-		- Updated Korean localization - Thanks Sunyruru
-		- Updated spells for Love is in the Air
-	v3.5.3
-		- Added Cataclysm spells for Throne of the Four Winds
-		- Updated Cataclysm spells for Throne of the Four Winds
-	v3.5.4
-		- Added Cataclysm spells for Bastion of Twilight
-	v3.5.5
-		- Fixed Cataclysm spells for Throne of the Four Winds
-		- Added Cataclysm spells for Bastion of Twilight
-		- Added Cataclysm spells for Blackwing Descent
-		- Added Burning Crusade spells for Tempest Keep
-	v3.5.6
-		- Added Cataclysm spells for Bastion of Twilight
-	v3.6
-		- Updated sounds to play on the Master channel instead of the SFX channel
-		- SFX channel is no longer unmuted when "Play sounds when muted" option is checked
-	v4.0
-		- Added 4.1.0 support (PTR)
-		- Added alerts for when the player is damaging other party/raid members
-		- Added support for alerts based on player's debuffs
-		- Fixed Cataclysm spells for Throne of the Four Winds
-		- Added Cataclysm spells for Bastion of Twilight
-		- Added Cataclysm spells for Blackwing Descent
-		- Added Cataclysm spells for Zul'Gurub
-		- Added Cataclysm spells for Zul'Aman
-		- Added Wrath spells for Icecrown Citadel
-	v4.0.1
-		- Fixed Cataclysm spells for Zul'Gurub
-		- Fixed Cataclysm spells for Blackwing Descent
-		- Fixed Cataclysm spells for Bastion of Twilight
-	v4.1
-		- Added Recount integration
-		- Added support for alerts based on player's buffs
-		- Added Cataclysm spells for Bastion of Twilight
-		- Added Wrath spells for Ruby Sanctum
-	v4.2
-		- Added addon message registration (PTR)
-		- Added support for alerts based on minimum damage taken
-		- Added and fixed Cataclysm spells for Blackwing Descent
-		- Added Cataclysm spells for Bastion of Twilight
-		- Removed Cataclysm spells for Throne of the Four Winds
-	v4.2.1
-		- Updated French localization - Thanks Blubibulga
-		- Added Spanish localization - Thanks Pablous
-		- Added Cataclysm spells for Zul'Aman
-	v4.2.2
-		- Updated Cataclysm spells for Throne of the Four Winds
-		- Added Cataclysm spells for Blackwing Descent
-		- Added Latin American Spanish localization (copied from the Spanish localization)
-	v4.2.3
-		- Updated Traditional Chinese localization - Thanks Wowuicn
-		- Added Cataclysm spells for Zul'Gurub
-		- Added Cataclysm spells for Blackwing Descent
-	v4.3
-		- Removed support for versions prior to GTFO 4.3 due to WoW 4.1 combat log changes
-		- Changed addon communications to use "GTFO" only instead of "GTFO_u" and "GTFO_v"
-		- Updated Korean localization - Thanks Sunyruru
-	v4.3.1
-		- Added Cataclysm spells for Zul'Gurub
-		- Added Cataclysm spells for Zul'Aman
-		- Updated Generic spells (PvP)
-	v4.3.2
-		- Added Classic spells for Thousand Needles
-		- Updated Cataclysm spells for Blackwing Descent
-	v4.4
-		- Fixed cross-server version check bug
-		- Added 4.2.0 support (PTR)
-		- Added Cataclysm spells for Baradin Hold
-		- Added Cataclysm spells for Firelands (Experimental Mode)
-	v4.5
-		- Revamped event handling system
-		- Added advanced custom logic handling to work around Blizzard's bugs
-		- Reworked test console commands so "/gtfo test2" and "/gtfo test 2" are both valid
-		- Updated French localization - Thanks Blubibulga	
-		- Added Cataclysm spells for Blackwing Descent
-		- Fixed Cataclysm spells for Throne of the Four Winds
-		- Fixed Cataclysm spells for Baradin Hold
-		- Fixed Cataclysm spells for Throne of the Tides
-		- Maloriak's Frost Chill and Al'akir's Lightning Rod no longer spams friendly fire warnings when you have the debuff
-		- Removed low alert warning for lava when gaining stacks of magma in Blackwing Descent or Bastion of Twilight
-		- Removed Cataclysm spells for Vashj'ir
-	v4.6
-		- Added Skada integration
-		- Friendly fire alerts now record who caused the damage (when this info is available) in Recount/Skada
-		- Environmental, PvP, generic alerts, and campfires that damage less than 0.5% of your total HP are considered trivial alerts
-		- Improved memory management of disabled integration features
-		- Fixed several spells incorrectly sounding friendly fire alerts on the final tick of damage
-		- Magma is now being ignored briefly at the beginning of Phase 2 Nefarian
-		- Added Cataclysm spells for Baradin Hold (PTR)
-		- Added Cataclysm spells for Firelands (PTR)
-		- Added and updated Cataclysm spells for Blackwing Descent
-		- Updated Cataclysm spells for Zul'Gurub
-		- Added and updated Cataclysm spells for Throne of the Four Winds
-		- Fixed Cataclysm spells for Vashj'ir
-		- Fixed label bug in Recount
-	v4.7
-		- Fixed localization bug that causes untranslated strings to appear as blank instead of English
-		- Revamped display handling system for easier hooking
-		- Updated French localization - Thanks Blubibulga
-		- Updated Cataclysm spells for Throne of the Tides
-		- Added and updated Cataclysm spells for Deadmines (Heroic)
-	v4.8
-		- Removed support for versions prior to GTFO 4.8 due to WoW 4.2 combat log changes
-		- Added and updated Cataclysm spells for Uldum
-		- Updated Cataclysm spells for Firelands
-		- Updated Cataclysm spells for Shadowfang Keep (Heroic)
-		- Added holiday event spells for Ahune
-	v4.8.1
-		- Added Cataclysm spells for Firelands
-		- Fixed version numbering bug
-	v4.8.2
-		- Added Cataclysm spells for Firelands
-		- Added Cataclysm spells for Hyjal
-		- Added Cataclysm spells for the Molten Front
-		- Added generic spells
-	v4.8.3
-		- Fixed Cataclysm spells for Firelands
-		- Added Cataclysm spells for Vortex Pinnacle
-		- Added Cataclysm spells for Hyjal
-		- Added Cataclysm spells for the Molten Front
-	v4.8.4
-		- Added Cataclysm spells for Firelands
-		- Added Cataclysm spells for Hyjal
-		- Added Cataclysm spells for the Molten Front
-	v4.8.5
-		- Fixed lua error with Skada integration
-		- Added Cataclysm spells for Firelands
-		- Added Cataclysm spells for the Molten Front
-	v4.8.6
-		- Updated German Localization - Thanks Zaephyr81
-		- Fixed another lua error with Skada integration
-		- Added Cataclysm spells for the Molten Front
-		- Added Cataclysm spells for Hyjal
-		- Added Cataclysm spells for Blasted Lands
-		- Updated Cataclysm spells for Zul'Gurub
-		- Updated Cataclysm spells for Firelands
-	v4.8.7
-		- Updated Simplified Chinese localization - Thanks Wowuicn
-		- Added Cataclysm spells for Firelands
-	v4.9
-		- Updated Traditional Chinese localization - Thanks lsjyzjl
-		- Recount integration is disabled when using the LUI mod
-		- Added handling of alerts when a debuff gets refreshed
-		- Added Cataclysm spells for Firelands - Thanks Ferret2
-		- Added Classic spells for Ruins of Ahn'Qiraj
-	v4.9.1
-		- Fixed lua error with Skada integration
-		- Added Cataclysm spells for Firelands (Volcanus encounter)
-	v4.9.2
-		- Restored Recount integration when using the LUI mod
-		- Fixed Skada integration from being subjected to the sound spam filter
-		- Added Cataclysm spells for Firelands (Ragnaros)
-		- Fixed Cataclysm spells for Icecrown Citadel (Blood Queen)
-	v4.9.3
-		- Added Cataclysm spells for Baradin Hold (Occu'thar)
-	v4.9.4
-		- Updated Korean localization - Thanks Sunyruru
-		- Added holiday event spells for Brewfest
-	v4.9.5
-		- Added Brazilian Portuguese localization - Thanks Phalk and Omukeka
-		- Updated Simplified Chinese localization - Thanks xazhaoyang
-		- Updated Traditional Chinese localization - Thanks xazhaoyang
-		- Added Cataclysm spells for Firelands (Trash, Ragnaros, Lord Rhyolith)
-		- Updated Cataclysm spells for Throne of the Four Winds (Al'Akir)
-		- Added Cataclysm spells for End Time
-		- Added Cataclysm spells for Hour of Twilight
-		- Added Cataclysm spells for Baradin Hold (Alizabal, Trash)
-		- Added Cataclysm spells for the Nexus (Legendary quest) - Thanks Alaw & Blubibulga
-	v4.10
-		- Added PowerAuras 5.0 integration
-		- Updated Nefarian for Simplified Chinese
-		- Updated French localization - Thanks TrAsHeR
-		- Added Cataclysm spells for Well of Eternity
-		- Added Cataclysm spells for Dragon Soul
-		- Added Cataclysm spells for Firelands (Heroic Alysrazor)
-	v4.11
-		- Updated for patch 4.3 compatibility
-	v4.11.1
-		- Fixed GTFO high buzzer sound to work with 4.3
-		- Added Cataclysm spells for Dragon Soul
-		- Added Cataclysm spells for Well of Eternity
-		- Added Cataclysm spells for Hour of Twilight
-	v4.11.2
-		- Added Cataclysm spells for Dragon Soul (Ultraxion, Warmaster Blackhand, Deathwing)
-	v4.11.3
-		- Added Cataclysm spells for Dragon Soul (Warmaster Blackhorn)
-		- Added Cataclysm spells for Hour of Twilight
-		- Added Cataclysm spells for Darkmoon Faire
-		- Updated Cataclysm spells for Dragon Soul (Deathwing)
-		- Updated Cataclysm spells for Well of Eternity (Peroth'arn)
-	v4.11.4
-		- Updated Cataclysm spells for End Time
-		- Added Classic spells for Eastern Plaguelands
-	v4.11.5
-		- Added Cataclysm spells for Dragon Soul (Warmaster Blackhand)
-		- Updated generic spells
-	v4.12
-		- Added "special alerts" section for managing specific alert categories
-		- Updated Traditional Chinese localization - Thanks Andyca
-	v4.12.1
-		- Fixed LUA error in config options for some clients
-	v4.12.2
-		- Fixed lua error with Skada integration
-	v4.12.3
-		- Removed "GTFO Loaded" startup message
-		- Updated French localization - Thanks Blubibulga
-		- Added command line option to disable version notifications
-	v4.12.4
-		- Preventative taint protection on pop-up box
-		- Updated French localization - Thanks Blubibulga
-	v4.13
-		- Added support for Mists of Pandaria (5.0.1)
-		- Added "INSTAKILL" event for fail alerts
-		- Added "Fatigue" to "special alerts"
-		- Added Cataclysm spells for Dragon Soul (Heroic Hagara)
-		- Added Pandaria spells for Scholomance
-		- Added Pandaria spells for Scarlet Cathedral
-		- Added Pandaria spells for Scarlet Halls
-		- Added Pandaria spells for Stormstout Brewery
-		- Added Pandaria spells for Temple of the Jade Serpent
-	v4.14
-		- Updated for patch 5.0.4
-		- Reorganized spells for easier maintainability
-		- Added Pandaria spells for Mogu'shan Vaults
-	v4.14.1
-		- Code optimizations
-		- Added Cataclysm spells for Dragon Soul (Heroic Madness)
-		- Added placeholders for Pandaria spells
-		- Added Pandaria spells for Gate of the Setting Sun
-		- Added Pandaria spells for Mogu'shan Palace
-		- Added Pandaria spells for Heart of Fear	
-	v4.14.2
-		- Added Pandaria spells for Theramore's Fall
-		- Added Traditional Chinese localization - Thanks BNSSNB
-	v4.14.3
-		- Added Pandaria spells for world bosses
-		- Added Pandaria spells for Shado-Pan Monastery
-		- Added Pandaria spells for Siege of Nivzao Temple
-		- Added Pandaria spells for Mogu'shan Vaults
-	v4.15
-		- Fixed a bug with debuffs
-		- Fixed Pandaria spells for Temple of the Jade Serpent
-		- Removed Pandaria spells for Scarlet Cathedral
-		- Added Pandaria spells for Pandaria
-		- Added Pandaria spells for Stormstout Brewery
-	v4.16
-		- Added support for different spell alerts at different difficulty levels
-		- Removed change logs from most individual files to reduce addon install size
-		- Updated Cataclysm spells for Dragon Soul (Heroic Hagara)
-		- Updated Pandaria spells for Stormstout Brewery
-		- Added Pandaria spells for Temple of the Jade Serpent
-		- Added Pandaria spells for Shado-Pan Monastery
-		- Added Pandaria spells for Mogu'shan Palace
-		- Added Pandaria spells for Mogu'shan Vaults
-		- Added Pandaria spells for Pandaria (world)
-	v4.16.1
-		- Updated Pandaria spells for Stormstout Brewery
-		- Added Pandaria spells for Shado-Pan Monastery
-		- Added Pandaria spells for Pandaria (world)
-		- Added Pandaria spells for A Brewing Storm
-		- Added Pandaria spells for Crypt of the Forgotten Kings
-		- Added Pandaria spells for Arena of Annihilation
-		- Added Pandaria spells for Brewmoon Festival
-		- Added Pandaria spells for Greenstone Village
-		- Added Pandaria spells for Siege of Nivzao Temple
-		- Added Pandaria spells for Scarlet Cathedral
-		- Added Pandaria spells for Scarlet Halls
-		- Added Pandaria spells for Gate of the Setting Sun
-	v4.16.2
-		- Added Pandaria spells for Mogu'shan Vaults
-		- Added Pandaria spells for Pandaria (world)
-		- Added Pandaria spells for Headless Horseman
-	v4.16.3
-		- Added Pandaria spells for Pandaria (world)
-		- Added Pandaria spells for Arena of Annihilation
-		- Added Pandaria spells for Gate of the Setting Sun
-		- Added Pandaria spells for Siege of Nivzao Temple
-		- Added Pandaria spells for Mogu'shan Vaults
-		- Added Pandaria spells for Heart of Fear
-	v4.16.4
-		- Alerts for Pheromones of Zeal for Imperial Vizier Zor'lok have been toned down
-		- Added Pandaria spells for Pandaria (world)
-		- Added Pandaria spells for Mogu'shan Vaults
-		- Added Pandaria spells for Heart of Fear
-	v4.17
-		- PvP alerts no longer sound during the Amber-Shaper Un'sok encounter
-		- Added Korean localization - Thanks Maknae
-		- Added Brazilian Portuguese localization - Thanks Phalk
-		- Added Pandaria spells for Siege of Nivzao Temple
-		- Added Pandaria spells for Pandaria (world)
-		- Added Pandaria spells for Heart of Fear
-		- Added Pandaria spells for The Eye
-	v4.17.1
-		- Updated for patch 5.1
-		- Added Pandaria spells for Terrace of Endless Spring
-		- Added Pandaria spells for Pandaria (world)
-		- Added Pandaria spells for Heart of Fear
-		- Added Pandaria spells for Mogu'shan Vaults
-		- Added Pandaria spells for Stormstout Brewery
-		- Added Pandaria spells for Brewmoon Festival
-	v4.18
-		- Fixed addon message handling in LFD/LFR/Battlegrounds
-		- Updated Pandaria spells for Terrace of Endless Spring
-	v4.18.1
-		- Added Pandaria spells for Heart of Fear
-		- Added Pandaria spells for Assault on Zan'vess
-		- Added Pandaria spells for Darkmoon Faire
-		- Added Pandaria spells for Terrace of Endless Spring
-		- Added Pandaria spells for Pandaria (world)
-		- Added Classic spells for Temple of Ahn'Qiraj
-	v4.19
-		- Fixed addon support with WeakAuras and other display hooks
-		- Debugging mode commented out to improve performance
-		- Added trivial alert slider
-		- Added Simplified Chinese localization - Thanks lsjyzjl
-		- Added Pandaria spells for Lion's Landing
-		- Added Pandaria spells for Domination Point
-		- Added Pandaria spells for Pandaria (world)
-		- Added Pandaria spells for Mogu'shan Vaults
-		- Added Pandaria spells for Terrace of Endless Spring
-		- Added Pandaria spells for Brawler's Guild
-	v4.19.1
-		- Fixed missing localization strings
-	v4.20
-		- Added Traditional Chinese localization - Thanks BNSSNB
-		- Added native WeakAuras integration
-		- Added Pandaria spells for Pandaria (world)
-		- Added Pandaria spells for Brawler's Guild		
-		- Added Pandaria spells for Heart of Fear	
-	v4.20.1
-		- Added 5.2 support (PTR)
-		- Added French localization - Thanks Blubibulga
-		- Added Pandaria spells for Pandaria (world)
-		- Added Pandaria spells for Throne of Thunder
-	v4.21
-		- Fixed trivial alert slider settings
-		- Added Pandaria spells for Throne of Thunder
-		- Added Pandaria spells for Trove of the Thunder King
-		- Added Pandaria spells for Pandaria (world)
-		- Added Pandaria spells for Mogu'shan Vaults
-		- Added Pandaria spells for Terrace of Endless Spring
-	v4.22
-		- Updated for patch 5.2
-		- Added support for Brewmaster monk tanks
-		- Added Pandaria spells for Throne of Thunder
-	v4.22.1
-		- Added Pandaria spells for Throne of Thunder
-		- Added Pandaria spells for Pandaria (world)
-		- Added Pandaria spells for Mogu'shan Vaults
-	v4.22.2
-		- Fixed Pandaria spells for Throne of Thunder
-		- Fixed Pandaria spells for Brawler's Guild
-	v4.23
-		- Added support for LFR filters
-		- Added Pandaria spells for Black Temple
-		- Fixed Pandaria spells for Throne of Thunder
-		- Added Pandaria spells for Heart of Fear	
-	v4.23.1
-		- Added Pandaria spells for Throne of Thunder
-		- Added Pandaria spells for A Little Patience
-		- Added Pandaria spells for Dagger in the Dark
-		- Added Pandaria spells for Pandaria (world)
-	v4.23.2
-		- Updated for patch 5.3
-		- Added Pandaria spells for Pandaria (world)
-		- Added Pandaria spells for Throne of Thunder
-		- Added Pandaria spells for Theramore's Fall
-		- Added Pandaria spells for Blood in the Snow
-		- Added Pandaria spells for The Secrets of Ragefire
-		- Added Pandaria spells for Dark Heart of Pandaria
-		- Added Pandaria spells for Battle on the High Seas
-		- Added Pandaria spells for Unga Ingoo
-	v4.23.3
-		- Added Pandaria spells for Pandaria (world)
-		- Added Pandaria spells for Throne of Thunder
-		- Added Pandaria spells for Dark Heart of Pandaria
-		- Added Pandaria spells for The Secrets of Ragefire
-	v4.23.4
-		- Added Pandaria spells for Pandaria (world)
-		- Added Pandaria spells for Crypt of the Forgotten Kings
-		- Added Pandaria spells for A Brewing Storm
-		- Added Pandaria spells for Trove of the Thunder King
-		- Added/Updated Pandaria spells for Throne of Thunder (thanks Oscarucb)
-	v4.23.5
-		- Added Pandaria spells for Pandaria (world)
-		- Removed Pandaria spells for Throne of Thunder
-	v4.23.6
-		- Added Pandaria spells for Throne of Thunder
-		- Added Pandaria spells for Pandaria (world)
-	v4.23.7
-		- Updated for patch 5.4
-		- Added Pandaria spells for Proving Grounds
-		- Added Pandaria spells for Throne of Thunder
-		- Added Pandaria spells for Siege of Orgrimmar
-	v4.23.8
-		- Added Pandaria spells for Siege of Orgrimmar
-		- Added Pandaria spells for Pandaria (world)
-	v4.24
-		- Added additional detection to prevent false friendly-fire alerts
-		- Added Pandaria spells for Siege of Orgrimmar
-		- Added Pandaria spells for Pandaria (world)
-		- Added Pandaria spells for Temple of the Jade Serpent
-		- Added Pandaria spells for Gate of the Setting Sun
-	v4.24.1
-		- Added Pandaria spells for Siege of Orgrimmar
-	v4.24.2
-		- Added Pandaria spells for Siege of Orgrimmar
-		- Added Pandaria spells for Pandaria (world)
-		- Fixed Pandaria spells for The Secrets of Ragefire
-	v4.24.3
-		- Fixed Pandaria spells for Siege of Orgrimmar
-	v4.25
-		- Added support for maximum stacks for alerts
-		- Added Pandaria spells for Siege of Orgrimmar
-		- Added Pandaria spells for Pandaria (world)
-	v4.26
-		- Updated PowerAuras integration
-		- Added Pandaria spells for Siege of Orgrimmar
-		- Added Pandaria spells for Pandaria (world)
-		- Added Pandaria spells for Darkmoon Faire
-	v4.26.1
-		- Added Pandaria spells for Siege of Orgrimmar
-		- Added Pandaria spells for Brawler's Guild
-	v4.27
-		- Updated PowerAuras integration
-		- Added Pandaria spells for Siege of Orgrimmar
-	v4.27.1
-		- Added Pandaria spells for Siege of Orgrimmar (Heroic)
-		- Added Pandaria spells for Feast of Winter Veil
-	v4.27.2
-		- Added Pandaria spells for Siege of Orgrimmar (Heroic)
-	v4.28
-		- Fixed a bug with GTFO options causing Trivial damage filters to stop working
-		- Added Pandaria spells for Siege of Orgrimmar (Heroic)
-		- Updated spells for Love is in the Air
-	v4.29
-		- Updated for patch 5.4.7, resolved communication issues
-		- Raised default trivial % from .5% HP (200+ ticks to death) to 2% of HP (50+ ticks to death)
-		- Trivial slider increments in .5% intervals with .5% as the minimum
-		- /gtfo options now opens directly to the options frame
-		- Added Pandaria spells for Pandaria (world)
-	v4.30
-		- Disabled tank alerts when soloing
-		- Added Pandaria spells for Pandaria (world)
-		- Added Pandaria spells for Siege of Orgrimmar (Heroic)
-	v4.30.1
-		- Added Pandaria spells for Siege of Orgrimmar (Heroic)
-	v4.31
-		- Added support for Warlords of Draenor
-		- Added and fixed Pandaria spells for Siege of Orgrimmar (Heroic)
-		- Added Pandaria spells for Gate of the Setting Sun
-	v4.32
-		- Added an option to specify the sound channel GTFO sounds play on (default is Master)
-		- Added dialog sound channel support in Warlords of Draenor
-		- Updated Russian localization - Thanks user_kh
-		- Added Pandaria spells for Pandaria (world)
-		- Added WoD spells for Draenor (world)
-		- Added WoD spells for Auchindoun
-		- Added WoD spells for Bloodmaul Slag Mines
-		- Added WoD spells for Grimrail Depot
-		- Added WoD spells for Shadowmoon Burial Grounds
-		- Added WoD spells for Skyreach
-		- Added WoD spells for Upper Blackrock Spire
-	v4.33
-		- Disabled sound channel support UI dropdown due to possible taint issues
-		- Added Pandaria spells for Siege of Orgrimmar (Heroic) - Thanks freddy436
-	v4.34
-		- Fixed realm communication bug in Warlords of Draenor beta
-		- Added support for non-caster and caster-only alerts
-		- Added Pandaria spells for Brawler's Guild
-		- Added WoD spells for Draenor (world)
-		- Added WoD spells for Highmaul
-		- Added WoD spells for Shadowmoon Burial Grounds
-		- Added WoD spells for the Everbloom
-		- Added WoD spells for Upper Blackrock Spire
-	v4.34.1
-		- Added Traditional Chinese localization - Thanks BNSSNB
-		- Added Pandaria spells for Siege of Orgrimmar (Heroic)
-		- Added WoD spells for Highmaul
-		- Added WoD spells for Blackrock Foundry
-		- Added WoD spells for Iron Docks
-	v4.35
-		- Updated for patch 6.0
-	v4.35.1
-		- Added WoD spells for Upper Blackrock Spire
-		- Added WoD spells for Blasted Lands Event
-		- Added Pandaria spells for Brewmoon Festival
-	v4.35.2
-		- Updated mob identification for 6.0
-		- Added Wrath spells for Ulduar
-	v4.35.3
-		- Added Pandaria spells for Siege of Orgrimmar (Heroic)
-		- Added WoD spells for Draenor (world)
-		- Added WoD spells for Bloodmaul Slag Mines
-		- Added WoD spells for Iron Docks
-		- Added WoD spells for Auchindoun
-	v4.35.4
-		- Added WoD spells for Draenor (world)
-		- Added WoD spells for Shadowmoon Burial Grounds
-		- Added WoD spells for Skyreach
-		- Added WoD spells for Upper Blackrock Spire
-		- Added WoD spells for Grimrail Depot
-		- Added WoD spells for the Everbloom
-	v4.35.5
-		- Added WoD spells for Draenor (world)
-		- Added WoD spells for Grimrail Depot
-		- Added WoD spells for Shadowmoon Burial Grounds
-		- Added WoD spells for the Everbloom
-		- Updated Classic spells for Molten Core
-	v4.35.6
-		- Added WoD spells for Draenor (world)
-		- Added WoD spells for Highmaul
-		- Added WoD spells for Iron Docks
-		- Added WoD spells for Skyreach
-	v4.35.7
-		- Added and fixed WoD spells for Highmaul
-	v4.35.8
-		- Added WoD spells for Draenor (world)
-		- Added WoD spells for Highmaul
-		- Added WoD spells for Auchindoun
-		- Added WoD spells for Feast of Winter Veil
-	v4.35.9
-		- Fixed WoD spells for Grimrail Depot
-		- Added WoD spells for Draenor (world)		
-		- Added WoD spells for Highmaul
-	v4.35.10
-		- Added WoD spells for Brawler's Guild
-		- Added WoD spells for Highmaul
-		- Added WoD spells for Blackrock Foundry
-		
 ]]--
 GTFO = {
 	DefaultSettings = {
@@ -860,16 +21,19 @@ GTFO = {
 		SoundChannel = "Master"; -- Sound channel to play on
 		IgnoreOptions = { };
 		TrivialDamagePercent = 2; -- Minimum % of HP lost required for an alert to be trivial
+		SoundOverrides = { }; -- Override table for GTFO sounds
 	};
-	Version = "4.35.10"; -- Version number (text format)
-	VersionNumber = 43510; -- Numeric version number for checking out-of-date clients
+	Version = "4.57.3"; -- Version number (text format)
+	VersionNumber = 0; -- Numeric version number for checking out-of-date clients (placeholder until client is detected)
+	RetailVersionNumber = 45703; -- Numeric version number for checking out-of-date clients (retail)
+	ClassicVersionNumber = 45702; -- Numeric version number for checking out-of-date clients (classic)
 	DataLogging = nil; -- Indicate whether or not the addon needs to run the datalogging function (for hooking)
 	DataCode = "4"; -- Saved Variable versioning, change this value to force a reset to default
 	CanTank = nil; -- The active character is capable of tanking
 	CanCast = nil; -- The active character is capable of casting
 	TankMode = nil; -- The active character is a tank
 	CasterMode = nil; -- The active character is a caster
-	SpellName = { }; -- List of spells (legacy placeholder, not supported)
+	SpellName = { }; -- List of spells (for Classic only since Spell IDs are not available in the combat log)
 	SpellID = { }; -- List of spell IDs
 	FFSpellID = { }; -- List of friendly fire spell IDs
 	IgnoreSpellCategory = { }; -- List of spell groups to ignore
@@ -902,22 +66,28 @@ GTFO = {
 		DisableGTFO = nil;
 	};
 	BetaMode = nil; -- WoW Beta/PTR client detection
+	ClassicMode = nil; -- WoW Classic client detection
 	SoundChannels = { 
 		{ Code = "Master", Name = _G.MASTER },
 		{ Code = "SFX", Name = _G.SOUND_VOLUME, CVar = "Sound_EnableSFX" },
 		{ Code = "Ambience", Name = _G.AMBIENCE_VOLUME, CVar = "Sound_EnableAmbience" },
 		{ Code = "Music", Name = _G.MUSIC_VOLUME, CVar = "Sound_EnableMusic" },
-		{ Code = "Dialog", Name = _G.DIALOG_VOLUME },
+		{ Code = "Dialog", Name = _G.DIALOG_VOLUME, CVar = "Sound_EnableDialog" },
 	};
+	Scans = { };
 };
 
 GTFOData = {};
 
---[[
-if (select(4, GetBuildInfo()) >= 60000) then
+if (select(4, GetBuildInfo()) >= 90100) then
 	GTFO.BetaMode = true;
 end
-]]--
+if (select(4, GetBuildInfo()) <= 20000) then
+	GTFO.ClassicMode = true;
+	GTFO.VersionNumber = GTFO.ClassicVersionNumber;
+else
+	GTFO.VersionNumber = GTFO.RetailVersionNumber;
+end
 
 StaticPopupDialogs["GTFO_POPUP_MESSAGE"] = {
 	preferredIndex = 3,
@@ -936,22 +106,22 @@ StaticPopupDialogs["GTFO_POPUP_MESSAGE"] = {
 };	
 
 function GTFO_ChatPrint(str)
-	DEFAULT_CHAT_FRAME:AddMessage("[GTFO] "..str, 0.25, 1.0, 0.25);
+	DEFAULT_CHAT_FRAME:AddMessage("[GTFO] "..tostring(str), 0.25, 1.0, 0.25);
 end
 
 function GTFO_ErrorPrint(str)
-	DEFAULT_CHAT_FRAME:AddMessage("[GTFO] "..str, 1.0, 0.5, 0.5);
+	DEFAULT_CHAT_FRAME:AddMessage("[GTFO] "..tostring(str), 1.0, 0.5, 0.5);
 end
 
 function GTFO_DebugPrint(str)
 	if (GTFO.Settings.DebugMode) then
-		DEFAULT_CHAT_FRAME:AddMessage("[GTFO] "..str, 0.75, 1.0, 0.25);
+		DEFAULT_CHAT_FRAME:AddMessage("[GTFO] "..tostring(str), 0.75, 1.0, 0.25);
 	end
 end
 
 function GTFO_ScanPrint(str)
 	if (GTFO.Settings.ScanMode) then
-		DEFAULT_CHAT_FRAME:AddMessage("[GTFO] "..str, 0.5, 0.5, 0.85);
+		DEFAULT_CHAT_FRAME:AddMessage("[GTFO] "..tostring(str), 0.5, 0.5, 0.85);
 	end
 end
 
@@ -965,7 +135,7 @@ end
 
 function GTFO_OnEvent(self, event, ...)
 	if (event == "VARIABLES_LOADED") then
-		RegisterAddonMessagePrefix("GTFO");
+		C_ChatInfo.RegisterAddonMessagePrefix("GTFO");
 		if (GTFOData.DataCode ~= GTFO.DataCode) then
 			GTFO_SetDefaults();
 			GTFO_ChatPrint(string.format(GTFOLocal.Loading_NewDatabase, GTFO.Version));
@@ -980,14 +150,35 @@ function GTFO_OnEvent(self, event, ...)
 			UnmuteMode = GTFOData.UnmuteMode;
 			TrivialMode = GTFOData.TrivialMode;
 			NoVersionReminder = GTFOData.NoVersionReminder;
-			Volume = GTFOData.Volume;
+			Volume = GTFOData.Volume or 3;
 			TrivialDamagePercent = GTFOData.TrivialDamagePercent or GTFO.DefaultSettings.TrivialDamagePercent;
 			SoundChannel = GTFOData.SoundChannel or GTFO.DefaultSettings.SoundChannel;
 			IgnoreOptions = { };
+			SoundOverrides = { };
 		};
+		
+		-- Load spell ignore options (player set)
 		if (GTFOData.IgnoreOptions) then
 			for key, option in pairs(GTFOData.IgnoreOptions) do
 				GTFO.Settings.IgnoreOptions[key] = GTFOData.IgnoreOptions[key];
+			end
+		end
+		
+		-- Load default spell ignore options
+		if (GTFO.IgnoreSpellCategory) then
+			for key, option in pairs(GTFO.IgnoreSpellCategory) do
+				if (GTFO.IgnoreSpellCategory[key].isDefault) then
+					GTFO.DefaultSettings.IgnoreOptions[key] = true;
+					if (GTFO.Settings.IgnoreOptions[key] == nil) then
+						GTFO.Settings.IgnoreOptions[key] = true;
+					end
+				end
+			end
+		end
+		
+		if (GTFOData.SoundOverrides) then
+			for key, option in pairs(GTFOData.SoundOverrides) do
+				GTFO.Settings.SoundOverrides[key] = GTFOData.SoundOverrides[key];
 			end
 		end
 
@@ -1060,6 +251,11 @@ function GTFO_OnEvent(self, event, ...)
 		GTFO.TankMode = GTFO_CheckTankMode();
 		GTFO.CasterMode = GTFO_CheckCasterMode();
 		GTFO_SendUpdateRequest();
+		
+		if (GTFO.ClassicMode) then
+			GTFO_ScanSpells();
+		end
+		
 		return;
 	end
 	if (event == "COMBAT_LOG_EVENT_UNFILTERED") then
@@ -1070,8 +266,8 @@ function GTFO_OnEvent(self, event, ...)
 			end
 		end
 
-		local timestamp, eventType, hideCaster, sourceGUID, sourceName, sourceFlags, sourceRaidFlags, destGUID, destName, destFlags, destRaidFlags, misc1, misc2, misc3, misc4, misc5, misc6, misc7 = ...; 
-
+		local timestamp, eventType, hideCaster, sourceGUID, sourceName, sourceFlags, sourceRaidFlags, destGUID, destName, destFlags, destRaidFlags, misc1, misc2, misc3, misc4, misc5, misc6, misc7 = CombatLogGetCurrentEventInfo(); 
+		
 		local SpellType = tostring(eventType);
 		local vehicle = nil;
 
@@ -1097,7 +293,13 @@ function GTFO_OnEvent(self, event, ...)
 						local SpellID = tonumber(misc1);
 						local SpellName = tostring(misc2);
 						local SpellSourceGUID = tostring(sourceGUID);
-						SpellID = tostring(SpellID);
+						
+						if (GTFO.ClassicMode) then
+							SpellID = tostring(GTFO.SpellName[SpellName] or SpellID or 0)
+						else
+							SpellID = tostring(SpellID);
+						end
+						
 						--GTFO_ScanPrint(SpellType.." - "..SpellID.." - "..SpellName.." - "..SpellSourceName.." ("..GTFO_GetMobId(sourceGUID)..") >"..tostring(destName));
 						if (GTFO.FFSpellID[SpellID]) then
 							-- Friendly fire alerts
@@ -1196,13 +398,27 @@ function GTFO_OnEvent(self, event, ...)
 				SpellID = 17086;
 			end
 			
-			SpellID = tostring(SpellID);
-
+			if (GTFO.ClassicMode) then
+				SpellID = tostring(GTFO.SpellName[SpellName] or SpellID or 0)
+			else
+				SpellID = tostring(SpellID);
+			end
+						
 			if (GTFO.Settings.ScanMode and not GTFO.IgnoreScan[SpellID]) then
 				if (vehicle) then
 					GTFO_ScanPrint("V: "..SpellType.." - "..SpellID.." - "..GetSpellLink(SpellID).." - "..SpellSourceName.." ("..GTFO_GetMobId(sourceGUID)..") >"..tostring(destName));
+					GTFO_SpellScan(SpellID, SpellSourceName);
 				elseif (SpellType~="SPELL_ENERGIZE" or (SpellType=="SPELL_ENERGIZE" and sourceGUID ~= UnitGUID("player"))) then
-					GTFO_ScanPrint(SpellType.." - "..SpellID.." - "..GetSpellLink(SpellID).." - "..SpellSourceName.." ("..GTFO_GetMobId(sourceGUID)..") >"..tostring(destName).." for "..tostring(misc4));
+					if (GTFO.ClassicMode) then
+						GTFO_ScanPrint(SpellType.." - "..SpellID.." - "..SpellName.." - "..SpellSourceName.." ("..GTFO_GetMobId(sourceGUID)..") >"..tostring(destName).." for "..tostring(misc4));
+					else
+						GTFO_ScanPrint(SpellType.." - "..SpellID.." - "..GetSpellLink(SpellID).." - "..SpellSourceName.." ("..GTFO_GetMobId(sourceGUID)..") >"..tostring(destName).." for "..tostring(misc4));
+					end
+					if (GTFO.ClassicMode) then
+						GTFO_SpellScanName(SpellName, SpellSourceName, tostring(misc4));
+					else
+						GTFO_SpellScan(SpellID, SpellSourceName, tostring(misc4));
+					end
 				end
 			end
 			if (GTFO.SpellID[SpellID]) then
@@ -1212,6 +428,12 @@ function GTFO_OnEvent(self, event, ...)
 						--GTFO_DebugPrint("Won't alert "..SpellName.." ("..SpellID..") - Player activated ignore option: "..GTFO.SpellID[SpellID].category);
 						return;						
 					end
+				end
+
+				if (GTFO.SpellID[SpellID].spellType and not (GTFO.SpellID[SpellID].spellType == SpellType)) then
+					--GTFO_DebugPrint("Won't alert "..SpellName.." ("..SpellID..") - Wrong Spell Type");
+					-- Wrong spell type
+					return;
 				end
 
 				if (vehicle and not GTFO.SpellID[SpellID].vehicle) then
@@ -1309,6 +531,16 @@ function GTFO_OnEvent(self, event, ...)
 						-- Application Only is set and this was a non-application event
 						return;
 					end
+				end
+				if (GTFO.SpellID[SpellID].ignoreApplication and (SpellType == "SPELL_AURA_APPLIED" or SpellType == "SPELL_AURA_APPLIED_DOSE" or SpellType == "SPELL_AURA_REFRESH")) then
+					--GTFO_DebugPrint("Won't alert "..SpellName.." ("..SpellID..") - Ignore application event");
+					-- Debuff application and "Ignore Application" is set
+					return;					
+				end
+				if (GTFO.SpellID[SpellID].trivialLevelApplication and GTFO.SpellID[SpellID].trivialLevelApplication <= UnitLevel("player") and (SpellType == "SPELL_AURA_APPLIED" or SpellType == "SPELL_AURA_APPLIED_DOSE" or SpellType == "SPELL_AURA_REFRESH")) then
+					--GTFO_DebugPrint("Won't alert "..SpellName.." ("..SpellID..") - Ignore trivial level application event");
+					-- Debuff application and "Ignore Application when above trivial level" is set
+					return;					
 				end
 				if (GTFO.SpellID[SpellID].ignoreSelfInflicted and SpellSourceGUID == UnitGUID("player")) then
 					--GTFO_DebugPrint("Won't alert "..SpellName.." ("..SpellID..") - Ignore self inflicted");
@@ -1458,7 +690,8 @@ function GTFO_OnEvent(self, event, ...)
 		return;
 	end
 	if (event == "ACTIVE_TALENT_GROUP_CHANGED" or event == "PLAYER_TALENT_UPDATE") then
-		--GTFO_DebugPrint("Spec changed, check caster mode -- "..event);
+		--GTFO_DebugPrint("Spec changed, check tank/caster mode -- "..event);
+		GTFO.TankMode = GTFO_CheckTankMode();
 		GTFO.CasterMode = GTFO_CheckCasterMode();
 		return;
 	end
@@ -1528,6 +761,10 @@ function GTFO_Command(arg1)
 		GTFO_Command_Test(4);
 	elseif (Command == "NOVERSION") then
 		GTFO_Command_VersionReminder();
+	elseif (Command == "DATA") then
+		GTFO_Command_Data();
+	elseif (Command == "CLEAR") then
+		GTFO_Command_ClearData();
 	elseif (Command == "HELP" or Command == "") then
 		GTFO_Command_Help();
 	else
@@ -1649,26 +886,39 @@ function GTFO_PlaySound(iSound, bOverride)
 	if (bOverride or GTFO.Settings.Sounds[iSound]) then
 		local soundChannel = GTFO.Settings.SoundChannel;
 		if (bOverride) then
-			--soundChannel = UIDropDownMenu_GetSelectedValue(GTFO_SoundChannelDropdown) or soundChannel;
+			soundChannel = L_UIDropDownMenu_GetSelectedValue(GTFO_SoundChannelDropdown) or soundChannel;
 		end
 		if (bOverride and getglobal("GTFO_UnmuteButton"):GetChecked()) then
 			GTFO_UnmuteSound(GTFO.SoundTimes[iSound], soundChannel);
 		elseif (GTFO.Settings.UnmuteMode and GTFO.SoundTimes[iSound] and not bOverride) then
 			GTFO_UnmuteSound(GTFO.SoundTimes[iSound], soundChannel);
 		end
-		PlaySoundFile(GTFO.Sounds[iSound], soundChannel);
-		if (GTFO.Settings.Volume >= 4) then
+		if (GTFO.Settings.SoundOverrides[iSound]) then
+			PlaySoundFile(GTFO.Settings.SoundOverrides[iSound], soundChannel);
+		else
 			PlaySoundFile(GTFO.Sounds[iSound], soundChannel);
 		end
+		
+		if (GTFO.Settings.Volume >= 4) then
+			if (GTFO.Settings.SoundOverrides[iSound]) then
+				PlaySoundFile(GTFO.Settings.SoundOverrides[iSound], soundChannel);
+			else
+				PlaySoundFile(GTFO.Sounds[iSound], soundChannel);
+			end
+		end
 		if (GTFO.Settings.Volume >= 5) then
-			PlaySoundFile(GTFO.Sounds[iSound], soundChannel);
+			if (GTFO.Settings.SoundOverrides[iSound]) then
+				PlaySoundFile(GTFO.Settings.SoundOverrides[iSound], soundChannel);
+			else
+				PlaySoundFile(GTFO.Sounds[iSound], soundChannel);
+			end
 		end
 	end
 	GTFO_DisplayAura(iSound);
 end
 
 -- Create Addon Menu options and interface
---local GTFO_SoundChannelDropdown;
+local GTFO_SoundChannelDropdown;
 function GTFO_RenderOptions()
 	GTFO.UIRendered = true;
 
@@ -1776,20 +1026,18 @@ function GTFO_RenderOptions()
 	TestModeButton.tooltip = GTFOLocal.UI_TestModeDescription.."\n\n"..string.format(GTFOLocal.UI_TestModeDescription2,"zensunim","gmail","com");
 	getglobal(TestModeButton:GetName().."Text"):SetText(GTFOLocal.UI_TestMode);
 
-	--[[
 	local SoundChannelText = ConfigurationPanel:CreateFontString("GTFO_SoundChannelText","ARTWORK","GameFontNormal");
 	SoundChannelText:SetPoint("TOPLEFT", 10, -330);
 	SoundChannelText:SetText(GTFOLocal.UI_SoundChannel);
 	SoundChannelText.tooltip = UI_SoundChannelDescription;
 	
-	GTFO_SoundChannelDropdown = CreateFrame("Button", "GTFO_SoundChannelDropdown", ConfigurationPanel, "UIDropDownMenuTemplate");
+	GTFO_SoundChannelDropdown = L_Create_UIDropDownMenu("GTFO_SoundChannelDropdown", ConfigurationPanel);
 	GTFO_SoundChannelDropdown:SetPoint("TOPLEFT", 10, -350)
-	UIDropDownMenu_Initialize(GTFO_SoundChannelDropdown, GTFO_SoundChannelDropdownInitialize);
-  UIDropDownMenu_SetWidth(GTFO_SoundChannelDropdown, 150);
-  UIDropDownMenu_SetButtonWidth(GTFO_SoundChannelDropdown, 124);
-  UIDropDownMenu_SetSelectedValue(GTFO_SoundChannelDropdown, GTFO.Settings.SoundChannel);
-  UIDropDownMenu_JustifyText(GTFO_SoundChannelDropdown, "LEFT");
-  ]]--
+	L_UIDropDownMenu_Initialize(GTFO_SoundChannelDropdown, GTFO_SoundChannelDropdownInitialize);
+	L_UIDropDownMenu_SetWidth(GTFO_SoundChannelDropdown, 150);
+	L_UIDropDownMenu_SetButtonWidth(GTFO_SoundChannelDropdown, 124);
+	L_UIDropDownMenu_SetSelectedValue(GTFO_SoundChannelDropdown, GTFO.Settings.SoundChannel);
+	L_UIDropDownMenu_JustifyText(GTFO_SoundChannelDropdown, "LEFT");
 
 	-- Special Alerts frame
 
@@ -1819,6 +1067,8 @@ function GTFO_RenderOptions()
 	GTFOSpellTooltip:ClearLines();
 
 	-- Confirmation buttons Logic
+	GTFO.Settings.OriginalVolume = GTFO.Settings.Volume;
+	GTFO.Settings.OriginalTrivialDamagePercent = GTFO.Settings.TrivialDamagePercent;
 
 	ConfigurationPanel.okay = 
 		function (self)
@@ -1829,28 +1079,27 @@ function GTFO_RenderOptions()
 			GTFO.Settings.Sounds[4] = FriendlyFireSoundButton:GetChecked();
 			GTFO.Settings.Volume = VolumeSlider:GetValue();
 			GTFO.Settings.TrivialDamagePercent = TrivialDamageSlider:GetValue();
-			--GTFO.Settings.SoundChannel = SoundChannelDropdown:GetValue();
 			GTFO.Settings.TestMode = TestModeButton:GetChecked();
 			GTFO.Settings.UnmuteMode = UnmuteButton:GetChecked();
 			GTFO.Settings.TrivialMode = TrivialButton:GetChecked();
 			for key, option in pairs(GTFO.IgnoreSpellCategory) do
 				if (getglobal("GTFO_IgnoreAlertButton_"..key):GetChecked()) then
-					GTFO.Settings.IgnoreOptions[key] = nil;
+					GTFO.Settings.IgnoreOptions[key] = false;
 				else
 					-- Option unchecked, add to ignore list
 					GTFO.Settings.IgnoreOptions[key] = true;
 				end
 			end
-			--GTFO.Settings.SoundChannel = UIDropDownMenu_GetSelectedValue(GTFO_SoundChannelDropdown);
+			GTFO.Settings.SoundChannel = L_UIDropDownMenu_GetSelectedValue(GTFO_SoundChannelDropdown);
 
 			GTFO_SaveSettings();
 		end
 	ConfigurationPanel.cancel = 
 		function (self)
-			VolumeSlider:SetValue(GTFO.Settings.Volume);
-			TrivialDamageSlider:SetValue(GTFO.Settings.TrivialDamagePercent);
-			--UIDropDownMenu_Initialize(GTFO_SoundChannelDropdown, GTFO_SoundChannelDropdownInitialize);
-			--UIDropDownMenu_SetSelectedValue(GTFO_SoundChannelDropdown, GTFO.Settings.SoundChannel);
+			VolumeSlider:SetValue(GTFO.Settings.OriginalVolume);
+			TrivialDamageSlider:SetValue(GTFO.Settings.OriginalTrivialDamagePercent);
+			L_UIDropDownMenu_Initialize(GTFO_SoundChannelDropdown, GTFO_SoundChannelDropdownInitialize);
+			L_UIDropDownMenu_SetSelectedValue(GTFO_SoundChannelDropdown, GTFO.Settings.SoundChannel);
 			GTFO_SaveSettings();
 		end
 	ConfigurationPanel.default = 
@@ -1860,19 +1109,17 @@ function GTFO_RenderOptions()
 end
 
 function GTFO_SoundChannelDropdownInitialize(self, level)
-  --[[
   for id, soundChannel in pairs(GTFO.SoundChannels) do
     local info;
-    info = UIDropDownMenu_CreateInfo();
+    info = L_UIDropDownMenu_CreateInfo();
     info.text = soundChannel.Name;
     info.value = soundChannel.Code;
     info.arg1 = id;
     info.func = function(self, arg1, arg2, checked)
-    	UIDropDownMenu_SetSelectedValue(GTFO_SoundChannelDropdown, self.value);
+    	L_UIDropDownMenu_SetSelectedValue(GTFO_SoundChannelDropdown, self.value);
     end
-    UIDropDownMenu_AddButton(info, level);
+    L_UIDropDownMenu_AddButton(info, level);
   end
-  ]]--
 end
 
 function GTFO_RefreshOptions()
@@ -1888,7 +1135,9 @@ function GTFO_RefreshOptions()
 				
 					GTFOSpellTooltip:SetOwner(_G["GTFOFrame"],"ANCHOR_NONE");
 					GTFOSpellTooltip:ClearLines();
-					GTFOSpellTooltip:SetHyperlink(GetSpellLink(spellID));
+					if (not GTFO.ClassicMode) then
+						GTFOSpellTooltip:SetHyperlink(GetSpellLink(spellID));
+					end
 					local tooltipText = tostring(getglobal("GTFOSpellTooltipTextLeft1"):GetText());
 					if (GTFOSpellTooltip:NumLines()) then
 						if (getglobal("GTFOSpellTooltipTextLeft"..tostring(GTFOSpellTooltip:NumLines()))) then
@@ -2092,7 +1341,7 @@ function GTFO_SendUpdate(sMethod)
 	GTFO.IgnoreUpdateTime = currentTime + GTFO.IgnoreUpdateTimeAmount;
 
 	--GTFO_DebugPrint("Sending version info to "..sMethod);
-	SendAddonMessage("GTFO","V:"..GTFO.VersionNumber,sMethod)
+	C_ChatInfo.SendAddonMessage("GTFO","V:"..GTFO.VersionNumber,sMethod)
 end
 
 function GTFO_SendUpdateRequest()
@@ -2111,11 +1360,11 @@ function GTFO_SendUpdateRequest()
 	end
 	
 	if (IsInGroup(LE_PARTY_CATEGORY_INSTANCE)) then
-		SendAddonMessage("GTFO","U:INSTANCE_CHAT","INSTANCE_CHAT");
+		C_ChatInfo.SendAddonMessage("GTFO","U:INSTANCE_CHAT","INSTANCE_CHAT");
 	elseif (raidmembers > 0) then
-		SendAddonMessage("GTFO","U:RAID","RAID");
+		C_ChatInfo.SendAddonMessage("GTFO","U:RAID","RAID");
 	elseif (partymembers > 0) then
-		SendAddonMessage("GTFO","U:PARTY","PARTY");
+		C_ChatInfo.SendAddonMessage("GTFO","U:PARTY","PARTY");
 	end
 end
 
@@ -2129,7 +1378,8 @@ function GTFO_Option_SetVolume()
 	if (not GTFO.UIRendered) then
 		return;
 	end
-	GTFO.Settings.Volume = getglobal("GTFO_VolumeSlider"):GetValue() * 1;
+	GTFO.Settings.Volume = math.floor(getglobal("GTFO_VolumeSlider"):GetValue());
+	getglobal("GTFO_VolumeSlider"):SetValue(GTFO.Settings.Volume);
 	GTFO_GetSounds();
 	GTFO_Option_SetVolumeText(GTFO.Settings.Volume)
 end
@@ -2165,7 +1415,7 @@ function GTFO_Option_SetSoundChannel()
 		return;
 	end
 	GTFO.Settings.SoundChannel = "Master";
-	--getglobal("GTFO_SoundChannelDropdown"):SetValue(GTFO.Settings.SoundChannel);
+	getglobal("GTFO_SoundChannelDropdown"):SetValue(GTFO.Settings.SoundChannel);
 end
 
 function GTFO_Option_SetTrivialDamageText(iTrivialDamagePercent)
@@ -2179,53 +1429,23 @@ end
 function GTFO_CheckTankMode()
 	if (GTFO.CanTank) then
 		local x, class = UnitClass("player");
-		if (class == "PALADIN") then
-			-- While it's more obvious to check for Righteous Fury, that ended up being more CPU intensive than desired
-			-- Checking for the shield is good enough.
-			if (GetInventoryItemID("PLAYER",17)) then
-				local itemName, itemLink, itemRarity, itemLevel, itemMinLevel, itemType, itemSubType, itemStackCount, itemEquipLoc, itemTexture, itemSellPrice = GetItemInfo(GetInventoryItemID("PLAYER",17));
-				local itemStats = {};
-				if (not itemLink) then
-						--GTFO_DebugPrint("Item found, but unable to scan it - Tank mode off for now");
-						return nil;						
-				end
-				itemStats = GetItemStats(itemLink, itemStats);
-				for statType, statValue in pairs(itemStats) do
-					if (statType == "ITEM_MOD_INTELLECT_SHORT" or statType == "ITEM_MOD_SPIRIT_SHORT") then
-						--GTFO_DebugPrint("Healing Shield found - Tank mode off");
-						return nil;
-					end
-				end
-				--GTFO_DebugPrint("Tanking Shield found - tank mode activated");
+		if (class == "DRUID") then
+			local stance = GetShapeshiftForm();
+			if (stance == 1) then
+				--GTFO_DebugPrint("Bear Form found - tank mode activated");
 				return true;
 			end
-		else
-			local stance = GetShapeshiftForm();
-			if (class == "DRUID") then
-				if (stance == 1) then
-					--GTFO_DebugPrint("Bear Form found - tank mode activated");
-					return true;
-				end
-			elseif (class == "DEATHKNIGHT") then
-				if (stance == 1) then
-					--GTFO_DebugPrint("Blood Presence found - tank mode activated");
-					return true;
-				end
-			elseif (class == "WARRIOR") then
-				if (stance == 2) then
-					--GTFO_DebugPrint("Defensive stance found - tank mode activated");
-					return true;
-				end
-			elseif (class == "MONK") then
-				local spec = GetSpecialization();
-				if (spec and GetSpecializationRole(spec) == "TANK" and stance == 1) then
-					--GTFO_DebugPrint("Ox stance found - tank mode activated");
-					return true;
-				end
-			else
-				--GTFO_DebugPrint("Failed Tank Mode - This code shouldn't have ran");
-				GTFO.CanTank = nil;
+		elseif ((not GTFO.ClassicMode) and (class == "MONK" or class == "DEMONHUNTER" or class == "WARRIOR" or class == "DEATHKNIGHT" or class == "PALADIN")) then
+			local spec = GetSpecialization();
+			if (spec and GetSpecializationRole(spec) == "TANK") then
+				--GTFO_DebugPrint("Tank spec found - tank mode activated");
+				return true;
 			end
+		elseif ((GTFO.ClassicMode) and (class == "WARRIOR" or class == "PALADIN")) then
+			GTFO.CanTank = true;
+		else
+			--GTFO_DebugPrint("Failed Tank Mode - This code shouldn't have ran");
+			GTFO.CanTank = nil;
 		end
 	end
 	--GTFO_DebugPrint("Tank mode off");
@@ -2240,23 +1460,30 @@ function GTFO_CheckCasterMode()
 			return true;
 		end
 
-		local spec = GetSpecialization();
-		if (spec) then
-			local role = GetSpecializationRole(spec);
-			if (role == "TANK") then
-				return nil;
+		if not (GTFO.ClassicMode) then
+			local spec = GetSpecialization();
+			if (spec) then
+				local role = GetSpecializationRole(spec);
+				if (role == "TANK") then
+					return nil;
+				end
+				if (role == "HEALER") then
+					return true;
+				end
+			
+				local id, _ = GetSpecializationInfo(spec);
+				if (id == 102) then
+					-- Balance Druid
+					return true;
+				end
+				if (id == 262) then
+					-- Elemental Shaman
+					return true;
+				end
 			end
-			if (role == "HEALER") then
-				return true;
-			end
-		
-			local id, _ = GetSpecializationInfo(spec);
-			if (id == 102) then
-				-- Balance Druid
-				return true;
-			end
-			if (id == 262) then
-				-- Elemental Shaman
+		else
+			if (class == "DRUID" or class == "PALADIN" or class == "SHAMAN") then
+				-- Classic Detection (check for caster mode)
 				return true;
 			end
 		end
@@ -2283,7 +1510,7 @@ function GTFO_IsTank(target)
 			if (GTFO_HasBuff(target, 48263)) then
 				return true;
 			end
-		elseif (class == "WARRIOR" or class == "MONK") then
+		elseif (class == "WARRIOR" or class == "MONK" or class == "DEMONHUNTER") then
 			-- No definitive way to determine...take a guess.
 			if (UnitGroupRolesAssigned(target) == "TANK" or GetPartyAssignment("MAINTANK", target)) then
 				return true;
@@ -2295,7 +1522,7 @@ end
 
 function GTFO_CanTankCheck(target)
 	local _, class = UnitClass(target);
-	if (class == "PALADIN" or class == "DRUID" or class == "DEATHKNIGHT" or class == "WARRIOR" or class == "MONK") then
+	if (class == "PALADIN" or class == "DRUID" or class == "DEATHKNIGHT" or class == "WARRIOR" or class == "MONK" or class == "DEMONHUNTER") then
 		----GTFO_DebugPrint("Possible tank detected for "..target);
 		return true;
 	else
@@ -2325,8 +1552,10 @@ function GTFO_RegisterTankEvents()
 end
 
 function GTFO_RegisterCasterEvents()
-	GTFOFrame:RegisterEvent("ACTIVE_TALENT_GROUP_CHANGED");
-	GTFOFrame:RegisterEvent("PLAYER_TALENT_UPDATE");	
+	if not (GTFO.ClassicMode) then
+		GTFOFrame:RegisterEvent("ACTIVE_TALENT_GROUP_CHANGED");
+		GTFOFrame:RegisterEvent("PLAYER_TALENT_UPDATE");	
+	end
 end
 
 -- Cache sound file locations 
@@ -2382,6 +1611,15 @@ function GTFO_SaveSettings()
 			GTFOData.IgnoreOptions[key] = GTFO.Settings.IgnoreOptions[key];
 		end
 	end
+	GTFOData.SoundOverrides = { };
+	if (GTFO.Settings.SoundOverrides) then
+		for key, option in pairs(GTFO.Settings.SoundOverrides) do
+			GTFOData.SoundOverrides[key] = GTFO.Settings.SoundOverrides[key];
+		end
+	end
+
+	GTFO.Settings.OriginalVolume = GTFO.Settings.Volume;
+	GTFO.Settings.OriginalTrivialDamagePercent = GTFO.Settings.TrivialDamagePercent;
 	
 
 	if (GTFO.UIRendered) then
@@ -2422,10 +1660,11 @@ function GTFO_SetDefaults()
 	if (GTFO.UIRendered) then
 		getglobal("GTFO_VolumeSlider"):SetValue(GTFO.DefaultSettings.Volume);
 		getglobal("GTFO_TrivialDamageSlider"):SetValue(GTFO.DefaultSettings.TrivialDamagePercent);
-		--UIDropDownMenu_Initialize(GTFO_SoundChannelDropdown, GTFO_SoundChannelDropdownInitialize);
-		--UIDropDownMenu_SetSelectedValue(GTFO_SoundChannelDropdown, GTFO.Settings.SoundChannel);
+		L_UIDropDownMenu_Initialize(GTFO_SoundChannelDropdown, GTFO_SoundChannelDropdownInitialize);
+		L_UIDropDownMenu_SetSelectedValue(GTFO_SoundChannelDropdown, GTFO.Settings.SoundChannel);
 	end
 	GTFO.Settings.IgnoreOptions = GTFO.DefaultSettings.IgnoreOptions;
+	GTFO.Settings.SoundOverrides = GTFO.DefaultSettings.SoundOverrides;
 	GTFO_SaveSettings();
 end
 
@@ -2435,8 +1674,7 @@ function GTFO_DisplayConfigPopupMessage()
 end
 
 function GTFO_HasBuff(target, iSpellID)
-	local spellName = GetSpellInfo(tonumber(iSpellID));
-	if (spellName and UnitBuff(target, spellName)) then
+	if (GTFO_GetBuffSpellIndex(target, iSpellID)) then
 		return true;
 	else
 		return nil;
@@ -2444,8 +1682,7 @@ function GTFO_HasBuff(target, iSpellID)
 end
 
 function GTFO_HasDebuff(target, iSpellID)
-	local spellName = GetSpellInfo(tonumber(iSpellID));
-	if (spellName and UnitDebuff(target, spellName)) then
+	if (GTFO_GetDebuffSpellIndex(target, iSpellID)) then
 		return true;
 	else
 		return nil;
@@ -2455,12 +1692,48 @@ end
 function GTFO_DebuffStackCount(target, iSpellID)
 	local spellName = GetSpellInfo(tonumber(iSpellID));
 	if (spellName) then
-		local debuffInfo = select(4, UnitDebuff(target, spellName));
+		local debuffInfo;
+		local debuffIndex = GTFO_GetDebuffSpellIndex(target, iSpellID);
+		if (debuffIndex) then
+			debuffInfo = select(3, UnitDebuff(target, debuffIndex));
+		end
 		if (debuffInfo) then
 			return tonumber(debuffInfo);
 		end
 	end
 	return 0;
+end
+
+function GTFO_GetBuffSpellIndex(target, iSpellID)
+	if (iSpellID) then
+		for i = 1, 40, 1 do
+			local buff = select(10, UnitBuff(target, i));
+			if (buff) then
+				if (tonumber(buff) == tonumber(iSpellID)) then
+					return i;
+				end
+			else
+				return nil;
+			end
+		end
+	end
+	return nil;
+end
+
+function GTFO_GetDebuffSpellIndex(target, iSpellID)
+	if (iSpellID) then
+		for i = 1, 40, 1 do
+			local debuff = select(10, UnitDebuff(target, i));
+			if (debuff) then
+				if (tonumber(debuff) == tonumber(iSpellID)) then
+					return i;
+				end
+			else
+				return nil;
+			end
+		end
+	end
+	return nil;
 end
 
 function GTFO_GetAlertID(alert, target)
@@ -2494,14 +1767,21 @@ function GTFO_GetAlertID(alert, target)
 		elseif (alert.soundLFR) then
 			alertLevel = alert.soundLFR;
 		end
-	elseif (alert.soundHeroic or alert.soundChallenge or (tankAlert and (alert.tankSoundHeroic or alert.tankSoundChallenge))) then
-		local isHeroic, isChallenge = select(3, GetDifficultyInfo(select(3, GetInstanceInfo())));
+	elseif (alert.soundHeroic or alert.soundMythic or alert.soundChallenge or (tankAlert and (alert.tankSoundHeroic or alert.tankSoundMythic or alert.tankSoundChallenge))) then
+		local isHeroic, isChallenge, _, isMythic = select(3, GetDifficultyInfo(select(3, GetInstanceInfo())));
 		if (isChallenge == true) then
-			-- Challenge Mode
-			if (tankAlert and (alert.tankSoundChallenge or alert.tankSoundHeroic)) then
-				alertLevel = alert.tankSoundChallenge or alert.tankSoundHeroic;
-			elseif (alert.soundChallenge or alert.soundHeroic) then
-				alertLevel = alert.soundChallenge or alert.soundHeroic;
+			-- Mythic+/Challenge Mode
+			if (tankAlert and (alert.tankSoundChallenge or alert.tankSoundMythic or alert.tankSoundHeroic)) then
+				alertLevel = alert.tankSoundChallenge or alert.tankSoundMythic or alert.tankSoundHeroic;
+			elseif (alert.soundChallenge or alert.soundMythic or alert.soundHeroic) then
+				alertLevel = alert.soundChallenge or alert.soundMythic or alert.soundHeroic;
+			end
+		elseif (isMythic == true) then
+			-- Mythic Mode
+			if (tankAlert and (alert.tankSoundMythic or alert.tankSoundHeroic)) then
+				alertLevel = alert.tankSoundMythic or alert.tankSoundHeroic;
+			elseif (alert.soundMythic or alert.soundHeroic) then
+				alertLevel = alert.soundMythic or alert.soundHeroic;
 			end
 		elseif (isHeroic == true) then
 			-- Heroic Mode
@@ -2642,4 +1922,111 @@ end
 
 function GTFO_GetRealmName()
 	return gsub(GetRealmName(), "%s", "");
+end
+
+function GTFO_SpellScan(spellId, spellOrigin, spellDamage)
+	if (GTFO.Settings.ScanMode) then
+		local damage = tonumber(spellDamage) or 0;
+		if not (GTFO.Scans[spellId] or GTFO.SpellID[spellId] or GTFO.FFSpellID[spellId] or GTFO.IgnoreScan[spellId]) then
+			GTFO.Scans[spellId] = {
+				TimeAdded = GetTime();
+				Times = 1;
+				SpellID = spellId;
+				SpellName = tostring(select(1, GetSpellInfo(spellId)));
+				SpellDescription = GetSpellDescription(spellId) or "";
+				SpellOrigin = tostring(spellOrigin);
+				IsDebuff = (spellDamage == "DEBUFF");
+				Damage = damage;
+			};
+		elseif (GTFO.Scans[spellId]) then
+			GTFO.Scans[spellId].Times = GTFO.Scans[spellId].Times + 1;
+			GTFO.Scans[spellId].Damage = GTFO.Scans[spellId].Damage + damage;
+		end
+	end
+end
+
+function GTFO_SpellScanName(spellName, spellOrigin, spellDamage)
+	if (GTFO.Settings.ScanMode) then
+		local damage = tonumber(spellDamage) or 0;
+		if not (GTFO.Scans[spellName] or GTFO.SpellName[spellName] or GTFO.IgnoreScan[spellName]) then
+			GTFO.Scans[spellName] = {
+				TimeAdded = GetTime();
+				Times = 1;
+				SpellID = 0;
+				SpellName = spellName;
+				SpellOrigin = tostring(spellOrigin);
+				IsDebuff = (spellDamage == "DEBUFF");
+				Damage = damage;
+			};
+		elseif (GTFO.Scans[spellName]) then
+			GTFO.Scans[spellName].Times = GTFO.Scans[spellName].Times + 1;
+			GTFO.Scans[spellName].Damage = GTFO.Scans[spellName].Damage + damage;
+		end
+	end
+end
+
+function GTFO_Command_Data()
+	if (next(GTFO.Scans) == nil) then
+		GTFO_ErrorPrint("No scan data available.");
+		return;
+	end
+	if (not PratCCFrame) then
+		GTFO_ErrorPrint("Prat Addon is required to use this feature.");
+		return;
+	end
+
+	local dataOutput = "";
+	local scans = { };
+	for key, data in pairs(GTFO.Scans) do
+    table.insert(scans, data);
+  end
+  table.sort(scans, (function(a, b) return tonumber(a.TimeAdded) < tonumber(b.TimeAdded) end));
+  
+	for _, data in pairs(scans) do
+		dataOutput = dataOutput.."-- |cff00ff00"..tostring(data.SpellName).." (x"..data.Times;
+
+		if (data.SpellDescription == nil or data.SpellDescription == "") then
+			data.SpellDescription = GetSpellDescription(data.SpellID) or "";
+		end
+		
+		if (data.Damage > 0) then
+			dataOutput = dataOutput..", "..data.Damage
+		end
+		dataOutput = dataOutput..")|r\n";
+		dataOutput = dataOutput.."-- |cff00aa00"..tostring(data.SpellDescription or "").."|r\n";
+		dataOutput = dataOutput.."GTFO.SpellID[\""..data.SpellID.."\"] = {\n";
+		dataOutput = dataOutput.."  --desc = \""..tostring(data.SpellName).." ("..tostring(data.SpellOrigin)..")\";\n";
+		if (data.IsDebuff) then
+			dataOutput = dataOutput.."  applicationOnly = true;\n";
+		end
+		dataOutput = dataOutput.."  sound = 1;\n";
+		dataOutput = dataOutput.."};\n";
+		dataOutput = dataOutput.."\n";
+	end
+
+	local display = "|cffffffff"..dataOutput.."|r"
+	PratCCText:SetText("GTFO Spells");
+	PratCCFrameScrollText:SetText(display);
+	PratCCFrame:Show()
+end
+
+function GTFO_Command_ClearData()
+	GTFO.Scans = { };
+	return;
+end
+
+function GTFO_ScanSpells()
+	GTFO.SpellName = { };
+	for spellId, record in pairs(GTFO.SpellID) do
+		local spellName = GetSpellInfo(spellId);
+		if (spellName or "" ~= "") then
+			if (GTFO.SpellName[spellName] ~= nil) then
+			GTFO_ErrorPrint("Duplicate spell "..spellName.." from ID #"..tostring(spellId));
+			else
+				GTFO.SpellName[spellName] = spellId;
+			end
+		else
+			GTFO_ErrorPrint("Unknown or invalid spell ID #"..tostring(spellId));
+		end
+	end		
 end

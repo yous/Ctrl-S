@@ -7,10 +7,6 @@ local L
 -----------------
 L= DBM:GetModLocalization(192)
 
-L:SetOptionLocalization({
-	RangeFrame			= "Exibir medidor de distância (10)"
-})
-
 L:SetMiscLocalization({
 	EmoteSpiderlings 	= "Spiderlings have been roused from their nest!"
 })
@@ -41,14 +37,12 @@ L:SetOptionLocalization({
 	WarnNewInitiate		= "Exibir aviso quando Novato do Gadanho Flamejante surge",
 	timerNextInitiate	= "Exibir cronógrafo para o próximo Novato do Gadanho Flamejante",
 	TimerPhaseChange	= "Exibir cronógrafo para a próxima fase",
-	TimerHatchEggs		= "Exibir cronógrafo para quando os próximos ovos chocarem",
-	InfoFrame			= "Exibir quadro de informações para Penas Ígneas"
+	TimerHatchEggs		= "Exibir cronógrafo para quando os próximos ovos chocarem"
 })
 
 L:SetMiscLocalization({
 	YellPull		= "I serve a new master now, mortals!",
 	YellPhase2		= "These skies are MINE!",
-	FullPower		= "spell:99925",--This is in the emote, shouldn't need localizing, just msg:find
 	LavaWorms		= "Fiery Lava Worms erupt from the ground!",--Might use this one day if i feel it needs a warning for something. Or maybe pre warning for something else (like transition soon)
 	PowerLevel		= "Penas Ígneas",
 	East			= "Leste",
@@ -60,16 +54,6 @@ L:SetMiscLocalization({
 -- Shannox --
 -------------
 L= DBM:GetModLocalization(195)
-
-L:SetOptionLocalization({
-	SetIconOnFaceRage	= DBM_CORE_AUTO_ICONS_OPTION_TEXT:format(99945),
-	SetIconOnRage		= DBM_CORE_AUTO_ICONS_OPTION_TEXT:format(100415)
-})
-
-L:SetMiscLocalization({
-	Riplimb		= "Ranca-membro",
-	Rageface	= "Face da Fúria"
-})
 
 -------------
 -- Baleroc --
@@ -91,16 +75,7 @@ L:SetOptionLocalization({
 	warnStrike			= "Show warnings for Decimation/Inferno Strike", -- couldn't find corresponding spells on dungeon journal. Has it been removed?
 	timerStrike			= "Show timer for next Decimation/Inferno Strike", -- same as above
 	TimerBladeActive	= "Exibir cronógrafo de duração para a Lâmina ativa",
-	TimerBladeNext		= "Exibir cronógrafo para a próxima Lâmina da Dizimação/Inferno",
-	SetIconOnCountdown	= DBM_CORE_AUTO_ICONS_OPTION_TEXT:format(99516),
-	SetIconOnTorment	= DBM_CORE_AUTO_ICONS_OPTION_TEXT:format(100232),
-	ArrowOnCountdown	= "Exibir seta do DBM quando você é afetado por $spell:99516 ",
-	InfoFrame			= "Exibir quadro de informações para pilhas de Centelha Vital",
-	RangeFrame			= "Exibir medidor de distância (5) para $spell:99404"
-})
-
-L:SetMiscLocalization({
-	VitalSpark		= "Pilhas de "..GetSpellInfo(99262)
+	TimerBladeNext		= "Exibir cronógrafo para a próxima Lâmina da Dizimação/Inferno"
 })
 
 --------------------------------
@@ -115,9 +90,7 @@ L:SetTimerLocalization({
 L:SetOptionLocalization({
 	timerNextSpecial			= "Exibir cronógrafo para a próxima habilidade especial.",
 	RangeFrameSeeds				= "Exibir medidor de distância (12) para $spell:98450",
-	RangeFrameCat				= "Exibir medidor de distância (10) para $spell:98374",
-	LeapArrow					= "Exibir seta do DBM quando $spell:98476 está próximo de você",
-	IconOnLeapingFlames			= DBM_CORE_AUTO_ICONS_OPTION_TEXT:format(100208)
+	RangeFrameCat				= "Exibir medidor de distância (10) para $spell:98374"
 })
 
 --------------
@@ -138,19 +111,17 @@ L:SetTimerLocalization({
 })
 
 L:SetOptionLocalization({
-	warnRageRagnarosSoon		= DBM_CORE_AUTO_ANNOUNCE_OPTIONS.prewarn:format(101109),
+	warnRageRagnarosSoon		= DBM_CORE_L.AUTO_ANNOUNCE_OPTIONS.prewarn:format(101109),
 	warnSplittingBlow			= "Exibir avisos para local de $spell:100877",
 	warnEngulfingFlame			= "Exibir avisos para local de $spell:99171",
 	WarnEngulfingFlameHeroic	= "Exibir avisos para local de $spell:99171 (modo heróico)",
 	warnSeedsLand				= "Exibir aviso/cronógrafo para queda de $spell:98520 ao invés do lançamento",
-	warnEmpoweredSulf			= DBM_CORE_AUTO_ANNOUNCE_OPTIONS.cast:format(100997),
-	timerRageRagnaros			= DBM_CORE_AUTO_TIMER_OPTIONS.cast:format(101109),
+	warnEmpoweredSulf			= DBM_CORE_L.AUTO_ANNOUNCE_OPTIONS.cast:format(100997),
+	timerRageRagnaros			= DBM_CORE_L.AUTO_TIMER_OPTIONS.cast:format(101109),
 	TimerPhaseSons				= "Exibir cronógrafo de duração da \"Fase dos Filhos das Chamas\"",
-	RangeFrame					= "Exibir medidor de distância",
 	InfoHealthFrame				= "Exibir quadro de informações de vida (<100k pv)",
 	MeteorFrame					= "Exibir quadro de informações para alvos de $spell:99849",
-	AggroFrame					= "Exibir quadro de informações de jogadores que não tem ameaça durante Elementais Derretidos",
-	BlazingHeatIcons			= DBM_CORE_AUTO_ICONS_OPTION_TEXT:format(100983)
+	AggroFrame					= "Exibir quadro de informações de jogadores que não tem ameaça durante Elementais Derretidos"
 })
 
 L:SetMiscLocalization({

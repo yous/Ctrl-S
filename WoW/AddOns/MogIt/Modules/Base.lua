@@ -10,61 +10,17 @@ local ipairs = ipairs;
 local select = select;
 
 
---// Input Functions
-function mog.base.AddSlot(slot, addon)
-	local module = mog:GetModule(addon);
-	if not module.slots[slot] then
-		module.slots[slot] = {
-			label = LBI[slot] or slot,
-			list = {},
-		};
-		tinsert(module.slotList, slot);
-	end
-	local list = module.slots[slot].list;
-	
-	return function(itemID, bonusID, display, quality, lvl, faction, class, bind, slot, source, sourceid, zone, sourceinfo)
-		local id = mog:ToStringItem(itemID, bonusID);
-		tinsert(list, id);
-		mog:AddData("item", id, "display", display);
-		mog:AddData("item", id, "quality", quality);
-		mog:AddData("item", id, "level", lvl);
-		mog:AddData("item", id, "faction", faction);
-		mog:AddData("item", id, "class", class);
-		mog:AddData("item", id, "bind", bind);
-		mog:AddData("item", id, "slot", slot);
-		mog:AddData("item", id, "source", source);
-		mog:AddData("item", id, "sourceid", sourceid);
-		mog:AddData("item", id, "sourceinfo", sourceinfo);
-		mog:AddData("item", id, "zone", zone);
-		tinsert(mog:GetData("display", display, "items") or mog:AddData("display", display, "items", {}), id);
-	end
-end
-
-function mog.base.AddColours(display, c1, c2, c3)
-	--mog:AddData("display",display,"colours",colours);
-	mog:AddData("display", display, "colour1", c1);
-	mog:AddData("display", display, "colour2", c2);
-	mog:AddData("display", display, "colour3", c3);
-end
-
-function mog.base.AddNPC(id,name)
-	mog:AddData("npc", id, "name", LBB[name] or name);
-end
-
---[=[
-function mog.base.AddObject(id,name)
-	mog:AddData("object", id, "name", LBB[name] or name);
-end
---]=]
---//
-
-
 --// Base Functions
 local list = {};
 
 function mog.base.DropdownTier1(self)
 	if self.value.loaded then
 		self.value.active = nil;
+		if mog.relevantCategories[self.value.label] then
+			mog:GetFilter("class").Default()
+		else
+			mog:GetFilter("class"):SelectAll()
+		end
 		mog:SetModule(self.value, self.value.label);
 	else
 		LoadAddOn(self.value.name);
@@ -73,21 +29,27 @@ end
 
 function mog.base.DropdownTier2(self)
 	self.arg1.active = self.value;
-	mog:SetModule(self.arg1, self.arg1.label.." - "..self.value.label);
+	if mog.relevantCategories[self.arg1.label] or mog.relevantCategories[self.value.label] then
+		mog:GetFilter("class").Default()
+	else
+		mog:GetFilter("class"):SelectAll()
+	end
+	mog:SetModule(self.arg1, self.arg1.label.." - "..mog.db.profile.slotLabels[self.value.label]);
 	CloseDropDownMenus();
 end
 
 function mog.base.Dropdown(module, tier)
 	local info;
 	if tier == 1 then
+		local moduleDB = _G[module.name.."DB"]
 		info = UIDropDownMenu_CreateInfo();
-		info.text = module.label..(module.loaded and "" or " \124cFFFFFFFF("..L["Click to load addon"]..")");
+		info.text = module.label..(module.loaded and "" or " |cFFFFFFFF("..L["Click to load addon"]..")");
 		info.value = module;
-		info.colorCode = "\124cFF"..(module.loaded and "00FF00" or "FF0000");
-		info.hasArrow = module.loaded;
+		info.colorCode = "|cFF"..(module.loaded and ((moduleDB and next(moduleDB)) and "00FF00" or "c0c0c0") or "FF0000");
+		info.hasArrow = module.loaded and moduleDB and next(moduleDB) and module.label ~= "Artifact";
 		info.keepShownOnClick = not module.loaded;
 		info.notCheckable = true;
-		info.func = mog.base.DropdownTier1;
+		info.func = (not module.loaded or moduleDB) and mog.base.DropdownTier1;
 		if not module.loaded then
 			if module.version < mog.moduleVersion then
 				info.tooltipOnButton = true;
@@ -98,12 +60,16 @@ function mog.base.Dropdown(module, tier)
 				info.tooltipTitle = RED_FONT_COLOR_CODE..ADDON_INTERFACE_VERSION;
 				info.tooltipText = L["This module was created for a newer version of MogIt and may not work correctly."];
 			end
+		elseif not moduleDB or not next(moduleDB) then
+			info.tooltipOnButton = true;
+			info.tooltipTitle = RED_FONT_COLOR_CODE..L["No data"];
+			info.tooltipText = L["This module has no items registered. Please log in with a character of appropriate armor class to register items."];
 		end
 		UIDropDownMenu_AddButton(info, tier);
 	elseif tier == 2 then
 		for _,slot in ipairs(module.slotList) do
 			info = UIDropDownMenu_CreateInfo();
-			info.text = module.slots[slot].label;
+			info.text = mog.db.profile.slotLabels[module.slots[slot].label];
 			info.value = module.slots[slot];
 			info.notCheckable = true;
 			info.func = mog.base.DropdownTier2;
@@ -114,11 +80,16 @@ function mog.base.Dropdown(module, tier)
 end
 
 function mog.base:FrameUpdate(frame, value)
-	frame.data.items = value;
+	local items = {}
+	for i, source in ipairs(value) do
+		tinsert(items, (select(6, C_TransmogCollection.GetAppearanceSourceInfo(source))))
+	end
+	frame.data.items = items;
+	frame.data.sourceID = value[1];
 	frame.data.cycle = 1;
-	frame.data.item = value[frame.data.cycle];
-	for i, item in ipairs(value) do
-		if mog:HasItem(item) then
+	frame.data.item = items[frame.data.cycle];
+	for i, item in ipairs(items) do
+		if mog:HasItem(value[i]) then
 			frame:ShowIndicator("hasItem");
 		end
 		if mog.wishlist:IsItemInWishlist(item) then
@@ -145,7 +116,7 @@ local function itemSort(a, b)
 	local aLevel = mog:GetData("item", a, "level") or 0;
 	local bLevel = mog:GetData("item", b, "level") or 0;
 	if aLevel == bLevel then
-		return a < b;
+		return a > b;
 	else
 		return aLevel < bLevel;
 	end
@@ -153,7 +124,7 @@ end
 
 local function buildList(module, slot, list, items)
 	for _, item in ipairs(slot) do
-		if mog:CheckFilters(module,item) then
+		if mog:CheckFilters(module, item) then
 			local display = mog:GetData("item", item, "display");
 			if display then
 				if not items[display] then
@@ -193,7 +164,7 @@ mog.base.Help = {
 }
 
 function mog.base.GetFilterArgs(filter,item)
-	if filter == "name" or filter == "itemLevel" or filter == "hasItem" or filter == "chestType" then
+	if filter == "name" or filter == "level" or filter == "quality" or filter == "itemLevel" or filter == "bind" or filter == "hasItem" or filter == "chestType" then
 		return item;
 	elseif filter == "source" then
 		return mog:GetData("item", item, "source"),mog:GetData("item", item, "sourceinfo");
@@ -202,34 +173,25 @@ function mog.base.GetFilterArgs(filter,item)
 	end
 end
 
-function mog.base.SortLevel(items)
-	return items;
-end
-
-function mog.base.SortColour(items)
-	local display = mog:GetData("item", items[1], "display");
-	return {mog:GetData("display", display, "colour1"), mog:GetData("display", display, "colour2"), mog:GetData("display", display, "colour3")};
-	--return mog:GetData("display", display, "colours");
-end
 --//
 
 
 --// Register Modules
-local addons = {
+mog.baseModules = {
 	"MogIt_Cloth",
 	"MogIt_Leather",
 	"MogIt_Mail",
 	"MogIt_Plate",
+	"MogIt_Other",
 	"MogIt_OneHanded",
 	"MogIt_TwoHanded",
 	"MogIt_Ranged",
-	"MogIt_Other",
-	"MogIt_Accessories",
+	"MogIt_Artifact",
 };
 
 local myName = UnitName("player");
 
-for _, addon in ipairs(addons) do
+for _, addon in ipairs(mog.baseModules) do
 	local _, title = GetAddOnInfo(addon);
 	if GetAddOnEnableState(myName, addon) > 0 then
 		local module = mog:RegisterModule(addon, tonumber(GetAddOnMetadata(addon, "X-MogItModuleVersion")), {
@@ -255,17 +217,12 @@ for _, addon in ipairs(addons) do
 				"quality",
 				"bind",
 				"chestType",
-				(addon == "MogIt_OneHanded" and "slot") or nil,
+				-- (addon == "MogIt_OneHanded" and "slot") or nil,
 			},
 			sorting = {
-				"level",
-				"colour",
 				"display",
 			},
-			sorts = {
-				level = mog.base.SortLevel,
-				colour = mog.base.SortColour,
-			},
+			sorts = {},
 		});
 		if module then
 			-- dirty fix for now - if the "slot" filter is not present the array is broken unless we do this

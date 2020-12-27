@@ -17,6 +17,14 @@ local races = {
    "Blood Elf",
    "Goblin",
    "Pandaren",
+   "Lightforged Draenei",
+   "Void Elf",
+   "Dark Iron Dwarf",
+   "Kul Tiran",
+   "Highmountain Tauren",
+   "Nightborne",
+   "Mag'har Orc",
+   "Zandalari Troll",
 }
 
 local raceID = {
@@ -33,12 +41,22 @@ local raceID = {
    ["Draenei"] = 11,
    ["Worgen"] = 22,
    ["Pandaren"] = 24,
+   ["Nightborne"] = 27,
+   ["Highmountain Tauren"] = 28,
+   ["Void Elf"] = 29,
+   ["Lightforged Draenei"] = 30,
+   ["Zandalari Troll"] = 31,
+   ["Kul Tiran"] = 32,
+   ["Dark Iron Dwarf"] = 34,
+   ["Mag'har Orc"] = 36,
 }
 
 -- UnitRace returns differently for the following races, so need to include exceptions
-raceID["NightElf"] = raceID["Night Elf"]
 raceID["Scourge"] = raceID["Undead"]
-raceID["BloodElf"] = raceID["Blood Elf"]
+-- most are just with the space removed
+for i, race in ipairs(races) do
+	raceID[race:gsub("[%A]", "")] = raceID[race]
+end
 
 local gender = {
 	[0] = MALE,
@@ -52,6 +70,8 @@ mog.playerGender = myGender;
 
 mog.displayRace = myRace
 mog.displayGender = myGender
+
+mog.sheathe = false
 
 local ModelFramePrototype = CreateFrame("Button")
 local ModelFrame_MT = {__index = ModelFramePrototype}
@@ -138,10 +158,11 @@ function mog:CreateModelFrame(parent)
 	f.model:SetModelScale(2);
 	f.model:SetUnit("PLAYER");
 	f.model:SetPosition(0,0,0);
+	f.model:SetLight(true, false, 0, 0.8, -1, 1, 1, 1, 1, 0.3, 1, 1, 1);
 	
 	f.bg = f:CreateTexture(nil,"BACKGROUND");
 	f.bg:SetAllPoints(f);
-	f.bg:SetTexture(0.3,0.3,0.3,0.2);
+	f.bg:SetColorTexture(0.3,0.3,0.3,0.2);
 	
 	f:RegisterForClicks("AnyUp");
 	f:RegisterForDrag("LeftButton","RightButton");
@@ -161,6 +182,7 @@ function mog:DeleteModelFrame(f)
 	f:SetScript("OnEnter",nil);
 	f:SetScript("OnLeave",nil);
 	f:SetScript("OnMouseWheel",nil);
+	f.model:SetSheathed(false);
 	f:EnableMouseWheel(false);
 	for ind,frame in pairs(f.indicators) do
 		frame:Hide();
@@ -264,16 +286,29 @@ function ModelFramePrototype:SetText(text)
 end
 
 local tryOnSlots = {
-	MainHandSlot = "mainhand",
-	SecondaryHandSlot = "offhand",
+	MainHandSlot = "MAINHANDSLOT",
+	SecondaryHandSlot = "SECONDARYHANDSLOT",
 }
 
-function ModelFramePrototype:TryOn(item, slot)
-	self.model:TryOn(item, tryOnSlots[slot]);
+function ModelFramePrototype:TryOn(item, slot, itemAppearanceModID)
+	if type(item) == "number" then
+		item = "item:"..item
+	end
+	self.model:TryOn(item, tryOnSlots[slot] or slot, itemAppearanceModID);
 end
 
 function ModelFramePrototype:Undress()
-	self.model:Undress()
+	-- the worst of hacks to prevent certain armor model pieces from getting stuck on the character
+	for i, slotName in ipairs(mog.slots) do
+		local slot = GetInventorySlotInfo(slotName);
+		local item = GetInventoryItemLink("player", slot);
+		if item then
+			self:TryOn(item);
+			self:UndressSlot(slot);
+		end
+	end
+	self:UndressSlot(GetInventorySlotInfo("MainHandSlot"));
+	self:UndressSlot(GetInventorySlotInfo("SecondaryHandSlot"));
 end
 
 function ModelFramePrototype:UndressSlot(slot)
@@ -300,18 +335,8 @@ function ModelFramePrototype:ResetModel()
 		model:Dress();
 	else
 		model:SetCustomRace(info.displayRace, info.displayGender);
-		-- hack for hidden helm and cloak showing on models
-		local showingHelm, showingCloak = ShowingHelm(), ShowingCloak();
-		local helm, cloak = GetInventoryItemID("player", INVSLOT_HEAD), GetInventoryItemID("player", INVSLOT_BACK);
-		if not showingHelm and helm then
-			model:TryOn(helm);
-			model:UndressSlot(INVSLOT_HEAD);
-		end
-		if not showingCloak and cloak then
-			model:TryOn(cloak);
-			model:UndressSlot(INVSLOT_BACK);
-		end
 	end
+	model:SetAnimation(0, 0)
 	self:PositionModel();
 end
 
@@ -332,7 +357,10 @@ function mog.DressFromPreview(model, previewFrame)
 	
 	for id, slot in pairs(previewFrame.slots) do
 		if slot.item then
-			model:TryOn(format(gsub(slot.item, "item:(%d+):0", "item:%1:%%d"), previewFrame.data.weaponEnchant), slot.slot);
+			model:TryOn(format(gsub(slot.item, "item:(%d+):0", "item:%1:%%d"), previewFrame.data.weaponEnchant), slot.slot, slot.itemAppearanceModID);
+			if not mog:GetItemInfo(slot.item) then
+				mog.doModelUpdate = true;
+			end
 		end
 	end
 end
@@ -408,8 +436,8 @@ local updater = CreateFrame("Frame");
 updater:Hide();
 updater:SetScript("OnUpdate", function(self)
 	self:Hide();
-	mog:UpdateScroll();
 	mog.doModelUpdate = nil;
+	mog:UpdateScroll();
 end);
 
 
@@ -497,6 +525,7 @@ function mog.scroll.update(self, value, offset, onscroll)
 			else
 				frame:Show();
 			end
+			frame.model:SetSheathed(mog.sheathe);
 			frame:SetAlpha(1);
 			frame:Enable();
 		else
@@ -613,11 +642,11 @@ local function menuOnEnter(self)
 			self.menuBar:ToggleMenu(nil, self);
 		end
 	end
-	self.nt:SetTexture(1,0.82,0,1);
+	self.nt:SetColorTexture(1,0.82,0,1);
 end
 
 local function menuOnLeave(self)
-	self.nt:SetTexture(0,0,0,0);
+	self.nt:SetColorTexture(0,0,0,0);
 end
 
 local function createMenu(menuBar, label, func)
@@ -631,8 +660,8 @@ local function createMenu(menuBar, label, func)
 	f.menuBar.yOffset = 0
 	
 	f.nt = f:CreateTexture(nil,"BACKGROUND");
-	--nt:SetTexture(0.8,0.3,0.8,1);
-	f.nt:SetTexture(0,0,0,0);
+	--nt:SetColorTexture(0.8,0.3,0.8,1);
+	f.nt:SetColorTexture(0,0,0,0);
 	f.nt:SetAllPoints(f);
 	f:SetNormalTexture(f.nt);
 	
@@ -753,7 +782,7 @@ local dressOptions = {
 }
 
 local function setGridDress(self)
-	mog.db.profile.gridDress = self.value;
+	mog.db.profile.gridDress = self.value
 	for i, model in ipairs(mog.models) do
 		model.model:SetPosition(0, 0, 0)
 	end
@@ -761,7 +790,15 @@ local function setGridDress(self)
 	for i, model in ipairs(mog.models) do
 		model:PositionModel()
 	end
-	CloseDropDownMenus(1);
+	CloseDropDownMenus(1)
+end
+
+local function setSheathe(self, arg1, arg2, checked)
+	checked = not checked
+	mog.sheathe = checked
+	for i, model in ipairs(mog.models) do
+		model.model:SetSheathed(checked)
+	end
 end
 
 function mog:ToggleFilters()
@@ -812,6 +849,13 @@ mog.menu.catalogue = mog.menu:CreateMenu(L["Catalogue"], function(self, tier)
 		info.value = "gridDress";
 		info.notCheckable = true;
 		info.hasArrow = true;
+		UIDropDownMenu_AddButton(info,tier);
+		
+		local info = UIDropDownMenu_CreateInfo();
+		info.text = L["Sheathe weapons"];
+		info.checked = mog.sheathe;
+		info.isNotRadio = true;
+		info.func = setSheathe;
 		UIDropDownMenu_AddButton(info,tier);
 	elseif self.tier[2] == "sorting" then
 		if tier == 2 then
@@ -947,11 +991,11 @@ help:SetScript("OnEnter", function(self)
 		end
 	end
 	GameTooltip:Show()
-	self.nt:SetTexture(1, 0.82, 0, 1);
+	self.nt:SetColorTexture(1, 0.82, 0, 1);
 end);
 help:SetScript("OnLeave", function(self)
 	GameTooltip_Hide()
-	self.nt:SetTexture(0, 0, 0, 0);
+	self.nt:SetColorTexture(0, 0, 0, 0);
 end);
 
 

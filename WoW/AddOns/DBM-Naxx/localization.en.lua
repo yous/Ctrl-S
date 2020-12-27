@@ -9,14 +9,7 @@ L:SetGeneralLocalization({
 	name = "Anub'Rekhan"
 })
 
-L:SetWarningLocalization({
-	SpecialLocust		= "Locust Swarm",
-	WarningLocustFaded	= "Locust Swarm faded"
-})
-
 L:SetOptionLocalization({
-	SpecialLocust		= "Show special warning for Locust Swarm",
-	WarningLocustFaded	= "Show warning for Locust Swarm fade",
 	ArachnophobiaTimer	= "Show timer for Arachnophobia (achievement)"
 })
 
@@ -74,7 +67,6 @@ L:SetOptionLocalization({
 })
 
 L:SetMiscLocalization({
-	YellWebWrap	= "I'm wrapped! Help me!",
 	ArachnophobiaTimer	= "Arachnophobia"
 })
 
@@ -89,7 +81,7 @@ L:SetGeneralLocalization({
 
 L:SetWarningLocalization({
 	WarningTeleportNow	= "Teleported",
-	WarningTeleportSoon	= "Teleport in 20 seconds"
+	WarningTeleportSoon	= "Teleport in 10 seconds"
 })
 
 L:SetTimerLocalization({
@@ -105,7 +97,9 @@ L:SetOptionLocalization({
 })
 
 L:SetMiscLocalization({
-	Pull				= "Die, trespasser!"
+	Pull				= "Die, trespasser!",
+	Adds				= "summons forth Skeletal Warriors!",
+	AddsTwo				= "raises more skeletons!"
 })
 
 --------------------------
@@ -181,18 +175,6 @@ L:SetGeneralLocalization({
 	name = "Grobbulus"
 })
 
-L:SetOptionLocalization({
-	SpecialWarningInjection		= "Show special warning when you are affected by Mutating Injection",
-	SetIconOnInjectionTarget	= DBM_CORE_AUTO_ICONS_OPTION_TEXT:format(28169)
-})
-
-L:SetWarningLocalization({
-	SpecialWarningInjection	= "Mutating Injection on you"
-})
-
-L:SetTimerLocalization({
-})
-
 -------------
 --  Gluth  --
 -------------
@@ -224,7 +206,8 @@ L:SetMiscLocalization({
 L:SetOptionLocalization({
 	WarningChargeChanged	= "Show special warning when your polarity changed",
 	WarningChargeNotChanged	= "Show special warning when your polarity did not change",
-	ArrowsEnabled			= "Show arrows (normal \"2 camp\" strategy)",
+	ArrowsEnabled			= "Show arrows during $spell:28089",
+	TwoCamp					= "Show arrows (normal \"2 camp\" run through strategy)",
 	ArrowsRightLeft			= "Show left/right arrows for the \"4 camp\" strategy (show left arrow if polarity changed, right if not)",
 	ArrowsInverse			= "Inverse \"4 camp\" strategy (show right arrow if polarity changed, left if not)"
 })
@@ -232,10 +215,6 @@ L:SetOptionLocalization({
 L:SetWarningLocalization({
 	WarningChargeChanged	= "Polarity changed to %s",
 	WarningChargeNotChanged	= "Polarity did not change"
-})
-
-L:SetOptionCatLocalization({
-	Arrows	= "Arrows"
 })
 
 ----------------------------
@@ -350,13 +329,11 @@ L:SetOptionLocalization({
 	TimerAir			= "Show timer for air phase",
 	TimerLanding		= "Show timer for landing",
 	TimerIceBlast		= "Show timer for Frost Breath",
-	WarningDeepBreath	= "Show special warning for Frost Breath",
-	WarningIceblock		= "Yell on Ice Block"
+	WarningDeepBreath	= "Show special warning for Frost Breath"
 })
 
 L:SetMiscLocalization({
-	EmoteBreath			= "%s takes a deep breath.",
-	WarningYellIceblock	= "I'm an Ice Block!"
+	EmoteBreath			= "%s takes a deep breath."
 })
 
 L:SetWarningLocalization({
@@ -369,7 +346,7 @@ L:SetWarningLocalization({
 L:SetTimerLocalization({
 	TimerAir		= "Air phase",
 	TimerLanding	= "Landing",
-	TimerIceBlast	= "Frost Breath"	
+	TimerIceBlast	= "Frost Breath"
 })
 
 ------------------
@@ -385,11 +362,7 @@ L:SetGeneralLocalization({
 L:SetOptionLocalization({
 	TimerPhase2			= "Show timer for Phase 2",
 	specwarnP2Soon		= "Show special warning 10 seconds before Kel'Thuzad engages",
-	warnAddsSoon		= "Show pre-warning for Guardians of Icecrown",
-	SetIconOnMC			= DBM_CORE_AUTO_ICONS_OPTION_TEXT:format(28410),
-	SetIconOnManaBomb	= DBM_CORE_AUTO_ICONS_OPTION_TEXT:format(27819),
-	SetIconOnFrostTomb	= DBM_CORE_AUTO_ICONS_OPTION_TEXT:format(27808),
-	ShowRange			= "Show range frame when Phase 2 starts"
+	warnAddsSoon		= "Show pre-warning for Guardians of Icecrown"
 })
 
 L:SetMiscLocalization({

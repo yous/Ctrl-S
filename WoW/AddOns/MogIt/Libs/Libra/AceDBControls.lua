@@ -1,5 +1,5 @@
 ﻿local Libra = LibStub("Libra")
-local Type, Version = "AceDBControls", 4
+local Type, Version = "AceDBControls", 5
 if Libra:GetModuleVersion(Type) >= Version then return end
 
 Libra.modules[Type] = Libra.modules[Type] or {}
@@ -9,6 +9,9 @@ AceDBControls.Prototype = AceDBControls.Prototype or CreateFrame("Frame")
 
 local Prototype = AceDBControls.Prototype
 local mt = {__index = Prototype}
+
+local _, _, classID = UnitClass("player")
+local numSpecs = GetNumSpecializationsForClassID(classID)
 
 local L = {
 	default = "Default",
@@ -20,8 +23,7 @@ local L = {
 	delete_confirm = "Are you sure you want to delete the selected profile?",
 	profiles = "Profiles",
 
-	dual_profile = "Dual profile",
-	enabled = "Enable dual profile",
+	enabled = "Enable spec profiles",
 }
 
 local LOCALE = GetLocale()
@@ -35,8 +37,7 @@ if LOCALE == "deDE" then
 	L["delete_confirm"] = "Willst du das ausgew\195\164hlte Profil wirklich l\195\182schen?"
 	L["profiles"] = "Profile"
 	
-	L["dual_profile"] = "Duales Profil"
-	L["enabled"] = "Aktiviere Duale Profile"
+	L["enabled"] = "Spezialisierungsprofile aktivieren"
 elseif LOCALE == "frFR" then
 	L["default"] = "D\195\169faut"
 	L["reset"] = "R\195\169initialiser le profil"
@@ -47,7 +48,6 @@ elseif LOCALE == "frFR" then
 	L["delete_confirm"] = "Etes-vous s\195\187r de vouloir supprimer le profil s\195\169lectionn\195\169 ?"
 	L["profiles"] = "Profils"
 
-	L["dual_profile"] = 'Second profil'
 	L["enabled"] = 'Activez le second profil'
 elseif LOCALE == "koKR" then
 	L["default"] = "기본값"
@@ -59,7 +59,6 @@ elseif LOCALE == "koKR" then
 	L["delete_confirm"] = "정말로 선택한 프로필의 삭제를 원하십니까?"
 	L["profiles"] = "프로필"
 	
-	L["dual_profile"] = "이중 프로필"
 	L["enabled"] = "이중 프로필 사용"
 elseif LOCALE == "esES" or LOCALE == "esMX" then
 	L["default"] = "Por defecto"
@@ -79,6 +78,7 @@ elseif LOCALE == "zhTW" then
 	L["delete"] = "刪除一個設定檔"
 	L["delete_confirm"] = "你確定要刪除所選擇的設定檔嗎？"
 	L["profiles"] = "設定檔"
+	L["enabled"] = "啟用專精設定檔"
 elseif LOCALE == "zhCN" then
 	L["default"] = "默认"
 	L["reset"] = "重置配置文件"
@@ -90,8 +90,7 @@ elseif LOCALE == "zhCN" then
 	L["delete_confirm"] = "你确定要删除所选择的配置文件么？"
 	L["profiles"] = "配置文件"
 	
-	L["dual_profile"] = "双重配置文件"
-	L["enabled"] = "开启双重配置文件"
+	L["enabled"] = "启用专精配置文件"
 elseif LOCALE == "ruRU" then
 	L["default"] = "По умолчанию"
 	L["reset"] = "Сброс профиля"
@@ -102,8 +101,7 @@ elseif LOCALE == "ruRU" then
 	L["delete_confirm"] = "Вы уверены, что вы хотите удалить выбранный профиль?"
 	L["profiles"] = "Профили"
 	
-	L["dual_profile"] = "Второй профиль"
-	L["enabled"] = "Включить двойной профиль"
+	L["enabled"] = "Включить профили специализации"
 end
 
 local defaultProfiles = {}
@@ -152,7 +150,7 @@ local function initializeDropdown(self, level, menuList)
 		info.func = dropdownOnClick
 		info.arg1 = v.value
 		info.arg2 = self.func
-		info.checked = not self.nocurrent and (v.value == self.getCurrent(self.db))
+		info.checked = not self.nocurrent and (v.value == self.getCurrent(self.db, self.spec))
 		info.notCheckable = self.nocurrent
 		self:AddButton(info)
 	end
@@ -203,11 +201,13 @@ local createProfileScripts = {
 local function enableDualProfileOnClick(self)
 	local checked = self:GetChecked()
 	self.db:SetDualSpecEnabled(checked)
-	self.dualProfile:SetEnabled(checked)
+	for i = 1, numSpecs do
+		self["dualProfile"..i]:SetEnabled(checked)
+	end
 end
 
 local function dualProfileOnClick(db, profile, frame)
-	db:SetDualSpecProfile(profile)
+	db:SetDualSpecProfile(profile, frame.spec)
 	frame:SetText(profile)
 end
 
@@ -288,24 +288,38 @@ local function constructor(self, db, parent)
 		
 		local hasDualProfile = db:GetNamespace("LibDualSpec-1.0", true)
 		if hasDualProfile then
+			frame:SetHeight(320)
 			local isDualSpecEnabled = db:IsDualSpecEnabled()
 			
-			local dualProfile = createDropdown(frame)
-			dualProfile:SetPoint("TOP", reset, "BOTTOM", 0, -28)
-			dualProfile:SetEnabled(isDualSpecEnabled)
-			dualProfile:SetText(db:GetDualSpecProfile())
-			dualProfile.func = dualProfileOnClick
-			dualProfile.getCurrent = db.GetDualSpecProfile
-			dualProfile.common = true
-			objects.dualProfile = dualProfile
+			for i = 1, numSpecs do
+				local _, specName = GetSpecializationInfoForClassID(classID, i)
+				local dualProfile = createDropdown(frame)
+				if i == 1 then
+					dualProfile:SetPoint("TOP", reset, "BOTTOM", 0, -44)
+				else
+					dualProfile:SetPoint("TOP", objects["dualProfile"..(i - 1)], "BOTTOM", 0, -12)
+				end
+				dualProfile.label:SetText(specName)
+				dualProfile:SetEnabled(isDualSpecEnabled)
+				dualProfile:SetText(db:GetDualSpecProfile(i))
+				dualProfile.func = dualProfileOnClick
+				dualProfile.getCurrent = db.GetDualSpecProfile
+				dualProfile.common = true
+				dualProfile.spec = i
+				objects["dualProfile"..i] = dualProfile
+			end
 			
 			local enabled = CreateFrame("CheckButton", nil, frame, "OptionsBaseCheckButtonTemplate")
-			enabled:SetPoint("BOTTOMLEFT", dualProfile, "TOPLEFT", 16, 0)
+			enabled:SetPoint("LEFT", objects.dualProfile1, 16, 0)
+			enabled:SetPoint("TOP", reset, "BOTTOM", 0, -2)
 			enabled:SetPushedTextOffset(0, 0)
 			enabled:SetScript("OnClick", enableDualProfileOnClick)
 			enabled:SetChecked(isDualSpecEnabled)
 			enabled.tooltipText = L.enable_desc
-			enabled.dualProfile = dualProfile
+			enabled.dualProfile1 = objects.dualProfile1
+			enabled.dualProfile2 = objects.dualProfile2
+			enabled.dualProfile3 = objects.dualProfile3
+			enabled.dualProfile4 = objects.dualProfile4
 			objects.dualEnabled = enabled
 			
 			local text = enabled:CreateFontString(nil, nil, "GameFontHighlight")
@@ -342,7 +356,9 @@ function Prototype:OnProfileChanged(event, db, profile)
 	self.choose:SetText(profile)
 	self:CheckProfiles()
 	if self.hasDualProfile then
-		self.dualProfile:SetText(db:GetDualSpecProfile())
+		for i = 1, numSpecs do
+			self["dualProfile"..i]:SetText(db:GetDualSpecProfile(i))
+		end
 	end
 end
 

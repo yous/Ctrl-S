@@ -7,7 +7,7 @@
 --		Banjankri of Blackrock, Predeter of Proudmoore, Xenyr of Aszune
 
 -- Currently maintained by
--- Cybeloras of Aerie Peak/Detheroc/Mal'Ganis
+-- Cybeloras of Aerie Peak
 -- --------------------
 
 local TMW = TMW
@@ -40,10 +40,12 @@ Type.desc = L["ICONMENU_SWINGTIMER_DESC"]
 Type.menuIcon = "Interface\\Icons\\INV_Gauntlets_04"
 Type.hasNoGCD = true
 
+local STATE_NOTREADY = TMW.CONST.STATE.DEFAULT_SHOW
+local STATE_READY = TMW.CONST.STATE.DEFAULT_HIDE
 
 -- AUTOMATICALLY GENERATED: UsesAttributes
+Type:UsesAttributes("state")
 Type:UsesAttributes("start, duration")
-Type:UsesAttributes("alpha")
 Type:UsesAttributes("texture")
 -- END AUTOMATICALLY GENERATED: UsesAttributes
 
@@ -59,26 +61,23 @@ if pclass == "HUNTER" then
 	Type:RegisterConfigPanel_XMLTemplate(130, "TellMeWhen_AutoshootSwingTimerTip")
 end
 
-Type:RegisterConfigPanel_XMLTemplate(165, "TellMeWhen_WhenChecks", {
-	text = L["ICONMENU_SHOWWHEN"],
-	[0x2] = { text = "|cFF00FF00" .. L["ICONMENU_SWINGTIMER_SWINGING"],			},
-	[0x1] = { text = "|cFFFF0000" .. L["ICONMENU_SWINGTIMER_NOTSWINGING"],		},
+Type:RegisterConfigPanel_XMLTemplate(165, "TellMeWhen_IconStates", {
+	[STATE_NOTREADY] = { text = "|cFF00FF00" .. L["ICONMENU_SWINGTIMER_SWINGING"],    },
+	[STATE_READY]    = { text = "|cFFFF0000" .. L["ICONMENU_SWINGTIMER_NOTSWINGING"], },
 })
 
 
 Type:RegisterConfigPanel_ConstructorFunc(120, "TellMeWhen_WeaponSlot", function(self)
-	self.Header:SetText(TMW.L["ICONMENU_WPNENCHANTTYPE"])
-	TMW.IE:BuildSimpleCheckSettingFrame(self, {
-		{
-			setting = "SwingTimerSlot",
-			value = "MainHandSlot",
-			title = INVTYPE_WEAPONMAINHAND,
-		},
-		{
-			setting = "SwingTimerSlot",
-			value = "SecondaryHandSlot",
-			title = INVTYPE_WEAPONOFFHAND,
-		},
+	self:SetTitle(TMW.L["ICONMENU_WPNENCHANTTYPE"])
+	self:BuildSimpleCheckSettingFrame({
+		function(check)
+			check:SetTexts(INVTYPE_WEAPONMAINHAND, nil)
+			check:SetSetting("SwingTimerSlot", "MainHandSlot")
+		end,
+		function(check)
+			check:SetTexts(INVTYPE_WEAPONOFFHAND, nil)
+			check:SetSetting("SwingTimerSlot", "SecondaryHandSlot")
+		end,
 	})
 end)
 
@@ -89,10 +88,6 @@ local function SwingTimer_OnEvent(icon, event, unit, _, _, _, spellID)
 		-- Update the icon's texture when the player changes weapons.
 		local wpnTexture = GetInventoryItemTexture("player", icon.Slot)
 		icon:SetInfo("texture", wpnTexture or GetSpellTexture(15590))
-
-	elseif event == "TMW_COMMON_SWINGTIMER_CHANGED" then
-		-- Queue an icon update when the swing timer updates.
-		icon.NextUpdateTime = 0
 	end
 end
 
@@ -104,15 +99,15 @@ local function SwingTimer_OnUpdate(icon, time)
 	if time - SwingTimer.startTime > SwingTimer.duration then
 		-- Weapon swing is not on cooldown.
 		icon:SetInfo(
-			"alpha; start, duration",
-			icon.UnAlpha,
+			"state; start, duration",
+			STATE_READY,
 			0, 0
 		)
 	else
 		-- Weapon swing is on cooldown
 		icon:SetInfo(
-			"alpha; start, duration",
-			icon.Alpha,
+			"state; start, duration",
+			STATE_NOTREADY,
 			SwingTimer.startTime, SwingTimer.duration
 		)
 	end
@@ -130,7 +125,7 @@ function Type:Setup(icon)
 	
 	
 	-- Register events and setup update functions.
-	TMW:RegisterCallback("TMW_COMMON_SWINGTIMER_CHANGED", SwingTimer_OnEvent, icon)
+	icon:RegisterSimpleUpdateEvent("TMW_COMMON_SWINGTIMER_CHANGED")
 	icon:RegisterEvent("UNIT_INVENTORY_CHANGED")
 	
 	icon:SetScript("OnEvent", SwingTimer_OnEvent)

@@ -1,4 +1,6 @@
-﻿if GetLocale() ~= "ptBR" then return end
+﻿--Last update by GlitterStorm @ Azralon on Feb,21th,2015
+
+if GetLocale() ~= "ptBR" then return end
 
 local L
 
@@ -36,28 +38,25 @@ L:SetMiscLocalization({
 L = DBM:GetModLocalization("d286")
 
 L:SetWarningLocalization({
-	Submerged		= "Ahune submergiu",
-	Emerged			= "Ahune emergiu",
+	Emerged			= "Ahune Emergiu",
 	specWarnAttack	= "Ahune está vulnerável - Ataque agora!"
 })
 
 L:SetTimerLocalization{
-	SubmergTimer	= "Submergir",
-	EmergeTimer		= "Emergir",
-	TimerCombat		= "Combate inicia"
+	SubmergTimer	        = "Submergir",
+	EmergeTimer		= "Emergir"
 }
 
+
 L:SetOptionLocalization({
-	Submerged		= "Exibir aviso quando Ahune submergir",
 	Emerged			= "Exibir aviso quando Ahune emergir",
 	specWarnAttack	= "Exibir aviso especial quando Ahune tornar-se vulnerável",
 	SubmergTimer	= "Exibir cronógrafo para submergir",
-	EmergeTimer		= "Exibir cronógrafo para emerge",
-	TimerCombat		= "Exibir cronógrafo para início do combate"
+	EmergeTimer		= "Exibir cronógrafo para emergir"
 })
 
 L:SetMiscLocalization({
-	Pull			= "The Ice Stone has melted!"
+	Pull			= "A pedra de gelo derreteu!"
 })
 
 ----------------------
@@ -66,18 +65,17 @@ L:SetMiscLocalization({
 L = DBM:GetModLocalization("d287")
 
 L:SetWarningLocalization({
-	specWarnBrew		= "Livre-se da bebida antes que ela te atire outra!",
+	specWarnBrew		= "Livre-se da bebida antes que ela te jogue outra!",
 	specWarnBrewStun	= "DICA: Você foi atordoado, lembre-se de beber da próxima vez!"
 })
 
 L:SetOptionLocalization({
 	specWarnBrew		= "Exibir aviso especial para $spell:47376",
-	specWarnBrewStun	= "Exibir aviso especial para $spell:47340",
-	YellOnBarrel		= "Gritar no $spell:51413"
+	specWarnBrewStun	= "Exibir aviso especial para $spell:47340"
 })
 
 L:SetMiscLocalization({
-	YellBarrel			= "Estou Embarrilado!"
+	YellBarrel			= "Barril em mim!"
 })
 
 -------------------------
@@ -88,23 +86,18 @@ L = DBM:GetModLocalization("d285")
 L:SetWarningLocalization({
 	WarnPhase				= "Fase %d",
 	warnHorsemanSoldiers	= "Abóboras Pulsantes surgindo",
-	warnHorsemanHead		= "Cabeça do Horseman ativa"
+	warnHorsemanHead		= "Cabeça do Cavaleiro ativa"
 })
-
-L:SetTimerLocalization{
-	TimerCombatStart		= "Combate inicia"
-}
 
 L:SetOptionLocalization({
 	WarnPhase				= "Exibir aviso para cada mudança de fase",
-	TimerCombatStart		= "Exibir cronógrafo para início do combate",
 	warnHorsemanSoldiers	= "Exibir aviso para surgimento de Abóboras Pulsantes",
-	warnHorsemanHead		= "Exibir aviso para surgimento da Cabeça do Horseman"
+	warnHorsemanHead		= "Exibir aviso para surgimento da Cabeça do Cavaleiro"
 })
 
 L:SetMiscLocalization({
-	HorsemanSummon			= "Horseman rise...",
-	HorsemanSoldiers		= "Soldiers arise, stand and fight! Bring victory at last to this fallen knight!"
+	HorsemanSummon			= "Cavaleiro ascende...",
+	HorsemanSoldiers		= "Soldados levantem-se, fiquem e lutem! Tragam finalmente à vitória para este cavaleiro caido!"
 })
 
 ------------------------------
@@ -113,5 +106,65 @@ L:SetMiscLocalization({
 L = DBM:GetModLocalization("Greench")
 
 L:SetGeneralLocalization({
-	name = "The Abominable Greench"
+	name = "O Greench abominável"
+})
+
+--------------------------
+--  Plants Vs. Zombies  --
+--------------------------
+L = DBM:GetModLocalization("PlantsVsZombies")
+
+L:SetGeneralLocalization({
+	name = "Plantas Vs. Zumbis"
+})
+
+L:SetWarningLocalization({
+	warnTotalAdds	= "Total zumbis gerados desde a última Onda Massiva: %d",
+	specWarnWave	= "Onda Massiva!"
+})
+
+L:SetTimerLocalization{
+	timerWave		= "Próxima Onda Massiva"
+}
+
+L:SetOptionLocalization({
+	warnTotalAdds	= "Anuncia a contagem total de adds gerados entre cada onda massiva",
+	specWarnWave	= "Mostra aviso especial quando uma onda massiva começar",
+	timerWave		= "Mostra contador para próxima onda massiva"
+})
+
+L:SetMiscLocalization({
+	MassiveWave		= "Uma onda Massiva de Zumbis está se aproximando!"
+})
+
+--------------------------
+--  Memories of Azeroth: Burning Crusade  --
+--------------------------
+L = DBM:GetModLocalization("BCEvent")
+
+L:SetGeneralLocalization({
+	name = "MoA: Burning Crusade"
+})
+
+--------------------------
+--  Memories of Azeroth: Wrath of the Lich King  --
+--------------------------
+L = DBM:GetModLocalization("WrathEvent")
+
+L:SetGeneralLocalization({
+	name = "MoA: WotLK"
+})
+
+L:SetMiscLocalization{
+	Emerge				= "emerges from the ground!",
+	Burrow				= "burrows into the ground!"
+}
+
+--------------------------
+--  Memories of Azeroth: Cataclysm  --
+--------------------------
+L = DBM:GetModLocalization("CataEvent")
+
+L:SetGeneralLocalization({
+	name = "MoA: Cataclysm"
 })

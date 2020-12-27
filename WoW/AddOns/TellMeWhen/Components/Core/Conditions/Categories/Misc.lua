@@ -7,7 +7,7 @@
 --		Banjankri of Blackrock, Predeter of Proudmoore, Xenyr of Aszune
 
 -- Currently maintained by
--- Cybeloras of Aerie Peak/Detheroc/Mal'Ganis
+-- Cybeloras of Aerie Peak
 -- --------------------
 
 
@@ -52,6 +52,8 @@ ConditionCategory:RegisterCondition(1,	 "ICON", {
 		[0] = L["CONDITIONPANEL_ICON_SHOWN"],
 		[1] = L["CONDITIONPANEL_ICON_HIDDEN"],
 	},
+	levelChecks = true,
+	
 	isicon = true,
 	nooperator = true,
 	unit = false,
@@ -96,6 +98,8 @@ local function RegisterShownHiddenTimerCallback()
 end
 
 ConditionCategory:RegisterCondition(1.2,	"ICONSHOWNTME", {
+	old = true,
+
 	text = L["CONDITIONPANEL_ICONSHOWNTIME"],
 	tooltip = L["CONDITIONPANEL_ICONSHOWNTIME_DESC"],
 	range = 30,
@@ -119,6 +123,8 @@ ConditionCategory:RegisterCondition(1.2,	"ICONSHOWNTME", {
 	end,
 })
 ConditionCategory:RegisterCondition(1.3,	"ICONHIDDENTME", {
+	old = true,
+	
 	text = L["CONDITIONPANEL_ICONHIDDENTIME"],
 	tooltip = L["CONDITIONPANEL_ICONHIDDENTIME_DESC"],
 	range = 30,
@@ -146,10 +152,9 @@ ConditionCategory:RegisterCondition(1.3,	"ICONHIDDENTME", {
 ConditionCategory:RegisterCondition(3,	 "MOUSEOVER", {
 	text = L["MOUSEOVERCONDITION"],
 	tooltip = L["MOUSEOVERCONDITION_DESC"],
-	min = 0,
-	max = 1,
-	formatter = TMW.C.Formatter.BOOL,
-	nooperator = true,
+	
+	bool = true,
+
 	unit = false,
 	icon = "Interface\\Icons\\Ability_Marksmanship",
 	tcoords = CNDT.COMMON.standardtcoords,
@@ -232,15 +237,17 @@ ConditionCategory:RegisterSpacer(19.5)
 ConditionCategory:RegisterCondition(21,	 "QUESTCOMPLETE", {
 	text = L["CONDITION_QUESTCOMPLETE"],
 	tooltip = L["CONDITION_QUESTCOMPLETE_DESC"],
-	min = 0,
-	max = 1,
-	formatter = TMW.C.Formatter.BOOL,
-	nooperator = true,
-	name = function(editbox) TMW:TT(editbox, "CONDITION_QUESTCOMPLETE", "CONDITION_QUESTCOMPLETE_EB_DESC") editbox.label = L["QUESTIDTOCHECK"] end,
+
+	bool = true,
+	
+	name = function(editbox)
+		editbox:SetTexts(L["CONDITION_QUESTCOMPLETE"], L["CONDITION_QUESTCOMPLETE_EB_DESC"])
+		editbox:SetLabel(L["QUESTIDTOCHECK"])
+	end,
 	unit = false,
 	icon = "Interface\\OptionsFrame\\UI-OptionsFrame-NewFeatureIcon",
 	Env = {
-		IsQuestFlaggedCompleted = IsQuestFlaggedCompleted,
+		IsQuestFlaggedCompleted = C_QuestLog and C_QuestLog.IsQuestFlaggedCompleted or IsQuestFlaggedCompleted,
 		GetQuestResetTime = GetQuestResetTime,
 	},
 	funcstr = function(c)
@@ -275,7 +282,10 @@ ConditionCategory:RegisterCondition(30,	 "MACRO", {
 	max = 1,
 	nooperator = true,
 	noslide = true,
-	name = function(editbox) TMW:TT(editbox, "MACROCONDITION", "MACROCONDITION_EB_DESC") editbox.label = L["MACROTOEVAL"] end,
+	name = function(editbox)
+		editbox:SetTexts(L["MACROCONDITION"], L["MACROCONDITION_EB_DESC"])
+		editbox:SetLabel(L["MACROTOEVAL"])
+	end,
 	unit = false,
 	icon = "Interface\\Icons\\inv_misc_punchcards_yellow",
 	tcoords = CNDT.COMMON.standardtcoords,
@@ -291,6 +301,31 @@ ConditionCategory:RegisterCondition(30,	 "MACRO", {
 	-- events = absolutely no events
 })
 
+
+
+local Functions = {}
+
+local function GetCompiledFunction(luaCode)
+	local key
+	if Functions[luaCode] then
+		key = tostring(Functions[luaCode]):gsub("function: ", "LF_")
+		return Functions[luaCode], key
+	end
+	
+	local func, err = loadstring("return " .. luaCode)
+	if err then
+		func, err = loadstring(luaCode)
+	end
+	
+	if func then
+		setfenv(func, TMW.CNDT.Env)
+		key = tostring(func):gsub("function: ", "LF_")
+		Functions[luaCode] = func
+		Env[key] = func
+	end
+	
+	return func, key, err
+end
 ConditionCategory:RegisterCondition(31,	 "LUA", {
 	text = L["LUACONDITION"],
 	tooltip = L["LUACONDITION_DESC"],
@@ -298,7 +333,6 @@ ConditionCategory:RegisterCondition(31,	 "LUA", {
 	max = 1,
 	nooperator = true,
 	noslide = true,
-	name = function(editbox) TMW:TT(editbox, "LUACONDITION", "LUACONDITION_DESC") editbox.label = L["CODETOEXE"] end,
 	unit = false,
 	icon = "Interface\\Icons\\INV_Misc_Gear_01",
 	tcoords = CNDT.COMMON.standardtcoords,
@@ -311,14 +345,25 @@ ConditionCategory:RegisterCondition(31,	 "LUA", {
 				if _G[parent:GetName()] == parent then
 					lua = lua:gsub("thisobj", parent:GetName())
 				else
-					error("Error with thisobj substitution: _G[thisobj:GetName()] ~= thisobj for " .. parent:GetName())
+					error("Error with `thisobj` substitution: _G[thisobj:GetName()] ~= thisobj for " .. parent:GetName())
 				end
 			else
-				error("Attempted use of thisobj in conditions that don't support it.")
+				error("Attempted use of `thisobj` in conditions that don't support it.")
 			end
 		end
+
+		if lua:find("thisunit") then
+			if c.Unit and c.Unit ~= "" then
+				lua = lua:gsub("thisunit", "(" .. CNDT:GetConditionUnitSubstitution(c.Unit) .. ")")
+			else
+				error("Attempted use of `thisunit` in conditions without units.")
+			end
+
+		end
+
+		local func, key, err = GetCompiledFunction(lua)
 		
-		return lua ~= "" and lua or "true"
+		return func and key .. "()" or format("error(%q)", err)
 	end,
 })
 

@@ -7,7 +7,7 @@
 --		Banjankri of Blackrock, Predeter of Proudmoore, Xenyr of Aszune
 
 -- Currently maintained by
--- Cybeloras of Aerie Peak/Detheroc/Mal'Ganis
+-- Cybeloras of Aerie Peak
 -- --------------------
 
 
@@ -19,7 +19,6 @@ local print = TMW.print
 
 
 local Timer = TMW.C.EventHandler:New("Timer", 51)
-Timer.frequencyMinimum = 0
 
 Timer:RegisterEventDefaults{
 	Counter = "",
@@ -65,6 +64,7 @@ local TIMERS = setmetatable({}, {__index = function(self, k)
 	return t
 end})
 
+TMW.TIMERS = TIMERS
 
 function Timer:SanitizeTimerName(counter)
 	-- don't return in a single line because that will return all of gsub's return values, which we don't want.
@@ -121,7 +121,9 @@ ConditionCategory:RegisterCondition(0.51,	"TIMER", {
 
 	unit = false,
 	icon = "Interface\\Icons\\spell_mage_altertime",
-	name = function(editbox) TMW:TT(editbox, "CONDITION_TIMER", "CONDITION_TIMER_EB_DESC") editbox.label = L["CONDITION_TIMER"] end,
+	name = function(editbox)
+		editbox:SetTexts(L["CONDITION_TIMER"], L["CONDITION_TIMER_EB_DESC"])
+	end,
 	useSUG = "timerName",
 	tcoords = TMW.CNDT.COMMON.standardtcoords,
 	Env = {

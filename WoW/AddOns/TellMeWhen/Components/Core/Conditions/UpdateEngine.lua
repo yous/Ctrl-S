@@ -7,7 +7,7 @@
 --		Banjankri of Blackrock, Predeter of Proudmoore, Xenyr of Aszune
 
 -- Currently maintained by
--- Cybeloras of Aerie Peak/Detheroc/Mal'Ganis
+-- Cybeloras of Aerie Peak
 -- --------------------
 
 
@@ -125,6 +125,7 @@ function UpdateEngine:OnEvent(event, ...)
 	local UpdateTable = self.EventUpdateTables[event]
 	
 	if UpdateTable then
+		TMW:UpdateGlobals()
 		for i = 1, #UpdateTable do
 			local ConditionObject = UpdateTable[i]
 			ConditionObject:UpdateFunction(event, ...)

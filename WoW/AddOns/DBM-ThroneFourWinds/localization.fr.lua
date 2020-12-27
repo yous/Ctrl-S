@@ -2,7 +2,7 @@
 local L
 
 -- Initial release by Sasmira: 12/26/2010
--- Last update: 01/25/2011 (by Sasmira) 
+-- Last update: 01/25/2011 (by Sasmira)
 
 ------------------------
 --  Conclave of Wind  --
@@ -43,6 +43,6 @@ L:SetTimerLocalization({
 })
 
 L:SetOptionLocalization({
-	LightningRodIcon	= DBM_CORE_AUTO_ICONS_OPTION_TEXT:format(89668),
+	LightningRodIcon	= DBM_CORE_L.AUTO_ICONS_OPTION_TEXT:format(89668),
 	TimerFeedback	= "Afficher le timer pour la durée de: $spell:87904"
 })

@@ -4,29 +4,34 @@ local L
 --------------
 -- Brawlers --
 --------------
-L= DBM:GetModLocalization("Brawlers")
+L= DBM:GetModLocalization("BrawlersGeneral")
 
 L:SetGeneralLocalization({
 	name = "Kampfgilde: Einstellungen"
 })
 
 L:SetWarningLocalization({
-	warnQueuePosition	= "Du bist %d. in der Warteschlange.",
+	warnQueuePosition2	= "Du bist %d. in der Warteschlange.",
 	specWarnYourNext	= "Du bist als nächstes dran!",
 	specWarnYourTurn	= "Du bist dran!"
 })
 
 L:SetOptionLocalization({
-	warnQueuePosition	= "Verkünde deine aktuelle Position in der Warteschlange<br/>(bei jeder Änderung)",
+	warnQueuePosition2	= "Verkünde deine aktuelle Position in der Warteschlange<br/>(bei jeder Änderung)",
 	specWarnYourNext	= "Spezialwarnung, wenn du als nächstes dran bist",
 	specWarnYourTurn	= "Spezialwarnung, wenn es dein Kampf ist",
 	SpectatorMode		= "Zeige Warnungen/Timer auch beim Zuschauen fremder Kämpfe<br/>(persönliche Spezialwarnungsmeldungen werden nicht angezeigt)",
-	SpeakOutQueue		= "Verkünde akustisch deine aktuelle Position in der Warteschlange<br/>(bei jeder Änderung)"
+	SpeakOutQueue		= "Verkünde akustisch deine aktuelle Position in der Warteschlange<br/>(bei jeder Änderung)",
+	NormalizeVolume		= "Setze im Kampfgildengebiet die Lautstärke des DIALOG-Audiokanals automatisch auf die Lautstärke des SFX-Audiokanals, damit der Jubel nicht so laut ist."
 })
 
 L:SetMiscLocalization({
 	Bizmo			= "Bizmo",--Alliance
 	Bazzelflange	= "Boss Nobelflansch",--Horde
+	BizmoIgnored	= "We Don't have all night. Hurry it up already!",--translate (trigger)
+	BizmoIgnored2	= "Do you smell smoke?",--translate (trigger)
+	BizmoIgnored3	= "I think it's about time to call this fight.",--translate (trigger)
+	BizmoIgnored4	= "Is it getting hot in here? Or is it just me?",--translate (trigger)
 	--I wish there was a better way to do this....so much localizing. :(
 	Rank1			= "ersten Ranges",
 	Rank2			= "zweiten Ranges",
@@ -60,6 +65,10 @@ L:SetGeneralLocalization({
 	name = "Kampfgilde: Rang 2"
 })
 
+L:SetOptionLocalization({
+	SetIconOnBlat	= "Setze Zeichen auf echten \"Blat\" (Totenkopf)"
+})
+
 ------------
 -- Rank 3 --
 ------------
@@ -69,10 +78,6 @@ L:SetGeneralLocalization({
 	name = "Kampfgilde: Rang 3"
 })
 
-L:SetOptionLocalization({
-	SetIconOnBlat	= "Setze Zeichen auf echten \"Blat\" (Totenkopf)"
-})
-
 ------------
 -- Rank 4 --
 ------------
@@ -80,10 +85,6 @@ L= DBM:GetModLocalization("BrawlRank4")
 
 L:SetGeneralLocalization({
 	name = "Kampfgilde: Rang 4"
-})
-
-L:SetOptionLocalization({
-	SetIconOnDominika	= "Setze Zeichen auf echte \"Dominika die Illusionistin\" (Totenkopf)"
 })
 
 ------------
@@ -113,6 +114,7 @@ L:SetGeneralLocalization({
 	name = "Kampfgilde: Rang 7"
 })
 
+--[[
 ------------
 -- Rank 8 --
 ------------
@@ -130,23 +132,28 @@ L= DBM:GetModLocalization("BrawlRank9")
 L:SetGeneralLocalization({
 	name = "Kampfgilde: Rang 9"
 })
+--]]
 
 -------------
--- Rares 1 --
+-- Brawlers: Legacy --
 -------------
-L= DBM:GetModLocalization("BrawlRare1")
+L= DBM:GetModLocalization("BrawlLegacy")
 
 L:SetGeneralLocalization({
-	name = "Kampfgilde: Klassische Herausford."
+	name = "Kampfgilde: alte Gegner"
+})
+
+L:SetOptionLocalization({
+	SpeakOutStrikes		= "Verkünde akustisch die Anzahl der $spell:141190 Angriffe"
 })
 
 -------------
--- Rares 2 --
+-- Brawlers: Challenges --
 -------------
-L= DBM:GetModLocalization("BrawlRare2")
+L= DBM:GetModLocalization("BrawlChallenges")
 
 L:SetGeneralLocalization({
-	name = "Kampfgilde: Spezielle Herausford."
+	name = "Kampfgilde: Herausforderungen"
 })
 
 L:SetWarningLocalization({
@@ -155,12 +162,20 @@ L:SetWarningLocalization({
 
 L:SetOptionLocalization({
 	ArrowOnBoxing		= "Zeige DBM-Pfeil während $spell:140868, $spell:140862 und $spell:140886",
-	specWarnRPS			= "Spezialwarnung für die richtige Auswahl bei $spell:141206",
-	SpeakOutStrikes		= "Verkünde akustisch die Anzahl der $spell:141190 Angriffe"
+	specWarnRPS			= "Spezialwarnung für die richtige Auswahl bei $spell:141206"
 })
 
 L:SetMiscLocalization({
 	rock			= "Stein",
 	paper			= "Papier",
 	scissors		= "Schere"
+})
+
+-------------
+-- Brawlers: Rumble --
+-------------
+L= DBM:GetModLocalization("BrawlRumble")
+
+L:SetGeneralLocalization({
+	name = "Kampfgilde: Prügeleien"
 })

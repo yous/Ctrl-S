@@ -1,4 +1,4 @@
-﻿if GetLocale() ~= "zhTW" then return end
+if GetLocale() ~= "zhTW" then return end
 local L
 
 -----------------------
@@ -9,7 +9,7 @@ L = DBM:GetModLocalization("FlameLeviathan")
 L:SetGeneralLocalization{
 	name = "烈焰戰輪"
 }
-	
+
 L:SetMiscLocalization{
 	YellPull	= "發現敵意實體。啟動威脅評估協定。首要目標接近中。30秒後將再度評估。",
 	Emote		= "%%s緊追(%S+)%。"
@@ -120,7 +120,6 @@ L:SetTimerLocalization{
 }
 
 L:SetWarningLocalization{
-	WarningPhasePunch		= "相位拳擊: >%s< - 第%d層",
 	WarnPhase2Soon			= "第2階段即將到來",
 	warnStarLow				= "崩陷之星血量低"
 }
@@ -134,12 +133,12 @@ L:SetOptionLocalization{
 }
 
 L:SetMiscLocalization{
+	HealthInfo			= "崩陷之星血量",
 	YellPull			= "你的行為毫無意義。這場衝突的結果早已計算出來了。不論結局為何，萬神殿仍將收到觀察者的訊息。",
 	YellKill			= "我曾經看過塵世沉浸在造物者的烈焰之中，眾生連一聲悲泣都無法呼出，就此凋零。整個星系在彈指之間歷經了毀滅與重生。然而在這段歷程之中，我的心卻無法感受到絲毫的...惻隱之念。我‧感‧受‧不‧到。成千上萬的生命就這麼消逝。他們是否擁有與你同樣堅韌的生命?他們是否與你同樣熱愛生命?",
 	Emote_CollapsingStar	= "%s開始召喚崩陷之星!",
 	Phase2				= "瞧瞧泰坦造物的能耐吧!",
-	FirstPull			= "你的行為毫無意義。這場衝突的結果早已計算出來了。不論結局為何，萬神殿仍將收到觀察者的訊息。",
-	PullCheck			= "艾爾加隆開始上傳滅世訊息的剩餘時間= (%d+)分鐘。"
+	FirstPull			= "從我的雙眼觀看你的世界:一個無邊無際的宇宙--連你們之中最具智慧者都無法想像的廣闊無垠。",
 }
 
 ----------------
@@ -230,7 +229,6 @@ L:SetTimerLocalization{
 
 L:SetOptionLocalization{
 	TimerHardmode	= "為困難模式顯示計時器",
-	RangeFrame		= "顯示距離框",
 	AnnounceFails	= "公佈中了閃電充能的玩家到團隊頻道<br/>(需要團隊隊長或助理權限)"
 }
 
@@ -239,7 +237,7 @@ L:SetMiscLocalization{
 	YellPhase2	= "無禮的小輩，你竟敢在我的王座之上挑戰我?我會親手碾碎你們!",
 	YellKill	= "住手!我認輸了!",
 	ChargeOn	= "閃電充能: %s",
-	Charge		= "中了閃電充能 (這一次): %s" 
+	Charge		= "中了閃電充能 (這一次): %s"
 }
 
 -------------
@@ -292,7 +290,6 @@ L:SetGeneralLocalization{
 
 L:SetWarningLocalization{
 	MagneticCore		= ">%s<拿到了磁能之核",
-	WarningShockBlast	= "震爆 - 快跑開",
 	WarnBombSpawn		= "炸彈機器人出現了"
 }
 
@@ -308,13 +305,8 @@ L:SetOptionLocalization{
 	TimeToPhase3			= "為第3階段開始顯示計時器",
 	TimeToPhase4			= "為第4階段開始顯示計時器",
 	MagneticCore			= "提示磁能之核的拾取者",
-	HealthFramePhase4		= "顯示第4階段的首領血量框架",
-	AutoChangeLootToFFA		= "第3階段自動轉換拾取方式為自由拾取",
 	WarnBombSpawn			= "為炸彈機器人顯示警告",
-	TimerHardmode			= "為困難模式顯示計時器",
-	ShockBlastWarningInP1	= "為第1階段的$spell:63631顯示特別警告",
-	ShockBlastWarningInP4	= "為第4階段的$spell:63631顯示特別警告",
-	RangeFrame				= "在第1階段顯示距離框(6碼)"
+	TimerHardmode			= "為困難模式顯示計時器"
 }
 
 L:SetMiscLocalization{
@@ -323,9 +315,6 @@ L:SetMiscLocalization{
 	MobPhase3		= "空中指揮裝置",
 	YellPull		= "我們沒有太多時間，朋友們!你們要幫我測試我最新也是最偉大的創作。在你們改變心意之前，別忘了就是你們把XT-002搞得一團糟，你們欠我一次。",
 	YellHardPull	= "為什麼你要做出這種事?難道你沒看見標示上寫著「請勿觸碰這個按鈕!」嗎?現在自爆裝置已經啟動了，我們要怎麼完成測試呢?",
-	YellPhase2		= "太好了!絕妙的良好結果!外殼完整度98.9%!幾乎只有一點擦痕!繼續下去。",
-	YellPhase3		= "感謝你，朋友們!我們的努力讓我獲得了一些絕佳的資料!現在，我把東西放在哪兒了--噢，在這裡。",
-	YellPhase4		= "初步測試階段完成。現在要玩真的啦!",
 	LootMsg			= "(.+)拾取了物品:.*Hitem:(%d+)"
 }
 
@@ -342,20 +331,8 @@ L:SetTimerLocalization{
 	hardmodeSpawn = "薩倫聚惡體出現"
 }
 
-L:SetWarningLocalization{
-	SpecialWarningShadowCrash		= "你中了暗影暴擊 - 快跑開",
-	SpecialWarningShadowCrashNear	= "你附近有人中暗影暴擊 - 快遠離",
-	SpecialWarningLLNear			= "你附近的%s中了無面者印記"
-}
-
 L:SetOptionLocalization{
-	SetIconOnShadowCrash			= "為$spell:62660的目標設置標記 (頭顱)",
-	SetIconOnLifeLeach				= "為$spell:63276的目標設置標記 (十字)",
-	SpecialWarningShadowCrash		= "為$spell:62660顯示特別警告(必須有最少一名團隊成員設置目標或專注目標)",
-	SpecialWarningShadowCrashNear	= "當你附近的人中了$spell:62660時顯示特別警告",
-	SpecialWarningLLNear			= "當你附近的人中了$spell:63276時顯示特別警告",
-	hardmodeSpawn					= "為薩倫聚惡體出現顯示計時器 (困難模式)",
-	CrashArrow						= "當你附近的人中了$spell:62660時顯示DBM箭頭"
+	hardmodeSpawn			= "為薩倫聚惡體出現顯示計時器 (困難模式)"
 }
 
 L:SetMiscLocalization{
@@ -371,23 +348,13 @@ L:SetGeneralLocalization{
 	name = "尤格薩倫"
 }
 
-L:SetMiscLocalization{
-	YellPull 			= "我們即將有機會打擊怪物的首腦!現在將你的憤怒與仇恨貫注在他的爪牙上!",
-	YellPhase2			= "我是清醒的夢境。",
-	Sara 				= "薩拉",
-	WarningYellSqueeze	= "我被觸手抓住了 - 快救我"
-}
-
 L:SetWarningLocalization{
 	WarningGuardianSpawned 			= "第%d個尤格薩倫守護者出現了",
 	WarningCrusherTentacleSpawned	= "粉碎觸手出現了",
 	WarningSanity 					= "剩下%d理智",
 	SpecWarnSanity 					= "剩下%d理智",
-	SpecWarnGuardianLow				= "停止攻擊這隻守護者",
 	SpecWarnMadnessOutNow			= "瘋狂誘陷即將結束 - 快傳送出去",
 	WarnBrainPortalSoon				= "3秒後腦部傳送門",
-	SpecWarnFervor					= "你中了薩拉的熱誠",
-	SpecWarnFervorCast				= "薩拉的熱誠正在對你施放",
 	specWarnBrainPortalSoon			= "腦部傳送門即將到來"
 }
 
@@ -400,13 +367,15 @@ L:SetOptionLocalization{
 	WarningCrusherTentacleSpawned	= "為粉碎觸手出現顯示警告",
 	WarningSanity					= "當理智剩下50時顯示警告",
 	SpecWarnSanity					= "當理智過低(25,15,5)時顯示特別警告",
-	SpecWarnGuardianLow				= "當守護者(第1階段)血量過低時顯示特別警告(DD用)",
 	WarnBrainPortalSoon				= "為腦部傳送門顯示預先警告",
 	SpecWarnMadnessOutNow			= "為瘋狂誘陷結束前顯示特別警告",
 	SpecWarnFervorCast				= "當薩拉的熱誠正在對你施放時顯示特別警告(必須有最少一名團隊成員設置目標或專注目標)",
 	specWarnBrainPortalSoon			= "為下一次腦部傳送門顯示特別警告",
-	WarningSqueeze					= "當你中了壓榨 (觸手綁人)時大喊",
-	NextPortal						= "為下一次傳送門顯示計時器",
-	ShowSaraHealth					= "顯示薩拉在第1階段的血量(必須有最少一名團隊成員設置目標或專注目標)",
-	MaladyArrow						= "當你附近的人中了$spell:63881時顯示DBM箭頭"
+	NextPortal						= "為下一次傳送門顯示計時器"
+}
+
+L:SetMiscLocalization{
+	YellPull 			= "我們即將有機會打擊怪物的首腦!現在將你的憤怒與仇恨貫注在他的爪牙上!",
+	YellPhase2			= "我是清醒的夢境。",
+	Sara 				= "薩拉"
 }

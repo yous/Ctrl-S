@@ -7,7 +7,7 @@
 --		Banjankri of Blackrock, Predeter of Proudmoore, Xenyr of Aszune
 
 -- Currently maintained by
--- Cybeloras of Aerie Peak/Detheroc/Mal'Ganis
+-- Cybeloras of Aerie Peak
 -- --------------------
 
 local TMW = TMW
@@ -18,8 +18,8 @@ local print = TMW.print
 local _G = _G
 local bit_band, bit_bor, tinsert, tremove, unpack, wipe =
 	  bit.band, bit.bor, tinsert, tremove, unpack, wipe
-local UnitGUID, GetItemIcon =
-	  UnitGUID, GetItemIcon
+local UnitGUID, GetItemIcon, CombatLogGetCurrentEventInfo =
+	  UnitGUID, GetItemIcon, CombatLogGetCurrentEventInfo
 local GetSpellTexture = TMW.GetSpellTexture
 
 local pGUID = nil -- This can't be defined at load.
@@ -40,11 +40,13 @@ Type.unitType = "name"
 Type.hasNoGCD = true
 Type.canControlGroup = true
 
+local STATE_RUNNING = TMW.CONST.STATE.DEFAULT_SHOW
+local STATE_EXPIRED = TMW.CONST.STATE.DEFAULT_HIDE
 
 -- AUTOMATICALLY GENERATED: UsesAttributes
 Type:UsesAttributes("sourceUnit, sourceGUID")
 Type:UsesAttributes("spell")
-Type:UsesAttributes("alpha")
+Type:UsesAttributes("state")
 Type:UsesAttributes("destUnit, destGUID")
 Type:UsesAttributes("unit, GUID")
 Type:UsesAttributes("start, duration")
@@ -81,18 +83,25 @@ Type:RegisterIconDefaults{
 	CLEUEvents 				= {
 		["*"] 				= false
 	},
+
+	-- If true, prevent handling of an event if the icon's conditions are failing.
+	OnlyIfConditions		= false
+}
+
+Type.RelevantSettings = {
+	SourceConditions = true,
+	DestConditions = true,
 }
 
 
 Type:RegisterConfigPanel_XMLTemplate(100, "TellMeWhen_ChooseName", {
-	title = L["ICONMENU_CHOOSENAME2"] .. " " .. L["ICONMENU_CHOOSENAME_ORBLANK"],
+	title = L["ICONMENU_CHOOSENAME3"] .. " " .. L["ICONMENU_CHOOSENAME_ORBLANK"],
 	SUGType = "cleu",
 })
 
-Type:RegisterConfigPanel_XMLTemplate(165, "TellMeWhen_WhenChecks", {
-	text = L["ICONMENU_SHOWWHEN"],
-	[0x2] = { text = "|cFF00FF00" .. L["ICONMENU_COUNTING"], 	 },
-	[0x1] = { text = "|cFFFF0000" .. L["ICONMENU_NOTCOUNTING"],  },
+Type:RegisterConfigPanel_XMLTemplate(165, "TellMeWhen_IconStates", {
+	[STATE_RUNNING] = { text = "|cFF00FF00" .. L["ICONMENU_COUNTING"],    },
+	[STATE_EXPIRED] = { text = "|cFFFF0000" .. L["ICONMENU_NOTCOUNTING"], },
 })
 
 Type:RegisterConfigPanel_XMLTemplate(150, "TellMeWhen_CLEUOptions")
@@ -103,6 +112,22 @@ Type:RegisterIconEvent(5, "OnCLEUEvent", {
 	desc = L["SOUND_EVENT_ONCLEU_DESC"],
 })
 
+TMW:RegisterUpgrade(87009, {
+	icon = function(self, ics)
+		if ics.CLEUEvents then
+			if ics.CLEUEvents["SPELL_MISSED"] then
+				ics.CLEUEvents["SPELL_MISSED_DODGE"] = true
+				ics.CLEUEvents["SPELL_MISSED_PARRY"] = true
+				ics.CLEUEvents["SPELL_MISSED_BLOCK"] = true
+			end
+			if ics.CLEUEvents["SWING_MISSED"] then
+				ics.CLEUEvents["SWING_MISSED_DODGE"] = true
+				ics.CLEUEvents["SWING_MISSED_PARRY"] = true
+				ics.CLEUEvents["SWING_MISSED_BLOCK"] = true
+			end
+		end
+	end,
+})
 
 TMW:RegisterCallback("TMW_GLOBAL_UPDATE", function()
 	-- This is here because UnitGUID() returns nil at load time.
@@ -130,6 +155,9 @@ local EventsWithoutSpells = {
 	ENCHANT_REMOVED = true,
 	SWING_DAMAGE = true,
 	SWING_MISSED = true,
+	SWING_MISSED_DODGE = true,
+	SWING_MISSED_PARRY = true,
+	SWING_MISSED_BLOCK = true,
 	UNIT_DIED = true,
 	UNIT_DESTROYED = true,
 	UNIT_DISSIPATES = true,
@@ -137,7 +165,10 @@ local EventsWithoutSpells = {
 	ENVIRONMENTAL_DAMAGE = true,
 }
 
-local function CLEU_OnEvent(icon, _, t, event, h, sourceGUID, sourceName, sourceFlags, sourceRaidFlags, destGUID, destName, destFlags, destRaidFlags, arg1, arg2, arg3, arg4, arg5, ...)
+local function CLEU_OnEvent(icon, _, t, event, h,
+	sourceGUID, sourceName, sourceFlags, sourceRaidFlags,
+	destGUID, destName, destFlags, destRaidFlags,
+	arg1, arg2, arg3, arg4, arg5, ...)
 
 	if event == "SPELL_MISSED" and arg4 == "REFLECT" then
 		-- Make a fake event for spell reflects. This will fire in place of SPELL_MISSED when this happens.
@@ -146,50 +177,46 @@ local function CLEU_OnEvent(icon, _, t, event, h, sourceGUID, sourceName, source
 		-- swap the source and the destination so they make sense.
 		sourceGUID, sourceName, sourceFlags, sourceRaidFlags,	destGUID, destName, destFlags, destRaidFlags =
 		destGUID, destName, destFlags, destRaidFlags,			sourceGUID, sourceName, sourceFlags, sourceRaidFlags
+	
+	elseif event == "SPELL_MISSED" and (arg4 == "DODGE" or arg4 == "PARRY" or arg4 == "BLOCK") then
+		-- Make a fake event for spell dodge/parry/block. This will fire in place of SPELL_MISSED when this happens.
+		event = event .. "_" .. arg4
+	elseif event == "SWING_MISSED" and (arg1 == "DODGE" or arg1 == "PARRY" or arg1 == "BLOCK") then
+		-- Make a fake event for swing dodge/parry/block. This will fire in place of SWING_MISSED when this happens.
+		event = event .. "_" .. arg1
 	elseif event == "SPELL_INTERRUPT" then
 		-- Fake an event that allow filtering based on the spell that caused an interrupt rather than the spell that was interrupted.
 		-- Fire it in addition to, not in place of, SPELL_INTERRUPT
 		CLEU_OnEvent(icon, _, t, "SPELL_INTERRUPT_SPELL", h, sourceGUID, sourceName, sourceFlags, sourceRaidFlags, destGUID, destName, destFlags, destRaidFlags, arg1, arg2, arg3, arg4, arg5, ...)
-	elseif event == "SPELL_DAMAGE" then
-		local _, _, _, _, critical, _, _, _, multistrike = ...
+	elseif event == "SPELL_DAMAGE" or event == "SPELL_HEAL" then
+		local _, healCrit, _, _, critical = ...
+		if event == "SPELL_HEAL" then critical = healCrit end
+		
 		if critical then
 			-- Fake an event that fires if there was a crit. Fire mages like this.
 			-- Fire it in addition to, not in place of, SPELL_DAMAGE.
-			CLEU_OnEvent(icon, _, t, "SPELL_DAMAGE_CRIT", h, sourceGUID, sourceName, sourceFlags, sourceRaidFlags, destGUID, destName, destFlags, destRaidFlags, arg1, arg2, arg3, arg4, arg5, ...)
+			CLEU_OnEvent(icon, _, t, event .."_CRIT", h, sourceGUID, sourceName, sourceFlags, sourceRaidFlags, destGUID, destName, destFlags, destRaidFlags, arg1, arg2, arg3, arg4, arg5, ...)
 		else
 			-- Fake an event that fires if there was not a crit. Fire mages don't like this.
 			-- Fire it in addition to, not in place of, SPELL_DAMAGE.
-			CLEU_OnEvent(icon, _, t, "SPELL_DAMAGE_NONCRIT", h, sourceGUID, sourceName, sourceFlags, sourceRaidFlags, destGUID, destName, destFlags, destRaidFlags, arg1, arg2, arg3, arg4, arg5, ...)
-		end
-	end
-
-	if event == "SPELL_DAMAGE" or event == "SPELL_PERIODIC_DAMAGE" or event == "SWING_DAMAGE" or event == "RANGE_DAMAGE" then
-		local _, _, _, _, critical, _, _, _, multistrike = ...
-		if multistrike then
-			-- Fake an event that fires if there was a multistrike.
-			-- Fire it in addition to, not in place of, SPELL_DAMAGE.
-			CLEU_OnEvent(icon, _, t, event .. "_MULTISTRIKE", h, sourceGUID, sourceName, sourceFlags, sourceRaidFlags, destGUID, destName, destFlags, destRaidFlags, arg1, arg2, arg3, arg4, arg5, ...)
-		end
-	elseif event == "SPELL_HEAL" or  event == "SPELL_PERIODIC_HEAL" then
-		local _, critical, multistrike = ...
-		if multistrike then
-			-- Fake an event that fires if there was a multistrike.
-			-- Fire it in addition to, not in place of, SPELL_HEAL.
-			CLEU_OnEvent(icon, _, t, event .. "_MULTISTRIKE", h, sourceGUID, sourceName, sourceFlags, sourceRaidFlags, destGUID, destName, destFlags, destRaidFlags, arg1, arg2, arg3, arg4, arg5, ...)
-		end
-	end
-
-
-	if icon.CLEUNoRefresh then
-		-- Don't handle the event if CLEUNoRefresh is set and the icon's timer is still running.
-		local attributes = icon.attributes
-		if TMW.time - attributes.start < attributes.duration then
-			return
+			CLEU_OnEvent(icon, _, t, event .. "_NONCRIT", h, sourceGUID, sourceName, sourceFlags, sourceRaidFlags, destGUID, destName, destFlags, destRaidFlags, arg1, arg2, arg3, arg4, arg5, ...)
 		end
 	end
 
 
 	if icon.AllowAnyEvents or icon.CLEUEvents[event] then
+
+		if icon.OnlyIfConditions and (not icon.ConditionObject or icon.ConditionObject.Failed) then
+			return
+		end
+	
+		if icon.CLEUNoRefresh then
+			-- Don't handle the event if CLEUNoRefresh is set and the icon's timer is still running.
+			local attributes = icon.attributes
+			if TMW.time - attributes.start < attributes.duration then
+				return
+			end
+		end
 
 		if icon.SourceFlags then
 			-- icon.SourceFlags is nil if it is default, so we don't go into this code if we don't need to.
@@ -293,7 +320,12 @@ local function CLEU_OnEvent(icon, _, t, event, h, sourceGUID, sourceName, source
 
 
 		local tex, spellID, spellName, extraID, extraName
-		if event == "SWING_DAMAGE" or event == "SWING_MISSED" then
+		if event == "SWING_DAMAGE"
+		or event == "SWING_MISSED"
+		or event == "SWING_MISSED_DODGE"
+		or event == "SWING_MISSED_PARRY"
+		or event == "SWING_MISSED_BLOCK"
+		then
 			spellName = ACTION_SWING
 			-- dont define spellID here so that ACTION_SWING will be reported as the icon's spell.
 			tex = GetSpellTexture(6603)
@@ -320,7 +352,7 @@ local function CLEU_OnEvent(icon, _, t, event, h, sourceGUID, sourceName, source
 			spellName = L["CLEU_DIED"]
 			tex = "Interface\\Icons\\Ability_Rogue_FeignDeath"
 			if not sourceUnit then
-			--	sourceUnit = destUnit -- clone it (wait, why? commenting this out because its stupid)
+				sourceUnit = destUnit -- clone it so that UNIT_DIED can be filtered by sourceUnit
 			end
 		else
 			spellID = arg1
@@ -332,25 +364,22 @@ local function CLEU_OnEvent(icon, _, t, event, h, sourceGUID, sourceName, source
 			--"SPELL_DAMAGE", -- normal
 			--"SPELL_DAMAGE_CRIT", -- normal BUT NOT ACTUALLY AN EVENT
 			--"SPELL_DAMAGE_NONCRIT", -- normal BUT NOT ACTUALLY AN EVENT
+			--"SPELL_MISSED_DODGE", -- normal (fake event)
+			--"SPELL_MISSED_PARRY", -- normal (fake event)
+			--"SPELL_MISSED_BLOCK", -- normal (fake event)
 			--"SPELL_MISSED", -- normal
 			--"SPELL_REFLECT", -- normal BUT NOT ACTUALLY AN EVENT
 			--"SPELL_EXTRA_ATTACKS", -- normal
 			--"SPELL_HEAL", -- normal
+			--"SPELL_HEAL_CRIT", -- normal BUT NOT ACTUALLY AN EVENT
+			--"SPELL_HEAL_NONCRIT", -- normal BUT NOT ACTUALLY AN EVENT
 			--"SPELL_ENERGIZE", -- normal
 			--"SPELL_DRAIN", -- normal
 			--"SPELL_LEECH", -- normal
+			--"SPELL_IMMUNE", -- normal
 			--"SPELL_AURA_APPLIED", -- normal
 			--"SPELL_AURA_REFRESH", -- normal
 			--"SPELL_AURA_REMOVED", -- normal
-
-
-			-- "RANGE_DAMAGE_MULTISTRIKE", -- normal BUT NOT ACTUALLY AN EVENT
-			-- "SWING_DAMAGE_MULTISTRIKE", -- normal BUT NOT ACTUALLY AN EVENT
-			-- "SPELL_DAMAGE_MULTISTRIKE", -- normal BUT NOT ACTUALLY AN EVENT
-			-- "SPELL_PERIODIC_DAMAGE_MULTISTRIKE", -- normal BUT NOT ACTUALLY AN EVENT
-			-- "SPELL_HEAL_MULTISTRIKE", -- normal BUT NOT ACTUALLY AN EVENT
-			-- "SPELL_PERIODIC_HEAL_MULTISTRIKE", -- normal BUT NOT ACTUALLY AN EVENT
-
 
 			--"SPELL_PERIODIC_DAMAGE", -- normal
 			--"SPELL_PERIODIC_DRAIN", -- normal
@@ -428,18 +457,21 @@ local function CLEU_OnEvent(icon, _, t, event, h, sourceGUID, sourceName, source
 			)
 		end
 
-		-- do an immediate update because it might look stupid if
-		-- half the icon changes on event and the other half changes on the next update cycle
-		icon:Update(true)
-
 		-- Fire the OnCLEUEvent icon event to immediately trigger any notifications for it, if needed.
 		if icon.EventHandlersSet.OnCLEUEvent then
 			icon:QueueEvent("OnCLEUEvent")
 			icon:ProcessQueuedEvents()
 		end
+
+		-- do an immediate update because it might look stupid if
+		-- half the icon changes on event and the other half changes on the next update cycle.
+		-- Ddo this after we fire the icon event in case anything in the icon event is going to cause the
+		-- calculated state of the icon to change from what it might otherwise be. See ticket 1352.
+		-- Since the icon's "state" attribute is basically the lowest priority in determining calculated state,
+		-- it should be set only after all other possible overrides have been calculated.
+		icon:Update(true)
 	end
 end
-
 
 local function CLEU_OnUpdate(icon, time)
 	local attributes = icon.attributes
@@ -447,17 +479,15 @@ local function CLEU_OnUpdate(icon, time)
 	local duration = attributes.duration
 
 	if time - start > duration then
-		-- The timer is not running. Use the timer-not-running alpha value.
 		icon:SetInfo(
-			"alpha; start, duration",
-			icon.UnAlpha,
+			"state; start, duration",
+			STATE_EXPIRED,
 			0, 0
 		)
 	else
-		-- The timer is running. Use the timer-is-running alpha value.
 		icon:SetInfo(
-			"alpha; start, duration",
-			icon.Alpha,
+			"state; start, duration",
+			STATE_RUNNING,
 			start, duration
 		)
 	end
@@ -487,14 +517,14 @@ end
 function Type:HandleYieldedInfo(icon, iconToSet, capturedEvent)
 	if capturedEvent then
 		iconToSet:SetInfo(
-			"alpha; start, duration; texture; spell; extraSpell; unit, GUID; sourceUnit, sourceGUID; destUnit, destGUID",
-			icon.Alpha,
+			"state; start, duration; texture; spell; extraSpell; unit, GUID; sourceUnit, sourceGUID; destUnit, destGUID",
+			STATE_RUNNING,
 			unpack(capturedEvent)
 		)
 	else
 		iconToSet:SetInfo(
-			"alpha; start, duration",
-			icon.UnAlpha,
+			"state; start, duration",
+			STATE_EXPIRED,
 			0, 0
 		)
 	end
@@ -504,8 +534,23 @@ function Type:Setup(icon)
 	icon.Spells = TMW:GetSpells(icon.Name, false)
 
 	-- only define units if there are any units. we dont want to waste time iterating an empty table.
-	icon.SourceUnits = icon.SourceUnit ~= "" and TMW:GetUnits(icon, icon.SourceUnit)
-	icon.DestUnits = icon.DestUnit ~= "" and TMW:GetUnits(icon, icon.DestUnit)
+	icon.SourceUnits = nil
+	if icon.SourceUnit ~= "" then
+		local unitSet
+		icon.SourceUnits, unitSet = TMW:GetUnits(icon, icon.SourceUnit, icon.SourceConditions)
+		if unitSet.mightHaveWackyUnitRefs then
+			icon.SourceUnits = TMW:GetUnits(icon, icon.SourceUnit)
+		end
+	end
+
+	icon.DestUnits = nil
+	if icon.DestUnit ~= "" then
+		local unitSet
+		icon.DestUnits, unitSet = TMW:GetUnits(icon, icon.DestUnit, icon.DestConditions)
+		if unitSet.mightHaveWackyUnitRefs then
+			icon.DestUnits = TMW:GetUnits(icon, icon.DestUnit)
+		end
+	end
 
 	-- nil out flags if they are set to default (0xFFFFFFFF)
 	icon.SourceFlags = icon.SourceFlags ~= 0xFFFFFFFF and icon.SourceFlags
@@ -519,7 +564,7 @@ function Type:Setup(icon)
 	-- Tell the user if they have an icon that is going to respond to every fucking thing that happens.
 	if icon.AllowAnyEvents and not icon.SourceUnits and not icon.DestUnits and icon.Name == "" and not icon.SourceFlags and not icon.DestFlags then
 		if TMW.Locked and icon.Enabled then
-			TMW.Warn(L["CLEU_NOFILTERS"]:format(icon:GetIconName(true)))
+			TMW:Warn(L["CLEU_NOFILTERS"]:format(icon:GetIconName(true)))
 		end
 		return
 	end
@@ -528,7 +573,7 @@ function Type:Setup(icon)
 	icon:SetUpdateMethod("manual")
 
 	icon:RegisterEvent("COMBAT_LOG_EVENT_UNFILTERED")
-	icon:SetScript("OnEvent", CLEU_OnEvent)
+	icon:SetScript("OnEvent", function(self, event) CLEU_OnEvent(self, event, CombatLogGetCurrentEventInfo()) end)
 
 	if icon:IsGroupController() then
 		icon.capturedCLEUEvents = icon.capturedCLEUEvents or {}
@@ -661,3 +706,83 @@ Processor:RegisterDogTag("TMW", "Extra", {
 	example = ('[Extra] => %q; [Extra(link=true)] => %q; [Extra(icon="TMW:icon:1I7MnrXDCz8T")] => %q; [Extra(icon="TMW:icon:1I7MnrXDCz8T", link=true)] => %q'):format(GetSpellInfo(5782), GetSpellLink(5782), GetSpellInfo(5308), GetSpellLink(5308)),
 	category = L["ICON"],
 })
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+for _, key in TMW:Vararg("Source", "Dest") do
+	local CNDT = TMW.CNDT
+
+	local ConditionSet = {
+		parentSettingType = "icon",
+		parentDefaults = TMW.Icon_Defaults,
+		modifiedDefaults = {
+			Unit = "unit",
+		},
+		
+		settingKey = key .. "Conditions",
+		GetSettings = function(self)
+			return TMW.CI.ics and TMW.CI.ics[key .. "Conditions"]
+		end,
+		
+		iterFunc = TMW.InIconSettings,
+		iterArgs = {
+			[1] = TMW,
+		},
+
+		useDynamicTab = true,
+		ShouldShowTab = function(self)
+			return TellMeWhen_CLEUOptions and TellMeWhen_CLEUOptions:IsShown()
+		end,
+		tabText = L["CLEU_CONDITIONS_" .. key:upper()],
+		tabTooltip = L["CLEU_CONDITIONS_DESC"],
+		
+		ConditionTypeFilter = function(self, conditionData)
+			if conditionData.unit == nil then
+				return true
+			elseif conditionData.identifier == "LUA" then
+				return true
+			end
+		end,
+		TMW_CNDT_GROUP_DRAWGROUP = function(self, event, conditionGroup, conditionData, conditionSettings)
+			if CNDT.CurrentConditionSet == self then
+				TMW.SUG:EnableEditBox(conditionGroup.Unit, "unitconditionunits", true)
+				TMW:TT(conditionGroup.Unit, "CONDITIONPANEL_UNIT", "ICONMENU_UNIT_DESC_UNITCONDITIONUNIT")
+			end
+		end,
+	}
+	CNDT:RegisterConditionSet("CLEU" .. key, ConditionSet)
+
+	TMW:RegisterCallback("TMW_OPTIONS_LOADED", function()
+		-- This can't happen until after TMW_OPTIONS_LOADED because it has to be registered
+		-- after the default callbacks are registered
+		TMW:RegisterCallback("TMW_CNDT_GROUP_DRAWGROUP", ConditionSet)
+	end)
+end

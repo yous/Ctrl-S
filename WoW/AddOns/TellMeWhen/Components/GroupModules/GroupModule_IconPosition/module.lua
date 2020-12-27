@@ -7,7 +7,7 @@
 --		Banjankri of Blackrock, Predeter of Proudmoore, Xenyr of Aszune
 
 -- Currently maintained by
--- Cybeloras of Aerie Peak/Detheroc/Mal'Ganis
+-- Cybeloras of Aerie Peak
 -- --------------------
 
 
@@ -38,6 +38,9 @@ TMW:RegisterUpgrade(60005, {
 		gs.Spacing = nil
 	end,
 })
+
+
+IconPosition:RegisterConfigPanel_XMLTemplate(30, "TellMeWhen_GM_IconPosition")
 
 
 function IconPosition:OnEnable()
@@ -113,7 +116,7 @@ function IconPosition:AdjustIconsForModNumRowsCols(deltaRows, deltaCols)
 		local columns_new = group.Columns + deltaCols
 
 		
-		local iconsCopy = TMW.UTIL.shallowCopy(group:GetSettings().Icons)
+		local iconsCopy = TMW.shallowCopy(group:GetSettings().Icons)
 		wipe(group:GetSettings().Icons)
 
 		for iconID, ics in pairs(iconsCopy) do

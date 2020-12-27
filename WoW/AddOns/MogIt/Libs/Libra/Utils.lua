@@ -1,5 +1,5 @@
 local Libra = LibStub("Libra")
-local Type, Version = "Utils", 1
+local Type, Version = "Utils", 2
 if Libra:GetModuleVersion(Type) >= Version then return end
 
 Libra.modules[Type] = Libra.modules[Type] or {}
@@ -19,11 +19,11 @@ end)
 function object:PLAYER_LOGIN()
 	local _, realm = UnitFullName("player")
 	self.myRealm = realm
-	self.connectedRealmsSorted = GetAutoCompleteRealms() or {}
-	for i, v in ipairs(self.connectedRealmsSorted) do
+	self.connectedRealmsSorted = {}
+	for i, v in ipairs(GetAutoCompleteRealms() or {}) do
 		self.connectedRealms[v] = true
-		if v == self.myRealm then
-			tremove(self.connectedRealmsSorted, i)
+		if v ~= self.myRealm then
+			tinsert(self.connectedRealmsSorted, v)
 		end
 	end
 	sort(self.connectedRealmsSorted)

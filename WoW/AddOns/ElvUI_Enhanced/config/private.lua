@@ -17,6 +17,8 @@ V.general.minimapbar = {
 	['layoutDirection'] = 'NORMAL',
 	['buttonSize'] = 28,
 	['mouseover'] = false,
+	['mbcalendar'] =  false,
+	['mbgarrison'] = false,
 }
 
 V.general.raidmarkerbar = {
@@ -36,8 +38,10 @@ V.equipment = {
 	['battleground'] = {
 		['enable'] = false,
 	},
-	['primary'] = 'none',
-	['secondary'] = 'none',
+	['spec1'] = 'none',
+	['spec2'] = 'none',
+	['spec3'] = 'none',
+	['spec4'] = 'none',
 	['equipmentset'] = 'none',
 	['durability'] = {
 		enable = true,

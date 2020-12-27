@@ -24,7 +24,7 @@ local raidmarkerVisibility = {
 }
 
 local function ColorizeSettingName(settingName)
-	return ("|cffE0B0FF%s|r"):format(settingName)
+	return ("|cffff8000%s|r"):format(settingName)
 end
 
 function EO:DataTextOptions()
@@ -92,7 +92,7 @@ function EO:EquipmentOptions()
 						get = function(info) return E.private.equipment.specialization.enable end,
 						set = function(info, value) E.private.equipment.specialization.enable = value end
 					},
-					primary = {
+					spec1 = {
 						type = "select",
 						order = 2,
 						name = L["Primary Talent"],
@@ -110,16 +110,61 @@ function EO:EquipmentOptions()
 							return sets
 						end,
 					},
-					secondary = {
+					spec2 = {
 						type = "select",
 						order = 3,
 						name = L["Secondary Talent"],
 						desc = L["Choose the equipment set to use for your secondary specialization."],
-						disabled = function() return not E.private.equipment.specialization.enable end,
+						disabled = function() 
+							local numSpecs = GetNumSpecializations(false, self.isPet);
+							return not E.private.equipment.specialization.enable or numSpecs < 2 
+						end,
 						values = function()
 							local sets = { ["none"] = L["No Change"] }
 							for i = 1, GetNumEquipmentSets() do
-								local name, _, _, _, _, _, _, _, _ = GetEquipmentSetInfo(i)
+								local name = GetEquipmentSetInfo(i)
+								if name then
+									sets[name] = name
+								end
+							end
+							tsort(sets, function(a, b) return a < b end)
+							return sets
+						end,
+					},
+					spec3 = {
+						type = "select",
+						order = 4,
+						name = L["Tertiary Talent"],
+						desc = L["Choose the equipment set to use for your thirth specialization."],
+						disabled = function() 
+							local numSpecs = GetNumSpecializations(false, self.isPet);
+							return not E.private.equipment.specialization.enable or numSpecs < 3 
+						end,
+						values = function()
+							local sets = { ["none"] = L["No Change"] }
+							for i = 1, GetNumEquipmentSets() do
+								local name = GetEquipmentSetInfo(i)
+								if name then
+									sets[name] = name
+								end
+							end
+							tsort(sets, function(a, b) return a < b end)
+							return sets
+						end,
+					},
+					spec4 = {
+						type = "select",
+						order = 5,
+						name = L["Quaternary Talent"],
+						desc = L["Choose the equipment set to use for your quaternary specialization."],
+						disabled = function() 
+							local numSpecs = GetNumSpecializations(false, self.isPet);
+							return not E.private.equipment.specialization.enable or numSpecs < 4 
+						end,
+						values = function()
+							local sets = { ["none"] = L["No Change"] }
+							for i = 1, GetNumEquipmentSets() do
+								local name = GetEquipmentSetInfo(i)
 								if name then
 									sets[name] = name
 								end
@@ -363,6 +408,7 @@ function EO:MapOptions()
 				name = L['Skin Style'],
 				desc = L['Change settings for how the minimap buttons are skinned.'],
 				disabled = function() return not E.private.general.minimapbar.skinButtons end,
+				set = function(info, value) E.private.general.minimapbar[ info[#info] ] = value; MB:UpdateSkinStyle() end,
 				values = {
 					['NOANCHOR'] = L['No Anchor Bar'],
 					['HORIZONTAL'] = L['Horizontal Anchor Bar'],
@@ -402,6 +448,30 @@ function EO:MapOptions()
 				set = function(info, value) E.private.general.minimapbar.mouseover = value; MB:ChangeMouseOverSetting() end,
 				disabled = function() return not E.private.general.minimapbar.skinButtons or E.private.general.minimapbar.skinStyle == 'NOANCHOR' end,
 			},
+			mmbuttons = {
+				order = 7,
+				type = "group",
+				name = L["Minimap Buttons"],
+				guiInline = true,
+				args = {
+					mbgarrison = {
+						order = 1,
+						name = GARRISON_LOCATION_TOOLTIP,
+						desc = L['TOGGLESKIN_DESC'],
+						type = "toggle",
+						disabled = function() return not E.private.general.minimapbar.skinButtons or E.private.general.minimapbar.skinStyle == 'NOANCHOR' end,
+						set = function(info, value) E.private.general.minimapbar.mbgarrison = value; E:StaticPopup_Show("PRIVATE_RL") end,
+					},
+					mbcalendar = {
+						order = 1,
+						name = L['Calendar'],
+						desc = L['TOGGLESKIN_DESC'],
+						type = "toggle",
+						disabled = function() return not E.private.general.minimapbar.skinButtons or E.private.general.minimapbar.skinStyle == 'NOANCHOR' end,
+						set = function(info, value) E.private.general.minimapbar.mbcalendar = value; E:StaticPopup_Show("PRIVATE_RL") end,
+					}
+				}
+			}
 		}
 	}
 	
@@ -701,13 +771,6 @@ function EO:UnitFramesOptions()
 		},
 	}
 
-	E.Options.args.unitframe.args.general.args.generalGroup.args.autoRoleSet = {
-		order = 6,
-		name = ColorizeSettingName(L['Automatic Role Assignment']),
-		desc = L['Enables the automatic role assignment based on specialization for party / raid members (only work when you are group leader or group assist).'],
-		type = 'toggle',
-	}
-	
 	E.Options.args.unitframe.args.general.args.generalGroup.args.hideroleincombat = {
 		order = 7,
 		name = ColorizeSettingName(L['Hide Role Icon in combat']),

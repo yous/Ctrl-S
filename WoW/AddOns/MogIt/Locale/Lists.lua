@@ -11,12 +11,12 @@ L.source = {
 	[4] = L["Vendor"],
 	[5] = L["Crafted"],
 	[6] = L["Achievement"],
-	[7] = L["Code Redemption"],
-	[8] = L["In-Game Store"],
-	[9] = L["Black Market Auction House"],
-	[10] = L["Starter Gear"],
-	[11] = L["Event"],
-	[12] = L["Follower Mission"],
+	-- [7] = L["Code Redemption"],
+	-- [8] = L["In-Game Store"],
+	-- [9] = L["Black Market Auction House"],
+	-- [10] = L["Starter Gear"],
+	-- [11] = L["Event"],
+	-- [12] = L["Follower Mission"],
 };
 
 L.diffs = {
@@ -82,7 +82,7 @@ L.quality = {
 	3, -- Rare
 	4, -- Epic
 	5, -- Legendary
-	--6, -- Artifact
+	6, -- Artifact
 	7, -- Heirloom
 };
 
@@ -98,13 +98,14 @@ L.classBits = {
 	WARLOCK = 256,
 	WARRIOR = 1,
 	MONK = 512,
+	DEMONHUNTER = 2048,
 };
 
 L.bind = {
-	[1] = NONE,
-	[2] = ITEM_BIND_ON_EQUIP,
-	[3] = ITEM_BIND_ON_PICKUP,
-	[4] = ITEM_BIND_TO_BNETACCOUNT,
+	[LE_ITEM_BIND_NONE] = NONE,
+	[LE_ITEM_BIND_ON_EQUIP] = ITEM_BIND_ON_EQUIP,
+	[LE_ITEM_BIND_ON_ACQUIRE] = ITEM_BIND_ON_PICKUP,
+	-- [4] = ITEM_BIND_TO_BNETACCOUNT,
 };
 
 L.BattleNetBonus = {

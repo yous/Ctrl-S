@@ -1,5 +1,5 @@
 local Libra = LibStub("Libra")
-local Type, Version = "UIPanel", 1
+local Type, Version = "UIPanel", 2
 if Libra:GetModuleVersion(Type) >= Version then return end
 
 Libra.modules[Type] = Libra.modules[Type] or {}
@@ -62,7 +62,7 @@ end
 
 local function onClick(self)
 	self:GetParent():SelectTab(self:GetID())
-	PlaySound("igCharacterInfoTab")
+	PlaySound(SOUNDKIT.IG_CHARACTER_INFO_TAB)
 end
 
 function Prototype:CreateTab(name)

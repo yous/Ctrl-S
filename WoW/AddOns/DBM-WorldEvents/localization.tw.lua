@@ -1,5 +1,4 @@
 ﻿if GetLocale() ~= "zhTW" then return end
-
 local L
 
 ------------
@@ -68,12 +67,24 @@ L:SetWarningLocalization({
 
 L:SetOptionLocalization({
 	specWarnBrew		= "為$spell:47376顯示特別警告",
-	specWarnBrewStun	= "為$spell:47340顯示特別警告",
-	YellOnBarrel		= "當你中了$spell:51413時大喊"
+	specWarnBrewStun	= "為$spell:47340顯示特別警告"
 })
 
 L:SetMiscLocalization({
 	YellBarrel			= "我中了空桶(暈)"
+})
+
+----------------
+--  Brewfest  --
+----------------
+L = DBM:GetModLocalization("Brew")
+
+L:SetGeneralLocalization({
+	name = "啤酒節"
+})
+
+L:SetOptionLocalization({
+	NormalizeVolume			= "在啤酒節區域時，自動地調整對話聲道以匹配音樂聲道的音量。(如果音樂聲道沒有開啟，則會設成静音。)"
 })
 
 -----------------------------
@@ -136,39 +147,108 @@ L:SetMiscLocalization({
 })
 
 --------------------------
---  Garrison Invasions  --
+--  Demonic Invasions  --
 --------------------------
-L = DBM:GetModLocalization("GarrisonInvasions")
+L = DBM:GetModLocalization("DemonInvasions")
 
 L:SetGeneralLocalization({
-	name = "要塞入侵"
+	name = "惡魔入侵"
 })
 
-L:SetWarningLocalization({
-	specWarnRylak	= "冰喉食腐者來了",
-	specWarnWorker	= "害怕的工人在空地上",
-	specWarnSpy		= "一個間諜闖入",
-	specWarnBuilding= "建築物受到攻擊"
+--------------------------
+--  Memories of Azeroth: Burning Crusade  --
+--------------------------
+L = DBM:GetModLocalization("BCEvent")
+
+L:SetGeneralLocalization({
+	name = "MoA: Burning Crusade"
 })
 
-L:SetOptionLocalization({
-	specWarnRylak	= "當萊拉克出現時顯示特別警告",
-	specWarnWorker	= "當害怕的工人在空地上被抓住時顯示特別警告",
-	specWarnSpy		= "當間諜闖入時顯示特別警告",
-	specWarnBuilding= "當建築物受到攻擊時顯示特別警告"
+--------------------------
+--  Memories of Azeroth: Wrath of the Lich King  --
+--------------------------
+L = DBM:GetModLocalization("WrathEvent")
+
+L:SetGeneralLocalization({
+	name = "MoA: WotLK"
 })
+
+L:SetMiscLocalization{
+	Emerge				= "從地底鑽出!",
+	Burrow				= "鑽進地裡!"
+}
+
+--------------------------
+--  Memories of Azeroth: Cataclysm  --
+--------------------------
+L = DBM:GetModLocalization("CataEvent")
+
+L:SetGeneralLocalization({
+	name = "MoA: Cataclysm"
+})
+
+----------------------------------
+--  Azeroth Event World Bosses  --
+----------------------------------
+
+-- Lord Kazzak (Badlands)
+L = DBM:GetModLocalization("KazzakClassic")
+
+L:SetGeneralLocalization{
+	name = "卡札克領主"
+}
 
 L:SetMiscLocalization({
-	--General
-	preCombat			= "準備作戰！堅守崗位！",--Common in all yells, rest varies based on invasion
-	preCombat2			= "我們走運了！再一次地，我們會讓惡魔見識一下真正的部落絕不動搖！",--Shadow Council doesn't follow format of others :\一群魔妾出現了！
-	rylakSpawn			= "戰場上的騷動吸引了一隻萊拉克！",--Source npc Darkwing Scavenger, target playername
-	terrifiedWorker		= "害怕的工人在空地上被抓住了！",
-	sneakySpy			= "的間諜趁亂闖進了要塞！",--Shortened to cut out "horde/alliance"
-	buildingAttack		= "你的%s受到攻擊了！",--Your Salvage Yard is under attack! 食腐骨蟲聞到牠的下一頓大餐了！
-	--Ogre
-	GorianwarCaller		= "一位戈利安戰鬥法師進入戰場！",--Maybe combined "add" special warning most adds?
-	WildfireElemental	= "有個野火元素被召喚到大門前！",--Maybe combined "add" special warning most adds?
-	--Iron Horde
-	Assassin			= "有個刺客正在獵殺你的守衛！"--Maybe combined "add" special warning most adds? --攻城大砲接近了！
+	Pull		= "為了軍團!為了基爾加德!"
+})
+
+-- Azuregos (Azshara)
+L = DBM:GetModLocalization("Azuregos")
+
+L:SetGeneralLocalization{
+	name = "艾索雷苟斯"
+}
+
+L:SetMiscLocalization({
+	Pull		= "我保護著這個地方。神秘的秘法不能受到褻瀆。"
+})
+
+-- Taerar (Ashenvale)
+L = DBM:GetModLocalization("Taerar")
+
+L:SetGeneralLocalization{
+	name = "泰拉爾"
+}
+
+L:SetMiscLocalization({
+	Pull		= "和平不過是短暫的夢想!讓夢魘統治整個世界吧!"
+})
+
+-- Ysondre (Feralas)
+L = DBM:GetModLocalization("Ysondre")
+
+L:SetGeneralLocalization{
+	name = "伊索德雷"
+}
+
+L:SetMiscLocalization({
+	Pull		= "生命的希冀已被切斷!夢遊者要展開報復!"
+})
+
+-- Lethon (Hinterlands)
+L = DBM:GetModLocalization("Lethon")
+
+L:SetGeneralLocalization{
+	name = "雷索"
+}
+
+-- Emeriss (Duskwood)
+L = DBM:GetModLocalization("Emeriss")
+
+L:SetGeneralLocalization{
+	name = "艾莫莉絲"
+}
+
+L:SetMiscLocalization({
+	Pull		= "希望是靈魂染上的疾病!這片土地應該枯竭，從此死氣騰騰!"
 })

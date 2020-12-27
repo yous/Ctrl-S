@@ -14,7 +14,7 @@ L:SetGeneralLocalization{
 
 L:SetTimerLocalization{
 }
-	
+
 L:SetMiscLocalization{
 	YellPull		= "Entités hostiles détectées. Protocole d'estimation de menace actif. Acquisition de la cible primaire. Décompte avant réévaluation : 30 secondes.",
 	Emote			= "%%s poursuit (%S+)%."
@@ -68,14 +68,14 @@ L = DBM:GetModLocalization("Razorscale")
 
 L:SetGeneralLocalization{
 	name = "Tranchécaille"
-}     
+}
 
 L:SetWarningLocalization{
 	SpecWarnDevouringFlame		= "Flamme dévorante - BOUGEZ",
 	warnTurretsReadySoon		= "Quatrième tourelle à harpon prête dans 20 Sec",
 	warnTurretsReady			= "Quatrième tourelle à harpon prête",
 	SpecWarnDevouringFlameCast	= "Flamme dévorante sur Vous",
-	WarnDevouringFlameCast		= "Flamme dévorante sur >%s<" 
+	WarnDevouringFlameCast		= "Flamme dévorante sur >%s<"
 }
 
 L:SetTimerLocalization{
@@ -104,7 +104,7 @@ L:SetMiscLocalization{
 	YellAir2			= "Incendie éteint ! Reconstruisons les tourelles !",
 	YellGround		= "Faites vite ! Elle va pas rester au sol très longtemps !",
 	EmotePhase2			= "bloquée au sol",
-	FlamecastUnknown	= DBM_CORE_UNKNOWN
+	FlamecastUnknown	= DBM_CORE_L.UNKNOWN
 }
 
 -------------
@@ -128,9 +128,7 @@ L:SetWarningLocalization{
 L:SetOptionLocalization{
 	SpecialWarningLightBomb		= "Activer l'avertissement spécial quand vous êtes affecté par la bombe de lumière",
 	SpecialWarningGravityBomb	= "Activer l'avertissement spécial quand vous êtes affecté par la bombe à gravité",
-	specWarnConsumption			= "Montre une alerte spéciale quand vous subissez des dégats venant des Zone de Vide ( Hard-mode )",
-	SetIconOnLightBombTarget	= "Mettre un icône sur la cible de la bombe de lumière",
-	SetIconOnGravityBombTarget	= "Mettre un icône sur la cible de la bombe à gravité"
+	specWarnConsumption			= "Montre une alerte spéciale quand vous subissez des dégats venant des Zone de Vide ( Hard-mode )"
 }
 
 -------------------
@@ -155,9 +153,7 @@ L:SetTimerLocalization{
 L:SetOptionLocalization{
 	WarningSupercharge			= "Activer l'avertissement quand la Supercharge est incanté",
 	LightningTendrils			= "Activer l'avertissement spécial pour les Vrilles d'éclair",
-	SetIconOnOverwhelmingPower	= "Mettre un icône sur la cible de la Puissance accablante",
 	RuneofDeath					= "Activer l'avertissement spécial pour les runes de mort",
-	SetIconOnStaticDisruption	= "Met une icône sur la cible de Static Disruption",
 	Overload					= "Montre une alerte spéciale pour la Surcharge",
 	AlwaysWarnOnOverload		= "Toujours alerter pour la surcharge (sinon seulement quand ciblé)"
 }
@@ -234,8 +230,7 @@ L:SetOptionLocalization{
 	timerLeftArm			= "Afficher un timer pour le repop du bras gauche",
 	timerRightArm			= "Afficher un timer pour le repop du bras droit",
 	achievementDisarmed		= "Afficher un timer pour le Haut Fait Désarmement",
-	WarnGrip				= "Annonce les cibles de la poigne",
-	SetIconOnGripTarget		= "Met une icône sur les joueurs victimes du sort poigne"
+	WarnGrip				= "Annonce les cibles de la poigne"
 }
 
 L:SetMiscLocalization{
@@ -300,7 +295,6 @@ L:SetTimerLocalization{
 L:SetOptionLocalization{
 	WarningFlashFreeze		= "Activer l'avertissement pour le gel instantané",
 	YellOnStormCloud		= "Crie quand la tempête de glace est active",
-	SetIconOnStormCloud		= "Met une icône sur la cible de la tempête de glace",
 	specWarnBitingCold		= "Montre une alerte spéciale quand vous êtes affecter par Froid mordant"
 }
 
@@ -328,7 +322,6 @@ L:SetTimerLocalization{
 
 L:SetOptionLocalization{
 	TimerHardmode			= "Afficher le timer pour le mode difficile",
-	RangeFrame				= "Afficher la fenêtre de portée",
 	AnnounceFails			= "Affiche les joueurs qui n'ont pas évité les Charges de foudre (Nécessite l'activation des annonces et être promu ou leader)",
 	LightningOrb			= "Montre une alerte spéciale pour les Charges de foudre"
 }
@@ -338,7 +331,7 @@ L:SetMiscLocalization{
 	YellPhase2		= "Avortons impertinents, vous osez me défier sur mon piédestal ? Je vais vous écraser moi-même !",
 	YellKill		= "Retenez vos coups ! Je me rends !",
 	ChargeOn		= "Charge(s) de foudre: %s",
-	Charge			= "Charge(s) de foudre non évitée(s) (cet essai): %s" 
+	Charge			= "Charge(s) de foudre non évitée(s) (cet essai): %s"
 }
 
 -------------
@@ -433,24 +426,18 @@ L:SetOptionLocalization{
 	TimeToPhase3			= "Montre le timer pour la Phase 3",
 	TimeToPhase4			= "Montre le timer pour la Phase 4",
 	MagneticCore			= "Annonce qui a loot le Core Magnétique",
-	HealthFramePhase4		= "Montre les barres de vie dans la phase 4",
-	AutoChangeLootToFFA		= "Met le butin en accès libre durant la phase 3",
 	WarnBombSpawn			= "Annonce les Robots Bombes",
 	TimerHardmode			= "Montre le timer pour le Hard Mode",
 	ShockBlastWarningInP1	= "Montre une alerte spéciale pour les Horions explosifs durant la Phase 1",
-	ShockBlastWarningInP4	= "Montre une alerte spéciale pour les Horions explosifs durant la Phase 4",
-	RangeFrame				= "Affiche la fenêtre de portée pour la phase 1"
+	ShockBlastWarningInP4	= "Montre une alerte spéciale pour les Horions explosifs durant la Phase 4"
 }
 
 L:SetMiscLocalization{
 	MobPhase1		= "Léviathan Mod. II",
 	MobPhase2		= "VX-001",
 	MobPhase3		= "Unité de commandement aérien",
-	YellPull		= "Nous n'avons pas beaucoup de temps, les amis ! Vous allez m'aider à tester ma dernière création en date, la plus grande de toutes. Avant de changer d'avis, n'oubliez pas que que vous me devez bien ça après m'avoir complètement déglingué le XT-002.",	
+	YellPull		= "Nous n'avons pas beaucoup de temps, les amis ! Vous allez m'aider à tester ma dernière création en date, la plus grande de toutes. Avant de changer d'avis, n'oubliez pas que que vous me devez bien ça après m'avoir complètement déglingué le XT-002.",
 	YellHardPull	= "Mais, pourquoi",
-	YellPhase2		= "MERVEILLEUX ! Résultats parfaitement formidables !",
-	YellPhase3		= "Merci, les amis !",
-	YellPhase4		= "Fin de la phase d'essais préliminaires",
 	LootMsg			= "([^%s]+).*Hitem:(%d+)"
 }
 
@@ -480,8 +467,6 @@ L:SetWarningLocalization{
 
 L:SetOptionLocalization{
 	WarningShadowCrash				= "Montre une alerte spéciale pour les Déferlante d'ombre",
-	SetIconOnShadowCrash			= "met une icône sur la cible des Déferlante d'ombre ( Tête de mort )",
-	SetIconOnLifeLeach				= "Met une icône sur la cible de la Marque du Sans-visage ( Croix )",
 	SpecialWarningSurgeDarkness		= "Montre une alerte spéciale pour les Vague de ténèbres",
 	SpecialWarningShadowCrash		= "Montre une alerte spéciale pour les Déferlante d'ombre",
 	SpecialWarningShadowCrashNear	= "Montre une alerte spéciale quand la Déferlante d'ombre tombe à côté de vous",
@@ -514,8 +499,7 @@ L:SetMiscLocalization{
 	YellPull 						= "Il sera bientôt temps de frapper la tête de la bête ! Concentrez votre rage et votre haine sur ses laquais !",
 	YellPhase2 						= "Je suis le rêve éveillé",
 	Sara 							= "Sara",
-	WhisperBrainLink 				= "Votre cerveau est lié ! Courez vers %s !",
-	WarningYellSqueeze				= "Ecrasement sur moi ! Aidez-moi !"
+	WhisperBrainLink 				= "Votre cerveau est lié ! Courez vers %s !"
 }
 
 L:SetWarningLocalization{
@@ -527,7 +511,7 @@ L:SetWarningLocalization{
 	SpecWarnSanity 					= "%d de Santé mentale restant",
 	SpecWarnGuardianLow				= "Arretez d'attaquer ce gardien !",
 	SpecWarnMadnessOutNow			= "Incantation de Susciter la folie fini - SORTEZ",
-	WarnBrainPortalSoon				= "Portail dans 3 sec",	
+	WarnBrainPortalSoon				= "Portail dans 3 sec",
 	SpecWarnFervor					= "Ferveur de Sara sur VOUS",
 	SpecWarnFervorCast				= "Ferveur de Sara commence a incanter sur vous",
 	WarnEmpowerSoon					= "Renforcement des ombres Bientôt !",
@@ -549,18 +533,12 @@ L:SetOptionLocalization{
 	SpecWarnGuardianLow				= "Montre une alerte spéciale quand les gardiens (P1) n'a plus beaucoup de vie",
 	WarnBrainPortalSoon				= "Annonce les Portails",
 	SpecWarnMadnessOutNow			= "Montre une alerte spéciale avant la fin du cast de Susciter la folie",
-	SetIconOnFearTarget				= "Met une icône sur la cible du fear",
 	SpecWarnFervor					= "Montre une alerte spéciale pour la ferveur de Sara",
 	SpecWarnFervorCast				= "Montre une alerte spéciale quand la Ferveur de Sara commence a cast sur vous (Il faut avoir Sara en Target/Focus)",
 	specWarnBrainPortalSoon			= "Annonce l'arrivée d'un portail",
-	WarningSqueeze					= "Annonce la cible d'Ecrasement",
 	NextPortal						= "Montre un timer avant le prochain portail",
 	WhisperBrainLink				= "Envoie un whisp aux Cerveaux liés",
-	SetIconOnFervorTarget			= "Met une icône sur les cible de la ferveur de Sara",
-	SetIconOnMCTarget				= "met une icône sur la cible du contrôle mental",
-	ShowSaraHealth					= "Montre la vie de Sara durant la P1 (Doit être sélectionnée par au moins un membre du raid)",
 	WarnEmpowerSoon					= "Alerte avant le Renforcement des ombres",
-	SpecWarnDeafeningRoar			= "Montre une alerte spéciale pour le Rugissement assourdissant (silence et haut-fait)",
-	SetIconOnBrainLinkTarget		= "Met une icone sur la cible des Cerveaux liés"
+	SpecWarnDeafeningRoar			= "Montre une alerte spéciale pour le Rugissement assourdissant (silence et haut-fait)"
 }
 

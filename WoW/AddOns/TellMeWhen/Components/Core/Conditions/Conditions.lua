@@ -7,7 +7,7 @@
 --		Banjankri of Blackrock, Predeter of Proudmoore, Xenyr of Aszune
 
 -- Currently maintained by
--- Cybeloras of Aerie Peak/Detheroc/Mal'Ganis
+-- Cybeloras of Aerie Peak
 -- --------------------
 
 if not TMW then return end
@@ -41,7 +41,6 @@ TMW.CNDT = CNDT
 
 
 CNDT.ConditionsByType = {}
-CNDT.SpecialUnitsUsed = {}
 
 
 
@@ -436,11 +435,15 @@ TMW:RegisterUpgrade(40080, {
 	end,
 })
 TMW:RegisterUpgrade(22010, {
-	icon = function(self, ics)
+	icon = function(self, ics, ...)
 		for k, condition in ipairs(ics.Conditions) do
-			if type(k) == "number" then
-				for k, v in pairs(condition) do
-					condition[k] = nil
+			local old = condition
+
+			-- Recreate the condition
+			ics.Conditions[k] = nil
+			condition = ics.Conditions[k]
+			for k, v in pairs(old) do
+				if k:find("Condition") then
 					condition[k:gsub("Condition", "")] = v
 				end
 			end
@@ -467,7 +470,40 @@ TMW:RegisterUpgrade(20100, {
 	end,
 })
 
-
+function CNDT:ConvertSliderCondition(condition, min, max, flagRemap)
+    local op = condition.Operator
+    local flags = {}
+    condition.BitFlags = flags
+    if op == "==" then
+        flags[condition.Level] = true
+    elseif op == "<=" then
+        for i = min, condition.Level do
+            flags[i] = true
+        end
+    elseif op == "<" then
+        for i = min, condition.Level-1 do
+            flags[i] = true
+        end
+    elseif op == ">" then
+        for i = condition.Level+1, max do
+            flags[i] = true
+        end
+    elseif op == ">=" then
+        for i = condition.Level, max do
+            flags[i] = true
+        end
+    elseif op == "~=" then
+        flags[condition.Level] = true
+        condition.Checked = true
+    end
+    if flagRemap then
+        local fc = CopyTable(flags)
+        wipe(flags)
+        for k, v in pairs(fc) do 
+            flags[flagRemap[k]] = v 
+        end
+    end
+end
 
 
 
@@ -485,6 +521,7 @@ CNDT.Env = {
 	floor = floor,
 	select = select,
 	min = min,
+	max = max,
 	tonumber = tonumber,
 	isNumber = TMW.isNumber,
 	
@@ -518,9 +555,6 @@ CNDT.Env = {
 			return o
 		end,
 	}),
-
-	-- Stores references to BitFlags settings tables.
-	TABLES = setmetatable({}, {__mode='kv'}),
 	
 	-- These are here as a primitive security measure to prevent some of the most basic forms of malicious Lua conditions.
 	-- This list isn't even exhaustive, and it is in no way cracker-proof, but its a start.
@@ -541,11 +575,16 @@ CNDT.Env = {
     CancelDuel = error,
     StartDuel = error,
     DeleteGMTicket = error,
+    AcceptTrade = error,
+    SendMail = error,
+    GuildDisband = error,
+    GuildPromote = error,
 
 } Env = CNDT.Env
 
 CNDT.EnvMeta = {
 	__index = _G,
+	-- don't do this. Manually add to _G if you need to add to _G.
 	--__newindex = _G,
 }
 
@@ -596,18 +635,6 @@ function CNDT:GetUnit(setting)
 	return TMW.UNITS:GetOriginalUnitTable(setting)[1] or ""
 end
 
--- [INTERNAL]
-function CNDT:GROUP_ROSTER_UPDATE()
-	TMW.UNITS:UpdateTankAndAssistMap()
-	
-	for oldUnit in pairs(Env) do
-		if CNDT.SpecialUnitsUsed[oldUnit] then
-			local newUnit = TMW.UNITS:SubstituteSpecialUnit(oldUnit)
-			Env[oldUnit] = newUnit or oldUnit
-		end
-	end
-end
-
 
 function CNDT:GetTableSubstitution(tbl)
 	TMW:ValidateType("CNDT:GetTableSubstitution(tbl)", "tbl", tbl, "table")
@@ -622,9 +649,9 @@ function CNDT:GetTableSubstitution(tbl)
 	end
 
 	local var = address:gsub(":", "_"):gsub(" ", "")
-	CNDT.Env.TABLES[var] = tbl
+	CNDT.Env[var] = tbl
 
-	return "TABLES." .. var
+	return var
 end
 
 function CNDT:GetBitFlag(conditionSettings, index)
@@ -642,6 +669,23 @@ function CNDT:ToggleBitFlag(conditionSettings, index)
 	else
 		local flag = bit.lshift(1, index-1)
 		conditionSettings.BitFlags = bit.bxor(conditionSettings.BitFlags, flag)
+	end
+end
+
+function CNDT:ConvertBitFlagsToTable(conditionSettings, conditionData)
+	if type(conditionSettings.BitFlags) == "table" then
+		return
+	end
+
+	local flagsOld = conditionSettings.BitFlags
+	conditionSettings.BitFlags = {}
+
+	for index, _ in pairs(conditionData.bitFlags) do
+		if type(index) == "number" and index < 32 and index >= 1 then
+			local flag = bit.lshift(1, index-1)
+			local flagSet = bit.band(flagsOld, flag) == flag
+			conditionSettings.BitFlags[index] = flagSet and true or nil
+		end
 	end
 end
 
@@ -683,6 +727,11 @@ CNDT.Substitutions = {
 		else
 			return [[not %1]]
 		end
+	end,
+},
+{	src = "MULTINAMECHECK(%b())",
+	rep = function(conditionData, conditionSettings, name, name2)
+		return [[ (not not strfind(c.Name, SemicolonConcatCache[%1])) ]]
 	end,
 },
 
@@ -748,6 +797,11 @@ CNDT.Substitutions = {
 	src = "c.NameFirst",
 	rep = function(conditionData, conditionSettings, name, name2)
 		return strWrap(TMW:GetSpells(name).First)
+	end,
+},{
+	src = "c.NameStrings",
+	rep = function(conditionData, conditionSettings, name, name2)
+		return strWrap(";" .. table.concat(TMW:GetSpells(name).StringArray, ";") .. ";")
 	end,
 },{
 	src = "c.NameString",
@@ -859,25 +913,47 @@ local conditionNameSettingProcessedCache = setmetatable(
 })
 
 -- [INTERNAL]
+function CNDT:GetConditionUnitSubstitution(unit)
+
+	local translatedUnits, unitSet = TMW:GetUnits(nil, unit)
+	local firstOriginal = unitSet.originalUnits[1]
+	local substitution
+	if unitSet.hasSpecialUnitRefs then
+		-- The unit is probably a special unit.
+		-- We will use the unit set to perform the translation
+		-- from the special unit to a real unit.
+		-- We have to have the " or <originalUnits[1]>" part
+		-- so that in case the special unit doesn't map to anything,
+		-- we won't be passing nil to functions that don't accept nil.
+		substitution = 
+			CNDT:GetTableSubstitution(translatedUnits)
+			.. "[1] or "
+			.. strWrap(firstOriginal)
+	else
+		-- The unit is something that can be passed raw as a unitID.
+		-- Just sub it straight in as a string.
+		substitution = strWrap(firstOriginal or "")
+	end
+
+	return substitution
+end
+
+-- [INTERNAL]
 function CNDT:DoConditionSubstitutions(conditionData, conditionSettings, funcstr)
 	-- Substitutes all the c.XXXXX substitutions into a string.
 	
 	for _, append in TMW:Vararg("2", "") do -- Unit2 MUST be before Unit
 		if strfind(funcstr, "c.Unit" .. append) then
+			-- Use CNDT:GetUnit() first to grab only the first unit
+			-- in case the configured value is an expansion (like party1-4).
 			local unit
 			if append == "2" then
 				unit = CNDT:GetUnit(conditionSettings.Name)
 			elseif append == "" then
 				unit = CNDT:GetUnit(conditionSettings.Unit)
 			end
-			if (strfind(unit, "maintank") or strfind(unit, "mainassist") or strfind(unit, "group")) then
-				funcstr = gsub(funcstr, "c.Unit" .. append,		unit) -- sub it in as a variable
-				Env[unit] = unit
-				CNDT.SpecialUnitsUsed[unit] = true
-				CNDT:RegisterEvent("GROUP_ROSTER_UPDATE")
-				CNDT:GROUP_ROSTER_UPDATE()
-			else
-				funcstr = gsub(funcstr, "c.Unit" .. append,	strWrap(unit)) -- sub it in as a string
+			if unit then
+				funcstr = gsub(funcstr, "c.Unit" .. append,	CNDT:GetConditionUnitSubstitution(unit))
 			end
 		end
 	end
@@ -931,6 +1007,10 @@ function CNDT:GetConditionCheckFunctionString(parent, Conditions)
 		local thisstr = "true"
 		if conditionData then
 		
+			if conditionData:UsesTabularBitflags() then
+				CNDT:ConvertBitFlagsToTable(conditionSettings, conditionData)
+			end
+
 			conditionData:PrepareEnv()
 
 			if conditionData:IsDeprecated() then
@@ -958,13 +1038,6 @@ function CNDT:GetConditionCheckFunctionString(parent, Conditions)
 	end
 	
 	if funcstr ~= "" then
-		-- Well, what the fuck? Apparently this code here doesn't work in MoP. I have to do it on a single line for some strange reason.
-		-- Aannnnnnddd what the fuck now it works again. See r540 commit message for more info.
-		-- Aannnnnnddd im switching back to single line because multiline [[long strings]] aren't playing nice at all in debugging dumps/prints
-		
-		-- funcstr = [[local ConditionObject = ...
-		-- return ( ]] .. funcstr .. [[ )]]
-		
 		funcstr = "local ConditionObject = ... \r\n return (\r\n " .. funcstr .. " )"
 	end
 	
@@ -977,6 +1050,13 @@ function CNDT:CheckParentheses(settings)
 	-- Second return is a localized error message if they are invalid.
 
 	if settings.n < 3 then
+		-- Remove hanging parens from condition settings with less than 3 conditions.
+		-- This prevents issues with post-user condition modifying via ConditionObjectConstructor,
+		-- and just ensures general sanity.
+		for _, Condition in TMW:InNLengthTable(settings) do
+			Condition.PrtsBefore = 0
+			Condition.PrtsAfter = 0
+		end
 		return true
 	end
 	
@@ -1172,7 +1252,7 @@ function CNDT:RegisterConditionSet(identifier, conditionSetData)
 	local defaults = CNDT.Condition_Defaults
 	if data.modifiedDefaults then
 		defaults = CopyTable(defaults)
-		TMW:CopyTableInPlaceWithMeta(data.modifiedDefaults, defaults["**"], true)
+		TMW:CopyInPlaceWithMetatable(data.modifiedDefaults, defaults["**"])
 		TMW:RegisterCallback("TMW_CNDT_DEFAULTS_NEWVAL", function(event, k, v)
 			defaults["**"][k] = v
 		end)
@@ -1182,7 +1262,7 @@ function CNDT:RegisterConditionSet(identifier, conditionSetData)
 	ConditionSets[identifier] = data
 	
 	if not data.useDynamicTab then
-		TMW:RegisterCallback("TMW_CONFIG_LOADED", function(event, icon)
+		TMW:RegisterCallback("TMW_CONFIG_TAB_CLICKED", function(event)
 			CNDT:SetTabText(identifier)
 		end)
 	end
@@ -1207,7 +1287,7 @@ function CNDT:RegisterConditionSetImplementingClass(className)
 end
 
 
-TMW:RegisterCallback("TMW_UPGRADE_REQUESTED", function(event, settingType, version, ...)
+TMW:RegisterCallback("TMW_UPGRADE_PERFORMED", function(event, settingType, upgradeData, ...)
 	local parentSettings = ...
 	
 	for identifier, conditionSetData in pairs(ConditionSets) do
@@ -1217,7 +1297,7 @@ TMW:RegisterCallback("TMW_UPGRADE_REQUESTED", function(event, settingType, versi
 			if type(parentSettings) ~= "table" then
 				TMW:Error("ConditionSet %q is defined as having child settings of '%q', " .. 
 				"but that settings type does not provide a settings table as the 4th arg "..
-				"(right after version) to TMW:DoUpgrade(settingType, version, ...)", identifier, settingType)
+				"(right after upgradeData) to TMW:Upgrade(settingType, upgradeData, ...)", identifier, settingType)
 				isGood = false
 			end
 			
@@ -1231,7 +1311,7 @@ TMW:RegisterCallback("TMW_UPGRADE_REQUESTED", function(event, settingType, versi
 			
 			if isGood then
 				for conditionID, condition in TMW:InNLengthTable(parentSettings[conditionSetData.settingKey]) do
-					TMW:DoUpgrade("condition", version, condition, conditionID)
+					TMW:Upgrade("condition", upgradeData, condition, conditionID)
 				end
 			end
 			

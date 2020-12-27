@@ -1,23 +1,30 @@
 --[[
     This file is part of Decursive.
-    
-    Decursive (v 2.7.3.6) add-on for World of Warcraft UI
-    Copyright (C) 2006-2014 John Wellesz (archarodim AT teaser.fr) ( http://www.2072productions.com/to/decursive.php )
 
-    Starting from 2009-10-31 and until said otherwise by its author, Decursive
-    is no longer free software, all rights are reserved to its author (John Wellesz).
+    Decursive (v 2.7.8) add-on for World of Warcraft UI
+    Copyright (C) 2006-2019 John Wellesz (Decursive AT 2072productions.com) ( http://www.2072productions.com/to/decursive.php )
 
-    The only official and allowed distribution means are www.2072productions.com, www.wowace.com and curse.com.
-    To distribute Decursive through other means a special authorization is required.
-    
+    Decursive is free software: you can redistribute it and/or modify
+    it under the terms of the GNU General Public License as published by
+    the Free Software Foundation, either version 3 of the License, or
+    (at your option) any later version.
+
+    Decursive is distributed in the hope that it will be useful,
+    but WITHOUT ANY WARRANTY; without even the implied warranty of
+    MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+    GNU General Public License for more details.
+
+    You should have received a copy of the GNU General Public License
+    along with Decursive.  If not, see <https://www.gnu.org/licenses/>
+
 
     Decursive is inspired from the original "Decursive v1.9.4" by Patrick Bohnet (Quu).
     The original "Decursive 1.9.4" is in public domain ( www.quutar.com )
 
     Decursive is distributed in the hope that it will be useful,
     but WITHOUT ANY WARRANTY.
-    
-    This file was last updated on 2014-10-13T09:20:46Z
+
+    This file was last updated on 2020-03-08T20:44:24Z
 
 --]]
 -------------------------------------------------------------------------------
@@ -106,7 +113,7 @@ end -- }}}
 -- The Factory for LiveList objects
 function LiveList:Create() -- {{{
 
-    if self.Number + 1 > D.profile.Amount_Of_Afflicted then
+    if self.Number >= D.profile.Amount_Of_Afflicted then
         return false;
     end
 
@@ -118,17 +125,33 @@ function LiveList:Create() -- {{{
 
 end -- }}}
 
+function LiveList:PreCreate()
+    if D.Status.Combat or self.Number >= D.profile.Amount_Of_Afflicted then
+        return;
+    end
+
+    D:Debug("(LiveList) Precreating LL item");
+
+    self.ExistingPerID[self.Number + 1] = self:new(DcrLiveList, self.Number + 1);
+
+    self.Number = self.Number + 1;
+    D:Debug("done");
+
+    LiveList:PreCreate();
+
+end
+
 function LiveList:DisplayItem (ID, UnitID, Debuff) -- {{{
 
     --D:Debug("(LiveList) Displaying LVItem %d for UnitID %s", ID, UnitID);
     local LVItem = false;
 
-    if ID > self.Number + 1 then
-        return error(("LiveList:DisplayItem: bad argument #1 'ID (= %d)' must be < LiveList.Number + 1 (LiveList.Number = %d) UnitID was %s, Amount_Of_Afflicted 2disp: %d"):format(ID, self.Number, UnitID, D.profile.Amount_Of_Afflicted),2);
+    if ID > self.Number + 1 then -- sanity check
+        return error(("LiveList:DisplayItem: bad argument #1 'ID (= %d)' must be < LiveList.Number + 1 (LiveList.Number = %d) UnitID was %s, Amount_Of_Afflicted 2disp: %d"):format(ID, self.Number, UnitID, D.profile.Amount_Of_Afflicted), 2);
     end
 
     if not self.ExistingPerID[ID] then
-        LVItem=self:Create();
+        LVItem = self:Create();
     else
         LVItem = self.ExistingPerID[ID];
     end
@@ -145,8 +168,16 @@ function LiveList:DisplayItem (ID, UnitID, Debuff) -- {{{
     --D:Debug("XXXX => Updating ll item %d for %s", ID, UnitID);
 
     if not LVItem.IsShown then
-        --D:Debug("(LiveList) Showing LVItem %d", ID);
+        --[==[@debug@--
+        D:Debug("(LiveList) Showing LVItem %d", ID);
+        --@end-debug@]==]
+
         LVItem.Frame:Show();
+
+        --[==[@debug@--
+        D:Debug("(LiveList) done", ID);
+        --@end-debug@]==]
+
         self.NumberShown = self.NumberShown + 1;
         LVItem.IsShown = true;
     end
@@ -174,7 +205,7 @@ function LiveList.prototype:GiveAnchor() -- {{{
         if D.profile.ReverseLiveDisplay then
             return "BOTTOMLEFT", LiveList.ExistingPerID[self.ID - 1].Frame, "TOPLEFT", 0, 1;
         else
-            return "TOPLEFT", LiveList.ExistingPerID[self.ID - 1].Frame, "BOTTOMLEFT", 0, -1; -- TODO index is nil error received in a report by mail on 2012-11-02
+            return "TOPLEFT", LiveList.ExistingPerID[self.ID - 1].Frame, "BOTTOMLEFT", 0, -1;
         end
     end
 
@@ -182,7 +213,7 @@ end -- }}}
 
 
 function LiveList.prototype:init(Container,ID) -- {{{
-    
+
     --LiveList.super.prototype.init(self); -- needed
     D:Debug("(LiveList) Initializing LiveList object '%s'", ID);
 
@@ -199,7 +230,7 @@ function LiveList.prototype:init(Container,ID) -- {{{
     self.PrevUnitID         = false;
     self.PrevRaidTargetIndex= false;
     self.UnitClass          = false;
-    
+
     self.Debuff             = {};
 
     self.PrevDebuffIndex    = false;
@@ -234,14 +265,14 @@ function LiveList.prototype:init(Container,ID) -- {{{
 
     -- Create the character name Fontstring
     self.UnitNameFontString = self.Frame:CreateFontString("DcrLiveListItem"..ID.."UnitName", "OVERLAY", "DcrLLUnitNameFont");
-    
+
     -- Create the unitID Fontstring
     self.UnitIDFontString = self.Frame:CreateFontString("DcrLiveListItem"..ID.."UnitID", "OVERLAY", "DcrLLUnitIDFont");
     --self.UnitIDFontString:SetHeight(3);
 
     -- Create the debuff type fontstring
     self.DebuffTypeFontString = self.Frame:CreateFontString("DcrLiveListItem"..ID.."Type", "OVERLAY", "DcrLLDebuffTypeFont");
-    
+
     -- Create the Raid Target Icon Texture
     self.RaidIconTexture = self.Frame:CreateTexture("DcrLiveListItem"..ID.."RaidIcon", "ARTWORK", "DcrLVRaidIconTemplate");
 
@@ -251,9 +282,6 @@ function LiveList.prototype:init(Container,ID) -- {{{
 
     -- a reference to this object
     self.Frame.Object = self;
-
-    self.Frame:Show();
-
 
 end -- }}}
 
@@ -311,15 +339,15 @@ function LiveList.prototype:SetDebuff(UnitID, Debuff, IsCharmed) -- {{{
     end
 
     -- Debuff Type Name
-    if self.PrevDebuffTypeName ~= Debuff.TypeName then
+    --if self.PrevDebuffTypeName ~= Debuff.TypeName then
         if Debuff.Type then
-            self.DebuffTypeFontString:SetText(D:ColorText(L[str_upper(Debuff.TypeName)], "FF" .. DC.TypeColors[Debuff.Type] ));
-            --self.DebuffTypeFontString:SetTextColor(DC.TypeColors[Debuff.Type]);
+            self.DebuffTypeFontString:SetText(D:ColorText(L[str_upper(Debuff.TypeName)], D.profile.TypeColors[Debuff.Type] ));
+            --self.DebuffTypeFontString:SetTextColor(D.profile.TypeColors[Debuff.Type]);
         else
             self.DebuffTypeFontString:SetText("Unknown");
         end
         self.PrevDebuffTypeName = Debuff.TypeName;
-    end
+    --end
 
     -- Debuff Name
     if self.PrevDebuffName ~= Debuff.Name then
@@ -376,6 +404,9 @@ function LiveList:Update_Display() -- {{{
     if not D.DcrFullyInitialized  then
         return;
     end
+
+    --
+    self:PreCreate();
 
     Index = 0;
 
@@ -549,13 +580,12 @@ end -- }}}
 
 -- this displays the tooltips of the live-list
 function LiveList:DebuffTemplate_OnEnter(frame) --{{{
-    if (D.profile.AfflictionTooltips and frame.Object.UnitID) then
+    if D.profile.AfflictionTooltips and frame.Object.UnitID then
         DcrDisplay_Tooltip:SetOwner(frame, "ANCHOR_CURSOR");
-        DcrDisplay_Tooltip:ClearLines();
-        DcrDisplay_Tooltip:SetUnitDebuff(frame.Object.UnitID,frame.Object.Debuff.index); -- OK
+        DcrDisplay_Tooltip:SetUnitDebuff(frame.Object.UnitID,frame.Object.Debuff.index); -- Reported to trigger a "script ran too long" error on 2016-09-13...
         DcrDisplay_Tooltip:Show();
     else
-        D:Debug(D.profile.AfflictionTooltips, frame.Object.UnitID );
+        D:Debug(D.profile.AfflictionTooltips, frame.Object.UnitID);
     end
 end --}}}
 
@@ -563,4 +593,4 @@ function LiveList:Onclick() -- {{{
     D:Println(L["HLP_LL_ONCLICK_TEXT"]);
 end -- }}}
 
-T._LoadedFiles["Dcr_LiveList.lua"] = "2.7.3.6";
+T._LoadedFiles["Dcr_LiveList.lua"] = "2.7.8";

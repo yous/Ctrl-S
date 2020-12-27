@@ -7,7 +7,7 @@
 --		Banjankri of Blackrock, Predeter of Proudmoore, Xenyr of Aszune
 
 -- Currently maintained by
--- Cybeloras of Aerie Peak/Detheroc/Mal'Ganis
+-- Cybeloras of Aerie Peak
 -- --------------------
 
 
@@ -29,13 +29,12 @@ Alpha:RegisterIconDefaults{
 
 
 Alpha:RegisterConfigPanel_ConstructorFunc(195, "TellMeWhen_AlphaModuleSettings", function(self)
-	self.Header:SetText(L["ICONALPHAPANEL_FAKEHIDDEN"])
-	TMW.IE:BuildSimpleCheckSettingFrame(self, {
-		{
-			setting = "FakeHidden",
-			title = L["ICONALPHAPANEL_FAKEHIDDEN"],
-			tooltip = L["ICONALPHAPANEL_FAKEHIDDEN_DESC"],
-		}
+	self:SetTitle(L["ICONALPHAPANEL_FAKEHIDDEN"])
+	self:BuildSimpleCheckSettingFrame({
+		function(check)
+			check:SetTexts(L["ICONALPHAPANEL_FAKEHIDDEN"], L["ICONALPHAPANEL_FAKEHIDDEN_DESC"])
+			check:SetSetting("FakeHidden")
+		end
 	})
 end)
 
@@ -57,10 +56,6 @@ Alpha:RegisterEventHandlerData("Animations", 40, "ICONALPHAFLASH", {
 		"Fade",
 		"AlphaStandalone",
 	},
-
-	applyDefaultsToSetting = function(eventSettings)
-		eventSettings.a_anim = 0
-	end,
 
 	Play = function(icon, eventSettings)
 		local Duration = 0
@@ -84,7 +79,7 @@ Alpha:RegisterEventHandlerData("Animations", 40, "ICONALPHAFLASH", {
 
 			Period = Period,
 			Fade = eventSettings.Fade,
-			Alpha = eventSettings.a_anim,
+			Alpha = eventSettings.Alpha,
 		}
 	end,
 
@@ -130,6 +125,7 @@ Alpha:RegisterEventHandlerData("Animations", 40, "ICONALPHAFLASH", {
 		tDeleteItem(IconModule_Alpha.FadeHandlers, "ICONALPHAFLASH")
 	end,
 })
+
 Alpha:RegisterEventHandlerData("Animations", 50, "ICONFADE", {
 	text = L["ANIM_ICONFADE"],
 	desc = L["ANIM_ICONFADE_DESC"],
@@ -179,6 +175,21 @@ Alpha:RegisterEventHandlerData("Animations", 50, "ICONFADE", {
 	end,
 })
 
+
+local IconPosition_Sortable = TMW.C.GroupModule_IconPosition_Sortable
+if IconPosition_Sortable then
+	IconPosition_Sortable:RegisterIconSorter("fakehidden", {
+		DefaultOrder = -1,
+		[1] = L["UIPANEL_GROUPSORT_fakehidden_1"],
+		[-1] = L["UIPANEL_GROUPSORT_fakehidden_-1"],
+	}, function(iconA, iconB, attributesA, attributesB, order)
+		local a, b = iconA.FakeHidden and 1 or 0, iconB.FakeHidden and 1 or 0
+		if a ~= b then
+			return a*order < b*order
+		end
+	end)
+end
+
 function Alpha:OnNewInstance_Alpha()
 	self.FadeHandlers = {}
 end
@@ -203,4 +214,4 @@ function Alpha:REALALPHA(icon, realAlpha)
 	end
 end
 
-Alpha:SetDataListner("REALALPHA")
+Alpha:SetDataListener("REALALPHA")

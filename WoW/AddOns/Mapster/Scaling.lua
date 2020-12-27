@@ -1,5 +1,5 @@
 --[[
-Copyright (c) 2009-2014, Hendrik "Nevcairiel" Leppkes < h.leppkes@gmail.com >
+Copyright (c) 2009-2018, Hendrik "Nevcairiel" Leppkes < h.leppkes@gmail.com >
 All rights reserved.
 
 Initial implementation provided by yssaril
@@ -30,12 +30,12 @@ end
 
 function Scale:OnEnable()
 	if not scaler then
-		scaler = CreateFrame("Frame", "MapsterScaler", WorldMapFrame.UIElementsFrame)
+		scaler = CreateFrame("Frame", "MapsterScaler", WorldMapFrame)
 		scaler:SetWidth(15)
 		scaler:SetHeight(15)
-		scaler:SetFrameStrata("HIGH")
-		scaler:SetFrameLevel(WorldMapFrame.UIElementsFrame:GetFrameLevel() + 15)
-		scaler.tex = WorldMapFrame.UIElementsFrame:CreateTexture("MapsterScalerTex", "OVERLAY")
+		scaler:SetFrameStrata(WorldMapFrame:GetFrameStrata())
+		scaler:SetFrameLevel(WorldMapFrame:GetFrameLevel() + 15)
+		scaler.tex = scaler:CreateTexture(nil, "OVERLAY")
 		scaler.tex:SetAllPoints(scaler)
 		scaler.tex:SetTexture([[Interface\Buttons\UI-AutoCastableOverlay]])
 		scaler.tex:SetTexCoord(0.619, 0.760, 0.612, 0.762)
@@ -43,8 +43,9 @@ function Scale:OnEnable()
 
 		scaler:SetPoint("BOTTOMRIGHT", WorldMapFrame, "BOTTOMRIGHT", 0, -2)
 
-		mousetracker = CreateFrame("Frame", nil, WorldMapFrame.UIElementsFrame)
-		mousetracker:SetFrameLevel(WorldMapFrame.UIElementsFrame:GetFrameLevel() + 20)
+		mousetracker = CreateFrame("Frame", nil, WorldMapFrame)
+		mousetracker:SetFrameStrata(WorldMapFrame:GetFrameStrata())
+		mousetracker:SetFrameLevel(WorldMapFrame:GetFrameLevel() + 20)
 		mousetracker:SetAllPoints(scaler)
 		mousetracker:EnableMouse(true)
 		mousetracker:SetScript("OnEnter", function()
@@ -53,21 +54,21 @@ function Scale:OnEnable()
 		mousetracker:SetScript("OnLeave", function()
 			scaler.tex:SetDesaturated(true)
 		end)
-		mousetracker:SetScript("OnMouseUp", function(self)
+		mousetracker:SetScript("OnMouseUp", function(t)
 			LibWindow.SavePosition(WorldMapFrame)
-			self:SetScript("OnUpdate", nil)
-			self:SetAllPoints(scaler)
-
-			WorldMapBlobFrame_ResetHitTranslations()
+			t:SetScript("OnUpdate", nil)
+			t:SetAllPoints(scaler)
+			Mapster.db.profile.scale = WorldMapFrame:GetScale()
+			Mapster:SetScale(true)
 		end)
-		mousetracker:SetScript("OnMouseDown",function(self)
+		mousetracker:SetScript("OnMouseDown",function(t)
 			SOS.left, SOS.top = WorldMapFrame:GetLeft(), WorldMapFrame:GetTop()
 			SOS.scale = WorldMapFrame:GetScale()
 			SOS.x, SOS.y = SOS.left, SOS.top-(UIParent:GetHeight()/SOS.scale)
 			SOS.EFscale = WorldMapFrame:GetEffectiveScale()
 			SOS.dist = GetScaleDistance()
-			self:SetScript("OnUpdate", OnUpdate)
-			self:SetAllPoints(UIParent)
+			t:SetScript("OnUpdate", OnUpdate)
+			t:SetAllPoints(UIParent)
 		end)
 		tinsert(Mapster.elementsToHide, scaler)
 	end
@@ -87,8 +88,8 @@ function GetScaleDistance() -- distance from cursor to TopLeft :)
 	local scale = SOS.EFscale
 
 	local x, y = GetCursorPosition()
-	local x = x/scale - left
-	local y = top - y/scale
+	x = x/scale - left
+	y = top - y/scale
 
 	return sqrt(x*x+y*y)
 end
@@ -97,21 +98,14 @@ function OnUpdate(self)
 	local scale = GetScaleDistance()/SOS.dist*SOS.scale
 	if scale < .2 then -- clamp min and max scale
 		scale = .2
-	elseif scale > 1.5 then 
-		scale = 1.5
+	elseif scale > 2 then
+		scale = 2
 	end
 	WorldMapFrame:SetScale(scale)
-
-	if HelpPlate.__Mapster then
-		HelpPlate:SetScale(scale)
-	end
 
 	local s = SOS.scale/WorldMapFrame:GetScale()
 	local x = SOS.x*s
 	local y = SOS.y*s
 	WorldMapFrame:ClearAllPoints()
 	WorldMapFrame:SetPoint("TOPLEFT", UIParent, "TOPLEFT", x, y)
-
-	-- after scale changes, the blobs need re-drawing
-	WorldMapBlobFrame_UpdateBlobs()
 end

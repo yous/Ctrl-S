@@ -24,7 +24,6 @@ L:SetMiscLocalization{
 
 L:SetOptionLocalization{
 	WarningSnobold				= "Montre une alerte quand les Vassal arrivent",
-	PingCharge					= "Ping sur la minimap quand Glace-hurlante va vous charger",
 	ClearIconsOnIceHowl			= "Enlève toutes les icônes avant la prochaine charge",
 	TimerNextBoss				= "Montre le timer pour l'arrivée du prochain boss",
 	TimerEmerge					= "Montre le timer avant que les vers rentre dans le sol",
@@ -83,7 +82,7 @@ L:SetGeneralLocalization{
 }
 
 L:SetTimerLocalization{
-	TimerSpecialSpell	= "Prochaine Capacité Spéciale"	
+	TimerSpecialSpell	= "Prochaine Capacité Spéciale"
 }
 
 L:SetWarningLocalization{
@@ -94,7 +93,7 @@ L:SetWarningLocalization{
 	SpecWarnSwitchTarget		= "Changement de cible !",
 	SpecWarnKickNow				= "Casser Maintenant !",
 	WarningTouchDebuff			= "Toucher sur >%s<",
-	WarningPoweroftheTwins		= "Puissance des jumelles - plus de soins sur >%s<",
+	WarningPoweroftheTwins2		= "Puissance des jumelles - plus de soins sur >%s<",
 	SpecWarnPoweroftheTwins		= "Puissance des jumelles!"
 }
 
@@ -114,7 +113,7 @@ L:SetOptionLocalization{
 	SpecialWarnOnDebuff			= "Montre une alerte spéciale quand vous avez un Toucher (pour changer de debuff)",
 	SetIconOnDebuffTarget		= "Met des icônes sur les cibles des Toucher (héroique)",
 	WarningTouchDebuff			= "Annoncer les cibles des débuff Toucher de Lumière/des Ténèbres",
-	WarningPoweroftheTwins		= "Annoncer la cible pour Puissance des jumelles",
+	WarningPoweroftheTwins2		= "Annoncer la cible pour Puissance des jumelles",
 	SpecWarnPoweroftheTwins		= "Montre une alerte spéciale quand vous êtes en train de tanker une Jumelle puissante"
 }
 

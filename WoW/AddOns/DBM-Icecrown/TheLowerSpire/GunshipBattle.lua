@@ -1,7 +1,7 @@
 local mod	= DBM:NewMod("GunshipBattle", "DBM-Icecrown", 1)
 local L		= mod:GetLocalizedStrings()
 
-mod:SetRevision(("$Revision: 182 $"):sub(12, -3))
+mod:SetRevision("20200524145648")
 local addsIcon
 local bossID
 --mod:SetEncounterID(1099)--No ES fires this combat
@@ -21,10 +21,10 @@ else
 end
 
 mod:RegisterEventsInCombat(
-	"SPELL_AURA_APPLIED",
-	"SPELL_AURA_APPLIED_DOSE",
-	"SPELL_AURA_REMOVED",
-	"SPELL_CAST_START",
+	"SPELL_AURA_APPLIED 71195 71193 71188 69652 69651 69638",
+	"SPELL_AURA_APPLIED_DOSE 69638",
+	"SPELL_AURA_REMOVED 69705",
+	"SPELL_CAST_START 69705",
 	"UNIT_SPELLCAST_SUCCEEDED boss1 boss2"
 )
 
@@ -32,43 +32,37 @@ mod:RegisterEvents(
 	"CHAT_MSG_MONSTER_YELL"
 )
 
-mod:SetBossHealthInfo(
-	37215, L.Hammer,
-	37540, L.Skybreaker
-)
-
 --TODO, see if IEEU fires here and if we need yell triggers for engage
 local warnBelowZero			= mod:NewSpellAnnounce(69705, 4)
 local warnExperienced		= mod:NewTargetAnnounce(71188, 1, nil, false)		-- might be spammy
 local warnVeteran			= mod:NewTargetAnnounce(71193, 2, nil, false)		-- might be spammy
 local warnElite				= mod:NewTargetAnnounce(71195, 3, nil, false)		-- might be spammy
-local warnBattleFury		= mod:NewStackAnnounce("OptionVersion2", 69638, 2, nil, "Tank|Healer")
+local warnBattleFury		= mod:NewStackAnnounce(69638, 2, nil, "Tank|Healer", 2)
 local warnBladestorm		= mod:NewSpellAnnounce(69652, 3, nil, "Melee")
 local warnWoundingStrike	= mod:NewTargetAnnounce(69651, 2)
 local warnAddsSoon			= mod:NewAnnounce("WarnAddsSoon", 2, addsIcon)
 
-local timerCombatStart		= mod:NewCombatTimer(45)
-local timerBelowZeroCD		= mod:NewNextTimer(33.5, 69705)
-local timerBattleFuryActive	= mod:NewBuffFadesTimer(17, 69638, nil, "Tank|Healer")
-local timerAdds				= mod:NewTimer(60, "TimerAdds", addsIcon)
+local timerCombatStart		= mod:NewCombatTimer(42)
+local timerBelowZeroCD		= mod:NewNextTimer(33.5, 69705, nil, nil, nil, 5)
+local timerBattleFuryActive	= mod:NewBuffFadesTimer(17, 69638, nil, "Tank|Healer", nil, 5, nil, DBM_CORE_L.TANK_ICON)
+local timerAdds				= mod:NewTimer(60, "TimerAdds", addsIcon, nil, nil, 1)
 
-mod:RemoveOption("HealthFrame")
+mod.vb.firstMage = false
 
-local firstMage = false
-
-function mod:Adds()
+local function Adds(self)
+	timerAdds:Stop()
 	timerAdds:Start()
 	warnAddsSoon:Cancel()
 	warnAddsSoon:Schedule(55)
-	self:UnscheduleMethod("Adds")
-	self:ScheduleMethod(60, "Adds")
+	self:Unschedule(Adds)
+	self:Schedule(60, Adds, self)
 end
 
 function mod:OnCombatStart(delay)
 	timerAdds:Start(15-delay)--First adds might come early or late so timer should be taken as a proximity only.
 	warnAddsSoon:Schedule(10)
-	self:ScheduleMethod(15, "Adds")
-	firstMage = false
+	self:Schedule(15, Adds, self)
+	self.vb.firstMage = false
 end
 
 function mod:SPELL_AURA_APPLIED(args)
@@ -108,8 +102,8 @@ function mod:SPELL_CAST_START(args)
 	end
 end
 
-function mod:UNIT_SPELLCAST_SUCCEEDED(uId, spellName)
-	if spellName == GetSpellInfo(72340) then
+function mod:UNIT_SPELLCAST_SUCCEEDED(uId, _, spellId)
+	if spellId == 72340 then
 		DBM:EndCombat(self)
 	end
 end
@@ -118,11 +112,12 @@ function mod:CHAT_MSG_MONSTER_YELL(msg)
 	if msg:find(L.PullAlliance) or msg:find(L.PullHorde) then
 		timerCombatStart:Start()
 	elseif (msg:find(L.AddsAlliance) or msg:find(L.AddsHorde)) and self:IsInCombat() then
-		self:Adds()
+		self:Unschedule(Adds)
+		Adds(self)
 	elseif (msg:find(L.MageAlliance) or msg:find(L.MageHorde)) and self:IsInCombat() then
-		if not firstMage then
+		if not self.vb.firstMage then
 			timerBelowZeroCD:Start(3.2)
-			firstMage = true
+			self.vb.firstMage = true
 		else
 			timerBelowZeroCD:Update(30.3, 33.5)--Update the below zero timer to correct it with yells since it tends to be off depending on how bad your cannon operators are.
 		end

@@ -76,8 +76,7 @@ L:SetWarningLocalization({
 
 L:SetOptionLocalization({
 	specWarnBrew		= "Montre une alerte spéciale pour $spell:47376",
-	specWarnBrewStun	= "Montre une alerte spéciale pour $spell:47340",
-	YellOnBarrel		= "Crie quand vous avez un $spell:51413 sur vous"
+	specWarnBrewStun	= "Montre une alerte spéciale pour $spell:47340"
 })
 
 L:SetMiscLocalization({
@@ -148,24 +147,33 @@ L:SetMiscLocalization({
 })
 
 --------------------------
---  Garrison Invasions  --
+--  Memories of Azeroth: Burning Crusade  --
 --------------------------
-L = DBM:GetModLocalization("GarrisonInvasions")
+L = DBM:GetModLocalization("BCEvent")
 
 L:SetGeneralLocalization({
-	name = "Invasions de Fief"
+	name = "MoA: Burning Crusade"
 })
 
-L:SetWarningLocalization({
-	specWarnRylak	= "Charognard sombraile arrive",
-	specWarnWorker	= "Paysan terrifié apparu",
-	specWarnSpy		= "Un espion s'est infiltré",
-	specWarnBuilding= "Un bâtiment est attaqué"
+--------------------------
+--  Memories of Azeroth: Wrath of the Lich King  --
+--------------------------
+L = DBM:GetModLocalization("WrathEvent")
+
+L:SetGeneralLocalization({
+	name = "MoA: WotLK"
 })
 
-L:SetOptionLocalization({
-	specWarnRylak	= "Afficher une alerte spéciale quand un rylak arrive",
-	specWarnWorker	= "Afficher une alerte spéciale quand un Paysan terrifié apparait",
-	specWarnSpy		= "Afficher une alerte spéciale quand un espion s'est infiltré",
-	specWarnBuilding= "Afficher une alerte spéciale quand un bâtiment est attaqué"
+L:SetMiscLocalization{
+	Emerge					= "surgit de la terre",
+	Burrow					= "enfonce dans le sol"
+}
+
+--------------------------
+--  Memories of Azeroth: Cataclysm  --
+--------------------------
+L = DBM:GetModLocalization("CataEvent")
+
+L:SetGeneralLocalization({
+	name = "MoA: Cataclysm"
 })

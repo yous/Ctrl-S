@@ -5,6 +5,27 @@ local Wishlist = MogIt:RegisterModule("Wishlist", MogIt.moduleVersion)
 MogIt.wishlist = Wishlist
 Wishlist.base = true
 
+Wishlist.filters = {
+	"name",
+	-- "level",
+	-- "itemLevel",
+	-- "faction",
+	-- "class",
+	-- "source",
+	-- "quality",
+	-- "bind",
+	-- "chestType",
+	"hasItem",
+}
+
+Wishlist.Help = {
+	L["Right click for additional options"],
+	L["Shift-left click to link"],
+	L["Shift-right click for item URL"],
+	L["Ctrl-left click to try on in dressing room"],
+	L["Ctrl-right click to preview with MogIt"],
+}
+
 local function convertBowSlots()
 	for i, set in ipairs(Wishlist.db.profile.sets) do
 		local offhand = set.items["SecondaryHandSlot"]
@@ -32,6 +53,8 @@ local defaults = {
 function Wishlist:MogItLoaded()
 	local db = LibStub("AceDB-3.0"):New("MogItWishlist", defaults)
 	self.db = db
+	
+	local _, _, _, tocversion = GetBuildInfo()
 	
 	-- add alternate items table to sets
 	for i, set in ipairs(db.profile.sets) do
@@ -63,12 +86,59 @@ function Wishlist:MogItLoaded()
 		end
 	end
 	
+	-- convert item strings to 6.2 format
+	if not db.global.version then
+		local origPattern = MogIt.itemStringPattern
+		MogIt.itemStringPattern = "item:(%d+):%d+:%d+:%d+:%d+:%d+:%d+:%d+:%d+:%d+:%d+:(%d+):([%d:]+)";
+		
+		for k, profile in pairs(self.db.profiles) do
+			if profile.items then
+				for k, item in pairs(profile.items) do
+					profile.items[k] = MogIt:NormaliseItemString(item)
+				end
+			end
+			
+			if profile.sets then
+				for i, set in ipairs(profile.sets) do
+					for k, item in pairs(set.items) do
+						set.items[k] = MogIt:NormaliseItemString(item)
+					end
+				end
+			end
+		end
+		
+		MogIt.itemStringPattern = origPattern
+	end
+	
+	do	-- update item strings wherever possible as the format changes
+		for k, profile in pairs(self.db.profiles) do
+			if profile.items then
+				for k, item in pairs(profile.items) do
+					profile.items[k] = MogIt:NormaliseItemString(item)
+				end
+			end
+			
+			if profile.sets then
+				for i, set in ipairs(profile.sets) do
+					for k, item in pairs(set.items) do
+						set.items[k] = MogIt:NormaliseItemString(item)
+					end
+				end
+			end
+		end
+	end
+	
+	db.global.version = tocversion
+	
 	db.RegisterCallback(self, "OnProfileChanged", onProfileUpdated)
 	db.RegisterCallback(self, "OnProfileCopied", onProfileUpdated)
 	db.RegisterCallback(self, "OnProfileReset", onProfileUpdated)
 end
 
 local function setModule(self)
+	if MogIt.db.profile.loadModulesWishlist then
+		MogIt:LoadBaseModules()
+	end
 	MogIt:SetModule(Wishlist, L["Wishlist"])
 end
 
@@ -114,16 +184,8 @@ function Wishlist:FrameUpdate(frame, value, index)
 		MogIt.Set_FrameUpdate(frame, data)
 	else
 		data.item = value
-		if MogIt:HasItem(value) then
+		if MogIt:HasItem(MogIt:GetSourceFromItem(value), true) then
 			frame:ShowIndicator("hasItem")
-		end
-		local displayIDs = MogIt:GetData("display", MogIt:GetData("item", value, "display"), "items")
-		if displayIDs and #displayIDs > 1 then
-			for i, item in ipairs(displayIDs) do
-				if MogIt:HasItem(item) then
-					frame:ShowIndicator("hasItem")
-				end
-			end
 		end
 		MogIt.Item_FrameUpdate(frame, data)
 	end
@@ -133,7 +195,7 @@ function Wishlist:OnEnter(frame, value)
 	if type(value) == "table" then
 		MogIt.ShowSetTooltip(frame, value.items, value.name)
 	else
-		MogIt.ShowItemTooltip(frame, value, MogIt:GetData("display", MogIt:GetData("item", value, "display"), "items"))
+		MogIt.ShowItemTooltip(frame, value, value)
 	end
 end
 
@@ -151,21 +213,26 @@ function Wishlist:BuildList()
 	wipe(list)
 	local db = self.db.profile
 	for i, v in ipairs(self:GetSets(nil, true)) do
-		list[#list + 1] = v
+		if MogIt:CheckFilters(self, v) then
+			list[#list + 1] = v
+		end
 	end
 	for i, v in ipairs(db.items) do
-		list[#list + 1] = v
+		if MogIt:CheckFilters(self, v) then
+			list[#list + 1] = v
+		end
 	end
 	return list
 end
 
-Wishlist.Help = {
-	L["Right click for additional options"],
-	L["Shift-left click to link"],
-	L["Shift-right click for item URL"],
-	L["Ctrl-left click to try on in dressing room"],
-	L["Ctrl-right click to preview with MogIt"],
-}
+function Wishlist.GetFilterArgs(filter, item)
+	if filter == "name" or filter == "itemLevel" or filter == "hasItem" or filter == "chestType" then
+		if type(item) ~= "table" then
+			item = select(2, C_TransmogCollection.GetItemInfo(item))
+		end
+		return item
+	end
+end
 
 local t = {}
 
@@ -181,19 +248,18 @@ function Wishlist:GetCurrentProfile()
 end
 
 function Wishlist:AddItem(item, setName, slot, isAlternate)
-	if type(item) == "string" then
-		item = MogIt:NormaliseItemString(item)
-	else
-		item = MogIt:ToStringItem(item)
-	end
+	item = MogIt:NormaliseItemString(item)
 	-- don't add single items that are already on the wishlist
-	if not setName and self:IsItemInWishlist(item, true) then
+	if not setName and self:IsItemInWishlist(item, true, nil, true) then
 		return false
 	end
 	-- if a valid set name was provided, the item is supposed to go into the set, otherwise be added as a single item
 	local set = self:GetSet(setName)
 	if set then
-		slot = slot or MogIt.slotsType[select(9, GetItemInfo(item))]
+		if type(slot) ~= "string" then
+			slot = nil
+		end
+		slot = slot or MogIt.slotsType[select(4, GetItemInfoInstant(item))]
 		if isAlternate then
 			local altItems = set.alternateItems[slot] or {}
 			set.alternateItems[slot] = altItems
@@ -279,18 +345,25 @@ end
 local function tableFind(tbl, value, token)
 	if not tbl then return end
 	for i, v in pairs(tbl) do
-		if v == value or (token and token[v]) then
+		if MogIt:GetSourceFromItem(v) == value or (token and token[v]) then
 			return true
 		end
 	end
 end
 
-function Wishlist:IsItemInWishlist(item, noSet, profile)
-	if type(item) == "string" then
-		item = MogIt:NormaliseItemString(item)
-	else
-		item = MogIt:ToStringItem(item)
+function Wishlist:IsItemInWishlist(item, noSet, profile, noAlts)
+	if MogIt.db.profile.wishlistCheckAlts and not noAlts then
+		local found = false
+		local profiles = {}
+		for i, profile in ipairs(self.db:GetProfiles()) do
+			if self:IsItemInWishlist(item, nil, profile, true) then
+				found = true
+				tinsert(profiles, profile)
+			end
+		end
+		return found, profiles
 	end
+	item = MogIt:NormaliseItemString(item)
 	local token = MogIt.tokens[MogIt:ToNumberItem(item)]
 	local items
 	if profile then
@@ -300,15 +373,14 @@ function Wishlist:IsItemInWishlist(item, noSet, profile)
 	else
 		items = self.db.profile.items
 	end
+	local _, item = C_TransmogCollection.GetItemInfo(item)
+	if not item then return end
 	if tableFind(items, item, token) then return true end
 	if not noSet then
 		local sets = self:GetSets(profile)
 		if sets then
 			for i, set in ipairs(sets) do
 				if tableFind(set.items, item, token) then return true end
-				for slot, items in pairs(set.alternateItems) do
-					if tableFind(items, item, token) then return true end
-				end
 			end
 		end
 	end
@@ -354,7 +426,7 @@ end
 
 local setFuncs = {
 	addItem = function(self, set, item)
-		if Wishlist:AddItem(item, set, select(9, GetItemInfo(item)) == "INVTYPE_WEAPON" and IsShiftKeyDown() and "SecondaryHandSlot" or nil) then
+		if Wishlist:AddItem(item, set, select(4, GetItemInfoInstant(item)) == "INVTYPE_WEAPON" and IsShiftKeyDown() and "SecondaryHandSlot" or nil) then
 			MogIt:BuildList(nil, "Wishlist")
 		end
 		CloseDropDownMenus()
@@ -370,7 +442,7 @@ function Wishlist:AddSetMenuItems(level, func, arg2, profile)
 	local onehand
 	if type(func) ~= "function" then
 		func = setFuncs[func]
-		if select(9, GetItemInfo(arg2)) == "INVTYPE_WEAPON" then
+		if select(4, GetItemInfoInstant(arg2)) == "INVTYPE_WEAPON" then
 			onehand = true
 		end
 	end
@@ -398,16 +470,12 @@ do
 			return
 		end
 		if data then
-			if type(data) == "table" then
-				for slot, v in pairs(data.items) do
-					Wishlist:AddItem(v, text, slot)
-				end
-				if data.previewFrame then
-					data.previewFrame.TitleText:SetText(text)
-					data.previewFrame.data.title = text
-				end
-			else
-				Wishlist:AddItem(data, text)
+			for slot, v in pairs(data.items) do
+				Wishlist:AddItem(v, text, slot)
+			end
+			if data.previewFrame then
+				data.previewFrame.TitleText:SetText(text)
+				data.previewFrame.data.title = text
 			end
 		end
 		MogIt:BuildList(nil, "Wishlist")
@@ -424,8 +492,8 @@ do
 			onAccept(parent, data)
 			parent:Hide()
 		end,
-		OnShow = function(self)
-			self.editBox:SetText("Set "..(#Wishlist:GetSets() + 1))
+		OnShow = function(self, data)
+			self.editBox:SetText(data and data.name or ("Set "..(#Wishlist:GetSets() + 1)))
 			self.editBox:HighlightText()
 		end,
 		whileDead = true,

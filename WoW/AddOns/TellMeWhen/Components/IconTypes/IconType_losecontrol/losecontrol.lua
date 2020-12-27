@@ -7,7 +7,7 @@
 --		Banjankri of Blackrock, Predeter of Proudmoore, Xenyr of Aszune
 
 -- Currently maintained by
--- Cybeloras of Aerie Peak/Detheroc/Mal'Ganis
+-- Cybeloras of Aerie Peak
 -- --------------------
 
 local TMW = TMW
@@ -19,12 +19,14 @@ if not _G.C_LossOfControl then
 end
 
 local print = TMW.print
-local GetSpellLink, GetSpellInfo =
-	  GetSpellLink, GetSpellInfo
-local GetEventInfo = C_LossOfControl.GetEventInfo
-local GetNumEvents = C_LossOfControl.GetNumEvents
+local GetSpellInfo =
+	  GetSpellInfo
+local GetEventInfo = C_LossOfControl.GetEventInfo or C_LossOfControl.GetActiveLossOfControlData
+local GetNumEvents = C_LossOfControl.GetNumEvents or C_LossOfControl.GetActiveLossOfControlDataCount
 
 local strlowerCache = TMW.strlowerCache
+
+local wow_900 = select(4, GetBuildInfo()) >= 90000
 
 
 local Type = TMW.Classes.IconType:New("losecontrol")
@@ -36,13 +38,15 @@ Type.usePocketWatch = 1
 Type.hasNoGCD = true
 Type.canControlGroup = true
 
+local INCONTROL = 1
+local CONTROLLOST = 2
 
 -- AUTOMATICALLY GENERATED: UsesAttributes
+Type:UsesAttributes("state")
 Type:UsesAttributes("spell")
 Type:UsesAttributes("reverse")
-Type:UsesAttributes("locCategory")
 Type:UsesAttributes("start, duration")
-Type:UsesAttributes("alpha")
+Type:UsesAttributes("locCategory")
 Type:UsesAttributes("texture")
 -- END AUTOMATICALLY GENERATED: UsesAttributes
 
@@ -62,7 +66,7 @@ TMW:RegisterUpgrade(71038, {
 	icon = function(self, ics)
 		-- Fix the misspelled setting name "LoseContolTypes" to "LoseControlTypes"
 		if ics.LoseContolTypes then
-			TMW:CopyTableInPlaceWithMeta(ics.LoseContolTypes, ics.LoseControlTypes)
+			TMW:CopyTableInPlaceUsingDestinationMeta(ics.LoseContolTypes, ics.LoseControlTypes)
 		end
 		ics.LoseContolTypes = nil
 	end,
@@ -71,10 +75,9 @@ TMW:RegisterUpgrade(71038, {
 
 Type:RegisterConfigPanel_XMLTemplate(105, "TellMeWhen_LoseControlTypes")
 
-Type:RegisterConfigPanel_XMLTemplate(165, "TellMeWhen_WhenChecks", {
-	text = L["ICONMENU_SHOWWHEN"],
-	[0x1] = { text = "|cFF00FF00" .. L["LOSECONTROL_INCONTROL"],		},
-	[0x2] = { text = "|cFFFF0000" .. L["LOSECONTROL_CONTROLLOST"],		},
+Type:RegisterConfigPanel_XMLTemplate(165, "TellMeWhen_IconStates", {
+	[INCONTROL] =   { text = "|cFF00FF00" .. L["LOSECONTROL_INCONTROL"],   },
+	[CONTROLLOST] = { text = "|cFFFF0000" .. L["LOSECONTROL_CONTROLLOST"], },
 })
 
 
@@ -85,6 +88,16 @@ local function LoseControl_OnUpdate(icon, time)
 
 	for eventIndex = 1, GetNumEvents() do 
 		local locType, spellID, text, texture, start, _, duration, lockoutSchool = GetEventInfo(eventIndex)
+		if wow_900 then
+			locType, spellID, text, texture, start, duration, lockoutSchool = 
+				locType.locType,
+				locType.spellID,
+				locType.displayText,
+				locType.iconTexture,
+				locType.startTime,
+				locType.duration,
+				locType.lockoutSchool
+		end
 		
 		local isValidType = LoseControlTypes[""]
 		if not isValidType then
@@ -117,16 +130,16 @@ end
 
 function Type:HandleYieldedInfo(icon, iconToSet, category, texture, start, duration, spellID)
 	if category then
-		iconToSet:SetInfo("alpha; texture; start, duration; spell; locCategory",
-			icon.Alpha,
+		iconToSet:SetInfo("state; texture; start, duration; spell; locCategory",
+			INCONTROL,
 			texture,
 			start, duration,
 			spellID,
 			category
 		)
 	else
-		iconToSet:SetInfo("alpha; start, duration; spell; locCategory",
-			icon.UnAlpha,
+		iconToSet:SetInfo("state; start, duration; spell; locCategory",
+			CONTROLLOST,
 			0, 0,
 			nil,
 			nil
@@ -152,7 +165,7 @@ function Type:Setup(icon)
 	icon:Update()
 end
 
-Type:Register(102)
+Type:Register(103)
 
 
 

@@ -1,0 +1,8 @@
+## Interface: 90002
+## Title: Lib: Diminishing Returns Database
+## Version: b1a1eff
+## X-Category: Library
+## X-Curse-Project-ID: 315757
+
+
+DRList-1.0.xml

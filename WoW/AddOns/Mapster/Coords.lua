@@ -1,72 +1,43 @@
 --[[
-Copyright (c) 2009-2014, Hendrik "Nevcairiel" Leppkes < h.leppkes@gmail.com >
+Copyright (c) 2009-2016, Hendrik "Nevcairiel" Leppkes < h.leppkes@gmail.com >
 All rights reserved.
 ]]
 
 local Mapster = LibStub("AceAddon-3.0"):GetAddon("Mapster")
 local L = LibStub("AceLocale-3.0"):GetLocale("Mapster")
 
+local WoWClassic = select(4, GetBuildInfo()) < 20000
+
 local MODNAME = "Coords"
 local Coords = Mapster:NewModule(MODNAME)
 
 local GetCursorPosition = GetCursorPosition
-local GetPlayerMapPosition = GetPlayerMapPosition
-local WorldMapDetailFrame = WorldMapDetailFrame
+local GetPlayerMapPosition = C_Map.GetPlayerMapPosition
+local WorldMapScrollChild = WorldMapFrame.ScrollContainer.Child
 local display, cursortext, playertext
 local texttemplate, text = "%%s: %%.%df, %%.%df"
 
 local MouseXY, OnUpdate
 
 local db
-local defaults = { 
+local defaults = {
 	profile = {
 		accuracy = 1,
 		fontSize = 11,
-		mini = {
-			fontSize = 14,
-		},
 	}
 }
-
-local miniList = { fontSize = true }
-
-local db_
-local db = setmetatable({}, {
-	__index = function(t, k)
-		if Mapster.miniMap and miniList[k] then
-			return db_.mini[k]
-		else
-			return db_[k]
-		end
-	end,
-	__newindex = function(t, k, v)
-		if Mapster.miniMap and miniList[k] then
-			db_.mini[k] = v
-		else
-			db_[k] = v
-		end
-	end
-})
 
 local optGetter, optSetter
 do
 	local mod = Coords
 	function optGetter(info)
 		local key = info[#info]
-		if key:sub(0,5) == "mini_" then
-			return Coords.db.profile.mini[key:sub(6)]
-		else
-			return Coords.db.profile[key]
-		end
+		return Coords.db.profile[key]
 	end
 
 	function optSetter(info, value)
 		local key = info[#info]
-		if key:sub(0,5) == "mini_" then
-			Coords.db.profile.mini[key:sub(6)] = value
-		else
-			Coords.db.profile[key] = value
-		end
+		Coords.db.profile[key] = value
 		mod:Refresh()
 	end
 end
@@ -111,13 +82,6 @@ local function getOptions()
 					desc = L["Font Size on the normal map."],
 					min = 6, max = 18, step = 1,
 				},
-				mini_fontSize = {
-					order = 6,
-					type = "range",
-					name = L["(Mini) Font Size"],
-					desc = L["Font Size on the minimized map."],
-					min = 6, max = 18, step = 1,
-				}
 			},
 		}
 	end
@@ -127,7 +91,7 @@ end
 
 function Coords:OnInitialize()
 	self.db = Mapster.db:RegisterNamespace(MODNAME, defaults)
-	db_ = self.db.profile
+	db = self.db.profile
 
 	self:SetEnabledState(Mapster:GetModuleEnabled(MODNAME))
 	Mapster:RegisterModuleOptions(MODNAME, getOptions, L["Coordinates"])
@@ -135,29 +99,24 @@ end
 
 function Coords:OnEnable()
 	if not display then
-		display = CreateFrame("Frame", "Mapster_CoordsFrame", WorldMapFrame)
-		display:SetFrameLevel(WorldMapFrame.UIElementsFrame:GetFrameLevel() + 20)
+		display = CreateFrame("Frame", "Mapster_CoordsFrame", WorldMapFrame.ScrollContainer)
 
 		cursortext = display:CreateFontString(nil, "OVERLAY")
 		playertext = display:CreateFontString(nil, "OVERLAY")
 
-		self:UpdateMapSize(Mapster.miniMap)
+		self:UpdateMapSize()
 
 		cursortext:SetTextColor(1, 1, 1)
 		playertext:SetTextColor(1, 1, 1)
 
-		cursortext:SetPoint("TOPLEFT", WorldMapFrame.UIElementsFrame, "BOTTOM", 30, -5)
-		playertext:SetPoint("TOPRIGHT", WorldMapFrame.UIElementsFrame, "BOTTOM", -30, -5)
+		cursortext:SetPoint("TOPLEFT", WorldMapFrame.ScrollContainer, "BOTTOM", 30, WoWClassic and -9 or -5)
+		playertext:SetPoint("TOPRIGHT", WorldMapFrame.ScrollContainer, "BOTTOM", -30, WoWClassic and -9 or -5)
 
 		tinsert(Mapster.elementsToHide, display)
 	end
 
 	display:SetScript("OnUpdate", OnUpdate)
-	if Mapster.bordersVisible then
-		display:Show()
-	else
-		display:Hide()
-	end
+	display:Show()
 
 	self:Refresh()
 end
@@ -168,24 +127,25 @@ function Coords:OnDisable()
 end
 
 function Coords:Refresh()
-	db_ = self.db.profile
+	db = self.db.profile
 	if not self:IsEnabled() then return end
 
 	local acc = tonumber(db.accuracy) or 1
 	text = texttemplate:format(acc, acc)
-	self:UpdateMapSize(Mapster.miniMap)
+	self:UpdateMapSize()
 end
 
-function Coords:UpdateMapSize(mini)
+function Coords:UpdateMapSize()
 	if not cursortext or not playertext then return end
 	cursortext:SetFont(GameFontNormal:GetFont(), db.fontSize, "OUTLINE")
 	playertext:SetFont(GameFontNormal:GetFont(), db.fontSize, "OUTLINE")
 end
 
 function MouseXY()
-	local left, top = WorldMapDetailFrame:GetLeft(), WorldMapDetailFrame:GetTop()
-	local width, height = WorldMapDetailFrame:GetWidth(), WorldMapDetailFrame:GetHeight()
-	local scale = WorldMapDetailFrame:GetEffectiveScale()
+	local left, top = WorldMapScrollChild:GetLeft(), WorldMapScrollChild:GetTop()
+	local width, height = WorldMapScrollChild:GetWidth(), WorldMapScrollChild:GetHeight()
+	local scale = WorldMapScrollChild:GetEffectiveScale()
+	if not left or not top then return end -- this can occur while the map is being moved
 
 	local x, y = GetCursorPosition()
 	local cx = (x/scale - left) / width
@@ -201,7 +161,11 @@ end
 local cursor, player = L["Cursor"], L["Player"]
 function OnUpdate()
 	local cx, cy = MouseXY()
-	local px, py = GetPlayerMapPosition("player")
+	local px, py
+	local xy = GetPlayerMapPosition(WorldMapFrame:GetMapID(), "player")
+	if xy then
+		px, py = xy:GetXY()
+	end
 
 	if cx then
 		cursortext:SetFormattedText(text, cursor, 100 * cx, 100 * cy)
@@ -209,7 +173,7 @@ function OnUpdate()
 		cursortext:SetText("")
 	end
 
-	if px == 0 then
+	if not px or px == 0 then
 		playertext:SetText("")
 	else
 		playertext:SetFormattedText(text, player, 100 * px, 100 * py)

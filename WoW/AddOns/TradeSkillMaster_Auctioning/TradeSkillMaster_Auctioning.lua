@@ -8,41 +8,74 @@
 
 local TSM = select(2, ...)
 TSM = LibStub("AceAddon-3.0"):NewAddon(TSM, "TSM_Auctioning", "AceEvent-3.0", "AceConsole-3.0")
-TSM.status = {}
-local AceGUI = LibStub("AceGUI-3.0")
-
 local L = LibStub("AceLocale-3.0"):GetLocale("TradeSkillMaster_Auctioning") -- loads the localization table
 TSM.operationLookup = {}
 TSM.operationNameLookup = {}
-local status = TSM.status
-local statusLog, logIDs, lastSeenLogID = {}, {}
 
 
-local savedDBDefaults = {
-	profile = {
-	},
+local settingsInfo = {
+	version = 1,
 	global = {
-		optionsTreeStatus = {},
-		scanCompleteSound = 1,
-		cancelWithBid = false,
-		matchWhitelist = true,
-		roundNormalPrice = false,
-		disableInvalidMsg = false,
-		defaultOperationTab = 1,
-		priceColumn = 1,
-		tooltip = true,
+		cancelWithBid = { type = "boolean", default = false, lastModifiedVersion = 1 },
+		disableInvalidMsg = { type = "boolean", default = false, lastModifiedVersion = 1 },
+		roundNormalPrice = { type = "boolean", default = false, lastModifiedVersion = 1 },
+		matchWhitelist = { type = "boolean", default = true, lastModifiedVersion = 1 },
+		priceColumn = { type = "number", default = 1, lastModifiedVersion = 1 },
+		scanCompleteSound = { type = "string", default = TSMAPI:GetNoSoundKey(), lastModifiedVersion = 1 },
+		confirmCompleteSound = { type = "string", default = TSMAPI:GetNoSoundKey(), lastModifiedVersion = 1 },
+		helpPlatesShown = { type = "table", default = { selection = nil }, lastModifiedVersion = 1 },
 	},
 	factionrealm = {
-		player = {},
-		whitelist = {},
-		lastSoldFilter = 0,
+		whitelist = { type = "table", default = {}, lastModifiedVersion = 1 },
+		player = { type = "table", default = {}, lastModifiedVersion = 1 },
 	},
+}
+local tooltipDefaults = {
+	operationPrices = false,
+}
+local operationDefaults = {
+	-- general
+	matchStackSize = nil,
+	blacklist = "",
+	ignoreLowDuration = 0,
+	-- post
+	stackSize = 1,
+	stackSizeIsCap = nil,
+	postCap = 1,
+	keepQuantity = 0,
+	keepQtySources = {},
+	maxExpires = 0,
+	duration = 24,
+	bidPercent = 1,
+	undercut = 1,
+	minPrice = 50000,
+	maxPrice = 5000000,
+	normalPrice = 1000000,
+	priceReset = "none",
+	aboveMax = "normalPrice",
+	-- cancel
+	cancelUndercut = true,
+	keepPosted = 0,
+	cancelRepost = true,
+	cancelRepostThreshold = 10000,
+	-- reset
+	resetEnabled = nil,
+	resetMaxQuantity = 5,
+	resetMaxInventory = 10,
+	resetMaxCost = 500000,
+	resetMinProfit = 500000,
+	resetResolution = 100,
+	resetMaxItemCost = 1000000,
 }
 
 -- Addon loaded
 function TSM:OnInitialize()
-	-- load the savedDB into TSM.db
-	TSM.db = LibStub:GetLibrary("AceDB-3.0"):New("TradeSkillMaster_AuctioningDB", savedDBDefaults, true)
+	if TradeSkillMasterModulesDB then
+		TradeSkillMasterModulesDB.Auctioning = TradeSkillMaster_AuctioningDB
+	end
+
+	-- load settings
+	TSM.db = TSMAPI.Settings:Init("TradeSkillMaster_AuctioningDB", settingsInfo)
 
 	for name, module in pairs(TSM.modules) do
 		TSM[name] = module
@@ -50,40 +83,70 @@ function TSM:OnInitialize()
 
 	-- Add this character to the alt list so it's not undercut by the player
 	TSM.db.factionrealm.player[UnitName("player")] = true
-	
+
 	-- register this module with TSM
 	TSM:RegisterModule()
 
-	-- clear out 1.x settings
-	if TSM.db.profile.groups then
-		for _, profile in ipairs(TSM.db:GetProfiles()) do
-			TSM.db:SetProfile(profile)
-			TSM.db:ResetProfile()
-		end
-	end
-
 	for _ in TSMAPI:GetTSMProfileIterator() do
 		for _, operation in pairs(TSM.operations) do
-			operation.resetMaxInventory = operation.resetMaxInventory or TSM.operationDefaults.resetMaxInventory
-			operation.aboveMax = operation.aboveMax or TSM.operationDefaults.aboveMax
-			operation.keepQuantity = operation.keepQuantity or TSM.operationDefaults.keepQuantity
+			operation.resetMaxInventory = operation.resetMaxInventory or operationDefaults.resetMaxInventory
+			operation.aboveMax = operation.aboveMax or operationDefaults.aboveMax
+			operation.keepQuantity = operation.keepQuantity or operationDefaults.keepQuantity
+			operation.keepQtySources = operation.keepQtySources or operationDefaults.keepQtySources
+			operation.maxExpires = operation.maxExpires or operationDefaults.maxExpires
 			operation.blacklist = operation.blacklist or ""
 		end
+	end
+	
+	-- fix patch 7.3 sound changes
+	local sounds = TSMAPI:GetSounds()
+	if not sounds[TSM.db.global.scanCompleteSound] then
+		TSM.db.global.scanCompleteSound = TSM.NO_SOUND_KEY
+	end
+	if not sounds[TSM.db.global.confirmCompleteSound] then
+		TSM.db.global.confirmCompleteSound = TSM.NO_SOUND_KEY
 	end
 end
 
 -- registers this module with TSM by first setting all fields and then calling TSMAPI:NewModule().
 function TSM:RegisterModule()
-	TSM.operations = { maxOperations = 5, callbackOptions = "Options:Load", callbackInfo = "GetOperationInfo" }
+	TSM.operations = { maxOperations = 5, callbackOptions = "Options:GetOperationOptionsInfo", callbackInfo = "GetOperationInfo", defaults = operationDefaults}
 	TSM.auctionTab = { callbackShow = "GUI:ShowSelectionFrame", callbackHide = "GUI:HideSelectionFrame" }
+	TSM.moduleOptions = {callback="Options:Load"}
 	TSM.bankUiButton = { callback = "Util:createTab" }
-	TSM.tooltipOptions = { callback = "Options:LoadTooltipOptions" }
+	TSM.tooltip = {callbackLoad="LoadTooltip", callbackOptions="Options:LoadTooltipOptions", defaults=tooltipDefaults}
+	TSM.moduleAPIs = {
+		{key="getMinPrice", callback="GetMinPrice"},
+		{key="getPostCap", callback="GetPostCap"},
+	}
 
 	TSMAPI:NewModule(TSM)
 end
 
+function TSM:GetMinPrice(item)
+	local itemString = TSMAPI.Item:ToItemString(item)
+	if not itemString then return end
+	local operationName = TSMAPI.Operations:GetFirstByItem(itemString, "Auctioning")
+	if not operationName then return end
+	TSMAPI.Operations:Update("Auctioning", operationName)
+	local operation = TSM.operations[operationName]
+	if not operation then return end
+	return TSM.Util:GetMinPrice(operation, itemString)
+end
+
+function TSM:GetPostCap(item)
+	local itemString = TSMAPI.Item:ToItemString(item)
+	if not itemString then return end
+	local operationName = TSMAPI.Operations:GetFirstByItem(itemString, "Auctioning")
+	if not operationName then return end
+	TSMAPI.Operations:Update("Auctioning", operationName)
+	local operation = TSM.operations[operationName]
+	if not operation then return end
+	return operation.postCap
+end
+
 function TSM:GetOperationInfo(operationName)
-	TSMAPI:UpdateOperation("Auctioning", operationName)
+	TSMAPI.Operations:Update("Auctioning", operationName)
 	local operation = TSM.operations[operationName]
 	if not operation then return end
 	local parts = {}
@@ -115,69 +178,26 @@ function TSM:GetOperationInfo(operationName)
 	return table.concat(parts, " ")
 end
 
-TSM.operationDefaults = {
-	-- general
-	matchStackSize = nil,
-	blacklist = "",
-	ignoreLowDuration = 0,
-	ignorePlayer = {},
-	ignoreFactionrealm = {},
-	relationships = {},
-	-- post
-	stackSize = 1,
-	stackSizeIsCap = nil,
-	postCap = 1,
-	keepQuantity = 0,
-	duration = 24,
-	bidPercent = 1,
-	undercut = 1,
-	minPrice = 50000,
-	maxPrice = 5000000,
-	normalPrice = 1000000,
-	priceReset = "none",
-	aboveMax = "normalPrice",
-	-- cancel
-	cancelUndercut = true,
-	keepPosted = 0,
-	cancelRepost = true,
-	cancelRepostThreshold = 10000,
-	-- reset
-	resetEnabled = nil,
-	resetMaxQuantity = 5,
-	resetMaxInventory = 10,
-	resetMaxCost = 500000,
-	resetMinProfit = 500000,
-	resetResolution = 100,
-	resetMaxItemCost = 1000000,
-}
+function TSM:LoadTooltip(itemString, quantity, options, moneyCoins, lines)
+	if not options.operationPrices then return end -- only 1 tooltip option
+	itemString = TSMAPI.Item:ToBaseItemString(itemString, true)
+	local numStartingLines = #lines
 
-function TSM:GetTooltip(itemString)
-	if not TSM.db.global.tooltip then return end
-	local text = {}
-	local moneyCoinsTooltip = TSMAPI:GetMoneyCoinsTooltip()
-	itemString = TSMAPI:GetBaseItemString(itemString, true)
-	local operations = TSMAPI:GetItemOperation(itemString, "Auctioning")
-	if not operations or not operations[1] or not TSM.operations[operations[1]] then return end
-	
-	TSMAPI:UpdateOperation("Auctioning", operations[1])
-	local prices = TSM.Util:GetItemPrices(TSM.operations[operations[1]], itemString, {minPrice=true, maxPrice=true, normalPrice=true})
+	-- get operation
+	local operationName = TSMAPI.Operations:GetFirstByItem(itemString, "Auctioning")
+	if not operationName or not TSM.operations[operationName] then return end
+	TSMAPI.Operations:Update("Auctioning", operationName)
+
+	local prices = TSM.Util:GetItemPrices(TSM.operations[operationName], itemString, false, {minPrice=true, maxPrice=true, normalPrice=true})
 	if prices then
-		local minPrice, normPrice, maxPrice
-		if moneyCoinsTooltip then
-			minPrice = (TSMAPI:FormatTextMoneyIcon(prices.minPrice, "|cffffffff") or "|cffffffff---|r")
-			normPrice = (TSMAPI:FormatTextMoneyIcon(prices.normalPrice, "|cffffffff") or "|cffffffff---|r")
-			maxPrice = (TSMAPI:FormatTextMoneyIcon(prices.maxPrice, "|cffffffff") or "|cffffffff---|r")
-		else
-			minPrice = (TSMAPI:FormatTextMoney(prices.minPrice, "|cffffffff") or "|cffffffff---|r")
-			normPrice = (TSMAPI:FormatTextMoney(prices.normalPrice, "|cffffffff") or "|cffffffff---|r")
-			maxPrice = (TSMAPI:FormatTextMoney(prices.maxPrice, "|cffffffff") or "|cffffffff---|r")
-		end
-		tinsert(text, { left = "  " .. L["Auctioning Prices:"], right = format(L["Min (%s), Normal (%s), Max (%s)"], minPrice, normPrice, maxPrice) })
+		local minPrice = (TSMAPI:MoneyToString(prices.minPrice, "|cffffffff", moneyCoins and "OPT_ICON" or nil) or "|cffffffff---|r")
+		local normPrice = (TSMAPI:MoneyToString(prices.normalPrice, "|cffffffff", moneyCoins and "OPT_ICON" or nil) or "|cffffffff---|r")
+		local maxPrice = (TSMAPI:MoneyToString(prices.maxPrice, "|cffffffff", moneyCoins and "OPT_ICON" or nil) or "|cffffffff---|r")
+		tinsert(lines, {left="  "..L["Min/Normal/Max Prices:"], right=format("%s / %s / %s", minPrice, normPrice, maxPrice)})
 	end
 
-	if #text > 0 then
-		tinsert(text, 1, "|cffffff00" .. "TSM Auctioning:")
-		return text
+	if #lines > numStartingLines then
+		tinsert(lines, numStartingLines+1, "|cffffff00TSM Auctioning:|r")
 	end
 end
 

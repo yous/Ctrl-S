@@ -67,12 +67,24 @@ L:SetWarningLocalization({
 
 L:SetOptionLocalization({
 	specWarnBrew		= "Spezialwarnung für $spell:47376",
-	specWarnBrewStun	= "Spezialwarnung für $spell:47340",
-	YellOnBarrel		= "Schreie bei $spell:51413"
+	specWarnBrewStun	= "Spezialwarnung für $spell:47340"
 })
 
 L:SetMiscLocalization({
 	YellBarrel			= "Stecke im Fass!"
+})
+
+----------------
+--  Brewfest  --
+----------------
+L = DBM:GetModLocalization("Brew")
+
+L:SetGeneralLocalization({
+	name = "Braufest"
+})
+
+L:SetOptionLocalization({
+	NormalizeVolume			= "Setze im Braufestgebiet die Lautstärke des DIALOG-Audiokanals automatisch auf die Lautstärke des Musik-Audiokanals, damit es nicht so ärgerlich laut ist. (falls keine Musiklautstärke gesetzt ist, wird der Dialog-Audiokanal stummgeschaltet)"
 })
 
 -----------------------------
@@ -135,39 +147,112 @@ L:SetMiscLocalization({
 })
 
 --------------------------
---  Garrison Invasions  --
+--  Demonic Invasions  --
 --------------------------
-L = DBM:GetModLocalization("GarrisonInvasions")
+L = DBM:GetModLocalization("DemonInvasions")
 
 L:SetGeneralLocalization({
-	name = "Garnisonsinvasionen"
+	name = "Dämoneninvasionen"
 })
 
-L:SetWarningLocalization({
-	specWarnRylak	= "Darkwing Scavenger Incoming",--translate
-	specWarnWorker	= "Ein panischer Arbeiter ist schutzlos.",
-	specWarnSpy		= "Ein Spion hat sich eingeschlichen.",
-	specWarnBuilding= "Ein Gebäude wird angegriffen."
+--------------------------
+--  Memories of Azeroth: Burning Crusade  --
+--------------------------
+L = DBM:GetModLocalization("BCEvent")
+
+L:SetGeneralLocalization({
+	name = "MoA: Burning Crusade"
 })
 
-L:SetOptionLocalization({
-	specWarnRylak	= "Show special warning when a rylak is incoming",--translate
-	specWarnWorker	= "Spezialwarnung, wenn ein panischer Arbeiter schutzlos ist",
-	specWarnSpy		= "Spezialwarnung, wenn sich ein Spion eingeschlichen hat",
-	specWarnBuilding= "Spezialwarnung, wenn ein Gebäude angegriffen wird"
+--------------------------
+--  Memories of Azeroth: Wrath of the Lich King  --
+--------------------------
+L = DBM:GetModLocalization("WrathEvent")
+
+L:SetGeneralLocalization({
+	name = "MoA: WotLK"
 })
+
+L:SetMiscLocalization{
+	Emerge				= "entsteigt dem Boden!",
+	Burrow				= "gräbt sich in den Boden!"
+}
+
+--------------------------
+--  Memories of Azeroth: Cataclysm  --
+--------------------------
+L = DBM:GetModLocalization("CataEvent")
+
+L:SetGeneralLocalization({
+	name = "MoA: Cataclysm"
+})
+
+-- Lord Kazzak (Badlands)
+L = DBM:GetModLocalization("KazzakClassic")
+
+----------------------------------
+--  Azeroth Event World Bosses  --
+----------------------------------
+
+L:SetGeneralLocalization{
+	name = "Lord Kazzak"
+}
 
 L:SetMiscLocalization({
-	--General
-	preCombat			= "Zu den Waffen! Auf eure Posten!",
-	preCombat2			= "So ein gewisser Gestank liegt in der Luft. Dämonen...",
-	rylakSpawn			= "The commotion of the battle attracts a rylak!",--translate, Source npc Darkwing Scavenger, target playername
-	terrifiedWorker		= "Ein panischer Arbeiter ist schutzlos!",
-	sneakySpy			= "hat das Chaos genutzt, um sich einzuschleichen!",
-	buildingAttack		= "Dein %s wird angegriffen!",--needs to be verified (guessed)
-	--Ogre
-	GorianwarCaller		= "A Gorian Warcaller joins the battle to raise morale!",--translate
-	WildfireElemental	= "Ein Wildfeuerelementar wird am Haupttor beschworen!",
-	--Iron Horde
-	Assassin			= "An Assassin is hunting your guards!"--translate
+	Pull		= "Für die Legion! Für Kil'jaeden!"
+})
+
+-- Azuregos (Azshara)
+L = DBM:GetModLocalization("Azuregos")
+
+L:SetGeneralLocalization{
+	name = "Azuregos"
+}
+
+L:SetMiscLocalization({
+	Pull		= "Dieser Ort steht unter meinem Schutz. Die Mysterien des Arkanen werden unberührt bleiben."
+})
+
+-- Taerar (Ashenvale)
+L = DBM:GetModLocalization("Taerar")
+
+L:SetGeneralLocalization{
+	name = "Taerar"
+}
+
+L:SetMiscLocalization({
+	Pull		= "Frieden ist nur ein flüchtiger Traum! Möge der Alptraum herrschen!"
+})
+
+-- Ysondre (Feralas)
+L = DBM:GetModLocalization("Ysondre")
+
+L:SetGeneralLocalization{
+	name = "Ysondre"
+}
+
+L:SetMiscLocalization({
+	Pull		= "Die Fäden des Lebens wurden durchtrennt! Die Träumer müssen gerächt werden."
+})
+
+-- Lethon (Hinterlands)
+L = DBM:GetModLocalization("Lethon")
+
+L:SetGeneralLocalization{
+	name = "Lethon"
+}
+
+L:SetMiscLocalization({
+--	Pull		= "Ich spüre die Schatten in Euren Herzen. Die Verdammten werden niemals ruhen!"
+})
+
+-- Emeriss (Duskwood)
+L = DBM:GetModLocalization("Emeriss")
+
+L:SetGeneralLocalization{
+	name = "Smariss"
+}
+
+L:SetMiscLocalization({
+	Pull		= "Hoffnung ist ein Gebrechen der Seele! Dieses Land wird verdorren und vergehen!"
 })

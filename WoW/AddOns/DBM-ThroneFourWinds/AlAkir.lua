@@ -1,11 +1,9 @@
 local mod	= DBM:NewMod(155, "DBM-ThroneFourWinds", nil, 75)
 local L		= mod:GetLocalizedStrings()
 
-mod:SetRevision(("$Revision: 145 $"):sub(12, -3))
+mod:SetRevision("20200806141910")
 mod:SetCreatureID(46753)
 mod:SetEncounterID(1034)
-mod:DisableEEKillDetection()
-mod:SetZone()
 mod:SetUsedIcons(8)
 
 mod:RegisterCombat("combat")
@@ -39,27 +37,23 @@ local specWarnCloud			= mod:NewSpecialWarningMove(89588)
 local specWarnLightningRod	= mod:NewSpecialWarningMoveAway(89668)
 local yellLightningRod		= mod:NewYell(89668)
 
-local timerWindBurst		= mod:NewCastTimer(5, 87770)
-local timerWindBurstCD		= mod:NewCDTimer(25, 87770)		-- 25-30 Variation
-local timerAddCD			= mod:NewCDTimer(20, 88272)
-local timerFeedback			= mod:NewTimer(20, "TimerFeedback", 87904)
+local timerWindBurst		= mod:NewCastTimer(5, 87770, nil, nil, nil, 2)
+local timerWindBurstCD		= mod:NewCDTimer(25, 87770, nil, nil, nil, 2)		-- 25-30 Variation
+local timerAddCD			= mod:NewCDTimer(20, 88272, nil, nil, nil, 1)
+local timerFeedback			= mod:NewTimer(20, "TimerFeedback", 87904, nil, nil, 5, DBM_CORE_L.DAMAGE_ICON)
 local timerAcidRainStack	= mod:NewNextTimer(15, 88301, nil, isDKorPaly)
-local timerLightningRod		= mod:NewTargetTimer(5, 89668)
-local timerLightningRodCD	= mod:NewNextTimer(15, 89668)
-local timerLightningCloudCD	= mod:NewNextTimer(15, 89588)
-local timerIceStormCD		= mod:NewCDTimer(25, 88239)
-local timerSquallLineCD		= mod:NewCDTimer(20, 91129)
+local timerLightningRod		= mod:NewTargetTimer(5, 89668, nil, false)
+local timerLightningRodCD	= mod:NewNextTimer(15, 89668, nil, nil, nil, 3)
+local timerLightningCloudCD	= mod:NewNextTimer(15, 89588, nil, nil, nil, 3, nil, DBM_CORE_L.DEADLY_ICON)
+local timerIceStormCD		= mod:NewCDTimer(25, 88239, nil, nil, nil, 3)
+local timerSquallLineCD		= mod:NewCDTimer(20, 91129, nil, nil, nil, 3, nil, DBM_CORE_L.DEADLY_ICON)
 
 local berserkTimer			= mod:NewBerserkTimer(600)
-
-local countdownClouds		= mod:NewCountdown(10, 89588, false)
-local countdownFeedback		= mod:NewCountdown(20, 87904, false)
 
 mod:AddBoolOption("LightningRodIcon")
 mod:AddBoolOption("RangeFrame", true)
 
 local phase2Started = false
-local strikeStarted = false
 
 function mod:CloudRepeat()
 	self:UnscheduleMethod("CloudRepeat")
@@ -67,11 +61,9 @@ function mod:CloudRepeat()
 	if self:IsInCombat() then--Don't schedule if not in combat, prevent an infinite loop from happening if for some reason one got scheduled exactly on boss death.
 		if self:IsDifficulty("heroic10", "heroic25") then
 			timerLightningCloudCD:Start(10)
-			countdownClouds:Start(10)
 			self:ScheduleMethod(10, "CloudRepeat")
 		else
 			timerLightningCloudCD:Start()
-			countdownClouds:Start(15)
 			self:ScheduleMethod(15, "CloudRepeat")
 		end
 	end
@@ -79,7 +71,6 @@ end
 
 function mod:OnCombatStart(delay)
 	phase2Started = false
-	strikeStarted = false
 	berserkTimer:Start(-delay)
 	timerWindBurstCD:Start(20-delay)
 	timerIceStormCD:Start(6-delay)
@@ -101,13 +92,10 @@ function mod:SPELL_AURA_APPLIED(args)
 	if args.spellId == 87904 then
 		warnFeedback:Show(args.destName, args.amount or 1)
 		timerFeedback:Cancel()--prevent multiple timers spawning with diff args.
-		countdownFeedback:Cancel()
 		if self:IsDifficulty("normal10", "normal25") then
 			timerFeedback:Start(30, args.amount or 1)
-			countdownFeedback:Start(30)
 		else
 			timerFeedback:Start(20, args.amount or 1)
-			countdownFeedback:Start(20)
 		end
 	elseif args.spellId == 88301 then--Acid Rain (phase 2 debuff)
 		if args.amount and args.amount > 1 and args:IsPlayer() then
@@ -147,7 +135,6 @@ end
 
 function mod:SPELL_CAST_START(args)
 	if args.spellId == 87770 then--Phase 1 wind burst
-		warnWindBurst:Show()
 		specWarnWindBurst:Show()
 		timerWindBurstCD:Start()
 		if self:IsDifficulty("heroic10", "heroic25") then
@@ -175,7 +162,7 @@ function mod:SPELL_PERIODIC_DAMAGE(_, _, _, _, destGUID, _, _, _, spellId)
 end
 mod.SPELL_PERIODIC_MISSED = mod.SPELL_PERIODIC_DAMAGE
 
-function mod:UNIT_SPELLCAST_SUCCEEDED(uId, _, _, _, spellId)
+function mod:UNIT_SPELLCAST_SUCCEEDED(uId, _, spellId)
 	if spellId == 91129 and self:AntiSpam(2, 3) then -- Squall Line (Tornados)
 		warnSquallLine:Show()
 		if not phase2Started then

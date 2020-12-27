@@ -2,16 +2,23 @@
  http://wowprogramming.com/FrameXML/UI.xsd">
     <!--
     This file is part of Decursive.
-    
-    Decursive (v 2.7.3.6) add-on for World of Warcraft UI
-    Copyright (C) 2006-2014 John Wellesz (archarodim AT teaser.fr) ( http://www.2072productions.com/to/decursive.php )
 
-    Starting from 2009-10-31 and until said otherwise by its author, Decursive
-    is no longer free software, all rights are reserved to its author (John Wellesz).
+    Decursive (v 2.7.8) add-on for World of Warcraft UI
+    Copyright (C) 2006-2019 John Wellesz (Decursive AT 2072productions.com) ( http://www.2072productions.com/to/decursive.php )
 
-    The only official and allowed distribution means are www.2072productions.com, www.wowace.com and curse.com.
-    To distribute Decursive through other means a special authorization is required.
-    
+    Decursive is free software: you can redistribute it and/or modify
+    it under the terms of the GNU General Public License as published by
+    the Free Software Foundation, either version 3 of the License, or
+    (at your option) any later version.
+
+    Decursive is distributed in the hope that it will be useful,
+    but WITHOUT ANY WARRANTY; without even the implied warranty of
+    MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+    GNU General Public License for more details.
+
+    You should have received a copy of the GNU General Public License
+    along with Decursive.  If not, see <https://www.gnu.org/licenses/>.
+
 
     Decursive is inspired from the original "Decursive v1.9.4" by Patrick Bohnet (Quu).
     The original "Decursive 1.9.4" is in public domain ( www.quutar.com )
@@ -19,7 +26,7 @@
     Decursive is distributed in the hope that it will be useful,
     but WITHOUT ANY WARRANTY.
 
-    This file was last updated on 2014-10-13T09:20:46Z
+    This file was last updated on 2019-11-18T13:42:00Z
     -->
     <Script>
 
@@ -55,9 +62,9 @@
 
         <ButtonText name="$parentText" justifyH="LEFT" />
 
-        <NormalFont inherits="GameFontNormal" style="GameFontNormal" justifyH="LEFT" />
-        <HighlightFont inherits="GameFontHighlight" style="GameFontHighlight" justifyH="LEFT" />
-        <DisabledFont inherits="GameFontDisable" style="GameFontDisable" justifyH="LEFT" />
+        <NormalFont style="GameFontNormal" />
+        <HighlightFont style="GameFontHighlight" />
+        <DisabledFont style="GameFontDisable" />
 
     </Button>
 
@@ -87,16 +94,14 @@
     <!-- }}} -->
 
     <!--  Dcr_ListFrameTemplate {{{ -->
-    <Frame name="Dcr_ListFrameTemplate" frameStrata="LOW" toplevel="true" enableMouse="true" EnableMouseWheel="true" movable="true" hidden="true" virtual="true" parent="UIParent">
+    <Frame name="Dcr_ListFrameTemplate" frameStrata="LOW" toplevel="true" enableMouse="true" movable="true" clampedToScreen="true" hidden="true" virtual="true" parent="UIParent">
         <Size>
             <AbsDimension x="170" y="210" />
         </Size>
 
         <Anchors>
-            <Anchor point="CENTER" />
+            <Anchor point="CENTER" relativeTo="UIParent" />
         </Anchors>
-
-        <TitleRegion setAllPoints="true"/>
 
         <Backdrop bgFile="Interface\DialogFrame\UI-DialogBox-Background" edgeFile="Interface\Tooltips\UI-Tooltip-Border" tile="true">
             <EdgeSize>
@@ -118,6 +123,7 @@
                 DcrDisplay_Tooltip:Hide();
             </OnLeave>
             <OnLoad>
+                <!-- overridden in implementation -->
                 if DecursiveInstallCorrupted then return end
                 DecursiveRootTable.Dcr.ListFrameTemplate_OnLoad(self);
             </OnLoad>
@@ -128,6 +134,9 @@
             <OnUpdate>
                 self.OnUpdate(self);
             </OnUpdate>
+
+            <OnDragStart>self:StartMoving();</OnDragStart>
+            <OnDragStop>self:StopMovingOrSizing();</OnDragStop>
         </Scripts>
 
         <Layers>
@@ -238,7 +247,7 @@
 
                         local Scrollmin, scrollmax = Slider:GetMinMaxValues();
 
-                        Slider:SetMinMaxValues(Scrollmin, scrollmax + Slider:GetValueStep()); 
+                        Slider:SetMinMaxValues(Scrollmin, scrollmax + Slider:GetValueStep());
 
                         Slider:SetValue(scrollmax + Slider:GetValueStep());
                         end
@@ -349,8 +358,18 @@
     <!-- DecursivePriorityListFrame  {{{ -->
     <Frame name="DecursivePriorityListFrame" inherits="Dcr_ListFrameTemplate">
 
+        <Anchors>
+            <Anchor point="CENTER">
+                <Offset>
+                    <AbsDimension x="-85" y="0"/>
+                </Offset>
+            </Anchor>
+        </Anchors>
+
         <Scripts>
             <OnLoad>
+                self:RegisterForDrag("LeftButton");
+
                 if DecursiveInstallCorrupted then return end
                 DecursiveRootTable.Dcr.ListFrameTemplate_OnLoad(self);
 
@@ -368,7 +387,7 @@
 
                 self.CloseButtonTip = DecursiveRootTable.Dcr.L["BINDING_NAME_DCRPRSHOW"];
 
-                self.PopulateAddFunction = DecursiveRootTable.Dcr.AddUnitToPriorityList;
+                self.PopulateAddFunction = DecursiveRootTable.Dcr.AddElementToPriorityList;
                 self.PopulateFrameTitle = DecursiveRootTable.Dcr.L["PRIORITY_LIST"];
 
                 self.AddTargetFunc = DecursiveRootTable.Dcr.AddTargetToPriorityList;
@@ -383,8 +402,18 @@
     <!-- DecursiveSkipListFrame  {{{ -->
     <Frame name="DecursiveSkipListFrame" inherits="Dcr_ListFrameTemplate">
 
+        <Anchors>
+            <Anchor point="CENTER">
+                <Offset>
+                    <AbsDimension x="85" y="0"/>
+                </Offset>
+            </Anchor>
+        </Anchors>
+
         <Scripts>
             <OnLoad>
+                self:RegisterForDrag("LeftButton");
+
                 if DecursiveInstallCorrupted then return end
                 DecursiveRootTable.Dcr.ListFrameTemplate_OnLoad(self);
 
@@ -403,7 +432,7 @@
 
                 self.CloseButtonTip = DecursiveRootTable.Dcr.L["BINDING_NAME_DCRSKSHOW"];
 
-                self.PopulateAddFunction = DecursiveRootTable.Dcr.AddUnitToSkipList;
+                self.PopulateAddFunction = DecursiveRootTable.Dcr.AddElementToSkipList;
                 self.PopulateFrameTitle = DecursiveRootTable.Dcr.L["SKIP_LIST_STR"];
 
                 self.AddTargetFunc = DecursiveRootTable.Dcr.AddTargetToSkipList;
@@ -417,16 +446,18 @@
 
 
     <!-- DecursivePopulateListFrame {{{ -->
-    <Frame name="DecursivePopulateListFrame" frameStrata="LOW" toplevel="true" enableMouse="true" movable="true" hidden="true" parent="UIParent">
+    <Frame name="DecursivePopulateListFrame" frameStrata="LOW" toplevel="true" enableMouse="true" movable="true" clampedToScreen="true" hidden="true" parent="UIParent">
         <Size>
-            <AbsDimension x="168" y="285" />
+            <AbsDimension x="228" y="285" />
         </Size>
 
         <Anchors>
-            <Anchor point="CENTER" />
+            <Anchor point="CENTER">
+                <Offset>
+                    <AbsDimension x="0" y="285"/>
+                </Offset>
+            </Anchor>
         </Anchors>
-
-        <TitleRegion setAllPoints="true"/>
 
         <Backdrop bgFile="Interface\DialogFrame\UI-DialogBox-Background" edgeFile="Interface\Tooltips\UI-Tooltip-Border" tile="true">
             <EdgeSize>
@@ -444,6 +475,11 @@
             <OnShow>
                 _G[self:GetName().."Title"]:SetText(DecursiveRootTable.Dcr.L["STR_QUICK_POP"]);
             </OnShow>
+            <OnLoad>
+                self:RegisterForDrag("LeftButton");
+            </OnLoad>
+            <OnDragStart>self:StartMoving();</OnDragStart>
+            <OnDragStop>self:StopMovingOrSizing();</OnDragStop>
         </Scripts>
         <Layers>
             <Layer level="BACKGROUND">
@@ -515,6 +551,23 @@
                 </Scripts>
             </Button>
 
+            <Button name="$parentHealer" inherits="GameMenuButtonTemplate" text="healer">
+                <Anchors>
+                    <Anchor point="TOPLEFT" relativePoint="TOPRIGHT" relativeTo="$parentGroup1" />
+                    <Anchor point="TOPRIGHT" relativePoint="TOPLEFT" relativeTo="$parentGroup2" />
+                </Anchors>
+                <Scripts>
+                    <OnClick>
+                        self.GroupNumber = -1;
+                        DecursiveRootTable.Dcr:PopulateButtonPress(self);
+                    </OnClick>
+                    <OnLoad>
+                        if DecursiveInstallCorrupted then return end
+                        self:SetText(_G.HEALER or "healer");
+                    </OnLoad>
+                </Scripts>
+            </Button>
+
             <Button name="$parentGroup3" inherits="GameMenuButtonTemplate" text="Group 3">
                 <Size>
                     <AbsDimension x="80" y="20" />
@@ -561,6 +614,23 @@
                 </Scripts>
             </Button>
 
+            <Button name="$parentTank" inherits="GameMenuButtonTemplate" text="healer">
+                <Anchors>
+                    <Anchor point="TOPLEFT" relativePoint="TOPRIGHT" relativeTo="$parentGroup3" />
+                    <Anchor point="TOPRIGHT" relativePoint="TOPLEFT" relativeTo="$parentGroup4" />
+                </Anchors>
+                <Scripts>
+                    <OnClick>
+                        self.GroupNumber = -2;
+                        DecursiveRootTable.Dcr:PopulateButtonPress(self);
+                    </OnClick>
+                    <OnLoad>
+                        if DecursiveInstallCorrupted then return end
+                        self:SetText(_G.TANK or "tank");
+                    </OnLoad>
+                </Scripts>
+            </Button>
+
             <Button name="$parentGroup5" inherits="GameMenuButtonTemplate" text="Group 5">
                 <Size>
                     <AbsDimension x="80" y="20" />
@@ -603,6 +673,23 @@
                     <OnLoad>
                         if DecursiveInstallCorrupted then return end
                         self:SetText(DecursiveRootTable.Dcr.L["STR_GROUP"] .. '6');
+                    </OnLoad>
+                </Scripts>
+            </Button>
+
+            <Button name="$parentDamager" inherits="GameMenuButtonTemplate" text="healer">
+                <Anchors>
+                    <Anchor point="TOPLEFT" relativePoint="TOPRIGHT" relativeTo="$parentGroup5" />
+                    <Anchor point="TOPRIGHT" relativePoint="TOPLEFT" relativeTo="$parentGroup6" />
+                </Anchors>
+                <Scripts>
+                    <OnClick>
+                        self.GroupNumber = -3;
+                        DecursiveRootTable.Dcr:PopulateButtonPress(self);
+                    </OnClick>
+                    <OnLoad>
+                        if DecursiveInstallCorrupted then return end
+                        self:SetText(_G.DAMAGER or "damager");
                     </OnLoad>
                 </Scripts>
             </Button>
@@ -655,10 +742,10 @@
 
             <Button name="$parentWarrior" inherits="GameMenuButtonTemplate" text="Warrior">
                 <Size>
-                    <AbsDimension x="80" y="20" />
+                    <AbsDimension x="110" y="20" />
                 </Size>
                 <Anchors>
-                    <Anchor point="TOP" relativePoint="BOTTOM" relativeTo="$parentGroup7">
+                    <Anchor point="TOPLEFT" relativePoint="BOTTOMLEFT" relativeTo="$parentGroup7">
                         <Offset>
                             <AbsDimension x="0" y="-5" />
                         </Offset>
@@ -678,10 +765,10 @@
 
             <Button name="$parentPriest" inherits="GameMenuButtonTemplate" text="Priest">
                 <Size>
-                    <AbsDimension x="80" y="20" />
+                    <AbsDimension x="110" y="20" />
                 </Size>
                 <Anchors>
-                    <Anchor point="TOP" relativePoint="BOTTOM" relativeTo="$parentGroup8">
+                    <Anchor point="TOPRIGHT" relativePoint="BOTTOMRIGHT" relativeTo="$parentGroup8">
                         <Offset>
                             <AbsDimension x="0" y="-5" />
                         </Offset>
@@ -701,7 +788,7 @@
 
             <Button name="$parentMage" inherits="GameMenuButtonTemplate" text="Mage">
                 <Size>
-                    <AbsDimension x="80" y="20" />
+                    <AbsDimension x="110" y="20" />
                 </Size>
                 <Anchors>
                     <Anchor point="TOP" relativePoint="BOTTOM" relativeTo="$parentWarrior">
@@ -724,7 +811,7 @@
 
             <Button name="$parentWarlock" inherits="GameMenuButtonTemplate" text="Warlock">
                 <Size>
-                    <AbsDimension x="80" y="20" />
+                    <AbsDimension x="110" y="20" />
                 </Size>
                 <Anchors>
                     <Anchor point="TOP" relativePoint="BOTTOM" relativeTo="$parentPriest">
@@ -747,7 +834,7 @@
 
             <Button name="$parentHunter" inherits="GameMenuButtonTemplate" text="Hunter">
                 <Size>
-                    <AbsDimension x="80" y="20" />
+                    <AbsDimension x="110" y="20" />
                 </Size>
                 <Anchors>
                     <Anchor point="TOP" relativePoint="BOTTOM" relativeTo="$parentMage">
@@ -770,7 +857,7 @@
 
             <Button name="$parentRogue" inherits="GameMenuButtonTemplate" text="Rogue">
                 <Size>
-                    <AbsDimension x="80" y="20" />
+                    <AbsDimension x="110" y="20" />
                 </Size>
                 <Anchors>
                     <Anchor point="TOP" relativePoint="BOTTOM" relativeTo="$parentWarlock">
@@ -793,7 +880,7 @@
 
             <Button name="$parentDruid" inherits="GameMenuButtonTemplate" text="Druid">
                 <Size>
-                    <AbsDimension x="80" y="20" />
+                    <AbsDimension x="110" y="20" />
                 </Size>
                 <Anchors>
                     <Anchor point="TOP" relativePoint="BOTTOM" relativeTo="$parentHunter">
@@ -816,7 +903,7 @@
 
             <Button name="$parentShaman" inherits="GameMenuButtonTemplate" text="Shaman">
                 <Size>
-                    <AbsDimension x="80" y="20" />
+                    <AbsDimension x="110" y="20" />
                 </Size>
                 <Anchors>
                     <Anchor point="TOP" relativePoint="BOTTOM" relativeTo="$parentRogue">
@@ -839,7 +926,7 @@
 
             <Button name="$parentPaladin" inherits="GameMenuButtonTemplate" text="Paladin">
                 <Size>
-                    <AbsDimension x="80" y="20" />
+                    <AbsDimension x="110" y="20" />
                 </Size>
                 <Anchors>
                     <Anchor point="TOP" relativePoint="BOTTOM" relativeTo="$parentDruid">
@@ -861,7 +948,7 @@
             </Button>
             <Button name="$parentDeathknight" inherits="GameMenuButtonTemplate" text="Deathknight">
                 <Size>
-                    <AbsDimension x="80" y="20" />
+                    <AbsDimension x="110" y="20" />
                 </Size>
                 <Anchors>
                     <Anchor point="TOP" relativePoint="BOTTOM" relativeTo="$parentShaman">
@@ -883,7 +970,7 @@
             </Button>
             <Button name="$parentMonk" inherits="GameMenuButtonTemplate" text="Monk">
                 <Size>
-                    <AbsDimension x="80" y="20" />
+                    <AbsDimension x="110" y="20" />
                 </Size>
                 <Anchors>
                     <Anchor point="TOP" relativePoint="BOTTOM" relativeTo="$parentPaladin">
@@ -898,8 +985,31 @@
                     </OnClick>
                     <OnLoad>
                         if DecursiveInstallCorrupted then return end
-                        
+
                         self.ClassType = DecursiveRootTable._C.CLASS_MONK;
+                        self:SetText(DecursiveRootTable.Dcr:ColorText(DecursiveRootTable.Dcr.LC[self.ClassType], "FF"..DecursiveRootTable.Dcr:GetClassHexColor(self.ClassType)));
+                    </OnLoad>
+                </Scripts>
+            </Button>
+            <Button name="$parentDemonHunter" inherits="GameMenuButtonTemplate" text="DemonHunter">
+                <Size>
+                    <AbsDimension x="110" y="20" />
+                </Size>
+                <Anchors>
+                    <Anchor point="TOP" relativePoint="BOTTOM" relativeTo="$parentDeathknight">
+                        <Offset>
+                            <AbsDimension x="0" y="0" />
+                        </Offset>
+                    </Anchor>
+                </Anchors>
+                <Scripts>
+                    <OnClick>
+                        DecursiveRootTable.Dcr:PopulateButtonPress(self);
+                    </OnClick>
+                    <OnLoad>
+                        if DecursiveInstallCorrupted then return end
+
+                        self.ClassType = DecursiveRootTable._C.CLASS_DEMONHUNTER;
                         self:SetText(DecursiveRootTable.Dcr:ColorText(DecursiveRootTable.Dcr.LC[self.ClassType], "FF"..DecursiveRootTable.Dcr:GetClassHexColor(self.ClassType)));
                     </OnLoad>
                 </Scripts>
@@ -930,10 +1040,10 @@
     </Frame>
     <!-- DecursivePopulateListFrame }}} -->
 
-    
+
     <Script>
         local T = DecursiveRootTable or {};
 
-        T._LoadedFiles["Dcr_lists.xml"] = "2.7.3.6";
+        T._LoadedFiles["Dcr_lists.xml"] = "2.7.8";
     </Script>
 </Ui>

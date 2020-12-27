@@ -5,20 +5,20 @@ local L
 --------------
 -- Brawlers --
 --------------
-L= DBM:GetModLocalization("Brawlers")
+L= DBM:GetModLocalization("BrawlersGeneral")
 
 L:SetGeneralLocalization({
 	name = "Бойцовская гильдия: Общее"
 })
 
 L:SetWarningLocalization({
-	warnQueuePosition	= "Ваша позиция в очереди: %d",
+	warnQueuePosition2	= "Ваша позиция в очереди: %d",
 	specWarnYourNext	= "Вы следующие!",
 	specWarnYourTurn	= "Ваш выход!"
 })
 
 L:SetOptionLocalization({
-	warnQueuePosition	= "Показывать вашу текущию позицию в очереди",
+	warnQueuePosition2	= "Показывать вашу текущию позицию в очереди",
 	specWarnYourNext	= "Спец-предупреждение, когда подходит ваша очередь сражаться",
 	specWarnYourTurn	= "Спец-предупреждение о начале вашего боя",
 	SpectatorMode		= "Отображать предупреждения/таймеры во время просмотра боев<br/>(Персональные 'спец-предупреждения' зрителям не отображаются)",
@@ -61,6 +61,10 @@ L:SetGeneralLocalization({
 	name = "Бойцовская гильдия: 2 ранг"
 })
 
+L:SetOptionLocalization({
+	SetIconOnBlat	= "Устанавливать метку (череп) на настоящего Блэт"
+})
+
 ------------
 -- Rank 3 --
 ------------
@@ -68,10 +72,6 @@ L= DBM:GetModLocalization("BrawlRank3")
 
 L:SetGeneralLocalization({
 	name = "Бойцовская гильдия: 3 ранг"
-})
-
-L:SetOptionLocalization({
-	SetIconOnBlat	= "Устанавливать метку (череп) на настоящего Блэт"
 })
 
 ------------
@@ -135,16 +135,20 @@ L:SetGeneralLocalization({
 -------------
 -- Rares 1 --
 -------------
-L= DBM:GetModLocalization("BrawlRare1")
+L= DBM:GetModLocalization("BrawlLegacy")
 
 L:SetGeneralLocalization({
 	name = "Бойцовская гильдия: Вызовы 1"
 })
 
+L:SetOptionLocalization({
+	SpeakOutStrikes		= "Отсчитывать количество атак $spell:141190"
+})
+
 -------------
 -- Rares 2 --
 -------------
-L= DBM:GetModLocalization("BrawlRare2")
+L= DBM:GetModLocalization("BrawlChallenges")
 
 L:SetGeneralLocalization({
 	name = "Бойцовская гильдия: Вызовы 2"
@@ -156,8 +160,7 @@ L:SetWarningLocalization({
 
 L:SetOptionLocalization({
 	ArrowOnBoxing	= "Показывать стрелку DBM во время $spell:140868, $spell:140862 и $spell:140886",
-	specWarnRPS			= "Спец-предупреждение что использовать для $spell:141206",
-	SpeakOutStrikes		= "Отсчитывать количество атак $spell:141190"
+	specWarnRPS			= "Спец-предупреждение что использовать для $spell:141206"
 })
 
 L:SetMiscLocalization({

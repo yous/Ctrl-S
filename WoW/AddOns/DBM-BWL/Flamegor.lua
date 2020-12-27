@@ -1,41 +1,44 @@
 local mod	= DBM:NewMod("Flamegor", "DBM-BWL", 1)
 local L		= mod:GetLocalizedStrings()
 
-mod:SetRevision(("$Revision: 436 $"):sub(12, -3))
+mod:SetRevision("20200524145731")
 mod:SetCreatureID(11981)
+mod:SetEncounterID(615)
 mod:SetModelID(6377)
 mod:RegisterCombat("combat")
 
-mod:RegisterEvents(
-	"SPELL_CAST_START",
-	"SPELL_CAST_SUCCESS"
+mod:RegisterEventsInCombat(
+	"SPELL_CAST_START 23339 22539",
+	"SPELL_CAST_SUCCESS 23342"
 )
 
-local warnWingBuffet	= mod:NewCastAnnounce(23339)
-local warnShadowFlame	= mod:NewCastAnnounce(22539)
-local warnEnrage		= mod:NewSpellAnnounce(23342)
+--(ability.id = 23339 or ability.id = 22539) and type = "begincast" or ability.id = 23342 and type = "cast"
+local warnWingBuffet		= mod:NewCastAnnounce(23339, 2)
+local warnShadowFlame		= mod:NewCastAnnounce(22539, 2)
+local warnFrenzy			= mod:NewSpellAnnounce(23342, 3, nil, "Tank|RemoveEnrage|Healer", 4)
 
-local timerWingBuffet	= mod:NewNextTimer(31, 23339)
-local timerShadowFlame	= mod:NewCastTimer(2, 22539)
-local timerEnrageNext 	= mod:NewNextTimer(10, 23342)
+local timerWingBuffet		= mod:NewCDTimer(31, 23339, nil, nil, nil, 2)
+local timerShadowFlameCD	= mod:NewCDTimer(14, 22539, nil, false)--14-21
+local timerFrenzy	 		= mod:NewBuffActiveTimer(10, 23342, nil, "Tank|RemoveEnrage|Healer", 4, 5, nil, DBM_CORE_L.ENRAGE_ICON)
 
 function mod:OnCombatStart(delay)
-	timerWingBuffet:Start(-delay)
+	timerShadowFlameCD:Start(18-delay)
+	timerWingBuffet:Start(30-delay)
 end
 
 function mod:SPELL_CAST_START(args)
-	if args.spellId == 23339 and self:IsInCombat() then
+	if args.spellId == 23339 then
 		warnWingBuffet:Show()
 		timerWingBuffet:Start()
-	elseif args.spellId == 22539 and self:IsInCombat() then
-		timerShadowFlame:Start()
+	elseif args.spellId == 22539 then
 		warnShadowFlame:Show()
+		timerShadowFlameCD:Start()
 	end
 end
 
 function mod:SPELL_CAST_SUCCESS(args)
 	if args.spellId == 23342 then
-		warnEnrage:Show()
-		timerEnrageNext:Start()
+		warnFrenzy:Show()
+		timerFrenzy:Start()
 	end
 end

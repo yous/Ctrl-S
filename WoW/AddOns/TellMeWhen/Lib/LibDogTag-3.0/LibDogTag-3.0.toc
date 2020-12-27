@@ -1,4 +1,4 @@
-## Interface: 60000
+## Interface: 90002
 ## LoadOnDemand: 1
 ## Title: Lib: DogTag-3.0
 ## Notes: A library to provide a markup syntax
@@ -6,12 +6,10 @@
 ## eMail: ckknight@gmail.com
 ## Version: 1.0
 ## X-Category: Library
-## X-Credit: Shefki
+## X-Credit: Shefki, Parnic, Andrew Scott
+## X-Compatible-With: 11305
+## X-Curse-Project-ID: 14280
 ## OptionalDeps:
-## X-Curse-Packaged-Version: r266
-## X-Curse-Project-Name: LibDogTag-3.0
-## X-Curse-Project-ID: libdogtag-3-0
-## X-Curse-Repository-ID: wow/libdogtag-3-0/mainline
 
 LibStub\LibStub.lua
 lib.xml

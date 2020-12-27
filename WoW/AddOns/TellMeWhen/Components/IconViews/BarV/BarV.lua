@@ -7,7 +7,7 @@
 --        Banjankri of Blackrock, Predeter of Proudmoore, Xenyr of Aszune
 
 -- Currently maintained by
--- Cybeloras of Aerie Peak/Detheroc/Mal'Ganis
+-- Cybeloras of Aerie Peak
 -- --------------------
 
 
@@ -41,6 +41,7 @@ TMW:RegisterDatabaseDefaults{
 						{
 							point = "TOP",
 							relativePoint = "TOP",
+							relativeTo = "IconModule_TimerBar_BarDisplayTimerBar",
 							y = -1,
 						}, -- [1]
 					},
@@ -78,89 +79,143 @@ View:RegisterGroupDefaults{
 			TextLayout = "bar2",
 			SizeX = 20,
 			SizeY = 100,
+			Icon = true,
+			Flip = false,
+			Padding = 0,
+			BorderColor = "ff000000",
+			BorderBar = 0,
+			BorderIcon = 0,
 		}
 	}
 }
 
+TMW:RegisterUpgrade(80003, {
+	group = function(self, gs)
+		gs.SettingsPerView.barv.BorderColor = TMW:RGBATableToStringWithFallback(gs.SettingsPerView.barv.BorderColor, "ff000000")
+	end,
+})
+
+
+if not TMW.Views.bar then
+	TMW:Error("Some configuration for " .. View.name .. " depends on the normal Bar display method, which was not found.")
+end
+View:RegisterConfigPanel_XMLTemplate(50, "TellMeWhen_GM_Bar")
+
+
+View:ImplementsModule("IconModule_IconContainer_Masque", 1, function(Module, icon)
+	local group = icon.group
+	local gspv = group:GetSettingsPerView()
+	
+	Module.container:ClearAllPoints()
+
+	Module:SetBorder(gspv.BorderIcon, gspv.BorderColor, gspv.BorderInset)
+
+	local inset = gspv.BorderInset and 0 or gspv.BorderIcon
+
+	if gspv.Icon then
+		Module:Enable()
+
+		Module.container:SetSize(gspv.SizeX - 2*inset, gspv.SizeX - 2*inset)
+		Module.container:SetPoint(gspv.Flip and "TOPLEFT" or "BOTTOMLEFT", inset, gspv.Flip and -inset or inset)
+	end
+end)
 
 View:ImplementsModule("IconModule_Alpha", 10, true)
+
 View:ImplementsModule("IconModule_CooldownSweep", 20, function(Module, icon)
 	local group = icon.group
 	local gspv = group:GetSettingsPerView()
+	local IconContainer = icon.Modules.IconModule_IconContainer_Masque
 	
-	if icon.ShowTimer or icon.ShowTimerText then
+	if gspv.Icon and (icon.ShowTimer or icon.ShowTimerText) then
 		Module:Enable()
 	end
-	Module.cooldown:SetSize(gspv.SizeX, gspv.SizeX)
+
+	Module.cooldown:SetAllPoints(IconContainer.container)
+	Module.cooldown2:SetAllPoints(IconContainer.container)
+
+	if IconContainer:IsIconSkinned(icon) then
+		Module.cooldown:SetFrameLevel(icon:GetFrameLevel() + 3)
+		Module.cooldown2:SetFrameLevel(icon:GetFrameLevel() + 3)
+	else
+		Module.cooldown:SetFrameLevel(icon:GetFrameLevel() + 2)
+		Module.cooldown2:SetFrameLevel(icon:GetFrameLevel() + 2)
+	end
 end)
-View:ImplementsModule("IconModule_Backdrop", 25, true)
+
 View:ImplementsModule("IconModule_Texture_Colored", 30, function(Module, icon)
 	local group = icon.group
 	local gspv = group:GetSettingsPerView()
+	local IconContainer = icon.Modules.IconModule_IconContainer_Masque
 	
-	Module:Enable()
-	Module.texture:SetSize(gspv.SizeX, gspv.SizeX)
-end)
-View:ImplementsModule("IconModule_TimerBar_BarDisplay", 50, function(Module, icon)
-	Module:Enable()
+	if gspv.Icon then
+		Module:Enable()
+	end
 
-	Module.bar:SetOrientation("VERTICAL")
-	Module.bar:SetRotatesTexture(true)
+	Module.texture:SetAllPoints(IconContainer.container)
 end)
-View:ImplementsModule("IconModule_Texts", 70, true)
-View:ImplementsModule("IconModule_IconContainer_Masque", 100, function(Module, icon)
-	local Modules = icon.Modules
-	local Masque = Module
+
+View:ImplementsModule("IconModule_TimerBar_BarDisplay", 50, function(Module, icon)
 	local group = icon.group
 	local gspv = group:GetSettingsPerView()
+	local IconContainer = icon.Modules.IconModule_IconContainer_Masque
+	
+	Module.bar:SetOrientation("VERTICAL")
+	Module.bar:SetRotatesTexture(true)
+	
+	Module.bar:SetFrameLevel(icon:GetFrameLevel())
+
+	local inset = gspv.BorderBar
+	local iconInset = gspv.BorderInset and 0 or gspv.BorderIcon
 	
 
-	local CooldownSweep = Modules.IconModule_CooldownSweep
-	if CooldownSweep then
-		CooldownSweep.cooldown:SetAllPoints(Masque.container)
+	Module.bar:ClearAllPoints()
+	if not gspv.Icon then
+		Module.bar:SetPoint("TOPLEFT", inset, -inset)
+		Module.bar:SetPoint("BOTTOMRIGHT", -inset, inset)
+
+	elseif gspv.Flip then
+		Module.bar:SetPoint("BOTTOMLEFT", inset, inset)
+		Module.bar:SetPoint("BOTTOMRIGHT", -inset, inset)
+		Module.bar:SetPoint("TOP", IconContainer.container, "BOTTOM", 0, -gspv.Padding - inset - iconInset)
+
+	elseif not gspv.Flip then
+		Module.bar:SetPoint("TOPLEFT", inset, -inset)
+		Module.bar:SetPoint("TOPRIGHT", -inset, -inset)
+		Module.bar:SetPoint("BOTTOM", IconContainer.container, "TOP", 0, gspv.Padding + inset + iconInset)
 	end
 
-	local IconModule_Texture_Colored = Modules.IconModule_Texture_Colored
-	IconModule_Texture_Colored.texture:SetAllPoints(Masque.container)
-
-
-
-	Masque.container:ClearAllPoints()
-	Masque.container:SetSize(gspv.SizeX, gspv.SizeX)
-	Masque.container:SetPoint("BOTTOMLEFT")
-	Masque:Enable()
-	
-	---------- Skin-Dependent Module Layout ----------
-	local TimerBar_BarDisplay = Modules.IconModule_TimerBar_BarDisplay
-	
-	if CooldownSweep then
-		if Masque.isDefaultSkin then
-			CooldownSweep.cooldown:SetFrameLevel(icon:GetFrameLevel() + 3)
-		else
-			CooldownSweep.cooldown:SetFrameLevel(icon:GetFrameLevel() + 2)
-		end
-	end
-	
-	TimerBar_BarDisplay.bar:SetFrameLevel(icon:GetFrameLevel() + -0)
-	
-	TimerBar_BarDisplay.bar:ClearAllPoints()
-	TimerBar_BarDisplay.bar:SetPoint("TOPLEFT")
-	TimerBar_BarDisplay.bar:SetPoint("TOPRIGHT")
-	TimerBar_BarDisplay.bar:SetPoint("BOTTOM", Masque.container, "TOP")
-	
-	local Backdrop = Modules.IconModule_Backdrop
-	Backdrop.container:ClearAllPoints()
-	Backdrop.container:SetAllPoints(TimerBar_BarDisplay.bar)
-	Backdrop.container:SetFrameLevel(icon:GetFrameLevel() - 2)
-end)
-
-View:ImplementsModule("GroupModule_Resizer_ScaleX_SizeY", 10, function(Module, group)
-	if TMW.Locked or group.Locked then
-		Module:Disable()
-	else
+	-- We can only query the size of the bar if the icon has had its position set.
+	if icon:GetNumPoints() == 0 or Module.bar:GetHeight() > 0 then
 		Module:Enable()
 	end
 end)
+
+View:ImplementsModule("IconModule_Backdrop", 51, function(Module, icon)
+	local group = icon.group
+	local gspv = group:GetSettingsPerView()
+
+	Module:SetBorder(gspv.BorderBar, gspv.BorderColor)
+	Module:SetOrientation("VERTICAL")
+	
+	Module.container:ClearAllPoints()
+	Module.container:SetAllPoints(icon.Modules.IconModule_TimerBar_BarDisplay.bar)
+	Module.container:SetFrameLevel(icon:GetFrameLevel() - 2)
+
+	-- We can only query the size of the bar if the icon has had its position set.
+	if icon:GetNumPoints() == 0 or Module.container:GetHeight() > 0 then
+		Module:Enable()
+	end
+end)
+
+View:ImplementsModule("IconModule_Texts", 70, true)
+
+
+
+
+
+
+View:ImplementsModule("GroupModule_Resizer_ScaleX_SizeY", 10, true)
 View:ImplementsModule("GroupModule_IconPosition_Sortable", 20, true)
 
 

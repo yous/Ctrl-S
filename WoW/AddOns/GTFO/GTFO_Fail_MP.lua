@@ -3,8 +3,9 @@
 --------------------------------------------------------------------------
 --[[
 GTFO Fail List - Mists of Pandaria
-Author: Zensunim of Malygos
 ]]--
+
+if (not GTFO.ClassicMode) then
 
 -- ***************
 -- * Scholomance *
@@ -825,6 +826,11 @@ GTFO.SpellID["138802"] = {
 GTFO.SpellID["138847"] = {
 	--desc = "Charge Impact (Ahoo'ru)";
 	sound = 3;
+};
+
+GTFO.SpellID["133017"] = {
+  --desc = "Explode (Battletron)";
+  sound = 3;
 };
 
 
@@ -2198,3 +2204,5 @@ GTFO.SpellID["147335"] = {
 	--desc = "Furious Splash (Zesqua)";
 	sound = 3;
 };
+
+end

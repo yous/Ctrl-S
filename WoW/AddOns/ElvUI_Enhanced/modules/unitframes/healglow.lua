@@ -11,7 +11,7 @@ local playerId
 local spells = {}
 local groupUnits = {}
 local frameBuffers = {}
-local frameGroups = {5, 10, 25, 40}
+local frameGroups = {5, 25, 40}
 
 local healGlowFrame
 local healGlowTime
@@ -41,7 +41,7 @@ function HG:SetupVariables()
 	
 	for _, spellID in ipairs({
 		-- Druid
-		102792, -- Wild Mushroom: Bloom
+		81269, -- Wild Mushroom
 		-- Monk
 		130654, -- Chi Burst
 		124040, -- Chi Torpedo
@@ -53,6 +53,7 @@ function HG:SetupVariables()
 		114871, -- Holy Prism (friendly target)
 		82327,  -- Holy Radiance
 		85222,  -- Light of Dawn
+		121129, -- Daybreak
 		-- Priest
 		121148, -- Cascade
 		34861,  -- Circle of Healing
@@ -78,9 +79,9 @@ function HG:SetupVariables()
 		frameBuffers[index] = {}
 		for i=1, (index/5) do
 			for j=1, 5 do
-				frame = (index == 5 and _G[("ElvUF_PartyGroup%dUnitButton%i"):format(i, j)] or _G[("ElvUF_Raid%dGroup%dUnitButton%i"):format(index, i, j)])
+				frame = (index == 5 and _G[("ElvUF_PartyGroup%dUnitButton%i"):format(i, j)] or index == 25 and _G[("ElvUF_RaidGroup%dUnitButton%i"):format(i, j)] or _G[("ElvUF_Raid%dGroup%dUnitButton%i"):format(index, i, j)])
 				if frame then
-					frame.HealGlow = UF:Construct_HealGlow(frame, ((index == 5 and 'party%d' or 'raid%d')):format(i))
+					frame.HealGlow = UF:Construct_HealGlow(frame, ((index == 5 and 'party%d' or index == 25 and 'raid' or 'raid%d')):format(i))
 					tinsert(frameBuffers[index], frame)		
 				end
 			end

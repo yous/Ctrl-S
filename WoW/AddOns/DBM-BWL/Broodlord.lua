@@ -1,48 +1,46 @@
 local mod	= DBM:NewMod("Broodlord", "DBM-BWL", 1)
 local L		= mod:GetLocalizedStrings()
 
-mod:SetRevision(("$Revision: 436 $"):sub(12, -3))
+mod:SetRevision("20200524145731")
 mod:SetCreatureID(12017)
+mod:SetEncounterID(612)
 mod:SetModelID(14308)
-mod:RegisterCombat("combat")--Leave this combat, so pull still works for non localized if user manages to leave combat before pull
+mod:RegisterCombat("combat_yell", L.Pull)--L.Pull is backup for classic, since classic probably won't have ENCOUNTER_START to rely on and player regen never works for this boss
 
-mod:RegisterEvents(
-	"SPELL_CAST_SUCCESS",
-	"SPELL_AURA_APPLIED",
-	"CHAT_MSG_MONSTER_YELL"
+mod:RegisterEventsInCombat(
+	"SPELL_CAST_SUCCESS 23331 18670",
+	"SPELL_AURA_APPLIED 24573",
+	"SPELL_AURA_REMOVED 24573"
 )
 
-local warnBlastWave	= mod:NewSpellAnnounce(23331)
-local warnKnockAway	= mod:NewSpellAnnounce(18670)
-local warnMortal	= mod:NewTargetAnnounce(24573)
+--(ability.id = 18670 or ability.id = 23331 or ability.id = 24573) and type = "cast"
+local warnBlastWave		= mod:NewSpellAnnounce(23331, 2)
+local warnKnockAway		= mod:NewSpellAnnounce(18670, 3)
+local warnMortal		= mod:NewTargetNoFilterAnnounce(24573, 2, nil, "Tank|Healer", 3)
 
-local timerMortal	= mod:NewTargetTimer(5, 24573)
+local timerMortal		= mod:NewTargetTimer(5, 24573, nil, "Tank|Healer", 3, 5, nil, DBM_CORE_L.TANK_ICON)
 
-function mod:OnCombatStart(delay)
-end
+--function mod:OnCombatStart(delay)
 
---It's unfortunate this is a shared spellid.
---cause you are almost always in combat before pulling this boss which breaks "IsInCombat" detection
---these 2 of these warnings will never work.
+--end
 
 function mod:SPELL_CAST_SUCCESS(args)
 	if args.spellId == 23331 then
 		warnBlastWave:Show()
-	elseif args.spellId == 18670 and self:IsInCombat() then
+	elseif args.spellId == 18670 then
 		warnKnockAway:Show()
 	end
 end
 
 function mod:SPELL_AURA_APPLIED(args)
-	if args.spellId == 24573 and self:IsInCombat() then
+	if args.spellId == 24573 then
 		warnMortal:Show(args.destName)
 		timerMortal:Start(args.destName)
 	end
 end
 
---Secondary pull trigger, so we can detect combat when he's pulled while already in combat (which is about 99% of time)
-function mod:CHAT_MSG_MONSTER_YELL(msg)
-	if (msg == L.Pull or msg:find(L.Pull)) and not self:IsInCombat() then
-		DBM:StartCombat(self, 0)
+function mod:SPELL_AURA_REMOVED(args)
+	if args.spellId == 24573 then
+		timerMortal:Stop(args.destName)
 	end
 end

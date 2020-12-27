@@ -7,7 +7,7 @@
 --		Banjankri of Blackrock, Predeter of Proudmoore, Xenyr of Aszune
 
 -- Currently maintained by
--- Cybeloras of Aerie Peak/Detheroc/Mal'Ganis
+-- Cybeloras of Aerie Peak
 -- --------------------
 
 
@@ -25,13 +25,12 @@ local DOGTAG = TMW.DOGTAG
 
 TMW:NewClass("Config_EditBox_DogTags", "Config_EditBox"){
 	OnNewInstance_EditBox_DogTags = function(self, data)
-		data.ModifySettingValue = self.ModifySettingValue
+		self:CScriptAdd("ModifyValueForSave", self.ModifyValueForSave)
 
-		self.BackgroundText:SetWidth(self:GetWidth())
 		TMW.SUG:EnableEditBox(self, "dogtags")
 	end,
 
-	ModifySettingValue = function(self, text)
+	ModifyValueForSave = function(self, text)
 		return text:gsub("|c%x%x%x%x%x%x%x%x", ""):gsub("|r", "")
 	end,
 
@@ -68,14 +67,7 @@ TMW:NewClass("Config_EditBox_DogTags", "Config_EditBox"){
 	end,
 
 	METHOD_EXTENSIONS_PRE = {
-		OnTextChanged = function(self, userInput)
-			local text = self:GetText()
-			if text == "" then
-				self.BackgroundText:SetText(self.label)
-			else
-				self.BackgroundText:SetText(nil)
-			end
-			
+		OnTextChanged = function(self, userInput)			
 			if userInput and (GetLocale() == "zhCN" or GetLocale() == "zhTW") then
 				-- It seems that bad things happen here while typing chinese characters
 				-- See http://wow.curseforge.com/addons/tellmewhen/tickets/641-typing-chinese-error/
@@ -175,13 +167,12 @@ local extendedTags = {
 	Unit = "Unit:Name",
 	PreviousUnit = "PreviousUnit:Name",
 	Stacks = "Stacks:Hide(0)",
+	Timer = "Timer:TMWFormatDuration",
 }
 
 local function prepareEditBox(box)
 	if not box.PreparedForDogTagInsertion then
-		box:HookScript("OnEditFocusLost", function()
-			DOGTAG.AcceptingIcon = nil
-		end)
+		box:SetAcceptsTMWLinks(true, L["DT_INSERTGUID_TOOLTIP"])
 
 		TMW.Classes.ChatEdit_InsertLink_Hook:New(box, function(self, text, linkType, linkData)
 			-- if this editbox is active
@@ -200,8 +191,6 @@ local function prepareEditBox(box)
 
 		box.PreparedForDogTagInsertion = true
 	end
-
-	DOGTAG.AcceptingIcon = box
 end
 
 -- Finds the tag that the cursor is currently in, or at the end of.
@@ -245,7 +234,8 @@ end
 
 function Module:OnSuggest()
 	if not InCombatLockdown() then
-		-- I honestly can't remember why i did this.
+		-- Doing this will generate all the DogTag help strings
+		-- so we can then use them in the suggstion list.
 		local frame = _G["LibDogTag-3.0_HelpFrame"]
 		local wasShown = frame and frame:IsShown()
 		DogTag:OpenHelp()
@@ -270,7 +260,7 @@ function Module:GetStartEndPositions(isClick)
 end
 
 
-function Module:Table_GetNormalSuggestions(suggestions, tbl, ...)
+function Module:Table_GetNormalSuggestions(suggestions, tbl)
 	local currentTag = getCurrentTag(SUG.Box)
 
 	for _, namespaceName in pairs(DogTag.unpackNamespaceList[DOGTAG.nsList]) do

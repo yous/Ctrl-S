@@ -119,19 +119,21 @@ function RM:UpdateBar()
 end
 
 function RM:ToggleSettings()
-	self:UpdateBar()
-	self:UpdateWorldMarkersAndTooltips()
+	if not InCombatLockdown() then
+		self:UpdateBar()
+		self:UpdateWorldMarkersAndTooltips()
 	
-	if self.db.enable then
-		RegisterStateDriver(self.frame, "visibility", self.db.visibility == 'DEFAULT' and '[noexists, nogroup] hide; show' or self.db.visibility == 'ALWAYS' and '[noexists, nogroup] show; show' or '[group] show; hide')
-	else
-		UnregisterStateDriver(self.frame, "visibility")
-		self.frame:Hide()
-	end
-	if self.db.backdrop then
-		self.frame.backdrop:Show()
-	else
-		self.frame.backdrop:Hide()
+		if self.db.enable then
+			RegisterStateDriver(self.frame, "visibility", self.db.visibility == 'DEFAULT' and '[noexists, nogroup] hide; show' or self.db.visibility == 'ALWAYS' and '[noexists, nogroup] show; show' or '[group] show; hide')
+		else
+			UnregisterStateDriver(self.frame, "visibility")
+			self.frame:Hide()
+		end
+		if self.db.backdrop then
+			self.frame.backdrop:Show()
+		else
+			self.frame.backdrop:Hide()
+		end
 	end
 end
 
@@ -151,7 +153,7 @@ function RM:Initialize()
 
 	E:CreateMover(self.frame, "RaidMarkerBarAnchor", L['Raid Marker Bar'])
 	
-	self:RegisterEvent("GROUP_ROSTER_UPDATE", "ToggleSettings")
+	--self:RegisterEvent("GROUP_ROSTER_UPDATE", "ToggleSettings")
 	self:CreateButtons()
 	self:ToggleSettings()
 end

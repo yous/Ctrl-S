@@ -1,8 +1,9 @@
-## Interface: 50400
+## Interface: 70300
 ## X-Min-Interface: 50001
 ## Title:|cffffe00a<|r|cffff7d0aDBM|r|cffffe00a>|r |cff0055FFData Broker|r
 ## Title-deDE:|cffffe00a<|r|cffff7d0aDBM|r|cffffe00a>|r |cff0055FFLibDataBroker-Plugin|r
 ## RequiredDeps: DBM-Core
+## OptionalDependencies: LibStub, CallbackHandler-1.0, LibDataBroker-1.1
 ## DefaultState: enabled
 ## Author: Tandanu and Nitram
 ## URL: http://www.deadlybossmods.com

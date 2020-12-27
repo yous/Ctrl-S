@@ -1,8 +1,8 @@
 ﻿<Ui>
 	
-	<Frame name="$parentAnimations" inherits="TellMeWhen_EventContainer" parentKey="Animations">
+	<Frame parentKey="Animations" name="$parentAnimations" inherits="TellMeWhen_EventContainer">
 		<Frames>
-			<Frame name="$parentSubHandlerList" parentKey="SubHandlerList">
+			<Frame parentKey="SubHandlerList" name="$parentSubHandlerList">
 				<Size x="150" y="10"/>
 				<Anchors>
 					<Anchor point="TOPLEFT" />
@@ -15,18 +15,23 @@
 				</Scripts>
 			</Frame>
 			
-			<Frame name="$parentConfigFrames" parentKey="ConfigFrames">
+			<Frame parentKey="ConfigFrames" name="$parentConfigFrames">
+				<KeyValues>
+					<KeyValue key="tmwClass" type="string" value="Events_ColumnConfigContainer"/>
+				</KeyValues>
+
 				<Anchors>
 					<Anchor point="TOPLEFT" relativeTo="$parentSubHandlerListScrollFrame" relativePoint="TOPRIGHT" x="5" y="0"/>
 					<Anchor point="BOTTOMRIGHT" x="-0" y="0"/>
 				</Anchors>
 				<Frames>
-					<Slider name="$parentDuration" parentKey="Duration" inherits="TellMeWhen_EventHandler_ColumnConfig_SliderTemplate" valuestep="0.1" >
+					<Slider parentKey="Duration" name="$parentDuration" inherits="TellMeWhen_EventHandler_ColumnConfig_SliderTemplate" valuestep="0.1" >
 						<Scripts>
 							<OnLoad>
-								TMW:CInit(self, {
-									setting = "Duration",
-								})
+								TMW:CInit(self)
+
+								self:SetTexts(TMW.L["ANIM_DURATION"], TMW.L["ANIM_DURATION_DESC"])
+								self:SetSetting("Duration")
 								
 								self:SetMode(self.MODE_ADJUSTING)
 								self:SetMinMaxValues(0.1, math.huge)
@@ -34,130 +39,86 @@
 								self:SetValueStep(0.1)
 								self:SetTextFormatter(TMW.C.Formatter.S_SECONDS, TMW.C.Formatter.F_1)
 
+								self:CScriptAdd("ReloadRequested", function()
+									local settings = self:GetSettingTable()
+									if settings then
+										self:SetEnabled(not settings.Infinite)
+									end
+								end)
+
+								self:UseLightColor()
 							</OnLoad>
 						</Scripts>
 					</Slider>
 
-					<CheckButton name="$parentInfinite" inherits="TellMeWhen_EventHandler_ColumnConfig_CheckTemplate" parentKey="Infinite">
+					<CheckButton parentKey="Infinite" name="$parentInfinite" inherits="TellMeWhen_EventHandler_ColumnConfig_CheckTemplate">
+						<Size x="30" y="30"/>
 						<Scripts>
 							<OnLoad>
-								hooksecurefunc(self, "SetChecked", function(self, value)
-									if value then
-										self:GetParent().Duration:Disable()
-									else
-										self:GetParent().Duration:Enable()
-									end
-								end)
+								TMW:CInit(self)
+
+								self:SetTexts(TMW.L["ANIM_INFINITE"], TMW.L["ANIM_INFINITE_DESC"])
+								self:SetSetting("Infinite")
 							</OnLoad>
-							<OnClick>
-								self:SetChecked(self:GetChecked()) -- trigger the hook
-								TMW.EVENTS:GetEventSettings().Infinite = not not self:GetChecked()
-							</OnClick>
 						</Scripts>
 					</CheckButton>
 
-					<Slider name="$parentMagnitude" parentKey="Magnitude" inherits="TellMeWhen_EventHandler_ColumnConfig_SliderTemplate" valuestep="1">
+					<Slider parentKey="Magnitude" name="$parentMagnitude" inherits="TellMeWhen_EventHandler_ColumnConfig_SliderTemplate" valuestep="1">
 						<Scripts>
 							<OnLoad>
-								TMW:CInit(self, {
-									setting = "Magnitude",
-								})
+								TMW:CInit(self)
+
+								self:SetTexts(TMW.L["ANIM_MAGNITUDE"], TMW.L["ANIM_MAGNITUDE_DESC"])
+								self:SetSetting("Magnitude")
 								
 								self:SetMode(self.MODE_ADJUSTING)
 								self:SetMinMaxValues(0, math.huge)
 								self:SetRange(10)
 								self:SetTextFormatter(TMW.C.Formatter.PIXELS, TMW.C.Formatter.PASS)
+
+								self:UseLightColor()
 							</OnLoad>
 						</Scripts>
 					</Slider>
 
-					<Slider name="$parentPeriod" parentKey="Period" inherits="TellMeWhen_EventHandler_ColumnConfig_SliderTemplate" valuestep="0.1" >
+					<Slider parentKey="Period" name="$parentPeriod" inherits="TellMeWhen_EventHandler_ColumnConfig_SliderTemplate" valuestep="0.1" >
 						<Scripts>
 							<OnLoad>
-								TMW:CInit(self, {
-									setting = "Period",
-								})
+								TMW:CInit(self)
+
+								self:SetTexts(TMW.L["ANIM_PERIOD"], TMW.L["ANIM_PERIOD_DESC"])
+								self:SetSetting("Period")
 								
 								self:SetMode(self.MODE_ADJUSTING)
 								self:SetMinMaxValues(0, math.huge)
 								self:SetRange(10)
 								self:SetTextFormatter(TMW.C.Formatter.S_SECONDS, TMW.C.Formatter.F_1)
+
+								self:UseLightColor()
 							</OnLoad>
 						</Scripts>
 					</Slider>
 					
 
-					<Button name="$parentColor" parentKey="Color">
-						<Size x="20" y="20"/>
+					<Button parentKey="Color" name="$parentColor" inherits="TellMeWhen_ColorButtonTemplate">
 						<Anchors>
-							<!-- <Anchor point="TOPLEFT" relativeTo="$parentPeriod" relativePoint="BOTTOMLEFT" x="0" y="-25"/> -->
-							<Anchor point="LEFT" x="10" />
+							<Anchor point="LEFT" x="15" />
 						</Anchors>
-						<Layers>
-							<Layer level="BACKGROUND">
-								<Texture parentKey="background">
-									<Size x="17.5" y="17.5"/>
-									<Anchors>
-										<Anchor point="CENTER"/>
-									</Anchors>
-									<Color r="1.0" g="1.0" b="1.0"/>
-								</Texture>
-								<FontString name="$parenttext" parentKey="text" justifyH="LEFT" inherits="GameFontHighlightSmall">
-									<Anchors>
-										<Anchor point="LEFT" relativePoint="RIGHT" x="2"/>
-									</Anchors>
-								</FontString>
-							</Layer>
-						</Layers>
 						<Scripts>
 							<OnLoad>
-								self.text:SetText(TMW.L["ANIM_COLOR"])
-								TMW:TT(self, "ANIM_COLOR", "ANIM_COLOR_DESC")
-								self.func = function()
-									local settings = TMW.EVENTS:GetEventSettings()
-									local r, g, b = ColorPickerFrame:GetColorRGB()
-									settings.r_anim = r
-									settings.g_anim = g
-									settings.b_anim = b
-									self:GetNormalTexture():SetVertexColor(r, g, b, 1)
-									TMW.IE:ScheduleIconSetup()
-								end
-								self.opacityFunc = function()
-									local settings = TMW.EVENTS:GetEventSettings()
-									local a = 1 - OpacitySliderFrame:GetValue()
-									settings.a_anim = a
-									self.background:SetAlpha(a)
-									TMW.IE:ScheduleIconSetup()
-								end
-								self.cancel = function()
-									local settings = TMW.EVENTS:GetEventSettings()
-									local r, g, b, a = self.br, self.bg, self.bb, self.ba
-									settings.r_anim = r
-									settings.g_anim = g
-									settings.b_anim = b
-									settings.a_anim = a
-									self:GetNormalTexture():SetVertexColor(r, g, b, 1)
-									self.background:SetAlpha(a)
-									TMW.IE:ScheduleIconSetup()
-								end
-							</OnLoad>
-							<OnClick>
-								local settings = TMW.EVENTS:GetEventSettings()
-								local r, g, b, a = settings.r_anim, settings.g_anim, settings.b_anim, settings.a_anim
-								self.br, self.bg, self.bb, self.ba = r, g, b, a
+								TMW:CInit(self)
 
-								ColorPickerFrame.func, ColorPickerFrame.opacityFunc, ColorPickerFrame.cancelFunc = self.func, self.opacityFunc, self.cancel
-								ColorPickerFrame:SetColorRGB(r, g, b)
-								ColorPickerFrame.hasOpacity = true
-								ColorPickerFrame.opacity = 1 - a
-								ColorPickerFrame:Show()
-							</OnClick>
+								self:SetTexts(TMW.L["ANIM_COLOR"], TMW.L["ANIM_COLOR_DESC"])
+								self:SetHasOpacity(true)
+								self:SetSetting("AnimColor")
+
+								self.paddingTop, self.paddingBottom = 4, 4
+							</OnLoad>
 						</Scripts>
-						<NormalTexture name="$parentNormalTexture" file="Interface\ChatFrame\ChatFrameColorSwatch"/>
 					</Button>
 
 
-					<EditBox name="$parentImage" inherits="TellMeWhen_InputBoxTemplate" parentKey="Image" autoFocus="false">
+					<EditBox parentKey="Image" name="$parentImage" inherits="TellMeWhen_InputBoxTemplate" autoFocus="false">
 						<Size y="15"/>
 						<Anchors>
 							<!-- <Anchor point="TOPLEFT" relativeTo="$parentPeriod" relativePoint="BOTTOMLEFT" x="4" y="-25"/> -->
@@ -166,51 +127,58 @@
 						</Anchors>
 						<Scripts>
 							<OnLoad>
-								TMW:TT(self, "ANIM_TEX", "ANIM_TEX_DESC")
-								self.label = TMW.L["ANIM_TEX"]
-								self.BackgroundText:SetWidth(self:GetWidth())
+								TMW:CInit(self)
+
+								self:SetTexts(TMW.L["ANIM_TEX"], TMW.L["ANIM_TEX_DESC"])
+								self:SetSetting("Image")
+								self.paddingTop, self.paddingBottom = 4, 7
+
+								self:CScriptAdd("ModifyValueForSave", function(self, value)
+									return TMW:CleanPath(value)
+								end)
+
 								TMW.SUG:EnableEditBox(self, "texture", true)
 							</OnLoad>
-							<OnEditFocusLost>
-								EditBox_ClearHighlight(self)
-
-								self:SetText(self:GetText():gsub([[\\]], [[\]]))
-
-								if TMW.CI.ics then
-									TMW.EVENTS:GetEventSettings().Image = TMW:CleanString(self)
-									TMW.IE:ScheduleIconSetup()
-								end
-
-								self:GetScript("OnTextChanged")(self)
-							</OnEditFocusLost>
 						</Scripts>
 					</EditBox>
 
-					<CheckButton name="$parentFade" inherits="TellMeWhen_EventHandler_ColumnConfig_CheckTemplate" parentKey="Fade">
-					</CheckButton>
-
-					<Slider name="$parentAlphaStandalone" parentKey="AlphaStandalone" inherits="TellMeWhen_EventHandler_ColumnConfig_SliderTemplate" >
+					<CheckButton parentKey="Fade" name="$parentFade" inherits="TellMeWhen_EventHandler_ColumnConfig_CheckTemplate">
+						<Size x="30" y="30"/>
 						<Scripts>
 							<OnLoad>
-								TMW:CInit(self, {
-									setting = "a_anim",
-								})
+								TMW:CInit(self)
+
+								self:SetTexts(TMW.L["ANIM_FADE"], TMW.L["ANIM_FADE_DESC"])
+								self:SetSetting("Fade")
+							</OnLoad>
+						</Scripts>
+					</CheckButton>
+
+					<Slider parentKey="AlphaStandalone" name="$parentAlphaStandalone" inherits="TellMeWhen_EventHandler_ColumnConfig_SliderTemplate" >
+						<Scripts>
+							<OnLoad>
+								TMW:CInit(self)
+
+								self:SetTexts(TMW.L["ANIM_ALPHASTANDALONE"], TMW.L["ANIM_ALPHASTANDALONE_DESC"])
+								self:SetSetting("Alpha")
 								
 								self:SetMinMaxValues(0, 1)
 								self:SetValueStep(0.01)
 								self:SetTextFormatter(TMW.C.Formatter.PERCENT100)
 
+								self:UseLightColor()
 							</OnLoad>
 						</Scripts>
 					</Slider>
 					
 					
-					<Slider name="$parentThickness" parentKey="Thickness" inherits="TellMeWhen_EventHandler_ColumnConfig_SliderTemplate" >
+					<Slider parentKey="Thickness" name="$parentThickness" inherits="TellMeWhen_EventHandler_ColumnConfig_SliderTemplate" >
 						<Scripts>
 							<OnLoad>
-								TMW:CInit(self, {
-									setting = "Thickness",
-								})
+								TMW:CInit(self)
+
+								self:SetTexts(TMW.L["ANIM_THICKNESS"], TMW.L["ANIM_THICKNESS_DESC"])
+								self:SetSetting("Thickness")
 								
 								self:SetMode(self.MODE_ADJUSTING)
 								self:SetMinMaxValues(0.1, math.huge)
@@ -218,16 +186,18 @@
 								self:SetRange(10)
 								self:SetTextFormatter(TMW.C.Formatter.PIXELS, TMW.C.Formatter.F_1)
 
+								self:UseLightColor()
 							</OnLoad>
 						</Scripts>
 					</Slider>
 					
-					<Slider name="$parentSize_anim" parentKey="Size_anim" inherits="TellMeWhen_EventHandler_ColumnConfig_SliderTemplate" >
+					<Slider parentKey="Size_anim" name="$parentSize_anim" inherits="TellMeWhen_EventHandler_ColumnConfig_SliderTemplate" >
 						<Scripts>
 							<OnLoad>
-								TMW:CInit(self, {
-									setting = "Size_anim",
-								})
+								TMW:CInit(self)
+
+								self:SetTexts(TMW.L["ANIM_SIZE_ANIM"], TMW.L["ANIM_SIZE_ANIM_DESC"])
+								self:SetSetting("Size_anim")
 								
 								self:SetMode(self.MODE_ADJUSTING)
 								self:SetMinMaxValues(-math.huge, math.huge)
@@ -235,16 +205,37 @@
 								self:SetRange(10)
 								self:SetTextFormatter(TMW.C.Formatter.PIXELS, TMW.C.Formatter.F_1)
 
+								self:UseLightColor()
 							</OnLoad>
 						</Scripts>
 					</Slider>
 
-					<Slider name="$parentSizeX" parentKey="SizeX" inherits="TellMeWhen_EventHandler_ColumnConfig_SliderTemplate" >
+					<Slider parentKey="Scale" name="$parentScale" inherits="TellMeWhen_EventHandler_ColumnConfig_SliderTemplate" >
 						<Scripts>
 							<OnLoad>
-								TMW:CInit(self, {
-									setting = "SizeX",
-								})
+								TMW:CInit(self)
+
+								self:SetTexts(TMW.L["UIPANEL_SCALE"])
+								self:SetSetting("Scale")
+								
+								self:SetMode(self.MODE_ADJUSTING)
+								self:SetMinMaxValues(0.1, 10)
+								self:SetValueStep(0.01)
+								self:SetRange(1)
+								self:SetTextFormatter(TMW.C.Formatter.PERCENT100, TMW.C.Formatter.PASS)
+
+								self:UseLightColor()
+							</OnLoad>
+						</Scripts>
+					</Slider>
+
+					<Slider parentKey="SizeX" name="$parentSizeX" inherits="TellMeWhen_EventHandler_ColumnConfig_SliderTemplate" >
+						<Scripts>
+							<OnLoad>
+								TMW:CInit(self)
+
+								self:SetTexts(TMW.L["ANIM_SIZEX"], TMW.L["ANIM_SIZEX_DESC"])
+								self:SetSetting("SizeX")
 								
 								self:SetMode(self.MODE_ADJUSTING)
 								self:SetMinMaxValues(1, math.huge)
@@ -252,16 +243,18 @@
 								self:SetRange(100)
 								self:SetTextFormatter(TMW.C.Formatter.PIXELS, TMW.C.Formatter.PASS)
 
+								self:UseLightColor()
 							</OnLoad>
 						</Scripts>
 					</Slider>
 
-					<Slider name="$parentSizeY" parentKey="SizeY" inherits="TellMeWhen_EventHandler_ColumnConfig_SliderTemplate" >
+					<Slider parentKey="SizeY" name="$parentSizeY" inherits="TellMeWhen_EventHandler_ColumnConfig_SliderTemplate" >
 						<Scripts>
 							<OnLoad>
-								TMW:CInit(self, {
-									setting = "SizeY",
-								})
+								TMW:CInit(self)
+
+								self:SetTexts(TMW.L["ANIM_SIZEY"], TMW.L["ANIM_SIZEY_DESC"])
+								self:SetSetting("SizeY")
 								
 								self:SetMode(self.MODE_ADJUSTING)
 								self:SetMinMaxValues(1, math.huge)
@@ -269,20 +262,21 @@
 								self:SetRange(100)
 								self:SetTextFormatter(TMW.C.Formatter.PIXELS, TMW.C.Formatter.PASS)
 
+								self:UseLightColor()
 							</OnLoad>
 						</Scripts>
 					</Slider>
 
-					<Frame name="$parentAnchorTo" parentKey="AnchorTo" inherits="TMW_DropDownMenuTemplate">
+					<Frame parentKey="AnchorTo" name="$parentAnchorTo" inherits="TMW_DropDownMenuTemplate">
 						<Anchors>
-							<Anchor point="LEFT" x="9" />
-							<Anchor point="RIGHT" x="-9" />
+							<Anchor point="LEFT" x="15" />
+							<Anchor point="RIGHT" x="-20" />
 						</Anchors>
 						<Layers>
 							<Layer level="ARTWORK">
-								<FontString name="$parentText" parentKey="text" inherits="GameFontHighlightSmall" justifyH="CENTER" justifyV="BOTTOM">
+								<FontString parentKey="Header" inherits="GameFontHighlightSmall" justifyH="CENTER" justifyV="BOTTOM">
 									<Anchors>
-										<Anchor point="BOTTOM" relativePoint="TOP" y="-1"/>
+										<Anchor point="BOTTOM" relativePoint="TOP" y="0"/>
 										<Anchor point="LEFT" x="-5"/>
 										<Anchor point="RIGHT" x="5"/>
 									</Anchors>
@@ -291,29 +285,45 @@
 						</Layers>
 						<Scripts>
 							<OnLoad>
-								TMW:CInit(self, {
-									title = TMW.L["ANCHORTO"],
-									--tooltip = TMW.L[""],
-									func = TMW.EVENTS:GetEventHandler("Animations").AnchorTo_Dropdown,
-								})
-								self.text:SetText(TMW.L["ANCHORTO"])
-							
+								TMW:CInit(self)
+
+								local Animations = TMW.EVENTS:GetEventHandler("Animations")
+								
+								self:SetFunction(Animations.AnchorTo_Dropdown)
+								self:SetTexts(TMW.L["ANCHORTO"], nil)
+								self:SetSetting("Image")
+								self.paddingTop, self.paddingBottom = 14, 4
+
+								self:CScriptAdd("ReloadRequested", function()
+									local settings = self:GetSettingTable()
+									if settings then
+										Animations:AnchorTo_Dropdown_SetText(settings.AnchorTo)
+									end
+								end)
+
+								self.Header:SetText(TMW.L["ANCHORTO"])
 							</OnLoad>
 						</Scripts>
 					</Frame>
 
 				</Frames>
+
+				<Scripts>
+					<OnLoad>
+						TMW:CInit(self)
+					</OnLoad>
+				</Scripts>
 			</Frame>
 		</Frames>
 		<Layers>
 			<Layer level="OVERLAY">
-				<FontString name="$parentListHeader" inherits="GameFontNormalLarge" parentKey="ListHeader" justifyH="LEFT" text="">
+				<FontString parentKey="ListHeader" name="$parentListHeader" inherits="GameFontNormalLarge" justifyH="LEFT" text="">
 					<Anchors>
 						<Anchor point="BOTTOM" relativeTo="$parentSubHandlerListScrollFrame" relativePoint="TOP" y="1"/>
 					</Anchors>
 				</FontString>
 				
-				<FontString name="$parentSettingsHeader" inherits="GameFontNormalLarge" parentKey="SettingsHeader" justifyH="CENTER" text="">
+				<FontString parentKey="SettingsHeader" name="$parentSettingsHeader" inherits="GameFontNormalLarge" justifyH="CENTER" text="">
 					<Anchors>
 						<Anchor point="BOTTOM" relativeTo="$parentSubHandlerListScrollFrame" relativePoint="TOP" />
 						<Anchor point="LEFT" relativeTo="$parentConfigFrames"/>

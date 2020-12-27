@@ -1,5 +1,115 @@
+v3.2.9
+*Fixed additional errors from 8.0.
+
+v3.2.8
+*Fixed another bug from 8.0.
+
+v3.2.7
+*Fixed some bugs from 8.0.
+
+v3.2.6
+*Updated TOC version for patch 8.0.
+
+v3.2.5
+*Updated TOC version for patch 7.3.
+
+v3.2.4
+*Fixed bug with estimated craft cost being incorrect in some situations
+*Fixed bug with intermediate crafting in Gathering
+
+v3.2.3
+*Updated TOC version for patch 7.2.
+
+v3.2.2
+*Fixed gathering error when items don't have a mat cost.
+*Fixed issue with duplicate headers in gathering UI.
+
+v3.2.1
+*Fixed bug with gathering tables going blank and producing an error.
+
+v3.2
+*Re-implemented intermediate crafting within gathering.
+*Added new enchants in 7.1.5
+
+v3.1.18
+*Fixed bug with buying vendor items with random suffixes via gathering.
+
+v3.1.17
+*Updated TOC version for patch 7.1.
+
+v3.1.16
+*Fixed bug with removing lower ranked recipes.
+*Added mouseover tooltip for rank info to recipe list.
+
+v3.1.15
+*Fixed bug with smart crafts and ranked recipes.
+*Fixed bug with changing professions in the default UI
+
+v3.1.14
+*Fixed issue with mapping for legion permanent enchants.
+
+v3.1.13
+*Fixed issues with ranked recipes.
+
+v3.1.12
+*Added mapping for legion permanent enchants.
+
+v3.1.11
+*Fixed bug with filtered recipes in the craft queue being removed if you close the profession.
+
+v3.1.10
+*Fixed bug with gathering mats list still being clickable - source options are now set on the selection screen.
+
+v3.1.9
+*Fixed bug with cooldowns frame for ruRU players.
+*Fixed bug with materials not showing for selected craft.
+
+v3.1.8
+*Using new APIs added to core TSM addon to workaround Blizzard's item caching issues.
+
+v3.1.7
+*Fixed bug with buyout from crafting search.
+
+v3.1.6
+*Fixed bug with the profession frame not opening.
+
+v3.1.5
+*Fixed bug with profession searching.
+
+v3.1.4
+*Removed some debug prints.
+
+v3.1.3
+*Fixed bug caused by Blizzard's item cache issue.
+
+v3.1.2
+*Fixed bug with not being able to craft items via the "Create" / "Create All" buttons.
+
+v3.1.1
+*Fixed bug in patch 7.0.3.
+
+v3.1
+*Updated for patch 7.0.3.
+
+v3.0.1
+*Fix issue with gathering not appearing if no queue for the current player.
+
+v3.0
+*Initial 3.0 version!
+\\
+
+v2.6.19
+*Updated to 6.2.
+*Fixed bug with material links not showing up.
+
+v2.6.18
+*Fixing interface version.
+
+v2.6.17
+*Updated for patch 6.1.
+
 v2.6.16
-*Added TradeSkillMaster_ItemTracker as a required dependency
+*Added TradeSkillMaster_ItemTracker as a required dependency.
 
 v2.6.15
 *Fixed an issue where the cost per mat was displayed incorrectly if more than one item was made per craft.

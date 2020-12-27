@@ -1,12 +1,12 @@
 local mod	= DBM:NewMod("HyjalWaveTimers", "DBM-Hyjal")
 local L		= mod:GetLocalizedStrings()
 
-mod:SetRevision(("$Revision: 548 $"):sub(12, -3))
+mod:SetRevision("20201105045757")
 
 mod:RegisterEvents(
 	"GOSSIP_SHOW",
 	"QUEST_PROGRESS",
-	"UPDATE_WORLD_STATES",
+	"UPDATE_UI_WIDGET",
 	"UNIT_DIED",
 	"SPELL_AURA_APPLIED"
 )
@@ -15,11 +15,9 @@ mod.noStatistics = true
 local warnWave			= mod:NewAnnounce("WarnWave", 1)
 local warnCannibalize	= mod:NewSpellAnnounce(31538, 2)
 
-local timerWave			= mod:NewTimer(125, "TimerWave")
+local timerWave			= mod:NewTimer(125, "TimerWave", nil, nil, nil, 1)
 
 mod:AddBoolOption("DetailedWave")
-mod:RemoveOption("HealthFrame")
-mod:RemoveOption("SpeedKillTimer")
 
 local lastWave = 0
 local boss = 0
@@ -35,28 +33,34 @@ function mod:GOSSIP_SHOW()
 	if not GetRealZoneText() == L.HyjalZoneName then return end
 	local target = UnitName("target")
 	if target == L.Thrall or target == L.Jaina then
-		local selection = GetGossipOptions()
-		if selection == L.RageGossip then
-			boss = 1
-			self:SendSync("boss", 1)
-		elseif selection == L.AnetheronGossip then
-			boss = 2
-			self:SendSync("boss", 2)
-		elseif selection == L.KazrogalGossip then
-			boss = 3
-			self:SendSync("boss", 3)
-		elseif selection == L.AzgalorGossip then
-			boss = 4
-			self:SendSync("boss", 4)
+		local table = C_GossipInfo.GetOptions()
+		if table[1] and table[1].name then
+			local selection = table[1].name
+			if selection == L.RageGossip then
+				boss = 1
+				self:SendSync("boss", 1)
+			elseif selection == L.AnetheronGossip then
+				boss = 2
+				self:SendSync("boss", 2)
+			elseif selection == L.KazrogalGossip then
+				boss = 3
+				self:SendSync("boss", 3)
+			elseif selection == L.AzgalorGossip then
+				boss = 4
+				self:SendSync("boss", 4)
+			end
 		end
 	end
 end
 mod.QUEST_PROGRESS = mod.GOSSIP_SHOW
 
-function mod:UPDATE_WORLD_STATES()
-	local text = select(4, GetWorldStateUIInfo(4))
+function mod:UPDATE_UI_WIDGET(table)
+	local id = table.widgetID
+	if id ~= 528 then return end
+	local widgetInfo = C_UIWidgetManager.GetIconAndTextWidgetVisualizationInfo(id)
+	local text = widgetInfo.text
 	if not text then return end
-	local _,_,currentWave = text:find(L.WaveCheck)
+	local currentWave = text:match("(%d)")
 	if not currentWave then
 		currentWave = 0
 	end
@@ -92,7 +96,6 @@ end
 function mod:WaveFunction(currentWave)
 	local timer = 0
 	currentWave = tonumber(currentWave)
-	lastWave = tonumber(lastWave)
 	if currentWave > lastWave then
 		if boss == 0 then--unconfirmed
 			timer = 125
@@ -155,21 +158,21 @@ function mod:WaveFunction(currentWave)
 			end
 			if self.Options.DetailedWave and boss == 3 then
 				if currentWave == 1 then
-					warnWave:Show(L.WarnWave_4:format(currentWave, 4, L.Ghoul, 4, L.Abomination, 2, L.Necromancer, 2, L.Banshee)) 
+					warnWave:Show(L.WarnWave_4:format(currentWave, 4, L.Ghoul, 4, L.Abomination, 2, L.Necromancer, 2, L.Banshee))
 				elseif currentWave == 2 then
-					warnWave:Show(L.WarnWave_2:format(currentWave, 4, L.Ghoul, 10, L.Gargoyle)) 
+					warnWave:Show(L.WarnWave_2:format(currentWave, 4, L.Ghoul, 10, L.Gargoyle))
 				elseif currentWave == 3 then
-					warnWave:Show(L.WarnWave_3:format(currentWave, 6, L.Ghoul, 6, L.Fiend, 2, L.Necromancer))  
+					warnWave:Show(L.WarnWave_3:format(currentWave, 6, L.Ghoul, 6, L.Fiend, 2, L.Necromancer))
 				elseif currentWave == 4 then
-					warnWave:Show(L.WarnWave_3:format(currentWave, 6, L.Fiend, 2, L.Necromancer, 6, L.Gargoyle)) 
+					warnWave:Show(L.WarnWave_3:format(currentWave, 6, L.Fiend, 2, L.Necromancer, 6, L.Gargoyle))
 				elseif currentWave == 5 then
-					warnWave:Show(L.WarnWave_3:format(currentWave, 4, L.Ghoul, 6, L.Abomination, 4, L.Necromancer)) 
+					warnWave:Show(L.WarnWave_3:format(currentWave, 4, L.Ghoul, 6, L.Abomination, 4, L.Necromancer))
 				elseif currentWave == 6 then
-					warnWave:Show(L.WarnWave_2:format(currentWave, 8, L.Gargoyle, 1, L.Wyrm)) 
+					warnWave:Show(L.WarnWave_2:format(currentWave, 8, L.Gargoyle, 1, L.Wyrm))
 				elseif currentWave == 7 then
-					warnWave:Show(L.WarnWave_3:format(currentWave, 6, L.Ghoul, 4, L.Abomination, 1, L.Wyrm)) 
+					warnWave:Show(L.WarnWave_3:format(currentWave, 6, L.Ghoul, 4, L.Abomination, 1, L.Wyrm))
 				elseif currentWave == 8 then
-					warnWave:Show(L.WarnWave_5:format(currentWave, 6, L.Ghoul, 2, L.Fiend, 4, L.Abomination, 2, L.Necromancer, 2, L.Banshee)) 
+					warnWave:Show(L.WarnWave_5:format(currentWave, 6, L.Ghoul, 2, L.Fiend, 4, L.Abomination, 2, L.Necromancer, 2, L.Banshee))
 				end
 			elseif self.Options.DetailedWave and boss == 4 then
 				if currentWave == 1 then

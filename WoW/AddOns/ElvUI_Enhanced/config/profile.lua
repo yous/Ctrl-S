@@ -12,7 +12,6 @@ P['unitframe']['healglow'] = true
 P['unitframe']['hideroleincombat'] = false
 P['unitframe']['glowtime'] = .8
 P['unitframe']['glowcolor'] = { r = 1, g = 1, b = 0}
-P['unitframe']['autoRoleSet'] = false
 
 P['unitframe']['units']['target']['gps'] = {
 	['enable'] = true,
@@ -38,13 +37,18 @@ P['unitframe']['units']['focus']['gps']= {
 }
 
 -- Nameplates
-P['nameplate'].showthreat = true
-P['nameplate'].targetcount = true
-P['nameplate'].buffs.stretchTexture = false
-P['nameplate'].buffs.numAuras = 6
-P['nameplate'].debuffs.stretchTexture = false
-P['nameplate'].debuffs.numAuras = 6
-
+P['nameplate'] = {
+	['showthreat'] = true,
+	['targetcount'] = true,
+	['buffs'] = {
+		['stretchTexture'] = false,
+		['numAuras'] = 6
+	},
+	['debuffs'] = {
+		['stretchTexture'] = false,
+		['numAuras'] = 6
+	},
+}
 
 -- DataTexts
 P['datatexts']['Actionbar1DataPanel'] = false

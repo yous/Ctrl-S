@@ -7,7 +7,7 @@
 --		Banjankri of Blackrock, Predeter of Proudmoore, Xenyr of Aszune
 
 -- Currently maintained by
--- Cybeloras of Aerie Peak/Detheroc/Mal'Ganis
+-- Cybeloras of Aerie Peak
 -- --------------------
 
 
@@ -172,13 +172,13 @@ TMW:RegisterCallback("TMW_DB_PRE_DEFAULT_UPGRADES", function()
 end)
 
 
-TMW:RegisterCallback("TMW_UPGRADE_REQUESTED", function(event, type, version, ...)
+TMW:RegisterCallback("TMW_UPGRADE_PERFORMED", function(event, type, upgradeData, ...)
 	if type == "icon" then
 		local ics, gs, iconID = ...
 		
 		-- Delegate the upgrade to eventSettings.
 		for eventID, eventSettings in TMW:InNLengthTable(ics.Events) do
-			TMW:DoUpgrade("iconEventHandler", version, eventSettings, eventID, ics)
+			TMW:Upgrade("iconEventHandler", upgradeData, eventSettings, eventID, ics)
 		end
 	end
 end)
@@ -337,10 +337,43 @@ function EventHandler:TestEvent(eventID)
 	return self:HandleEvent(TMW.CI.icon, eventSettings)
 end
 
+
+local eventSettingsProxies = setmetatable({}, {
+	__mode = 'k',
+})
+
+--- Generates a unique reference to an eventSettings for the given icon.
+function EventHandler:Proxy(eventSettings, icon)
+	if eventSettings.__proxyRef then
+		eventSettings = eventSettings.__proxyRef
+	end
+	
+	if eventSettingsProxies[eventSettings] then
+		return eventSettingsProxies[eventSettings][icon]
+	end
+
+	eventSettingsProxies[eventSettings] = setmetatable({}, {
+		__index = function(self, k)
+			self[k] = setmetatable({
+				__proxyRef = eventSettings
+			}, {
+				__index = eventSettings,
+				__newindex = eventSettings
+			})
+
+			return self[k]
+		end,
+	})
+
+	return eventSettingsProxies[eventSettings][icon]
+end
 	
 TMW:RegisterCallback("TMW_ICON_SETUP_PRE", function(_, icon)
+	if not TMW.Locked then
+		return
+	end
+	
 	-- Setup all of an icon's events.
-
 	wipe(icon.EventHandlersSet)
 
 	for _, eventSettings in TMW:InNLengthTable(icon.Events) do
@@ -406,7 +439,6 @@ end)
 -- Base class for EventHandlers that have sub-handlers (e.g. animations and announcements).
 TMW:NewClass("EventHandler_ColumnConfig", "EventHandler"){
 	OnNewInstance_ColumnConfig = function(self)
-		self.ConfigFrameData = {}
 	end,
 }
 
@@ -430,10 +462,10 @@ conditions are passing (EventHandler_WhileConditions_Repetitive)
 if TMW.C.IconType then
 	error("Bad load order! TMW.C.IconType shouldn't exist at this point!")
 end
-TMW:RegisterCallback("TMW_CLASS_NEW", function(event, class)
+TMW:RegisterSelfDestructingCallback("TMW_CLASS_NEW", function(event, class)
 	-- Register the WCSP event on IconType itself.
-	-- God, this is a awful hack.
-	-- TODO: Make this not a hack.
+	-- This allows it to be available to all icon types, 
+	-- since it is independent of all modules.
 	if class.className == "IconType" then
 		class:RegisterIconEvent(2, "WCSP", {
 			category = L["EVENT_CATEGORY_CONDITION"],
@@ -445,7 +477,7 @@ TMW:RegisterCallback("TMW_CLASS_NEW", function(event, class)
 			}
 		})
 
-		TMW:UnregisterThisCallback()
+		return true -- Signal callback destruction
 	end
 end)
 
@@ -469,9 +501,15 @@ TMW:NewClass("EventHandler_WhileConditions", "EventHandler"){
 			for eventSettings, ic in pairs(matches) do
 				if ic == icon then
 					ConditionObject:RequestAutoUpdates(eventSettings, false)
-					matches[eventSettings] = nil
-					self.EventSettingsToConditionObject[eventSettings] = nil
+
+					local eventSettingsProxy = self:Proxy(eventSettings, icon)
+					matches[eventSettingsProxy] = nil
+					self.EventSettingsToConditionObject[eventSettingsProxy] = nil
 				end
+			end
+
+			if not next(matches) then
+				self.MapConditionObjectToEventSettings[ConditionObject] = nil
 			end
 		end
 	end,
@@ -505,10 +543,10 @@ TMW:NewClass("EventHandler_WhileConditions", "EventHandler"){
 				matches = {}
 				self.MapConditionObjectToEventSettings[ConditionObject] = matches
 			end
-			matches[eventSettings] = icon
+			matches[self:Proxy(eventSettings, icon)] = icon
 
 			-- Allow backwards lookups of this, too.
-			self.EventSettingsToConditionObject[eventSettings] = ConditionObject
+			self.EventSettingsToConditionObject[self:Proxy(eventSettings, icon)] = ConditionObject
 
 			
 			-- Listen for changes in condition state so that we can ask
@@ -516,9 +554,9 @@ TMW:NewClass("EventHandler_WhileConditions", "EventHandler"){
 			TMW:RegisterCallback("TMW_CNDT_OBJ_PASSING_CHANGED", self)
 
 
-			-- Check condition state right now so the animation is always up-to-date with the state.
-			-- This might end up not doing anything since this code is called during TMW_ICON_SETUP_PRE
-			self:CheckState(ConditionObject)
+			-- DO NOT check the state right here, since animations might be missing required components. 
+			-- just let it happen during the queued update for TMW_ICON_SETUP_POST
+			-- self:CheckState(ConditionObject)
 
 			-- Queue an update during TMW_ICON_SETUP_POST, 
 			-- because animations might be missing required icon components when this is triggered.
@@ -546,6 +584,7 @@ TMW:NewClass("EventHandler_WhileConditions", "EventHandler"){
 		if TMW.Locked and matches then
 			-- If TMW is locked, and there are eventSettings that are using this ConditionObject,
 			-- then have the event handler do what needs to be done for all of the matching eventSettings.
+
 			self:HandleConditionStateChange(matches, ConditionObject.Failed)
 		end
 	end,
@@ -648,7 +687,7 @@ do
 
 		useDynamicTab = true,
 		ShouldShowTab = function(self)
-			local button = TellMeWhen_IconEditor.Events.EventSettingsContainer.IconEventWhileCondition
+			local button = TellMeWhen_IconEditor.Pages.Events.EventSettingsContainer.IconEventWhileCondition
 			
 			return button and button:IsShown()
 		end,

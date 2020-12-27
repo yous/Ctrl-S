@@ -1,8 +1,7 @@
 local mod	= DBM:NewMod("Tonks", "DBM-DMF")
 local L		= mod:GetLocalizedStrings()
 
-mod:SetRevision(("$Revision: 12283 $"):sub(12, -3))
-mod:SetZone()
+mod:SetRevision("20200803045206")
 
 mod:RegisterEvents(
 	"SPELL_CAST_SUCCESS 102341",
@@ -12,28 +11,20 @@ mod:RegisterEvents(
 )
 mod.noStatistics = true
 
-local warnMarked				= mod:NewSpellAnnounce(102341, 4)
+local specWarnMarked			= mod:NewSpecialWarningRun(102341, nil, nil, 2, 4, 2)
 
-local specWarnMarked			= mod:NewSpecialWarningRun("OptionVersion2", 102341, nil, nil, nil, 4)
-
-local timerGame					= mod:NewBuffActiveTimer(60, 102178)
-
-local countdownGame				= mod:NewCountdownFades(60, 102178)
-
-mod:RemoveOption("HealthFrame")
-mod:RemoveOption("SpeedKillTimer")
+local timerGame					= mod:NewBuffActiveTimer(60, 102178, nil, nil, nil, 5, nil, nil, nil, 1, 5)
 
 function mod:SPELL_CAST_SUCCESS(args)
 	if args.spellId == 102341 and UnitGUID("pet") == args.destGUID and self:AntiSpam() then
-		warnMarked:Show()
 		specWarnMarked:Show()
+		specWarnMarked:Play("justrun")
 	end
 end
 
-function mod:UNIT_SPELLCAST_SUCCEEDED(uId, spellName)
-	if spellName == GetSpellInfo(102178) then
+function mod:UNIT_SPELLCAST_SUCCEEDED(_, _, spellId)
+	if spellId == 102178 then
 		timerGame:Start()
-		countdownGame:Start(60)
 	end
 end
 
@@ -41,11 +32,9 @@ function mod:UNIT_DIED(args)
 	local cid = self:GetCIDFromGUID(args.destGUID)
 	if cid == 54588 and UnitGUID("pet") == args.destGUID then
 		timerGame:Cancel()
-		countdownGame:Cancel()
 	end
 end
 
-function mod:UNIT_EXITED_VEHICLE(uId)
+function mod:UNIT_EXITED_VEHICLE()
 	timerGame:Cancel()
-	countdownGame:Cancel()
 end

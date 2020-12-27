@@ -1,12 +1,13 @@
 local mod	= DBM:NewMod(168, "DBM-BastionTwilight", nil, 72)
 local L		= mod:GetLocalizedStrings()
 
-mod:SetRevision(("$Revision: 145 $"):sub(12, -3))
+mod.statTypes = "heroic,heroic25"
+
+mod:SetRevision("20200912041323")
 mod:SetCreatureID(45213)
---mod:SetEncounterID(1082, 1083) Muiti encounter id. need to verify.
-mod:SetZone()
+mod:SetEncounterID(1082, 1083)--Muiti encounter id. need to verify.
 mod:SetUsedIcons(1, 2, 3, 4, 5, 6, 7, 8)
-mod:SetModelSound("Sound\\Creature\\Sinestra\\VO_BT_Sinestra_Aggro01.wav", "Sound\\Creature\\Sinestra\\VO_BT_Sinestra_Kill02.wav")
+--mod:SetModelSound("Sound\\Creature\\Sinestra\\VO_BT_Sinestra_Aggro01.ogg", "Sound\\Creature\\Sinestra\\VO_BT_Sinestra_Kill02.ogg")
 --Long: We were fools to entrust an imbecile like Cho'gall with such a sacred duty! I will deal with you intruders myself!
 --Short: Powerless....
 
@@ -21,7 +22,6 @@ mod:RegisterEventsInCombat(
 	"SPELL_MISSED",
 	"UNIT_DIED"
 )
-mod.onlyHeroic = true
 
 local warnBreath			= mod:NewSpellAnnounce(90125, 3)
 local warnOrbSoon			= mod:NewAnnounce("WarnOrbSoon", 3, 92852, true, nil, true)--Still on by default but no longer plays it's own sounds
@@ -41,28 +41,25 @@ local specWarnEggShield		= mod:NewSpecialWarningSpell(87654, "Ranged")
 local specWarnEggWeaken		= mod:NewSpecialWarningSwitch("ej3238", "Ranged")
 local specWarnIndomitable	= mod:NewSpecialWarningDispel(90045, "RemoveEnrage")
 
-local timerBreathCD			= mod:NewCDTimer(21, 90125)
-local timerOrbs				= mod:NewTimer(28, "TimerOrbs", 92852)
-local timerWrack			= mod:NewNextTimer(61, 89421)
+local timerBreathCD			= mod:NewCDTimer(21, 90125, nil, nil, nil, 2)
+local timerOrbs				= mod:NewTimer(28, "TimerOrbs", 92852, nil, nil, 3, DBM_CORE_L.DEADLY_ICON, nil, 1, 4)
+local timerWrack			= mod:NewNextTimer(61, 89421, nil, "Healer", nil, 5, nil, DBM_CORE_L.HEALER_ICON)
 local timerExtinction		= mod:NewCastTimer(16, 86227)
 local timerEggWeakening		= mod:NewTimer(4, "TimerEggWeakening", 61357)
-local timerEggWeaken		= mod:NewTimer(30, "TimerEggWeaken", 61357)
-local timerDragon			= mod:NewNextTimer(50, "ej3231", nil, nil,nil, 69002)
+local timerEggWeaken		= mod:NewTimer(30, "TimerEggWeaken", 61357, nil, nil, 5, DBM_CORE_L.DAMAGE_ICON)
+local timerDragon			= mod:NewNextTimer(50, "ej3231", nil, nil, nil, 1, 69002)
 local timerRedEssenceCD		= mod:NewNextTimer(22, 87946)--21-23 seconds after red egg dies
 local timerRedEssence		= mod:NewBuffFadesTimer(180, 87946)
-
-local countdownOrbs			= mod:NewCountdown(28, 92852, nil, "OrbsCountdown")
 
 mod:AddBoolOption("SetIconOnOrbs", true)
 mod:AddBoolOption("InfoFrame", false)--Does not filter tanks. not putting ugly hack in info frame, its simpley an aggro tracker
 
 local eggDown = 0
 local eggRemoved = false
-local calenGUID = 0
 local orbList = {}
 local orbWarned = nil
 local playerWarned = nil
-local wrackName = GetSpellInfo(89421)
+local wrackName = DBM:GetSpellInfo(89421)
 local wrackTargets = {}
 
 local function resetPlayerOrbStatus()
@@ -87,6 +84,11 @@ end
 local function showOrbWarning(source)
 	table.wipe(orbList)
 	mod:Unschedule(showOrbWarning)
+	if not IsInGroup() then--Solo, always orb target
+		playerWarned = true
+		specWarnOrbOnYou:Show()
+		return
+	end
 	local _, _, difficulty = GetInstanceInfo()
 	for i = 1, DBM:GetNumGroupMembers() do
 		-- do some checks for 25/10 man raid size so we don't warn for ppl who are not in the instance
@@ -94,7 +96,7 @@ local function showOrbWarning(source)
 		if difficulty == 6 and i > 25 then return end
 		local n = GetRaidRosterInfo(i)
 		-- Has aggro on something, but not a tank
-		if UnitThreatSituation(n) == 3 and not isTank(n) then
+		if n and UnitThreatSituation(n) == 3 and not isTank(n) then
 			orbList[#orbList + 1] = n
 			if UnitIsUnit(n, "player") and not playerWarned then
 				playerWarned = true
@@ -148,7 +150,6 @@ function mod:OrbsRepeat()
 		warnOrbSoon:Schedule(26, 2)
 		warnOrbSoon:Schedule(27, 1)
 	end
-	countdownOrbs:Start(28)
 	specWarnOrbs:Show()--generic aoe warning on spawn, before we have actual targets yet.
 	if self:IsInCombat() then
 		self:ScheduleMethod(28, "OrbsRepeat")
@@ -164,7 +165,6 @@ end
 function mod:OnCombatStart(delay)
 	eggDown = 0
 	eggRemoved = false
-	calenGUID = 0
 	timerDragon:Start(16-delay)
 	timerBreathCD:Start(21-delay)
 	timerOrbs:Start(29-delay)
@@ -179,7 +179,6 @@ function mod:OnCombatStart(delay)
 		warnOrbSoon:Schedule(27-delay, 2)
 		warnOrbSoon:Schedule(28-delay, 1)
 	end
-	countdownOrbs:Start(29-delay)
 	self:ScheduleMethod(29-delay, "OrbsRepeat")
 	if self.Options.InfoFrame then
 		DBM.InfoFrame:SetHeader(L.HasAggro)
@@ -222,20 +221,11 @@ function mod:SPELL_AURA_APPLIED(args)
 		if self.Options.WarnOrbSoon then
 			warnOrbSoon:Cancel()
 		end
-		countdownOrbs:Cancel()
 		self:UnscheduleMethod("OrbsRepeat")
 		if self.Options.SetIconOnOrbs then
 			self:ClearIcons()
 		end
-	elseif args.spellId == 87231 and not args:IsDestTypePlayer() then
-		calenGUID = args.sourceGUID
-		if not DBM.BossHealth:HasBoss(args.sourceGUID) and DBM.BossHealth:IsShown() then
-			DBM.BossHealth:AddBoss(args.sourceGUID, args.sourceName)
-		end
 	elseif args.spellId == 87654 then
-		if not DBM.BossHealth:HasBoss(args.sourceGUID) and DBM.BossHealth:IsShown() then
-			DBM.BossHealth:AddBoss(args.sourceGUID, args.sourceName)
-		end
 		if self:AntiSpam(3) then
 			timerDragon:Cancel()
 			if eggRemoved then
@@ -276,14 +266,8 @@ end
 function mod:UNIT_DIED(args)
 	local cid = self:GetCIDFromGUID(args.destGUID)
 	if cid == 46842 then
-		if DBM.BossHealth:IsShown() then
-			DBM.BossHealth:RemoveBoss(args.destGUID)
-		end
 		eggDown = eggDown + 1
 		if eggDown >= 2 then
-			if DBM.BossHealth:IsShown() then
-				DBM.BossHealth:RemoveBoss(calenGUID)
-			end
 			timerEggWeaken:Cancel()
 			warnPhase3:Show()
 			timerBreathCD:Start()
@@ -298,9 +282,7 @@ function mod:UNIT_DIED(args)
 				warnOrbSoon:Schedule(28, 2)
 				warnOrbSoon:Schedule(29, 1)
 			end
-			countdownOrbs:Cancel()
 			self:UnscheduleMethod("OrbsRepeat")
-			countdownOrbs:Start(30)
 			self:ScheduleMethod(30, "OrbsRepeat")
 		end
 	end

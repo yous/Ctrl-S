@@ -7,7 +7,7 @@
 --		Banjankri of Blackrock, Predeter of Proudmoore, Xenyr of Aszune
 
 -- Currently maintained by
--- Cybeloras of Aerie Peak/Detheroc/Mal'Ganis
+-- Cybeloras of Aerie Peak
 -- --------------------
 
 
@@ -84,7 +84,7 @@ function TMW:GetItems(setting)
 
 	return items
 end
-TMW:MakeFunctionCached(TMW, "GetItems")
+TMW:MakeSingleArgFunctionCached(TMW, "GetItems")
 
 
 

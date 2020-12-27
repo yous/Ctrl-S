@@ -29,7 +29,6 @@ L:SetMiscLocalization{
 
 L:SetOptionLocalization{
 	WarningSnobold			= "为狗头人奴隶出现显示警报",
-	PingCharge			= "当冰吼即将向你你冲锋时自动点击小地图",
 	ClearIconsOnIceHowl		= "冲锋前清除所有标记",
 	TimerNextBoss			= "显示下一场战斗倒计时",
 	TimerEmerge			= "显示钻地计时",
@@ -78,7 +77,7 @@ L:SetMiscLocalization{
 	AllianceVictory			= "荣耀归于联盟！",
 	HordeVictory			= "那只是让你们知道将来必须面对的命运。为了部落！",
 	YellKill			= "肤浅而悲痛的胜利。今天痛失的生命反而令我们更加的颓弱。除了巫妖王之外，谁还能从中获利?伟大的战士失去了宝贵生命。为了什么?真正的威胁就在前方 - 巫妖王在死亡的领域中等着我们。"
-} 
+}
 
 ---------------------
 --  Val'kyr Twins  --
@@ -90,7 +89,7 @@ L:SetGeneralLocalization{
 }
 
 L:SetTimerLocalization{
-	TimerSpecialSpell		= "下一次 特殊技能"	
+	TimerSpecialSpell		= "下一次 特殊技能"
 }
 
 L:SetWarningLocalization{
@@ -99,7 +98,7 @@ L:SetWarningLocalization{
 	SpecWarnSwitchTarget		= "立刻切换目标攻击双生相协",
 	SpecWarnKickNow			= "立刻打断",
 	WarningTouchDebuff		= "光明或黑暗之触 -> >%s<",
-	WarningPoweroftheTwins		= "双生之能 - 加大治疗 -> >%s<",
+	WarningPoweroftheTwins2		= "双生之能 - 加大治疗 -> >%s<",
 	SpecWarnPoweroftheTwins		= "双生之能"
 }
 
@@ -117,7 +116,7 @@ L:SetOptionLocalization{
 	SpecialWarnOnDebuff		= "当你中了光明或黑暗之触时显示特殊警报(需切换颜色)",
 	SetIconOnDebuffTarget		= "为光明或黑暗之触的目标设置标记(英雄模式)",
 	WarningTouchDebuff		= "提示光明或黑暗之触的目标",
-	WarningPoweroftheTwins		= "提示双生之能的目标",
+	WarningPoweroftheTwins2		= "提示双生之能的目标",
 	SpecWarnPoweroftheTwins		= "当你坦克的首领拥有双生之能时显示特殊警报"
 }
 

@@ -7,7 +7,7 @@
 --		Banjankri of Blackrock, Predeter of Proudmoore, Xenyr of Aszune
 
 -- Currently maintained by
--- Cybeloras of Aerie Peak/Detheroc/Mal'Ganis
+-- Cybeloras of Aerie Peak
 -- --------------------
 
 
@@ -31,6 +31,9 @@ local type
 
 
 local GroupModule = TMW:NewClass("GroupModule", "GroupComponent", "ObjectModule")
+
+GroupModule.DefaultPanelColumnIndex = 2
+
 
 function GroupModule:OnNewInstance_1_GroupModule(group)
 	group.Modules[self.className] = self

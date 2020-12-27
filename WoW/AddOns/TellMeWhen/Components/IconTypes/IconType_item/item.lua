@@ -7,7 +7,7 @@
 --		Banjankri of Blackrock, Predeter of Proudmoore, Xenyr of Aszune
 
 -- Currently maintained by
--- Cybeloras of Aerie Peak/Detheroc/Mal'Ganis
+-- Cybeloras of Aerie Peak
 -- --------------------
 
 local TMW = TMW
@@ -17,8 +17,8 @@ local L = TMW.L
 local print = TMW.print
 local pairs, ipairs =
 	  pairs, ipairs
-local GetItemCooldown, IsItemInRange, IsEquippedItem, GetItemIcon, GetItemInfo =
-	  GetItemCooldown, IsItemInRange, IsEquippedItem, GetItemIcon, GetItemInfo
+local GetItemInfo =
+	  GetItemInfo
 
 local OnGCD = TMW.OnGCD
 local GetSpellTexture = TMW.GetSpellTexture
@@ -32,13 +32,15 @@ Type.desc = L["ICONMENU_ITEMCOOLDOWN_DESC"]
 Type.menuIcon = "Interface\\Icons\\inv_jewelry_trinketpvp_01"
 Type.checksItems = true
 
+local STATE_USABLE           = TMW.CONST.STATE.DEFAULT_SHOW
+local STATE_UNUSABLE         = TMW.CONST.STATE.DEFAULT_HIDE
+local STATE_UNUSABLE_NORANGE = TMW.CONST.STATE.DEFAULT_NORANGE
 
 -- AUTOMATICALLY GENERATED: UsesAttributes
+Type:UsesAttributes("state")
 Type:UsesAttributes("spell")
-Type:UsesAttributes("inRange")
-Type:UsesAttributes("stack, stackText")
 Type:UsesAttributes("start, duration")
-Type:UsesAttributes("alpha")
+Type:UsesAttributes("stack, stackText")
 Type:UsesAttributes("texture")
 -- END AUTOMATICALLY GENERATED: UsesAttributes
 
@@ -60,51 +62,51 @@ Type:RegisterIconDefaults{
 
 
 Type:RegisterConfigPanel_XMLTemplate(100, "TellMeWhen_ChooseName", {
-	title = L["ICONMENU_CHOOSENAME_ITEMSLOT2"],
+	title = L["ICONMENU_CHOOSENAME3"],
 	text = L["ICONMENU_CHOOSENAME_ITEMSLOT_DESC"],
 	SUGType = "itemwithslots",
 })
 
-Type:RegisterConfigPanel_XMLTemplate(165, "TellMeWhen_WhenChecks", {
-	text = L["ICONMENU_SHOWWHEN"],
-	[0x2] = { text = "|cFF00FF00" .. L["ICONMENU_USABLE"], 			},
-	[0x1] = { text = "|cFFFF0000" .. L["ICONMENU_UNUSABLE"], 		},
+Type:RegisterConfigPanel_XMLTemplate(165, "TellMeWhen_IconStates", {
+	[STATE_USABLE]           = { text = "|cFF00FF00" .. L["ICONMENU_READY"],   },
+	[STATE_UNUSABLE]         = { text = "|cFFFF0000" .. L["ICONMENU_NOTREADY"], },
+	[STATE_UNUSABLE_NORANGE] = { text = "|cFFFFff00" .. L["ICONMENU_OORANGE"], requires = "RangeCheck" },
 })
 
 Type:RegisterConfigPanel_ConstructorFunc(150, "TellMeWhen_ItemSettings", function(self)
-	self.Header:SetText(Type.name)
-	TMW.IE:BuildSimpleCheckSettingFrame(self, {
+	self:SetTitle(Type.name)
+	self:BuildSimpleCheckSettingFrame({
 		numPerRow = 2,
-		{
-			setting = "OnlyInBags",
-			title = L["ICONMENU_ONLYBAGS"],
-			tooltip = L["ICONMENU_ONLYBAGS_DESC"],
-			disabled = function(self)
-				return TMW.CI.ics.OnlyEquipped
-			end,
-		},
-		{
-			setting = "OnlyEquipped",
-			title = L["ICONMENU_ONLYEQPPD"],
-			tooltip = L["ICONMENU_ONLYEQPPD_DESC"],
-			OnState = function(self, button)
-				if self:GetChecked() then
-					TMW.CI.ics.OnlyInBags = true
-					self:GetParent().OnlyInBags:ReloadSetting()
-				end
-			end,
-		},
-		{
-			setting = "EnableStacks",
-			title = L["ICONMENU_SHOWSTACKS"],
-			tooltip = L["ICONMENU_SHOWSTACKS_DESC"],
-		},
-		{
-			setting = "RangeCheck",
-			title = L["ICONMENU_RANGECHECK"],
-			tooltip = L["ICONMENU_RANGECHECK_DESC"],
-		},
+		function(check)
+			check:SetTexts(L["ICONMENU_ONLYBAGS"], L["ICONMENU_ONLYBAGS_DESC"])
+			check:SetSetting("OnlyInBags")
+		end,
+		function(check)
+			check:SetTexts(L["ICONMENU_ONLYEQPPD"], L["ICONMENU_ONLYEQPPD_DESC"])
+			check:SetSetting("OnlyEquipped")
+		end,
+		function(check)
+			check:SetTexts(L["ICONMENU_SHOWSTACKS"], L["ICONMENU_SHOWSTACKS_DESC"])
+			check:SetSetting("EnableStacks")
+		end,
+		function(check)
+			check:SetTexts(L["ICONMENU_RANGECHECK"], L["ICONMENU_RANGECHECK_DESC"])
+			check:SetSetting("RangeCheck")
+		end,
 	})
+
+	self.OnlyEquipped:CScriptAdd("ReloadRequested", function()
+		local settings = self:GetSettingTable()
+
+		if settings then
+			self.OnlyInBags:SetEnabled(not settings.OnlyEquipped)
+
+			if settings.OnlyEquipped and not settings.OnlyInBags then
+				settings.OnlyInBags = true
+				self:RequestReload()
+			end
+		end
+	end)
 end)
 
 
@@ -117,7 +119,7 @@ local function ItemCooldown_OnUpdate(icon, time)
 
 
 	-- These variables will hold all the attributes that we pass to SetInfo().
-	local inrange, equipped, start, duration, count
+	local inrange, equipped, start, duration, enable, count
 
 	local numChecked = 1
 
@@ -125,9 +127,15 @@ local function ItemCooldown_OnUpdate(icon, time)
 		local item = Items[i]
 		numChecked = i
 
-		start, duration = item:GetCooldown()
+		start, duration, enable = item:GetCooldown()
 
 		if duration then
+			if enable == 0 then
+				-- Enable will be 0 for things like a potion that was used in combat 
+				-- and the cooldown hasn't yet started counting down.
+				start, duration = 0, 0
+			end
+
 			inrange, equipped, count = true, true, item:GetCount()
 			if RangeCheck then
 				inrange = item:IsInRange("target")
@@ -138,16 +146,15 @@ local function ItemCooldown_OnUpdate(icon, time)
 				equipped = false
 			end
 			
-			if equipped and inrange and (duration == 0 or OnGCD(duration)) then
+			if equipped and inrange and enable == 1 and (duration == 0 or OnGCD(duration)) then
 				-- This item is usable. Set the attributes and then stop.
 
-				icon:SetInfo("alpha; texture; start, duration; stack, stackText; spell; inRange",
-					icon.Alpha,
+				icon:SetInfo("state; texture; start, duration; stack, stackText; spell",
+					STATE_USABLE,
 					item:GetIcon() or "Interface\\Icons\\INV_Misc_QuestionMark",
 					start, duration,
 					count, icon.EnableStacks and count,
-					item:GetID(),
-					inrange
+					item:GetID()
 				)
 				return
 			end
@@ -165,7 +172,7 @@ local function ItemCooldown_OnUpdate(icon, time)
 			end
 		end
 		if not item2 then
-			icon:SetInfo("alpha", 0)
+			icon:SetInfo("state", 0)
 			return
 		end
 	else
@@ -177,7 +184,7 @@ local function ItemCooldown_OnUpdate(icon, time)
 	-- otherwise reuse the values obtained above since they are just for the first one
 
 	if numChecked > 1 then
-		start, duration = item2:GetCooldown()
+		start, duration, enable = item2:GetCooldown()
 
 		inrange, count = true, item2:GetCount()
 		if RangeCheck then
@@ -187,16 +194,21 @@ local function ItemCooldown_OnUpdate(icon, time)
 	end
 
 	if duration then
-		icon:SetInfo("alpha; texture; start, duration; stack, stackText; spell; inRange",
-			icon.UnAlpha,
+		if enable == 0 then
+			-- Enable will be 0 for things like a potion that was used in combat 
+			-- and the cooldown hasn't yet started counting down.
+			start, duration = 0, 0
+		end
+		
+		icon:SetInfo("state; texture; start, duration; stack, stackText; spell",
+			not inrange and STATE_UNUSABLE_NORANGE or STATE_UNUSABLE,
 			item2:GetIcon(),
 			start, duration,
 			count, icon.EnableStacks and count,
-			item2:GetID(),
-			inrange
+			item2:GetID()
 		)
 	else
-		icon:SetInfo("alpha", 0)
+		icon:SetInfo("state", 0)
 	end
 end
 

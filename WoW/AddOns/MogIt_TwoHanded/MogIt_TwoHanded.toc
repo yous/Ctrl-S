@@ -1,13 +1,10 @@
-## Interface: 60000
+## Interface: 90001
 ## Author: Aelobin (The Maelstrom EU) & Lombra (Defias Brotherhood EU)
-## Version: 3.4.0
+## Version: 3.9.4
+## SavedVariables: MogIt_TwoHandedDB
 ## LoadOnDemand: 1
 ## RequiredDeps: MogIt
 ## X-MogItModuleVersion: 3
-## X-Curse-Packaged-Version: 3.4.0
-## X-Curse-Project-Name: MogIt
-## X-Curse-Project-ID: mogit
-## X-Curse-Repository-ID: wow/mogit/mainline
 
 ## Title: MogIt: Two-Hand
 ## Title-frFR: MogIt: Deux mains
@@ -32,12 +29,3 @@
 ## Notes-zhTW: MogIt 的數據
 ## Notes-ptBR: MogIt Dados
 ## Notes-itIT: MogIt Dati
-
-Bosses.lua
-Colours.lua
-
-Sword.lua
-Axe.lua
-Mace.lua
-Polearm.lua
-Staff.lua

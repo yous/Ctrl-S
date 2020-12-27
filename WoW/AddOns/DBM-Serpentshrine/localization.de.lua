@@ -106,7 +106,6 @@ L:SetOptionLocalization{
 }
 
 L:SetMiscLocalization{
-	YellPull	= "Achtung, Wachen! Wir haben Besuch...",
 	Caribdis	= "Tiefenwächterin Caribdis",
 	Tidalvess	= "Tiefenwächter Flutvess",
 	Sharkkis	= "Tiefenwächter Haikis"
@@ -122,7 +121,6 @@ L:SetGeneralLocalization{
 }
 
 L:SetWarningLocalization{
-	WarnMurlocs		= "Murlocs",
 	SpecWarnMurlocs	= "Murlocs kommen!"
 }
 
@@ -131,7 +129,6 @@ L:SetTimerLocalization{
 }
 
 L:SetOptionLocalization{
-	WarnMurlocs		= "Zeige Warnung, wenn Murlocs erscheinen",
 	SpecWarnMurlocs	= "Spezialwarnung, wenn Murlocs erscheinen",
 	TimerMurlocs	= "Zeige Zeit bis Murlocs erscheinen"
 }
@@ -175,7 +172,6 @@ L:SetOptionLocalization{
 	TimerStrider		= "Zeige Zeit bis nächster Schreiter",
 	TimerNaga			= "Zeige Zeit bis nächster Naga",
 	SpecWarnElemental	= "Spezialwarnung, wenn Besudelter Elementar kommt",
-	RangeFrame			= "Zeige Abstandsfenster (10m)",
 	AutoChangeLootToFFA	= "Plündermodus in Phase 2 automatisch auf 'Jeder gegen jeden' einstellen"
 }
 

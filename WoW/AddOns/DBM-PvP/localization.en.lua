@@ -3,47 +3,63 @@
 --------------------------
 --  General BG Options  --
 --------------------------
-L = DBM:GetModLocalization("Battlegrounds")
+L = DBM:GetModLocalization("PvPGeneral")
 
 L:SetGeneralLocalization({
-	name = "General Options"
-})
-
-
-L:SetTimerLocalization({
-	TimerInvite = "%s"
-})
-
-L:SetOptionLocalization({
-	ColorByClass	= "Set name color to class color in the score frame",
-	ShowInviteTimer	= "Show battleground join timer",
-	AutoSpirit		= "Auto-release spirit",
-	HideBossEmoteFrame	= "Hide the raid boss emote frame & garrison/Guild toasts during battlegrounds"
-})
-
-L:SetMiscLocalization({
-	ArenaInvite	= "Arena invite"
-})
-
---------------
---  Arenas  --
---------------
-L = DBM:GetModLocalization("Arenas")
-
-L:SetGeneralLocalization({
-	name = "Arenas"
+	name	= "General Options"
 })
 
 L:SetTimerLocalization({
-	TimerShadow	= "Shadow Sight"
+	TimerCap		= "%s",
+	TimerFlag		= "Flag respawn",
+	TimerInvite		= "%s",
+	TimerRemaining	= "Time Remaining: ",
+	TimerShadow		= "Shadow Sight"
 })
 
 L:SetOptionLocalization({
-	TimerShadow = "Show timer for Shadow Sight"
+	AutoSpirit			= "Auto-release spirit",
+	ColorByClass		= "Set name color to class color in the score frame",
+	HideBossEmoteFrame	= "Hide the raid boss emote frame and garrison/Guild toasts during battlegrounds",
+	ShowBasesToWin		= "Show bases required to win",
+	ShowEstimatedPoints	= "Show estimated points on win/loss",
+	ShowFlagCarrier		= "Show flag carrier",
+	TimerCap			= "Show capture timer",
+	TimerFlag			= "Show flag respawn timer",
+	TimerInvite			= "Show battleground join timer",
+	TimerRemaining		= "Show time remaining for match start and match end",
+	TimerShadow			= "Show timer for Shadow Sight",
+	TimerWin			= "Show win timer",
+	ShowRelativeGameTime= "Fill win timer relative to BG start time (If disabled, bar just always looks full)"
 })
 
 L:SetMiscLocalization({
-	Start15	= "Fifteen seconds until the Arena battle begins!"
+	BgStart120          = "The battle begins in 2 minutes.",
+	BgStart60           = "The battle begins in 1 minute.",
+	BgStart30           = "The battle begins in 30 seconds.",
+	ArenaInvite			= "Arena invite",
+	BasesToWin			= "Bases to win: %d",
+	WinBarText			= "%s wins",
+	-- TODO: Implement the flag carrying system
+	FlagReset			= "The flag has been reset!", -- Unused
+	FlagTaken			= "(.+) has taken the flag!", -- Unused
+	FlagCaptured		= "The .+ ha%w+ captured the flag!",
+	FlagDropped			= "The flag has been dropped!", -- Unused
+	--
+	ExprFlagPickUp		= "The (%w+) .lag was picked up by (.+)!", -- Unused
+	ExprFlagCaptured	= "(.+) captured the (%w+) flag!",
+	ExprFlagReturn		= "The (%w+) .lag was returned to its base by (.+)!", -- Unused
+	Vulnerable1			= "The flag carriers have become vulnerable to attack!",
+	Vulnerable2			= "The flag carriers have become increasingly vulnerable to attack!"
+})
+
+----------------------
+--  Seething Shore  --
+----------------------
+L = DBM:GetModLocalization("z1803")
+
+L:SetOptionLocalization({
+	TimerSpawn	= "Show azerite spawn timer"
 })
 
 ----------------------
@@ -52,111 +68,25 @@ L:SetMiscLocalization({
 L = DBM:GetModLocalization("z30")
 
 L:SetTimerLocalization({
-	TimerTower	= "%s",
-	TimerGY		= "%s"
+	TimerBoss	= "%s"
 })
 
 L:SetOptionLocalization({
-	TimerTower	= "Show tower capture timer",
-	TimerGY		= "Show graveyard capture timer",
 	AutoTurnIn	= "Automatically turn-in quests"
 })
 
---------------------
---  Arathi Basin  --
---------------------
-L = DBM:GetModLocalization("z529")
-
-L:SetTimerLocalization({
-	TimerCap	= "%s"
+L:SetMiscLocalization({
+	BossHorde	= "WHO DARES SUMMON LOKHOLAR?",
+	BossAlly	= "Wicked, wicked, mortals! The forest weeps. The elements recoil at the destruction. Ivus must purge you from this world!"
 })
+
+--------------
+--  Ashran  --
+--------------
+L = DBM:GetModLocalization("z1191")
 
 L:SetOptionLocalization({
-	TimerWin				= "Show win timer",
-	TimerCap				= "Show capture timer",
-	ShowAbEstimatedPoints	= "Show estimated points on win/loss",
-	ShowAbBasesToWin		= "Show bases required to win"
-})
-
-L:SetMiscLocalization({
-	ScoreExpr	= "(%d+)/1500",
-	WinBarText	= "%s wins",
-	BasesToWin	= "Bases to win: %d"
-})
-
----------------------
---  Deepwind Gorge --
----------------------
-L = DBM:GetModLocalization("z1105")
-
-L:SetTimerLocalization({
-       TimerCap        = "%s"
-})
-
-L:SetOptionLocalization({
-       TimerCap        = "Show capture timer",
-       TimerWin        = "Show win timer"
-})
-
-L:SetMiscLocalization({
-       ScoreExpr       = "(%d+)/1500",
-       WinBarText      = "%s wins"
-})
-
-------------------------
---  Eye of the Storm  --
-------------------------
-L = DBM:GetModLocalization("z566")
-
-L:SetTimerLocalization({
-	TimerFlag	= "Flag respawn"
-})
-
-L:SetOptionLocalization({
-	TimerWin 		= "Show win timer",
-	TimerFlag 		= "Show flag respawn timer",
-	ShowPointFrame	= "Show flag carrier and estimated points"
-})
-
-L:SetMiscLocalization({
-	ScoreExpr		= "(%d+)/1500",
-	WinBarText 		= "%s wins",
-	Flag			= "Flag",
-	FlagReset 		= "The flag has been reset!",
-	FlagTaken 		= "(.+) has taken the flag!",
-	FlagCaptured	= "The .+ ha%w+ captured the flag!",
-	FlagDropped		= "The flag has been dropped!"
-})
-
----------------------
---  Warsong Gulch  --
----------------------
-L = DBM:GetModLocalization("z489")
-
-L:SetTimerLocalization({
-	TimerStart	= "Game starts",
-	TimerFlag	= "Flag respawn"
-})
-
-L:SetOptionLocalization({
-	TimerStart					= "Show start timer",
-	TimerFlag					= "Show flag respawn timer",
-	ShowFlagCarrier				= "Show flag carrier",
-	ShowFlagCarrierErrorNote	= "Show flag carrier error message while in combat"
-})
-
-L:SetMiscLocalization({
-	BgStart60 			= "The battle begins in 1 minute.",
-	BgStart30 			= "The battle begins in 30 seconds.  Prepare yourselves!",
-	InfoErrorText		= "The flag carrier targeting function will be restored when you are out of combat.",
-	ExprFlagPickUp		= "The (%w+) .lag was picked up by (.+)!",
-	ExprFlagCaptured	= "(.+) captured the (%w+) .lag!",
-	ExprFlagReturn		= "The (%w+) .lag was returned to its base by (.+)!",
-	FlagAlliance		= "Alliance Flag: ",
-	FlagHorde			= "Horde Flag: ",
-	FlagBase			= "Base",
-	Vulnerable1			= "The flag carriers have become vulnerable to attack!",
-	Vulnerable2			= "The flag carriers have become increasingly vulnerable to attack!"
+	AutoTurnIn	= "Automatically turn-in quests"
 })
 
 ------------------------
@@ -170,12 +100,10 @@ L:SetWarningLocalization({
 })
 
 L:SetTimerLocalization({
-	TimerPOI			= "%s",
 	TimerSiegeEngine	= "Siege Engine ready"
 })
 
 L:SetOptionLocalization({
-	TimerPOI			= "Show capture timer",
 	TimerSiegeEngine	= "Show timer for Siege Engine construction",
 	WarnSiegeEngine		= "Show warning when Siege Engine is ready",
 	WarnSiegeEngineSoon	= "Show warning when Siege Engine is almost ready",
@@ -186,7 +114,7 @@ L:SetMiscLocalization({
 	GatesHealthFrame		= "Damaged gates",
 	SiegeEngine				= "Siege Engine",
 	GoblinStartAlliance		= "See those seaforium bombs? Use them on the gates while I repair the siege engine!",
-	GoblinStartHorde		= "I'll work on the siege engine, just watch my back.  Use those seaforium bombs on the gates if you need them!",
+	GoblinStartHorde		= "I'll work on the siege engine, just watch my back. Use those seaforium bombs on the gates if you need them!",
 	GoblinHalfwayAlliance	= "I'm halfway there! Keep the Horde away from here.  They don't teach fighting in engineering school!",
 	GoblinHalfwayHorde		= "I'm about halfway done! Keep the Alliance away - fighting's not in my contract!",
 	GoblinFinishedAlliance	= "My finest work so far! This siege engine is ready for action!",
@@ -195,74 +123,25 @@ L:SetMiscLocalization({
 	GoblinBrokenHorde		= "It's broken again?! I'll fix it... just don't expect the warranty to cover this"
 })
 
-------------------
---  Twin Peaks  --
-------------------
-L = DBM:GetModLocalization("z726")
-
-L:SetTimerLocalization({
-	TimerStart	= "Game starts",
-	TimerFlag	= "Flag respawn"
-})
-
-L:SetOptionLocalization({
-	TimerStart					= "Show start timer",
-	TimerFlag					= "Show flag respawn timer",
-	ShowFlagCarrier				= "Show flag carrier",
-	ShowFlagCarrierErrorNote	= "Show flag carrier error message while in combat"
-})
-
-L:SetMiscLocalization({
-	BgStart60 			= "The battle begins in 1 minute.",
-	BgStart30 			= "The battle begins in 30 seconds.  Prepare yourselves!",
-	InfoErrorText		= "The flag carrier targeting function will be restored when you are out of combat.",
-	ExprFlagPickUp		= "The (%w+) .lag was picked up by (.+)!",
-	ExprFlagCaptured	= "(.+) captured the (%w+) flag!",
-	ExprFlagReturn		= "The (%w+) .lag was returned to its base by (.+)!",
-	FlagAlliance		= "Alliance Flag: ",
-	FlagHorde			= "Horde Flag: ",
-	FlagBase			= "Base",
-	Vulnerable1			= "The flag carriers have become vulnerable to attack!",
-	Vulnerable2			= "The flag carriers have become increasingly vulnerable to attack!"
-})
-
-------------------------------
---  The Battle for Gilneas  --
-------------------------------
-L = DBM:GetModLocalization("z761")
-
-L:SetTimerLocalization({
-	TimerCap	= "%s"
-})
-
-L:SetOptionLocalization({
-	TimerWin				= "Show win timer",
-	TimerCap				= "Show capture timer",
-	ShowGilneasEstimatedPoints		= "Show estimated points on win/loss",
-	ShowGilneasBasesToWin			= "Show bases required to win"
-})
-
-L:SetMiscLocalization({
-	ScoreExpr	= "(%d+)/1500",
-	WinBarText	= "%s wins",
-	BasesToWin	= "Bases to win: %d"
-})
-
 -------------------------
 --  Silvershard Mines  --
 -------------------------
 L = DBM:GetModLocalization("z727")
 
 L:SetTimerLocalization({
-	TimerCart	= "Cart respawn"
+	TimerRespawn	= "Cart respawn",
+	TimerCart		= "%s"
 })
 
 L:SetOptionLocalization({
-	TimerCart	= "Show cart respawn timer"
+	TimerResapwn	= "Show cart respawn timer",
+	TimerCart		= "Show cart cap timer"
 })
 
 L:SetMiscLocalization({
-	Capture = "has captured"
+	Capture	= "has captured",
+	Arrived	= "has arived",
+	Begun	= "has begun"
 })
 
 -------------------------
@@ -271,15 +150,10 @@ L:SetMiscLocalization({
 L = DBM:GetModLocalization("z998")
 
 L:SetOptionLocalization({
-	TimerWin			= "Show win timer",
-	ShowKotmoguEstimatedPoints	= "Show estimated points on win/loss",
-	ShowKotmoguOrbsToWin		= "Show orbs required to win"
+	ShowOrbCarriers	= "Show orb carrier"
 })
 
 L:SetMiscLocalization({
-	OrbTaken 	= "(%S+) has taken the (%S+) orb!",
-	OrbReturn 	= "The (%S+) orb has been returned!",
-	ScoreExpr	= "(%d+)/1500",
-	WinBarText	= "Estimate %s wins",
-	OrbsToWin	= "Orbs to win: %d"
+	OrbTaken	= "(%S+) has taken the (%S+) orb!",
+	OrbReturn	= "The (%S+) orb has been returned!"
 })

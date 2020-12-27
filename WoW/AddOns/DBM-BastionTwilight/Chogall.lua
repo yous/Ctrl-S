@@ -1,13 +1,11 @@
 local mod	= DBM:NewMod(167, "DBM-BastionTwilight", nil, 72)
 local L		= mod:GetLocalizedStrings()
 
-mod:SetRevision(("$Revision: 147 $"):sub(12, -3))
+mod:SetRevision("20200806141910")
 mod:SetCreatureID(43324)
 mod:SetEncounterID(1029)
-mod:DisableEEKillDetection()
-mod:SetZone()
 mod:SetUsedIcons(1, 2, 3, 4, 5, 6, 7, 8)
-mod:SetModelSound("Sound\\Creature\\Chogall\\VO_BT_Chogall_BotEvent15.wav", "Sound\\Creature\\Chogall\\VO_BT_Chogall_BotEvent42.wav")
+--mod:SetModelSound("Sound\\Creature\\Chogall\\VO_BT_Chogall_BotEvent15.ogg", "Sound\\Creature\\Chogall\\VO_BT_Chogall_BotEvent42.ogg")
 --Long: Foolish mortals-(Usurper's children!) nothing you have done- (Spawn of a lesser god!) I am TRYING to speak here. (Words, words, words. The Master wants murder.) ALL falls to chaos. ALL will be destroyed. (Chaos, chaos!) Your work here today changes nothing. (Chaos, chaos, all things end) No mortal may see what you have and live. Your end has come.
 --Short: (The Master sees, the Master sees!)
 
@@ -21,8 +19,7 @@ mod:RegisterEventsInCombat(
 	"SPELL_DAMAGE",
 	"SPELL_MISSED",
 	"UNIT_HEALTH boss1",
-	"UNIT_AURA player",
-	"UNIT_DIED"
+	"UNIT_AURA player"
 )
 
 local warnWorship					= mod:NewTargetAnnounce(91317, 3)--Phase 1
@@ -48,24 +45,24 @@ local specWarnDepravity				= mod:NewSpecialWarningInterrupt(81713)--On by defaul
 local specwarnFury					= mod:NewSpecialWarningTarget(82524, "Tank")
 local specwarnFlamingDestruction	= mod:NewSpecialWarningSpell(81194, "Tank")
 
-local timerWorshipCD				= mod:NewCDTimer(36, 91303)
-local timerAdherent					= mod:NewCDTimer(92, 81628)
-local timerFesterBlood				= mod:NewNextTimer(40, 82299)--40 seconds after an adherent is summoned
-local timerFlamingDestruction		= mod:NewBuffActiveTimer(10, 81194, nil, "Tank|Healer")
-local timerEmpoweredShadows			= mod:NewBuffActiveTimer(9, 81572, nil, "Healer")
-local timerFuryCD					= mod:NewCDTimer(47, 82524, nil, "Tank|Healer")--47-48 unless a higher priority ability is channeling (such as summoning adds or MC)
-local timerCreationsCD				= mod:NewNextTimer(30, 82414)
+local timerWorshipCD				= mod:NewCDTimer(36, 91303, nil, nil, nil, 3, nil, DBM_CORE_L.INTERRUPT_ICON)
+local timerAdherent					= mod:NewCDTimer(92, 81628, nil, nil, nil, 1)
+local timerFesterBlood				= mod:NewNextTimer(40, 82299, nil, nil, nil, 1)--40 seconds after an adherent is summoned
+local timerFlamingDestruction		= mod:NewBuffActiveTimer(10, 81194, nil, "Tank|Healer", nil, 5, nil, DBM_CORE_L.TANK_ICON)
+local timerEmpoweredShadows			= mod:NewBuffActiveTimer(9, 81572, nil, "Healer", nil, 5, nil, DBM_CORE_L.HEALER_ICON)
+local timerFuryCD					= mod:NewCDTimer(47, 82524, nil, "Tank|Healer", nil, 5, nil, DBM_CORE_L.TANK_ICON)--47-48 unless a higher priority ability is channeling (such as summoning adds or MC)
+local timerCreationsCD				= mod:NewNextTimer(30, 82414, nil, nil, nil, 1)
 local timerSickness					= mod:NewBuffFadesTimer(5, 82235)
-local timerFlamesOrders				= mod:NewNextTimer(25, 81171, nil, "Dps")--Orders are when he summons elemental
-local timerShadowsOrders			= mod:NewNextTimer(25, 81556, nil, "Dps")--These are more for dps to switch to them to lower em so useless for normal mode
-local timerFlamingDestructionCD		= mod:NewNextTimer(20, 81194, nil, "Tank|Healer")--Timer for when the special actually goes off (when he absorbs elemental)
-local timerEmpoweredShadowsCD		= mod:NewNextTimer(20, 81572, nil, "Healer")--^^
-local timerDepravityCD				= mod:NewCDTimer(12, 81713, nil, "Melee")
+local timerFlamesOrders				= mod:NewNextTimer(25, 81171, nil, "Dps", nil, 1, nil, DBM_CORE_L.DAMAGE_ICON)--Orders are when he summons elemental
+local timerShadowsOrders			= mod:NewNextTimer(25, 81556, nil, "Dps", nil, 1, nil, DBM_CORE_L.DAMAGE_ICON)--These are more for dps to switch to them to lower em so useless for normal mode
+local timerFlamingDestructionCD		= mod:NewNextTimer(20, 81194, nil, "Tank|Healer", nil, 5)--Timer for when the special actually goes off (when he absorbs elemental)
+local timerEmpoweredShadowsCD		= mod:NewNextTimer(20, 81572, nil, "Healer", nil, 5, nil, DBM_CORE_L.HEALER_ICON)--^^
+local timerDepravityCD				= mod:NewCDTimer(12, 81713, nil, "HasInterrupt", 2, 4, nil, DBM_CORE_L.INTERRUPT_ICON)
 
 local berserkTimer					= mod:NewBerserkTimer(600)
 
 mod:AddBoolOption("SetIconOnWorship", true)
-mod:AddBoolOption("SetIconOnCreature", true)
+mod:AddSetIconOption("SetIconOnCreature", 82411, false, true)
 mod:AddBoolOption("CorruptingCrashArrow", true)
 mod:AddBoolOption("RangeFrame")
 mod:AddBoolOption("InfoFrame")
@@ -76,11 +73,8 @@ local firstFury = false
 local worshipIcon = 8
 local worshipCooldown = 20.5
 local shadowOrdersCD = 15
-local creatureIcons = {}
-local creatureIcon = 8
-local iconsSet = 0
-local Corruption = GetSpellInfo(82235)
-local Bloodlevel = EJ_GetSectionInfo(3165)
+local Corruption = DBM:GetSpellInfo(82235)
+local Bloodlevel = DBM:EJ_GetSectionInfo(3165)
 
 local function showWorshipWarning()
 	warnWorship:Show(table.concat(worshipTargets, "<, >"))
@@ -88,12 +82,6 @@ local function showWorshipWarning()
 	worshipIcon = 8
 	timerWorshipCD:Start(worshipCooldown)
 	specWarnWorship:Show()
-end
-
-local function resetCreatureIconState()
-	table.wipe(creatureIcons)
-	creatureIcon = 8
-	iconsSet = 0
 end
 
 function mod:CorruptingCrashTarget(sGUID)
@@ -128,20 +116,17 @@ function mod:OnCombatStart(delay)
 	timerFlamesOrders:Start(5-delay)
 	timerWorshipCD:Start(10-delay)
 	table.wipe(worshipTargets)
-	table.wipe(creatureIcons)
 	prewarned_Phase2 = false
 	firstFury = false
 	worshipIcon = 8
 	worshipCooldown = 20.5
 	shadowOrdersCD = 15
-	creatureIcon = 8
-	iconsSet = 0
 	berserkTimer:Start(-delay)
 	if self.Options.InfoFrame then
 		DBM.InfoFrame:SetHeader(Bloodlevel)
 		DBM.InfoFrame:Show(5, "playerpower", 10, ALTERNATE_POWER_INDEX)
 	end
-end	
+end
 
 function mod:OnCombatEnd()
 	if self.Options.InfoFrame then
@@ -150,7 +135,7 @@ function mod:OnCombatEnd()
 	if self.Options.RangeFrame then
 		DBM.RangeCheck:Hide()
 	end
-end 
+end
 
 function mod:SPELL_AURA_APPLIED(args)
 	if args.spellId == 91317 then
@@ -205,14 +190,14 @@ function mod:SPELL_CAST_START(args)
 			timerFlamesOrders:Start(15)--Flames orders is 15 seconds after first fury, regardless whether or not shadow was last.
 		end
 	elseif args.spellId == 82411 then -- Creatures are channeling after their spawn.
-		if self.Options.SetIconOnCreature and not creatureIcons[args.sourceGUID] then
-			creatureIcons[args.sourceGUID] = creatureIcon
-			creatureIcon = creatureIcon - 1
+		if self.Options.SetIconOnCreature then
+			if self:IsDifficulty("normal25", "heroic25") then
+				self:ScanForMobs(args.destGUID, 0, 8, 8, 0.1, 20, "SetIconOnCreature")
+			else
+				self:ScanForMobs(args.destGUID, 0, 8, 4, 0.1, 20, "SetIconOnCreature")
+			end
 		end
 	elseif args.spellId == 81713 then
-		if not DBM.BossHealth:HasBoss(args.sourceGUID) and DBM.BossHealth:IsShown() then--Check if added to boss health
-			DBM.BossHealth:AddBoss(args.sourceGUID, args.sourceName)--And add if not.
-		end
 		if args.sourceGUID == UnitGUID("target") then--Only show warning for your own target.
 			specWarnDepravity:Show(args.sourceName)
 			if self:IsDifficulty("normal10", "heroic10") then
@@ -224,24 +209,9 @@ function mod:SPELL_CAST_START(args)
 	end
 end
 
-mod:RegisterOnUpdateHandler(function(self)
-	if self.Options.SetIconOnCreature and (DBM:GetRaidRank() > 0 and not (iconsSet == 8 and self:IsDifficulty("normal25", "heroic25") or iconsSet == 4 and self:IsDifficulty("normal10", "heroic10"))) then
-		for uId in DBM:GetGroupMembers() do
-			local uId = uId.."target"
-			local guid = UnitGUID(uId)
-			if creatureIcons[guid] then
-				SetRaidTarget(uId, creatureIcons[guid])
-				iconsSet = iconsSet + 1
-				creatureIcons[guid] = nil
-			end
-		end
-	end
-end, 1)
-
 function mod:SPELL_CAST_SUCCESS(args)
 	if args.spellId == 82414 then
 		warnCreations:Show()
-		resetCreatureIconState()
 		if self:IsDifficulty("heroic10", "heroic25") then -- other difficulty not sure, only comfirmed 25 man heroic
 			timerCreationsCD:Start(40)
 		else
@@ -271,9 +241,6 @@ function mod:SPELL_CAST_SUCCESS(args)
 			timerFlamingDestructionCD:Start(10.8)--Half the time on normal since you don't actually have to kill elementals plus the only thing worth showing on normal.
 		end
 	elseif args.spellId == 81685 then
-		if not DBM.BossHealth:HasBoss(args.sourceGUID) and DBM.BossHealth:IsShown() then--Check if added to boss health
-			DBM.BossHealth:AddBoss(args.sourceGUID, args.sourceName)--And add if not.
-		end
 		self:ScheduleMethod(0.2, "CorruptingCrashTarget", args.sourceGUID)
 	end
 end
@@ -298,19 +265,11 @@ function mod:UNIT_HEALTH(uId)
 end
 
 function mod:UNIT_AURA(uId)
-	if uId ~= "player" or not self:IsInCombat() then return end
-	if UnitDebuff("player", Corruption) and self:AntiSpam(7, 2) then
+	if DBM:UnitDebuff("player", Corruption) and self:AntiSpam(7, 2) then
 		specWarnSickness:Show()
 		timerSickness:Start()
-		if self.Options.RangeFrame and not DBM.RangeCheck:IsShown() then
+		if self.Options.RangeFrame then
 			DBM.RangeCheck:Show(5)
 		end
-	end
-end
-
-function mod:UNIT_DIED(args)
-	local cid = self:GetCIDFromGUID(args.destGUID)
-	if cid == 43622 and DBM.BossHealth:IsShown() then--Also remove from boss health when they die based on GUID
-		DBM.BossHealth:RemoveBoss(args.destGUID)
 	end
 end

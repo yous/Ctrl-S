@@ -1,14 +1,21 @@
 --[[
     This file is part of Decursive.
 
-    Decursive (v 2.7.3.6) add-on for World of Warcraft UI
-    Copyright (C) 2006-2014 John Wellesz (archarodim AT teaser.fr) ( http://www.2072productions.com/to/decursive.php )
+    Decursive (v 2.7.8) add-on for World of Warcraft UI
+    Copyright (C) 2006-2019 John Wellesz (Decursive AT 2072productions.com) ( http://www.2072productions.com/to/decursive.php )
 
-    Starting from 2009-10-31 and until said otherwise by its author, Decursive
-    is no longer free software, all rights are reserved to its author (John Wellesz).
+    Decursive is free software: you can redistribute it and/or modify
+    it under the terms of the GNU General Public License as published by
+    the Free Software Foundation, either version 3 of the License, or
+    (at your option) any later version.
 
-    The only official and allowed distribution means are www.2072productions.com, www.wowace.com and curse.com.
-    To distribute Decursive through other means a special authorization is required.
+    Decursive is distributed in the hope that it will be useful,
+    but WITHOUT ANY WARRANTY; without even the implied warranty of
+    MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+    GNU General Public License for more details.
+
+    You should have received a copy of the GNU General Public License
+    along with Decursive.  If not, see <https://www.gnu.org/licenses/>.
 
 
     Decursive is inspired from the original "Decursive v1.9.4" by Patrick Bohnet (Quu).
@@ -17,7 +24,7 @@
     Decursive is distributed in the hope that it will be useful,
     but WITHOUT ANY WARRANTY.
 
-    This file was last updated on 2014-10-15T09:23:18Z
+    This file was last updated on 2020-11-21T20:45:59Z
 --]]
 -------------------------------------------------------------------------------
 
@@ -48,22 +55,25 @@ end
 T._LoadedFiles["DCR_init.lua"] = false;
 
 local D;
+local _G                    = _G;
 local select                = _G.select;
 local GetSpellBookItemInfo  = _G.GetSpellBookItemInfo;
 local GetSpellInfo          = _G.GetSpellInfo;
-local IsSpellKnown          = _G.IsSpellKnown;
+local IsSpellKnown          = nil; -- use D:isSpellReady instead
+local GetSpecialization     = _G.GetSpecialization;
+local IsPlayerSpell         = _G.IsPlayerSpell;
 
 local function RegisterDecursive_Once() -- {{{
 
     T.Dcr = LibStub("AceAddon-3.0"):NewAddon("Decursive", "AceConsole-3.0", "AceEvent-3.0", "AceTimer-3.0", "AceHook-3.0"); -- XXX test this when a library is missing
     D     = T.Dcr;
 
-    --[===[@debug@
+    --[==[@debug@
     --Dcr = T.Dcr;
-    --@end-debug@]===]
+    --@end-debug@]==]
 
     D.name = "Decursive";
-    D.version = "2.7.3.6";
+    D.version = "2.7.8";
     D.author = "John Wellesz";
 
     D.DcrFullyInitialized = false;
@@ -76,12 +86,12 @@ local function RegisterLocals_Once() -- {{{
 
     D.L         = LibStub("AceLocale-3.0"):GetLocale("Decursive", true);
 
-    D.LC        = _G.LOCALIZED_CLASS_NAMES_MALE;
+    -- Make sure to never crash if some locals are missing (seen this happen on
+    -- Chinese clients when relying on LOCALIZED_CLASS_NAMES_MALE constant)
+    -- While that was probably caused by a badd-on redefining the constant,
+    -- it's best to stay on the safe side...
 
-    if not D.LC then
-        T._AddDebugText("DCR_init.lua: Couldn't get LOCALIZED_CLASS_NAMES_MALE!");
-        D.LC = {};
-    end
+    D.LC = setmetatable(FillLocalizedClassList({}, false), {__index = function(t,k) return k end});
 
     RegisterLocals_Once = nil;
 end -- }}}
@@ -124,6 +134,7 @@ local function SetBasicConstants_Once() -- these are constants that may be used 
     DC.CLASS_WARRIOR     = 'WARRIOR';
     DC.CLASS_DEATHKNIGHT = 'DEATHKNIGHT';
     DC.CLASS_MONK        = 'MONK';
+    DC.CLASS_DEMONHUNTER = 'DEMONHUNTER';
 
     DC.MyClass = "NOCLASS";
     DC.MyName = "NONAME";
@@ -142,7 +153,7 @@ local function SetBasicConstants_Once() -- these are constants that may be used 
     DC.AfflictionSound = "Interface\\AddOns\\Decursive\\Sounds\\AfflictionAlert.ogg";
     DC.FailedSound = "Interface\\AddOns\\Decursive\\Sounds\\FailedSpell.ogg";
     DC.DeadlyDebuffAlert = "Interface\\AddOns\\Decursive\\Sounds\\G_NecropolisWound-fast.ogg";
-    --DC.AfflictionSound = "Sound\\Doodad\\BellTollTribal.wav"
+    --DC.AfflictionSound = 566027
 
     DC.EMPTY_TABLE = {};
 
@@ -189,16 +200,6 @@ local function SetRuntimeConstants_Once () -- {{{
     DC.NameToTypes = D:tReverse(DC.TypeNames);
     DC.NameToTypes["Magic"] = DC.MAGIC; -- make sure 'Magic' is set to DC.MAGIC and not to DC.ENEMYMAGIC
 
-    DC.TypeColors = {
-        [DC.MAGIC]      = "2222DD",
-        [DC.ENEMYMAGIC] = "2222FF",
-        [DC.CURSE]      = "DD22DD",
-        [DC.POISON]     = "22DD22",
-        [DC.DISEASE]    = "995533",
-        [DC.CHARMED]    = "FF0000",
-        [DC.NOTYPE]     = "AAAAAA",
-    }
-
     DC.TypeToLocalizableTypeNames = {
         [DC.MAGIC]      = "MAGIC",
         [DC.ENEMYMAGIC] = "MAGICCHARMED",
@@ -213,210 +214,352 @@ local function SetRuntimeConstants_Once () -- {{{
 
     local DS = T._C.DS;
     local DSI = T._C.DSI;
-    local IsSpellKnown = _G.IsSpellKnown;
 
-    DC.IS_STEALTH_BUFF = D:tReverse({DS["Prowl"], DS["Stealth"], DS["Shadowmeld"],  DS["Invisibility"], DS["Lesser Invisibility"], DS["Camouflage"], DS["SHROUD_OF_CONCEALMENT"], DS['Greater Invisibility']});
 
-    DC.IS_HARMFULL_DEBUFF = D:tReverse({DC.DS["Unstable Affliction"], DC.DS["Vampiric Touch"]}); --, , DC.DS["Fluidity"]}); --, "Test item"});
-    DC.IS_DEADLY_DEBUFF   = D:tReverse({DC.DSI["Fluidity"]});
+    if not DC.WOWC then
+        DC.IS_STEALTH_BUFF = D:tReverse({DS["Prowl"], DS["Stealth"], DS["Shadowmeld"],  DS["Invisibility"], DS["Lesser Invisibility"], DS['Greater Invisibility']});
 
-    
+        DC.IS_HARMFULL_DEBUFF = D:tReverse({DC.DS["Unstable Affliction"], DC.DS["Vampiric Touch"]}); --, , DC.DS["Fluidity"]}); --, "Test item"});
+        DC.IS_DEADLY_DEBUFF   = D:tReverse({DC.DSI["Fluidity"]});
 
-    -- SPELL TABLE -- must be parsed after spell translations have been loaded {{{
-    DC.SpellsToUse = {
-        -- Druids
-        [DSI["SPELL_CYCLONE"]] = {
-            Types = {DC.CHARMED},
-            Better = 0,
-            Pet = false,
-        },
-        -- Mages
-        [DSI["SPELL_REMOVE_CURSE"]] = {
-            Types = {DC.CURSE},
-            Better = 0,
-            Pet = false,
-        },
-        -- Shamans http://www.wowhead.com/?spell=51514
-        [DSI["SPELL_HEX"]] = {
-            Types = {DC.CHARMED},
-            Better = 0,
-            Pet = false,
-        },
-        -- Shamans
-        [DSI["SPELL_PURGE"]] = {
-            Types = {DC.ENEMYMAGIC},
-            Better = 0,
-            Pet = false,
-        },
-        -- Hunters http://www.wowhead.com/?spell=19801
-        [DSI["SPELL_TRANQUILIZING_SHOT"]] = {
-            Types = {DC.ENEMYMAGIC},
-            Better = 0,
-            Pet = false,
-        },
-        -- Monks
-        [DSI["SPELL_DETOX"]] = {
-            Types = {DC.DISEASE, DC.POISON},
-            Better = 2,
-            Pet = false,
 
-            EnhancedBy = 'mistweather',
-            EnhancedByCheck = function ()
-                return (GetSpecialization() == 2) and true or false; -- mist?
-            end,
-            Enhancements = {
-                Types = {DC.MAGIC, DC.DISEASE, DC.POISON},
-            }
-        },
-        -- Monks
-        [DSI["SPELL_DIFFUSEMAGIC"]] = {
-            Types = {DC.MAGIC},
-            Better = 0,
-            Pet = false,
-            UnitFiltering = {
-                [DC.MAGIC]  = 1,
+        -- SPELL TABLE -- must be parsed after spell translations have been loaded {{{
+        DC.SpellsToUse = {
+            -- Druids
+            [DSI["SPELL_CYCLONE"]] = {
+                Types = {DC.CHARMED},
+                Better = 0,
+                Pet = false,
             },
-        },
-        -- Paladins
-        [DSI["SPELL_CLEANSE"]] = {
-            Types = {DC.DISEASE, DC.POISON},
-            Better = 2,
+            -- Mages
+            [DSI["SPELL_REMOVE_CURSE"]] = {
+                Types = {DC.CURSE},
+                Better = 0,
+                Pet = false,
+            },
+            -- Shamans http://www.wowhead.com/?spell=51514
+            [DSI["SPELL_HEX"]] = {
+                Types = {DC.CHARMED},
+                Better = 0,
+                Pet = false,
+            },
+            -- Shamans
+            [DSI["SPELL_PURGE"]] = {
+                Types = {DC.ENEMYMAGIC},
+                Better = 0,
+                Pet = false,
+            },
+            -- Hunters http://www.wowhead.com/?spell=212640
+            [DSI["SPELL_MENDINGBANDAGE"]] = { -- PVP
+                Types = {DC.DISEASE, DC.POISON},
+                Better = 0,
+                Pet = false,
+            },
+            --[=[ -- LEGION GONE
+            [DSI["SPELL_TRANQUILIZING_SHOT"]] = {
+            Types = {DC.ENEMYMAGIC},
+            Better = 0,
             Pet = false,
-
-            EnhancedBy = 'holy',
-            EnhancedByCheck = function ()
-                return (GetSpecialization() == 1) and true or false; -- holy?
-            end,
-            Enhancements = {
+            },
+            --]=]
+            -- Monks
+            [DSI["SPELL_DETOX_1"]] = {
                 Types = {DC.MAGIC, DC.DISEASE, DC.POISON},
-            }
-
-        },
-        [DSI["SPELL_HAND_OF_SACRIFICE"]] = {
-            Types = {},
-            Better = 1,
-            Pet = false,
-
-            EnhancedBy = 'retribution',
-            EnhancedByCheck = function ()
-                return (GetSpecialization() == 3) and true or false; -- ret?
-            end,
-            Enhancements = {
+                Better = 3,
+                Pet = false,
+            },
+            [DSI["SPELL_DETOX_2"]] = {
+                Types = {DC.DISEASE, DC.POISON},
+                Better = 2,
+                Pet = false,
+                -- detect mistweaver spec since the spell no longer seems to change with the spec like it used to
+                EnhancedBy = 'mistweaver',
+                EnhancedByCheck = function ()
+                    return (GetSpecialization() == 2) and true or false; -- restoration?
+                end,
+                Enhancements = {
+                    Types = {DC.MAGIC, DC.DISEASE, DC.POISON},
+                }
+            },
+            -- Monks
+            [DSI["SPELL_DIFFUSEMAGIC"]] = {
                 Types = {DC.MAGIC},
+                Better = 0,
+                Pet = false,
                 UnitFiltering = {
-                    [DC.MAGIC]  = 2, -- on raid/party only
+                    [DC.MAGIC]  = 1,
+                },
+            },
+            -- Paladins
+            [DSI["SPELL_CLEANSE_TOXINS"]] = {
+                Types = {DC.DISEASE, DC.POISON},
+                Better = 0,
+                Pet = false,
+            },
+            [DSI["SPELL_CLEANSE"]] = {
+                Types = {DC.MAGIC, DC.DISEASE, DC.POISON},
+                Better = 2,
+                Pet = false,
+            },
+            -- Shaman
+            [DSI["CLEANSE_SPIRIT"]] = { -- same name as PURIFY_SPIRIT in ruRU XXX
+                Types = {DC.CURSE},
+                Better = 3,
+                Pet = false,
+                -- detect resto spec and enhance this spell
+                EnhancedBy = 'resto',
+                EnhancedByCheck = function ()
+                    return (GetSpecialization() == 3) and true or false; -- restoration?
+                end,
+                Enhancements = {
+                    Types = {DC.CURSE, DC.MAGIC}, -- see PURIFY_SPIRIT
+                }
+            },
+
+            --[=[
+            i=1; while GetSpellBookItemInfo(i, 'spell') do if (select(2, GetSpellBookItemInfo(i, 'spell'))) == 77130 then print(i) end; i = i + 1; end
+            --]=]
+
+            -- Shaman resto
+            [DSI["PURIFY_SPIRIT"]] = { -- same name as CLEANSE_SPIRIT in ruRU XXX -- IsSpellKnown(DSI["PURIFY_SPIRIT"]) actually fails in all situaions...
+                -- BUG in MOP BETA and 5.2 (2012-07-08): /dump GetSpellBookItemInfo('Purify Spirit') == nil while /dump (GetSpellInfo('Cleanse Spirit')) == 'Purify Spirit'
+                Types = {DC.CURSE, DC.MAGIC},
+                Better = 4,
+                Pet = false,
+            },
+            -- Warlocks (Imp)
+            [DSI["PET_SINGE_MAGIC"]] = {
+                Types = {DC.MAGIC},
+                Better = 0,
+                Pet = true,
+            },
+            [DSI["PET_SINGE_MAGIC_PVP"]] = { -- PVP
+                Types = {DC.MAGIC},
+                Better = 0,
+                Pet = true,
+            },
+            -- Warlocks (Fel-Imp)
+            [DSI["PET_SEAR_MAGIC"]] = {
+                Types = {DC.MAGIC},
+                Better = 0,
+                Pet = true,
+            },
+            -- Warlocks (Imp singe magic ability when used with Grimoire of Sacrifice)
+            [DSI["SPELL_COMMAND_DEMON"]] = {
+                Types = {}, -- does nothing by default
+                Better = 1, -- the Imp takes time to disappear when sacrificed, during that interlude, Singe Magic is still there
+                Pet = false,
+
+                EnhancedBy = true,
+                EnhancedByCheck = function ()
+                    return (GetSpellInfo(DS["SPELL_COMMAND_DEMON"])) == DS["PET_SINGE_MAGIC"] or (GetSpellInfo(DS["SPELL_COMMAND_DEMON"])) == DS["PET_SEAR_MAGIC"];
+                end,
+                Enhancements = {
+                    Types = {DC.MAGIC},
+                }
+            },
+            -- Warlock
+            [DSI["SPELL_FEAR"]] = {
+                Types = {DC.CHARMED},
+                Better = 1,
+                Pet = false,
+                UnitFiltering = {
+                    [DC.CHARMED]  = 2,
+                },
+            },
+            -- Warlocks
+            [DSI["PET_TORCH_MAGIC"]] = {
+                Types = {DC.ENEMYMAGIC},
+                Better = 0,
+                Pet = true,
+            },
+            [DSI["PET_DEVOUR_MAGIC"]] = {
+                Types = {DC.ENEMYMAGIC},
+                Better = 0,
+                Pet = true,
+            },
+            -- Mages
+            [DSI["SPELL_POLYMORPH"]] = {
+                Types = {DC.CHARMED},
+                Better = 0,
+                Pet = false,
+            },
+            -- Druids (Balance Feral Guardian)
+            [DSI["SPELL_REMOVE_CORRUPTION"]] = {
+                Types = {DC.POISON, DC.CURSE},
+                Better = 0,
+                Pet = false,
+
+            },
+            -- Druids (Restoration)
+            [DSI["SPELL_NATURES_CURE"]] = {
+                Types = {DC.MAGIC, DC.POISON, DC.CURSE},
+                Better = 3,
+                Pet = false,
+            },
+            -- Priests (global)
+            [DSI["SPELL_DISPELL_MAGIC"]] = {
+                Types = {DC.ENEMYMAGIC},
+                Better = 0,
+                Pet = false,
+            },
+            -- Demon Hunters (global)
+            [DSI["SPELL_CONSUME_MAGIC"]] = {
+                Types = {DC.ENEMYMAGIC},
+                Better = 0,
+                Pet = false,
+            },
+            -- Mages (global)
+            [DSI["SPELL_SPELLSTEAL"]] = {
+                Types = {DC.ENEMYMAGIC},
+                Better = 1,
+                Pet = false,
+            },
+            -- Priests (Discipline, Holy)
+            [DSI["SPELL_PURIFY"]] = {
+                Types = {DC.MAGIC, DC.DISEASE},
+                Better = 1,
+                Pet = false,
+            },
+            [DSI["SPELL_PURIFY_DISEASE"]] = {
+                Types = {DC.DISEASE},
+                Better = 0,
+                Pet = false,
+            },
+            -- Demon hunters
+            [DSI["SPELL_REVERSEMAGIC"]] = { -- PVP
+                Types = {DC.MAGIC},
+                Better = 1,
+                Pet = false,
+            },
+            -- undead racial
+            [DSI["SPELL_WILL_OF_THE_FORSAKEN"]] = {
+                Types = {DC.CHARMED},
+                Better = 0,
+                Pet = false,
+                UnitFiltering = {
+                    [DC.CHARMED] = 1, -- player only
+                },
+            }
+        };
+
+        -- }}}
+    else -- WOW CLASSIC
+        DC.IS_STEALTH_BUFF = D:tReverse({DS["Prowl"], DS["Stealth"], DS["Shadowmeld"], DS["Lesser Invisibility"]});
+        DC.IS_HARMFULL_DEBUFF = D:tReverse({});
+        DC.IS_DEADLY_DEBUFF   = D:tReverse({});
+
+        -- SPELL TABLE -- must be parsed after spell translations have been loaded {{{
+        DC.SpellsToUse = {
+            -- Mage
+            [DSI["SPELL_REMOVE_LESSER_CURSE"]] = { -- WOW CLASSIC  https://classic.wowhead.com/spell=475/remove-lesser-curse
+                Types = {DC.CURSE},
+                Better = 0,
+                Pet = false,
+            },
+            -- Druid
+            [DSI["SPELL_REMOVE_CURSE"]] = { -- WOW CLASSIC  https://classic.wowhead.com/spell=2782/remove-curse
+                Types = {DC.CURSE},
+                Better = 0,
+                Pet = false,
+            },
+            -- Shaman
+            [DSI["SPELL_PURGE"]] = { -- WOW CLASSIC  https://classic.wowhead.com/spell=370/purge
+                Types = {DC.ENEMYMAGIC},
+                Better = 0,
+                Pet = false,
+            },
+            -- Paladin
+            [DSI["SPELL_CLEANSE"]] = { -- WOW CLASSIC  https://classic.wowhead.com/spell=4987/cleanse
+                Types = {DC.MAGIC, DC.DISEASE, DC.POISON},
+                Better = 2,
+                Pet = false,
+            },
+            -- Warlock
+            [DSI["SPELL_FEAR"]] = { -- WOW CLASSIC  https://classic.wowhead.com/spell=5782/fear
+                Types = {DC.CHARMED},
+                Better = 1,
+                Pet = false,
+                UnitFiltering = {
+                    [DC.CHARMED]  = 2,
+                },
+            },
+             -- Mages
+            [DSI["SPELL_POLYMORPH"]] = { -- WOW CLASSIC  https://classic.wowhead.com/spell=118/polymorph
+                Types = {DC.CHARMED},
+                Better = 0,
+                Pet = false,
+                UnitFiltering = {
+                    [DC.CHARMED]  = 2,
+                },
+            },
+            -- Priests (global)
+            [DSI["SPELL_DISPELL_MAGIC"]] = { -- WOW CLASSIC  https://classic.wowhead.com/spell=527/dispel-magic
+                Types = {DC.MAGIC, DC.ENEMYMAGIC},
+                Better = 0,
+                Pet = false,
+            },
+            -- Paladin
+            [DSI["SPELL_PURIFY"]] = { -- WOW CLASSIC  https://classic.wowhead.com/spell=1152/purify
+                Types = {DC.POISON, DC.DISEASE},
+                Better = 1,
+                Pet = false,
+            },
+            -- Priest
+            [DSI["SPELL_ABOLISH_DISEASE"]] = { -- WOW CLASSIC  https://classic.wowhead.com/spell=552/abolish-disease
+                Types = {DC.DISEASE},
+                Better = 2,
+                Pet = false,
+            },
+            -- Priest
+            [DSI["SPELL_CURE_DISEASE_PRIEST"]] = { -- WOW CLASSIC  https://classic.wowhead.com/spell=528/cure-disease
+                Types = {DC.DISEASE},
+                Better = 0,
+                Pet = false,
+            },
+            -- Priest
+            [DSI["SPELL_CURE_DISEASE_SHAMAN"]] = { -- WOW CLASSIC  https://classic.wowhead.com/spell=2870/cure-disease
+                Types = {DC.DISEASE},
+                Better = 0,
+                Pet = false,
+            },
+            -- Druid
+            [DSI["SPELL_ABOLISH_POISON"]] = { -- WOW CLASSIC  https://classic.wowhead.com/spell=2893/abolish-poison
+                Types = {DC.POISON},
+                Better = 2,
+                Pet = false,
+            },
+            -- Shaman
+            [DSI["SPELL_CURE_POISON_SHAMAN"]] = { -- WOW CLASSIC  https://classic.wowhead.com/spell=526/cure-poison
+                Types = {DC.POISON},
+                Better = 0,
+                Pet = false,
+            },
+            -- Druid
+            [DSI["SPELL_CURE_POISON_DRUID"]] = { -- WOW CLASSIC  https://classic.wowhead.com/spell=8946/cure-poison
+                Types = {DC.POISON},
+                Better = 0,
+                Pet = false,
+            },
+            -- Warlock
+            [DSI["PET_DEVOUR_MAGIC"]] = { -- WOW CLASSIC  https://classic.wowhead.com/spell=19505/devour-magic
+                Types = {DC.MAGIC, DC.ENEMYMAGIC},
+                Better = 0,
+                Pet = true,
+            },
+            -- undead racial
+            [DSI["SPELL_WILL_OF_THE_FORSAKEN"]] = {
+                Types = {DC.CHARMED},
+                Better = 0,
+                Pet = false,
+                UnitFiltering = {
+                    [DC.CHARMED] = 1, -- player only
                 },
             }
 
-        },
-        -- Shaman
-        [DSI["CLEANSE_SPIRIT"]] = { -- same name as PURIFY_SPIRIT in ruRU XXX
-            Types = {DC.CURSE},
-            Better = 3,
-            Pet = false,
-            -- detect resto spec and enhance this spell
-            EnhancedBy = 'resto',
-            EnhancedByCheck = function ()
-                return (GetSpecialization() == 3) and true or false; -- restoration?
-            end,
-            Enhancements = {
-                Types = {DC.CURSE, DC.MAGIC}, -- see PURIFY_SPIRIT
-            }
-        },
-
-        --[=[
-        i=1; while GetSpellBookItemInfo(i, 'spell') do if (select(2, GetSpellBookItemInfo(i, 'spell'))) == 77130 then print(i) end; i = i + 1; end
-        --]=]
-
-        -- Shaman resto
-        [DSI["PURIFY_SPIRIT"]] = { -- same name as CLEANSE_SPIRIT in ruRU XXX -- IsSpellKnown(DSI["PURIFY_SPIRIT"]) actually fails in all situaions...
-            -- BUG in MOP BETA and 5.2 (2012-07-08): /dump GetSpellBookItemInfo('Purify Spirit') == nil while /dump (GetSpellInfo('Cleanse Spirit')) == 'Purify Spirit'
-            Types = {DC.CURSE, DC.MAGIC},
-            Better = 4,
-            Pet = false,
-        },
-        -- Warlocks (Imp)
-        [DSI["SPELL_SINGE_MAGIC"]] = {
-            Types = {DC.MAGIC},
-            Better = 0,
-            Pet = true,
-        },
-        -- Warlocks (Imp singe magic ability when used with Grimoire of Sacrifice)
-        [DSI["SPELL_COMMAND_DEMON"]] = {
-            Types = {}, -- does nothing by default
-            Better = 1, -- the Imp takes time to disappear when sacrificed, during that interlude, Singe Magic is still there
-            Pet = false,
-
-            EnhancedBy = true,
-            EnhancedByCheck = function ()
-                return (GetSpellInfo(DS["SPELL_COMMAND_DEMON"]) == DS["SPELL_SINGE_MAGIC"]);
-            end,
-            Enhancements = {
-                Types = {DC.MAGIC},
-            }
-        },
-        -- Warlock
-        [DSI["SPELL_FEAR"]] = {
-            Types = {DC.CHARMED},
-            Better = 0,
-            Pet = false,
-        },
-        -- Warlocks
-        [DSI["PET_FEL_CAST"]] = {
-            Types = {DC.ENEMYMAGIC},
-            Better = 0,
-            Pet = true,
-        },
-        -- Mages
-        [DSI["SPELL_POLYMORPH"]] = {
-            Types = {DC.CHARMED},
-            Better = 0,
-            Pet = false,
-        },
-        -- Druids (Balance Feral Guardian)
-        [DSI["SPELL_REMOVE_CORRUPTION"]] = {
-            Types = {DC.POISON, DC.CURSE},
-            Better = 0,
-            Pet = false,
-
-        },
-        -- Druids (Restoration)
-        [DSI["SPELL_NATURES_CURE"]] = {
-            Types = {DC.MAGIC, DC.POISON, DC.CURSE},
-            Better = 3,
-            Pet = false,
-        },
-        -- Priests (global)
-        [DSI["SPELL_DISPELL_MAGIC"]] = {
-            Types = {DC.ENEMYMAGIC},
-            Better = 0,
-            Pet = false,
-        },
-        -- Priests (Discipline, Holy)
-        [DSI["SPELL_PURIFY"]] = {
-            Types = {DC.MAGIC, DC.DISEASE},
-            Better = 0,
-            Pet = false,
-        },
-        -- Deakth Knights
-        [DSI["SPELL_ICY_TOUCH"]] = {
-            Types = {},
-            Better = 1,
-            Pet = false,
-
-            EnhancedBy = DS["GLYPH_OF_ICY_TOUCH"],
-            EnhancedByCheck = function ()
-                return (IsPlayerSpell(DSI["GLYPH_OF_ICY_TOUCH"])) and true or false;
-            end,
-            Enhancements = {
-                Types = {DC.ENEMYMAGIC},
-            }
-
-        },
-    };
-
-    -- }}}
-
+        }
+        -- }}}
+    end
     D:CreateClassColorTables();
 
     SetRuntimeConstants_Once = nil;
@@ -436,12 +579,12 @@ local function InitVariables_Once() -- {{{
     -- A table UnitID=>IsDebuffed (boolean)
     D.UnitDebuffed = {};
 
-    D.Revision = "0cceb4c"; -- not used here but some other add-on may request it from outside
-    D.date = "2014-11-09T16:51:53Z";
-    D.version = "2.7.3.6";
+    D.Revision = "5c145aa"; -- not used here but some other add-on may request it from outside
+    D.date = "2020-11-21T20:45:59Z";
+    D.version = "2.7.8";
 
     if D.date ~= "@project".."-date-iso@" then
-        -- @project-timestamp@ doesn't work
+        -- 1605991559 doesn't work
 
         --local example =  "2008-05-01T12:34:56Z";
 
@@ -468,8 +611,8 @@ local L  = D.L;
 local LC = D.LC;
 local DC = T._C;
 
-local BOOKTYPE_PET      = BOOKTYPE_PET;
-local BOOKTYPE_SPELL    = BOOKTYPE_SPELL;
+local BOOKTYPE_PET      = _G.BOOKTYPE_PET;
+local BOOKTYPE_SPELL    = _G.BOOKTYPE_SPELL;
 
 local select            = _G.select;
 local pairs             = _G.pairs;
@@ -488,9 +631,9 @@ function D:VersionWarnings(forceDisplay) -- {{{
 
     local alpha = false;
     local fromCheckOut = false;
-    --[===[@alpha@
+    --[=[@alpha@
     alpha = true;
-    --@end-alpha@]===]
+    --@end-alpha@]=]
 
 
     -- test if WoW's TOC version is superior to Decursive's, wait 40 days and warn the users that this version has expired
@@ -507,7 +650,7 @@ function D:VersionWarnings(forceDisplay) -- {{{
 
             if time() - self.db.global.LastExpirationAlert > 48 * 3600 or forceDisplay then
 
-                T._ShowNotice ("|cff00ff00Decursive version: 2.7.3.6|r\n\n" .. "|cFFFFAA66" .. L["TOC_VERSION_EXPIRED"] .. "|r");
+                T._ShowNotice ("|cff00ff00Decursive version: 2.7.8|r\n\n" .. "|cFFFFAA66" .. L["TOC_VERSION_EXPIRED"] .. "|r");
 
                 self.db.global.LastExpirationAlert = time();
             end
@@ -516,7 +659,7 @@ function D:VersionWarnings(forceDisplay) -- {{{
         self.db.global.TocExpiredDetection = false;
     end
 
-    if (("2.7.3.6"):lower()):find("beta") or ("2.7.3.6"):find("RC") or ("2.7.3.6"):find("Candidate") or alpha then
+    if (("2.7.8"):lower()):find("beta") or ("2.7.8"):find("RC") or ("2.7.8"):find("Candidate") or alpha then
 
         D.RunningADevVersion = true;
 
@@ -529,7 +672,7 @@ function D:VersionWarnings(forceDisplay) -- {{{
                 DC.DevVersionExpired = true;
                 -- Display the expiration notice only once evry 48 hours
                 if time() - self.db.global.LastExpirationAlert > 48 * 3600 or forceDisplay then
-                    T._ShowNotice ("|cff00ff00Decursive version: 2.7.3.6|r\n\n" .. "|cFFFFAA66" .. L["DEV_VERSION_EXPIRED"] .. "|r");
+                    T._ShowNotice ("|cff00ff00Decursive version: 2.7.8|r\n\n" .. "|cFFFFAA66" .. L["DEV_VERSION_EXPIRED"] .. "|r");
 
                     self.db.global.LastExpirationAlert = time();
                 end
@@ -540,16 +683,16 @@ function D:VersionWarnings(forceDisplay) -- {{{
         end
 
         -- display a warning if this is a developpment version (avoid insults from people who don't know what they're doing)
-        if self.db.global.NonRelease ~= "2.7.3.6" then
-            self.db.global.NonRelease = "2.7.3.6";
-            T._ShowNotice ("|cff00ff00Decursive version: 2.7.3.6|r\n\n" .. "|cFFFFAA66" .. L["DEV_VERSION_ALERT"] .. "|r");
+        if self.db.global.NonRelease ~= "2.7.8" then
+            self.db.global.NonRelease = "2.7.8";
+            T._ShowNotice ("|cff00ff00Decursive version: 2.7.8|r\n\n" .. "|cFFFFAA66" .. L["DEV_VERSION_ALERT"] .. "|r");
         end
     end
 
-    --[===[@debug@
+    --[==[@debug@
     fromCheckOut = true;
     if time() - self.db.global.LastUnpackagedAlert > 24 * 3600  then
-        T._ShowNotice ("|cff00ff00Decursive version: 2.7.3.6|r\n\n" .. "|cFFFFAA66" ..
+        T._ShowNotice ("|cff00ff00Decursive version: 2.7.8|r\n\n" .. "|cFFFFAA66" ..
         [[
         |cFFFF0000You're using an unpackaged version of Decursive.|r
         Decursive is not meant to be used this way.
@@ -566,7 +709,7 @@ function D:VersionWarnings(forceDisplay) -- {{{
 
         self.db.global.LastUnpackagedAlert = time();
     end
-    --@end-debug@]===]
+    --@end-debug@]==]
 
     -- re-enable new version pop-up alerts when a newer version is installed
     if D.db.global.NewVersionsBugMeNot and D.db.global.NewVersionsBugMeNot < D.VersionTimeStamp then
@@ -587,7 +730,7 @@ function D:VersionWarnings(forceDisplay) -- {{{
         if D.db.global.NewerVersionDetected > D.VersionTimeStamp and D.db.global.NewerVersionName ~= D.version then -- it's still newer than this one
             if time() - D.db.global.NewerVersionAlert > 3600 * 24 * 4 then -- it's been more than 4 days since the new version alert was shown
                 if not D.db.global.NewVersionsBugMeNot then -- the user did not disable new version alerts
-                    T._ShowNotice ("|cff55ff55Decursive version: 2.7.3.6|r\n\n" .. "|cFF55FFFF" .. (L["NEW_VERSION_ALERT"]):format(D.db.global.NewerVersionName or "none", date("%Y-%m-%d", D.db.global.NewerVersionDetected)) .. "|r");
+                    T._ShowNotice ("|cff55ff55Decursive version: 2.7.8|r\n\n" .. "|cFF55FFFF" .. (L["NEW_VERSION_ALERT"]):format(D.db.global.NewerVersionName or "none", date("%Y-%m-%d", D.db.global.NewerVersionDetected)) .. "|r");
                     D.db.global.NewerVersionAlert = time();
                 end
             end
@@ -652,6 +795,14 @@ function D:OnInitialize() -- Called on ADDON_LOADED by AceAddon -- {{{
 
     LibStub("AceComm-3.0"):RegisterComm("DecursiveVersion", D.OnCommReceived);
 
+    -- Handle events directly without relying on AceEvent to prevent undue
+    -- "script ran too long" errors caused by the queuing of event handler
+    -- calls into a per-event dispatcher for ALL add-ons registering an event...
+    -- (The more add-ons registering an event the more chances to get a random
+    -- "script ran too long" error)
+    D.eventFrame = CreateFrame("Frame");
+    D.eventFrame:Hide();
+
     T._CatchAllErrors = false;
 
 end -- // }}}
@@ -693,38 +844,46 @@ function D:OnEnable() -- called after PLAYER_LOGIN -- {{{
     end); -- }}}
 
     D:SecureHook("CastSpellByName", "HOOK_CastSpellByName");
+    D:SecureHook("UseItemByName",   "HOOK_UseItemByName");
 
     -- these events are automatically stopped when the addon is disabled by Ace
 
     -- Spell changes events
-    self:RegisterEvent("LEARNED_SPELL_IN_TAB");
-    self:RegisterEvent("SPELLS_CHANGED");
-    self:RegisterEvent("PLAYER_TALENT_UPDATE");
-    self:RegisterEvent("PLAYER_ALIVE"); -- talents SHOULD be available
-    self:RegisterEvent("PLAYER_ENTERING_WORLD");
+    D.eventFrame:RegisterEvent("LEARNED_SPELL_IN_TAB");
+    D.eventFrame:RegisterEvent("SPELLS_CHANGED");
+    D.eventFrame:RegisterEvent("PLAYER_EQUIPMENT_CHANGED");
+    D.eventFrame:RegisterEvent("BAG_UPDATE_DELAYED");
+    D.eventFrame:RegisterEvent("GET_ITEM_INFO_RECEIVED");
+    if not DC.WOWC then
+        D.eventFrame:RegisterEvent("PLAYER_TALENT_UPDATE");
+    end
+    D.eventFrame:RegisterEvent("PLAYER_ALIVE"); -- talents SHOULD be available
+    D.eventFrame:RegisterEvent("PLAYER_ENTERING_WORLD");
 
     -- Combat detection events
-    self:RegisterEvent("PLAYER_REGEN_DISABLED","EnterCombat");
-    self:RegisterEvent("PLAYER_REGEN_ENABLED","LeaveCombat");
+    D.eventFrame:RegisterEvent("PLAYER_REGEN_DISABLED");
+    D.eventFrame:RegisterEvent("PLAYER_REGEN_ENABLED");
 
     -- Raid/Group changes events
-    self:RegisterEvent("PARTY_LEADER_CHANGED", D.GroupChanged, D);
+    D.eventFrame:RegisterEvent("PARTY_LEADER_CHANGED");
 
-    self:RegisterEvent("GROUP_ROSTER_UPDATE", D.GroupChanged, D);
+    D.eventFrame:RegisterEvent("GROUP_ROSTER_UPDATE");
 
-    self:RegisterEvent("PLAYER_FOCUS_CHANGED");
+    if not DC.WOWC then
+        D.eventFrame:RegisterEvent("PLAYER_FOCUS_CHANGED");
+    end
 
     -- Player pet detection event (used to find pet spells)
-    self:RegisterEvent("UNIT_PET");
+    D.eventFrame:RegisterEvent("UNIT_PET");
 
-    self:RegisterEvent("UNIT_AURA");
+    D.eventFrame:RegisterEvent("UNIT_AURA");
 
-    self:RegisterEvent("PLAYER_TARGET_CHANGED");
+    D.eventFrame:RegisterEvent("PLAYER_TARGET_CHANGED");
 
-    self:RegisterEvent("UPDATE_MOUSEOVER_UNIT");
+    D.eventFrame:RegisterEvent("UPDATE_MOUSEOVER_UNIT");
 
-    self:RegisterEvent("COMBAT_LOG_EVENT_UNFILTERED");
-    self:RegisterEvent("SPELL_UPDATE_COOLDOWN");
+    D.eventFrame:RegisterEvent("COMBAT_LOG_EVENT_UNFILTERED");
+    D.eventFrame:RegisterEvent("SPELL_UPDATE_COOLDOWN");
 
     self:RegisterMessage("DECURSIVE_TALENTS_AVAILABLE");
 
@@ -741,6 +900,8 @@ function D:OnEnable() -- called after PLAYER_LOGIN -- {{{
     FirstEnable = false;
 
     D:StartTalentAvaibilityPolling();
+
+    D.eventFrame:SetScript("OnEvent", D.OnEvent);
 
     T._CatchAllErrors = false;
 
@@ -761,6 +922,7 @@ function D:SetConfiguration() -- {{{
     D.Groups_datas_are_invalid = true;
     D.Status = {};
     D.Status.FoundSpells = {};
+    --FoundSpells is {1: Pet?, 2: spellID, 3: IsEnhanced, 4: spell prio, 5: user MacroText, 6: unit filter};
     D.Status.UnitFilteringTypes = {};
     D.Status.CuringSpells = {};
     D.Status.CuringSpellsPrio = {};
@@ -782,6 +944,7 @@ function D:SetConfiguration() -- {{{
     D.Status.Unit_Array = {};
     D.Status.InternalPrioList = {};
     D.Status.InternalSkipList = {};
+    D.Status.WaitingForSpellInfo = false;
 
     D.Stealthed_Units = {};
 
@@ -822,9 +985,9 @@ function D:SetConfiguration() -- {{{
                 if tonumber(spell) ~= 2139 and not D.classprofile.UserSpells[tonumber(spell)] then
                     D.classprofile.UserSpells[tonumber(spell)] = spellData;
                 end
-                --[===[@alpha@
+                --[=[@alpha@
                 D:AddDebugText('Sanity check error: string-number (',spell,') found in ', 'oldUserSpells' );
-                --@end-alpha@]===]
+                --@end-alpha@]=]
 
             elseif type(spell) == 'string' then -- necessary due to fuck up in previous release
 
@@ -849,7 +1012,40 @@ function D:SetConfiguration() -- {{{
         end
 
     end
-    
+
+    -- Remove invalid spell ids from D.classprofile.UserSpells
+    for spellOrItemID, spellData in pairs(D.classprofile.UserSpells) do
+        -- IsSpellKnown and isItemUsable crash on > 32 bit signed integers
+        -- It seems that the maximum value of a spell id is 24 bits
+        -- Try the id on the functions directly and remove them if they crash (they can return nothing at an early game loading stage)
+        if not (pcall(
+            function ()
+                return spellData.IsItem and (GetItemInfo(spellOrItemID * -1)) or (GetSpellInfo(spellOrItemID))
+            end)) then
+            D.classprofile.UserSpells[spellOrItemID] = nil;
+            --[==[@debug@
+            D:AddDebugText("Invalid spell/item id detected and removed:", spellOrItemID, spellData.MacroText)
+            --@end-debug@]==]
+        end
+    end
+
+
+    -- update layer for debuff filtering from version prior to 2020-03-19
+    local oldDebuffsSkipList = {};
+    -- make a copy of the table since we may add new keys while iterating with pairs()
+    D:tcopy(oldDebuffsSkipList, D.profile.DebuffsSkipList);
+    for key, debuffName in pairs(oldDebuffsSkipList) do
+        if type(key) == 'number' then
+            -- Let's associate a fake spell ID to existing user added names since
+            -- there is no way to retrieve this ID from the debuff tranlated name
+            if not D.defaults.profile.DebuffsSkipList[debuffName] then
+                D.profile.DebuffsSkipList[debuffName] = 0;
+            end
+            D.profile.DebuffsSkipList[key] = nil;
+        end
+    end
+    oldDebuffsSkipList = nil;
+
 
     if type (D.profile.OutputWindow) == "string" then
         D.Status.OutputWindow = _G[D.profile.OutputWindow];
@@ -939,6 +1135,7 @@ function D:OnDisable() -- When the addon is disabled by Ace -- {{{
     }; -- }}}
 
     LibStub("AceConfigRegistry-3.0"):NotifyChange(D.name);
+    D.eventFrame:SetScript("OnEvent", nil);
     StaticPopup_Show("Decursive_OnDisableWarning");
 end -- }}}
 
@@ -1026,20 +1223,26 @@ local function SpellIterator() -- {{{
         if currentKey == nil and currentSpellTable == DC.SpellsToUse then
             -- it was the base table now use the user defined one
             currentSpellTable = D.classprofile.UserSpells;
-            --[===[@debug@
+            --[==[@debug@
             D:Debug("|cFF00FF00Shifting to user spells|r");
-            --@end-debug@]===]
+            --@end-debug@]==]
             return iter(); -- continue with the other table
+        elseif currentSpellTable == DC.SpellsToUse and D.classprofile.UserSpells[currentKey] and not D.classprofile.UserSpells[currentKey].Hidden and not D.classprofile.UserSpells[currentKey].Disabled then
+            -- if the user actively redefined that spell then skip the default one
+            --[==[@debug@
+            D:Debug("Skipping default", currentKey);
+            --@end-debug@]==]
+            return iter(); -- aka 'continue'
         end
 
         -- if it's already defined in the base table (but not editable) or if it's hidden, skip it
         if ST and (currentSpellTable ~= DC.SpellsToUse and (DC.SpellsToUse[currentKey] and not currentSpellTable[currentKey].MacroText or currentSpellTable[currentKey].Hidden)) then
-            --[===[@debug@
+            --[==[@debug@
             D:Debug("Skipping", currentKey);
             if currentSpellTable ~= DC.SpellsToUse and DC.SpellsToUse[currentKey] then
                 D:Print("|cFFFF0000Cheating for|r", currentKey);
             end
-            --@end-debug@]===]
+            --@end-debug@]==]
 
             return iter(); -- aka 'continue'
         end
@@ -1054,17 +1257,37 @@ function D:ReConfigure() --{{{
 
     D:Debug("|cFFFF0000D:ReConfigure was called!|r");
     if not D.DcrFullyInitialized then
-        D:Debug("|cFFFF0000D:ReConfigure aborted, init uncomplete!|r");
-        return;
+        D:Debug("|cFFFF0000D:ReConfigure aborted, init incomplete!|r");
+        return false;
+    end
+
+    if InCombatLockdown() then
+        D:Debug("|cFFFF0000D:ReConfigure postponed, in combat!|r");
+        D:AddDelayedFunctionCall (
+        "Configure", self.ReConfigure,
+        self);
+        return false;
     end
 
     local SpellName = "";
 
     local Reconfigure = false;
-    for spellID, spell in SpellIterator() do
+    for spellID, spell in SpellIterator() do repeat
+
+        SpellName = D.GetSpellOrItemInfo(spellID);
+
+        spell.IsItem = (spellID < 0); -- pre-emptive fix for erroneous configuration -- this *-1 thing was a bad idea...
+
+        -- if item info not available yet
+        if spell.IsItem and not SpellName then
+            self.Status.WaitingForSpellInfo = -1 * spellID;
+            self:Debug("Item name not available yet");
+            break;
+        end
+
         -- Do we have that spell?
-        if IsSpellKnown(spellID, spell.Pet) then
-            SpellName = GetSpellInfo(spellID);
+        if not spell.IsItem and D:isSpellReady(spellID, spell.Pet)
+            or spell.IsItem and D:isItemUsable(-1 * spellID) then
 
             -- We had it but it's been disabled
             if spell.Disabled and D.Status.FoundSpells[SpellName] then
@@ -1100,16 +1323,16 @@ function D:ReConfigure() --{{{
             end
 
         elseif D.Status.FoundSpells[SpellName] then -- we don't have it anymore...
-            D:Debug("D:ReConfigure:", SpellName, 'is no longer available');
+            D:Debug("D:ReConfigure:", SpellName, 'is no longer available', spellID);
             Reconfigure = true;
             break;
         end
-    end
+    break until true if Reconfigure then break end end -- a continue statement would have been nice in Lua...
 
     if Reconfigure == true then
         D:Debug("D:ReConfigure RECONFIGURATION!");
         D:Configure();
-        return;
+        return true;
     end
     D:Debug("D:ReConfigure No reconfiguration required!");
 
@@ -1118,6 +1341,15 @@ end --}}}
 
 
 function D:Configure() --{{{
+
+
+    if InCombatLockdown() then
+        D:Debug("|cFFFF0000D:Configure postponed, in combat!|r");
+        D:AddDelayedFunctionCall (
+        "Configure", self.Configure,
+        self);
+        return false;
+    end
 
     -- first empty out the old "spellbook"
     self.Status.HasSpell = false;
@@ -1135,31 +1367,49 @@ function D:Configure() --{{{
 
     local Type, _;
     local GetSpellBookItemInfo = _G.GetSpellBookItemInfo;
-    local GetSpellInfo = _G.GetSpellInfo;
-    local IsSpellKnown = _G.IsSpellKnown;
+    local IsSpellKnown = nil; -- use D:isSpellReady instead
     local Types = {};
     local UnitFiltering = false;
+    local ActualUnitFiltering = false;
     local PermanentUnitFiltering = false;
     local IsEnhanced = false;
     local SpellName = "";
 
     self:Debug("Configuring Decursive...");
 
-    for spellID, spell in SpellIterator() do
+    for spellID, spell in SpellIterator() do repeat
         if not spell.Disabled then
             -- self:Debug("trying spell", spellID);
+
+            spell.IsItem = (spellID < 0); -- pre-emptive fix for erroneous configuration -- this *-1 thing was a bad idea...
+
             -- Do we have that spell?
-            if IsSpellKnown(spellID, spell.Pet) then
-                SpellName = GetSpellInfo(spellID);
+            if not spell.IsItem and D:isSpellReady(spellID, spell.Pet)
+                or spell.IsItem and D:isItemUsable(-1 * spellID) then
+
+                SpellName = D.GetSpellOrItemInfo(spellID);
+
+                -- if item info not available yet
+                if spell.IsItem and not SpellName then
+                    self.Status.WaitingForSpellInfo = -1 * spellID;
+                    self:Debug("Item name not available yet");
+                    break;
+                end
+
                 Types = spell.Types;
                 UnitFiltering = false;
+                ActualUnitFiltering = false;
                 IsEnhanced = false;
+
+                if spell.UnitFiltering then
+                    UnitFiltering = spell.UnitFiltering;
+                end
 
                 -- Could it be enhanced by something (a talent for example)?
                 if spell.EnhancedBy then
-                    --[===[@alpha@
+                    --[=[@alpha@
                     self:Debug("Enhancement for ", SpellName);
-                    --@end-alpha@]===]
+                    --@end-alpha@]=]
 
                     -- Workaround to the fact that function are not serialized upon storage to the DB
                     if not spell.EnhancedByCheck and D.classprofile.UserSpells[spellID] then
@@ -1167,38 +1417,42 @@ function D:Configure() --{{{
                         D.classprofile.UserSpells[spellID].EnhancedByCheck = spell.EnhancedByCheck;
                     end
 
-                    if spell.EnhancedByCheck() then -- we have the enhancement
+                    if spell.EnhancedByCheck and spell.EnhancedByCheck() then -- we have the enhancement
                         IsEnhanced = true;
 
                         Types = spell.Enhancements.Types; -- set the type to scan to the new ones
 
                         if spell.Enhancements.UnitFiltering then -- On the 'player' unit only?
-                            --[===[@alpha@
+                            --[=[@alpha@
                             self:Debug("Enhancement for %s is for player only", SpellName);
-                            --@end-alpha@]===]
+                            --@end-alpha@]=]
                             UnitFiltering = spell.Enhancements.UnitFiltering;
                         end
                     end
                 end
 
-                if spell.UnitFiltering then
-                    UnitFiltering = spell.UnitFiltering;
-                end
-
-
                 -- register it
-                self.Status.FoundSpells[SpellName] = {spell.Pet, "", IsEnhanced, spell.Better, spell.MacroText};
+                self.Status.FoundSpells[SpellName] = {spell.Pet, spellID, IsEnhanced, spell.Better, spell.MacroText, nil};
                 for _, Type in ipairs (Types) do
 
-                    if not CuringSpells[Type] or spell.Better > self.Status.FoundSpells[CuringSpells[Type]][4] then  -- we did not already registered this spell or it's not the best spell for this type
+                    if not CuringSpells[Type]
+                        or spell.Better > self.Status.FoundSpells[CuringSpells[Type]][4]
+                        or not spell.UnitFiltering and self.Status.FoundSpells[CuringSpells[Type]][6] then
+                        -- we did not already register this spell
+                        -- or it's not the best spell for this type
+                        -- or there the it has no unit filtering while the previous one had one.
 
                         CuringSpells[Type] = SpellName;
 
                         if UnitFiltering and UnitFiltering[Type] then
-                            --[===[@alpha@
-                            self:Debug("Enhancement for player only for type added",Type);
-                            --@end-alpha@]===]
+                            self:Debug("Spell with unit filtering added :", Type, UnitFiltering[Type]);
                             self.Status.UnitFilteringTypes[Type] = UnitFiltering[Type];
+
+                            if not ActualUnitFiltering then
+                                ActualUnitFiltering = {};
+                            end
+
+                            ActualUnitFiltering[Type] = UnitFiltering[Type];
                         else
                             self.Status.UnitFilteringTypes[Type] = false;
                         end
@@ -1207,12 +1461,12 @@ function D:Configure() --{{{
                         self.Status.HasSpell = true;
                     end
                 end
-                
-                if UnitFiltering then
+
+                if ActualUnitFiltering then
                     local filteredTypeCount = 0;
                     local lastfilter = false;
                     -- check if the filters are identical for every type
-                    for _, filter in pairs(UnitFiltering) do
+                    for Type, filter in pairs(ActualUnitFiltering) do
 
                         if not lastfilter then
                             lastfilter = filter;
@@ -1226,16 +1480,16 @@ function D:Configure() --{{{
 
                     if lastfilter and filteredTypeCount == #Types then -- we have the same filter everywhere and all the types managed by this spell are affected
                         D.Status.FoundSpells[SpellName][6] = lastfilter;
-                        --[===[@alpha@
+                        --[=[@alpha@
                         self:Debug("permanent filter added for spell",SpellName, lastfilter);
-                        --@end-alpha@]===]
+                        --@end-alpha@]=]
                     end
 
                 end
 
             end
         end
-    end
+    break until true end
 
     -- Verify the cure order list (if it was damaged)
     self:CheckCureOrder ();
@@ -1244,29 +1498,32 @@ function D:Configure() --{{{
 
     LibStub("AceConfigRegistry-3.0"):NotifyChange(D.name);
 
-    if (not self.Status.HasSpell) then
-        return;
-    end
+    return true;
 
 end --}}}
 
 function D:SetSpellsTranslations(FromDIAG) -- {{{
     local GetSpellInfo = _G.GetSpellInfo;
 
-
     if not T._C.DS then
         T._C.DS = {};
-        T._C.DSI = {
+        T._C.EXPECTED_DUPLICATES = {};
+
+        T._C.DSI = { -- Main spell table for WoW Retail {{{
             ["SPELL_POLYMORPH"]             =  118,
             ["SPELL_COUNTERSPELL"]          =  2139,
             ["SPELL_CYCLONE"]               =  33786,
+            ["SPELL_REMOVE_CURSE"]          =  475,
+            ["SPELL_CONSUME_MAGIC"]         =  278326,
+            ["SPELL_SPELLSTEAL"]            =  30449, -- mages, not sure about this one
             ["SPELL_CLEANSE"]               =  4987,
-            ["SPELL_HAND_OF_SACRIFICE"]     =  6940,
-            ['SPELL_TRANQUILIZING_SHOT']    =  19801,
+            ["SPELL_CLEANSE_TOXINS"]        =  213644,
             ['SPELL_HEX']                   =  51514, -- shamans
             ["CLEANSE_SPIRIT"]              =  51886,
             ["SPELL_PURGE"]                 =  370,
-            ["PET_FEL_CAST"]                =  19505,
+            ["PET_TORCH_MAGIC"]             =  171021,
+          --["PET_CLONE_MAGIC"]             =  115284, -- XXX disappeared in 7.2.5, devour magic seems to have returned...
+            ["PET_DEVOUR_MAGIC"]            =  19505,
             ["SPELL_FEAR"]                  =  5782,
             ["DCR_LOC_SILENCE"]             =  15487,
             ["DCR_LOC_MINDVISION"]          =  2096,
@@ -1288,30 +1545,106 @@ function D:SetSpellsTranslations(FromDIAG) -- {{{
             ['Arcane Blast']                =  30451,
             ['Prowl']                       =  5215,
             ['Stealth']                     =  1784,
-            ['Camouflage']                  =  51755,
             ['Shadowmeld']                  =  58984,
             ['Invisibility']                =  66,
             ['Lesser Invisibility']         =  7870,
-            ['Ice Armor']                   =  7302,
             ['Unstable Affliction']         =  30108,
             ['Fluidity']                    =  138002,
             ['Vampiric Touch']              =  34914,
-            ['Flame Shock']                 =  8050,
-            ["SPELL_REMOVE_CURSE"]          =  475, -- Druids/Mages
             ["SPELL_REMOVE_CORRUPTION"]     =  2782,
-            ["SPELL_SINGE_MAGIC"]           =  89808, -- Warlock imp
+            ["PET_SINGE_MAGIC"]             =  89808, -- Warlock imp
+            ["PET_SINGE_MAGIC_PVP"]         =  212623, -- Warlock imp PVP
+            ["PET_SEAR_MAGIC"]              =  115276, -- Warlock Fel imp
             ["SPELL_PURIFY"]                =  527,
+            ["SPELL_PURIFY_DISEASE"]        =  213634,
             ["SPELL_DISPELL_MAGIC"]         =  528,
             ["PURIFY_SPIRIT"]               =  77130, -- resto shaman
             ["SPELL_NATURES_CURE"]          =  88423,
-            ["SHROUD_OF_CONCEALMENT"]       =  115834, -- rogue
-            ["SPELL_DETOX"]                 =  115450, -- monk
+            ["SPELL_DETOX_1"]               =  115450, -- monk mistweaver
+            ["SPELL_DETOX_2"]               =  218164, -- monk brewmaster and windwaker
             ["SPELL_DIFFUSEMAGIC"]          =  122783, -- monk
             ["SPELL_COMMAND_DEMON"]         =  119898, -- warlock
             ['Greater Invisibility']        =  110959,
-            ['GLYPH_OF_ICY_TOUCH']          =  58631, --DK
-            ['SPELL_ICY_TOUCH']             =  45477, --DK
-        };
+            ['SPELL_MENDINGBANDAGE']        =  212640,
+            ['SPELL_REVERSEMAGIC']          =  205604,
+            ['SPELL_WILL_OF_THE_FORSAKEN']  =  7744,
+        }; --- }}}
+
+        T._C.EXPECTED_DUPLICATES = {
+            {"SPELL_DETOX_1", "SPELL_DETOX_2"},
+            {"PET_SINGE_MAGIC", "PET_SINGE_MAGIC_PVP"},
+        }
+
+        -- if running in WoW Classic, we need to adjust the main spell table
+        if DC.WOWC then
+            local DSI_REMOVED_OR_CHANGED_IN_CLASSIC = { -- {{{
+                ['Invisibility']            = 66,
+                ['Shadowmeld']              = 58984,
+                ["SPELL_DISPELL_MAGIC"]     = 528,
+                ["SPELL_PURIFY"]            = 527,
+                ["Fluidity"]	            = 138002,
+                ["SPELL_SPELLSTEAL"]	    = 30449,
+                ["SPELL_CONSUME_MAGIC"]	    = 278326,
+                ["PET_TORCH_MAGIC"]	        = 171021,
+                ["SPELL_HEX"]	            = 51514,
+                ["SPELL_CYCLONE"]	        = 33786,
+                ["SPELL_DETOX_1"]	        = 115450,
+                ["Unstable Affliction"]	    = 30108,
+                ["SPELL_REVERSEMAGIC"]	    = 205604,
+                ["PET_SEAR_MAGIC"]	        = 115276,
+                ["SPELL_COMMAND_DEMON"]	    = 119898,
+                ["Greater Invisibility"]    = 110959,
+                ["SPELL_MENDINGBANDAGE"]    = 212640,
+                ["CRIPLES"]	                = 33787,
+                ["Arcane Blast"]	        = 30451,
+                ["SPELL_DETOX_2"]	        = 218164,
+                ["MDREAMLESSSLEEP"]	        = 28504,
+                ["PURIFY_SPIRIT"]	        = 77130,
+                ["SONICBURST"]	            = 39052,
+                ["SPELL_PURIFY_DISEASE"]    = 213634,
+                ["Vampiric Touch"]	        = 34914,
+                ["CLEANSE_SPIRIT"]	        = 51886,
+                ["SPELL_NATURES_CURE"]	    = 88423,
+                ["PET_SINGE_MAGIC"]	        = 89808,
+                ["PET_SINGE_MAGIC_PVP"]	    = 212623,
+                ["SPELL_CLEANSE_TOXINS"]    = 213644,
+                ["SPELL_DIFFUSEMAGIC"]	    = 122783,
+                ["SPELL_REMOVE_CORRUPTION"] = 2782,
+            } -- }}}
+
+            -- remove invalid spells from the spell table
+            for name, sid in pairs(DSI_REMOVED_OR_CHANGED_IN_CLASSIC) do
+                T._C.DSI[name] = nil;
+            end
+
+            -- reassign the proper spells
+            -- The new and changed spells in classic {{{
+            T._C.DSI["SPELL_REMOVE_LESSER_CURSE"] = 475;
+            T._C.DSI["SPELL_REMOVE_CURSE"]        = 2782;
+            T._C.DSI["SPELL_PURGE"]               = 370;
+            T._C.DSI["SPELL_CLEANSE"]             = 4987;
+            T._C.DSI["SPELL_FEAR"]                = 5782;
+            T._C.DSI["SPELL_POLYMORPH"]           = 118;
+            T._C.DSI["SPELL_DISPELL_MAGIC"]       = 527;
+            T._C.DSI["SPELL_PURIFY"]              = 1152;
+            T._C.DSI["SPELL_ABOLISH_DISEASE"]     = 552;
+            T._C.DSI["SPELL_ABOLISH_POISON"]      = 2893;
+            T._C.DSI["SPELL_CURE_DISEASE_PRIEST"] = 528;
+            T._C.DSI["SPELL_CURE_DISEASE_SHAMAN"] = 2870;
+            T._C.DSI["SPELL_CURE_POISON_SHAMAN"]  = 526;
+            T._C.DSI["SPELL_CURE_POISON_DRUID"]   = 8946;
+            T._C.DSI["PET_DEVOUR_MAGIC"]          = 19505;
+            T._C.DSI["SONICBURST"]                = 8281;
+            T._C.DSI["CRIPLES"]                   = 11443;
+            T._C.DSI["Shadowmeld"]                = 20580;
+            -- }}}
+
+            T._C.EXPECTED_DUPLICATES = {
+                {"SPELL_CURE_DISEASE_PRIEST", "SPELL_CURE_DISEASE_SHAMAN"},
+                {"SPELL_CURE_POISON_SHAMAN", "SPELL_CURE_POISON_DRUID"},
+            }
+
+        end
     end
 
     local DS  = T._C.DS;
@@ -1321,11 +1654,11 @@ function D:SetSpellsTranslations(FromDIAG) -- {{{
 
     -- Note to self: The truth is not unique, there can be several truths. The world is not binary. (epiphany on 2011-02-25)
 
-    local dubs = {};
+    local duplicates = {};
     local alpha = false;
-    --[===[@alpha@
+    --[=[@alpha@
     alpha = true;
-    --@end-alpha@]===]
+    --@end-alpha@]=]
     local Sname, Sids, Sid, _, ok;
     ok = true;
     for Sname, Sid in pairs(DSI) do
@@ -1333,11 +1666,12 @@ function D:SetSpellsTranslations(FromDIAG) -- {{{
         DS[Sname] = (GetSpellInfo(Sid));
 
         if FromDIAG and DS[Sname] then
-            if not dubs[DS[Sname]] then
-                dubs[DS[Sname]] = {Sname};
+            if not duplicates[DS[Sname]] then
+                duplicates[DS[Sname]] = {Sname};
             else
-                dubs[DS[Sname]][#dubs[DS[Sname]] + 1] = Sname;
+                duplicates[DS[Sname]][#duplicates[DS[Sname]] + 1] = Sname;
             end
+
         end
 
         if not DS[Sname] then
@@ -1350,14 +1684,41 @@ function D:SetSpellsTranslations(FromDIAG) -- {{{
     end
 
     if FromDIAG then
-        for spell, ids in pairs(dubs) do
+        -- Do not report expected duplicates {{{
+        local compareDuplicates = function (d1, d2)
+            if #d1 ~= #d2 then
+                return false;
+            end
+            table.sort(d1);
+            table.sort(d2);
+
+            for i, _ in ipairs(d1) do
+                if d1[i] ~= d2[i] then
+                    return false;
+                end
+            end
+
+            return true;
+        end
+        for _, Snames in ipairs(T._C.EXPECTED_DUPLICATES) do
+            if DS[Snames[1]] and duplicates[DS[Snames[1]]] then
+                if compareDuplicates(Snames, duplicates[DS[Snames[1]]]) then
+                    duplicates[DS[Snames[1]]] = nil;
+                else
+                    D:AddDebugText("Expected duplicates diverges for", Snames[1]);
+                end
+            else
+                D:AddDebugText("Expected duplicates not found for", Snames[1]);
+            end
+        end -- }}}
+        for spell, ids in pairs(duplicates) do
             if #ids > 1 then
                 local dub = "";
 
                 for _, id in ipairs(ids) do
                     dub = dub .. ", " .. id;
                 end
-                D:AddDebugText("|cffffAA22dubs found for", spell, ':|r ', dub);
+                D:AddDebugText("|cffffAA22Unexpected duplicates found for", spell, ':|r ', dub);
             end
         end
     end
@@ -1369,6 +1730,8 @@ end -- }}}
 
 -- Create the macro for Decursive
 -- This macro will cast the first spell (priority)
+
+local MAX_ACCOUNT_MACROS = _G.MAX_ACCOUNT_MACROS;
 
 function D:UpdateMacro () -- {{{
 
@@ -1416,13 +1779,13 @@ function D:UpdateMacro () -- {{{
 
     --D:PrintLiteral(GetMacroIndexByName(D.CONF.MACRONAME));
     if GetMacroIndexByName(D.CONF.MACRONAME) ~= 0 then
-	if not D.profile.AllowMacroEdit then
-	    EditMacro(D.CONF.MACRONAME, unpack(MacroParameters));
-	    D:Debug("Macro updated");
-	else
-	    D:Debug("Macro not updated due to AllowMacroEdit");
-	end
-    elseif (GetNumMacros()) < 36 then
+        if not D.profile.AllowMacroEdit then
+            EditMacro(D.CONF.MACRONAME, unpack(MacroParameters));
+            D:Debug("Macro updated");
+        else
+            D:Debug("Macro not updated due to AllowMacroEdit");
+        end
+    elseif (GetNumMacros()) < MAX_ACCOUNT_MACROS then
         CreateMacro(unpack(MacroParameters));
     else
         D:errln("Too many macros exist, Decursive cannot create its macro");
@@ -1460,7 +1823,7 @@ end -- }}}
 
 
 
-T._LoadedFiles["DCR_init.lua"] = "2.7.3.6";
+T._LoadedFiles["DCR_init.lua"] = "2.7.8";
 
 -------------------------------------------------------------------------------
 
@@ -1469,42 +1832,42 @@ TEST to see what keyword substitutions are actually working....
 
 Simple replacements
 
-@file-revision@
+150
     Turns into the current revision of the file in integer form. e.g. 1234
     Note: does not work for git
-@project-revision@
+150
     Turns into the highest revision of the entire project in integer form. e.g. 1234
     Note: does not work for git
-3ecc18bf405aa1a72dcc1960e026edb385f5a0c0
+5c145aa5721f21bb4642ab4ac77e34b923f52811
     Turns into the hash of the file in hex form. e.g. 106c634df4b3dd4691bf24e148a23e9af35165ea
     Note: does not work for svn
-0cceb4c3800e5b90d01d425ee3dd80d77d0b22d4
+5c145aa5721f21bb4642ab4ac77e34b923f52811
     Turns into the hash of the entire project in hex form. e.g. 106c634df4b3dd4691bf24e148a23e9af35165ea
     Note: does not work for svn
-3ecc18b
+5c145aa
     Turns into the abbreviated hash of the file in hex form. e.g. 106c63 Note: does not work for svn
-0cceb4c
+5c145aa
     Turns into the abbreviated hash of the entire project in hex form. e.g. 106c63
     Note: does not work for svn
 Archarodim
     Turns into the last author of the file. e.g. ckknight
 Archarodim
     Turns into the last author of the entire project. e.g. ckknight
-2014-10-15T09:23:18Z
+2020-11-21T20:45:59Z
     Turns into the last changed date (by UTC) of the file in ISO 8601. e.g. 2008-05-01T12:34:56Z
-2014-11-09T16:51:53Z
+2020-11-21T20:45:59Z
     Turns into the last changed date (by UTC) of the entire project in ISO 8601. e.g. 2008-05-01T12:34:56Z
-20141015092318
+20201121204559
     Turns into the last changed date (by UTC) of the file in a readable integer fashion. e.g. 20080501123456
-20141109165153
+20201121204559
     Turns into the last changed date (by UTC) of the entire project in a readable integer fashion. e.g. 2008050123456
-@file-timestamp@
+1605991559
     Turns into the last changed date (by UTC) of the file in POSIX timestamp. e.g. 1209663296
     Note: does not work for git
-@project-timestamp@
+1605991559
     Turns into the last changed date (by UTC) of the entire project in POSIX timestamp. e.g. 1209663296
     Note: does not work for git
-2.7.3.6
+2.7.8
     Turns into an approximate version of the project. The tag name if on a tag, otherwise it's up to the repo.
     :SVN returns something like "r1234"
     :Git returns something like "v0.1-873fc1"

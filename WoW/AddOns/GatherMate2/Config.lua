@@ -6,6 +6,8 @@ local L = LibStub("AceLocale-3.0"):GetLocale("GatherMate2", false)
 -- Databroker support
 local DataBroker = LibStub:GetLibrary("LibDataBroker-1.1",true)
 
+local SaveBindings = SaveBindings or AttemptToSaveBindings
+
 --[[
 	Code here for configuring the mod, and making the minimap button
 ]]
@@ -102,7 +104,7 @@ local generalOptions = {
 			desc = L["Toggle showing gas clouds."],
 			type = "select",
 			values = prof_options2,
-			arg = "Extract Gas"
+			arg = "Extract Gas",
 		},
 		showTreasure = {
 			order = 5,
@@ -118,7 +120,7 @@ local generalOptions = {
 			desc = L["Toggle showing archaeology nodes."],
 			type = "select",
 			values = prof_options4,
-			arg = "Archaeology"
+			arg = "Archaeology",
 		},
 		showTimber = {
 			order = 7,
@@ -126,7 +128,7 @@ local generalOptions = {
 			desc = L["Toggle showing timber nodes."],
 			type = "select",
 			values = prof_options3,
-			arg = "Logging"
+			arg = "Logging",
 		},
 	},
 }
@@ -141,19 +143,30 @@ local minimapOptions = {
 			type = "description",
 			name = L["Control various aspects of node icons on both the World Map and Minimap."],
 		},
-		showMinimapIcons = {
-			order = 1,
-			name = L["Show Minimap Icons"],
-			desc = L["Toggle showing Minimap icons."],
-			type = "toggle",
-			arg = "showMinimap",
-		},
 		showWorldMapIcons = {
-			order = 2,
+			order = 1,
 			name = L["Show World Map Icons"],
 			desc = L["Toggle showing World Map icons."],
 			type = "toggle",
 			arg = "showWorldMap",
+			width = "full",
+		},
+		worldMapIconsInteractive = {
+			order = 1.5,
+			name = L["World Map Icons Clickable"],
+			desc = L["Toggle if World Map icons are clickable (to remove them or generate way points)."],
+			type = "toggle",
+			arg = "worldMapIconsInteractive",
+			width = "full",
+			disabled = function() return not db.showWorldMap end,
+		},
+		showMinimapIcons = {
+			order = 2,
+			name = L["Show Minimap Icons"],
+			desc = L["Toggle showing Minimap icons."],
+			type = "toggle",
+			arg = "showMinimap",
+			width = "full",
 		},
 		minimapTooltips = {
 			order = 3,
@@ -161,6 +174,7 @@ local minimapOptions = {
 			desc = L["Toggle showing Minimap icon tooltips."],
 			type = "toggle",
 			arg = "minimapTooltips",
+			width = "full",
 			disabled = function() return not db.showMinimap end,
 		},
 		minimapNodeRange = {
@@ -169,6 +183,8 @@ local minimapOptions = {
 			name = L["Show Nodes on Minimap Border"],
 			desc = L["Shows more Nodes that are currently out of range on the minimap's border."],
 			arg = "nodeRange",
+			width = "full",
+			disabled = function() return not db.showMinimap end,
 		},
 		togglekey = {
 			order = 5,
@@ -360,19 +376,19 @@ local sortedFilter = setmetatable({}, {__index = function(t, k)
 	local new = {}
 	table.wipe(delocalizedZones)
 	if k == "zones" then
-		for index, zoneID in pairs(GatherMate:GetAllMapIDs()) do
+		for index, zoneID in pairs(GatherMate.HBD:GetAllMapIDs()) do
 			local name = GatherMate:MapLocalize(zoneID)
 			new[name] = name
 			delocalizedZones[name] = zoneID
 		end
 	else
+		local expansion = GatherMate.nodeExpansion[k]
 		local map = GatherMate.nodeIDs[k]
 		for name in pairs(map) do
 			local idx = #new+1
 			new[idx] = name
 			denormalizedNames[name] = name
 		end
-		local expansion = GatherMate.nodeExpansion[k]
 		if expansion then
 			-- We only end up creating one function per tracked type anyway
 			table.sort(new, function(a, b)
@@ -667,7 +683,7 @@ filterOptions.args.archaeology = {
 	},
 }
 
-local selectedDatabase, selectedNode, selectedZone = "Extract Gas", 0, nil
+local selectedDatabase, selectedNode, selectedZone = "Herb Gathering", 0, nil
 
 -- Cleanup config tree
 local maintenanceOptions = {
@@ -973,7 +989,8 @@ ImportHelper.db_options = {
 	["Merge"] = L["Merge"],
 	["Overwrite"] = L["Overwrite"]
 }
-ImportHelper.db_tables = {
+ImportHelper.db_tables =
+{
 	["Herbs"] = L["Herbalism"],
 	["Mines"] = L["Mining"],
 	["Gases"] = L["Gas Clouds"],
@@ -986,7 +1003,10 @@ ImportHelper.expac_data = {
 	["WRATH"] = L["Wrath of the Lich King"],
 	["CATACLYSM"] = L["Cataclysm"],
 	["MISTS"] = L["Mists of Pandaria"],
-	["WOD"] = L["Warlords of Draenor"]
+	["WOD"] = L["Warlords of Draenor"],
+	["LEGION"] = L["Legion"],
+	["BFA"] = L["Battle for Azeroth"],
+	["SL"] = L["Shadowlands"],
 }
 imported["GatherMate2_Data"] = false
 importOptions.args.GatherMateData = {
@@ -1069,7 +1089,7 @@ importOptions.args.GatherMateData = {
 			func = function()
 				local loaded, reason = LoadAddOn("GatherMate2_Data")
 				local GatherMateData = LibStub("AceAddon-3.0"):GetAddon("GatherMate2_Data")
-				if loaded then
+				if loaded and GatherMateData.generatedVersion then
 					local dataVersion = tonumber(GatherMateData.generatedVersion:match("%d+"))
 					local filter = nil
 					if db.importers["GatherMate2_Data"].expacOnly then
@@ -1090,8 +1110,8 @@ importOptions.args.GatherMateData = {
 				local cm = 0
 				if db["importers"]["GatherMate2_Data"].Databases["Mines"] then cm = 1 end
 				if db["importers"]["GatherMate2_Data"].Databases["Herbs"] then cm = 1 end
-				if db["importers"]["GatherMate2_Data"].Databases["Gases"] then cm = 1 end
 				if db["importers"]["GatherMate2_Data"].Databases["Fish"] then cm = 1 end
+				if db["importers"]["GatherMate2_Data"].Databases["Gases"] then cm = 1 end
 				if db["importers"]["GatherMate2_Data"].Databases["Treasure"] then cm = 1 end
 				if db["importers"]["GatherMate2_Data"].Databases["Archaeology"] then cm = 1 end
 				return imported["GatherMate2_Data"] or (cm == 0 and not imported["GatherMate2_Data"])

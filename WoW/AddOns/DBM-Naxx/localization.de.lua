@@ -10,14 +10,7 @@ L:SetGeneralLocalization({
 	name = "Anub'Rekhan"
 })
 
-L:SetWarningLocalization({
-	SpecialLocust		= "Heuschreckenschwarm",
-	WarningLocustFaded	= "Heuschreckenschwarm Ende"
-})
-
 L:SetOptionLocalization({
-	SpecialLocust		= "Spezialwarnung für $spell:28785",
-	WarningLocustFaded	= "Zeige Warnung, wenn $spell:28785 endet",
 	ArachnophobiaTimer	= "Zeige Timer für Erfolg 'Arachnophobie'"
 })
 
@@ -75,7 +68,6 @@ L:SetOptionLocalization({
 })
 
 L:SetMiscLocalization({
-	YellWebWrap	= "Ich bin eingenetzt! Hilfe!",
 	ArachnophobiaTimer	= "Arachnophobie"
 })
 
@@ -106,7 +98,9 @@ L:SetOptionLocalization({
 })
 
 L:SetMiscLocalization({
-	Pull				= "Sterbt, Eindringling!"
+	Pull				= "Sterbt, Eindringling!",
+	Adds				= "summons forth Skeletal Warriors!",--translate (trigger)
+	AddsTwo				= "raises more skeletons!"--translate (trigger)
 })
 
 --------------------------
@@ -182,17 +176,6 @@ L:SetGeneralLocalization({
 	name = "Grobbulus"
 })
 
-L:SetOptionLocalization({
-	SpecialWarningInjection		= "Spezialwarnung, wenn du von $spell:28169 betroffen bist"
-})
-
-L:SetWarningLocalization({
-	SpecialWarningInjection	= "Mutagene Injektion auf dir"
-})
-
-L:SetTimerLocalization({
-})
-
 -------------
 --  Gluth  --
 -------------
@@ -232,10 +215,6 @@ L:SetOptionLocalization({
 L:SetWarningLocalization({
 	WarningChargeChanged	= "Polarität geändert zu %s",
 	WarningChargeNotChanged	= "Polarität hat sich nicht geändert"
-})
-
-L:SetOptionCatLocalization({
-	Arrows	= "Pfeile"
 })
 
 ----------------------------
@@ -350,13 +329,11 @@ L:SetOptionLocalization({
 	TimerAir			= "Zeige Zeit bis nächste Luftphase",
 	TimerLanding		= "Zeige Zeit bis nächste Bodenphase",
 	TimerIceBlast		= "Zeige Zeit bis $spell:28524",
-	WarningDeepBreath	= "Spezialwarnung für $spell:28524",
-	WarningIceblock		= "Schreie, wenn du ein Eisblock bist"
+	WarningDeepBreath	= "Spezialwarnung für $spell:28524"
 })
 
 L:SetMiscLocalization({
-	EmoteBreath			= "%s holt tief Luft.",
-	WarningYellIceblock	= "Ich bin ein Eisblock!"
+	EmoteBreath			= "%s holt tief Luft."
 })
 
 L:SetWarningLocalization({
@@ -369,7 +346,7 @@ L:SetWarningLocalization({
 L:SetTimerLocalization({
 	TimerAir		= "Nächste Luftphase",
 	TimerLanding	= "Nächste Bodenphase",
-	TimerIceBlast	= "Frostatem"   
+	TimerIceBlast	= "Frostatem"
 })
 
 ------------------
@@ -385,8 +362,7 @@ L:SetGeneralLocalization({
 L:SetOptionLocalization({
 	TimerPhase2			= "Zeige Zeit bis Phase 2",
 	specwarnP2Soon		= "Spezialwarnung 10 Sekunden bevor Kel'Thuzad angreift",
-	warnAddsSoon		= "Zeige Vorwarnung für Wächter von Eiskrone",
-	ShowRange			= "Zeige Abstandsfenster, wenn Phase 2 startet"
+	warnAddsSoon		= "Zeige Vorwarnung für Wächter von Eiskrone"
 })
 
 L:SetMiscLocalization({

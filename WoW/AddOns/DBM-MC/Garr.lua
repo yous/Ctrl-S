@@ -1,21 +1,24 @@
 local mod	= DBM:NewMod("Garr-Classic", "DBM-MC", 1)
 local L		= mod:GetLocalizedStrings()
 
-mod:SetRevision(("$Revision: 554 $"):sub(12, -3))
+mod:SetRevision("20190904201124")
 mod:SetCreatureID(12057)--, 12099
---mod:SetEncounterID(666)
+mod:SetEncounterID(666)
 mod:SetModelID(12110)
 mod:RegisterCombat("combat")
 
-mod:RegisterEvents(
+mod:RegisterEventsInCombat(
 	"SPELL_AURA_APPLIED 15732",
 	"SPELL_CAST_SUCCESS 19492"
 )
 
+--[[
+ability.id = 19492 and type = "cast"
+--]]
 local warnAntiMagicPulse	= mod:NewSpellAnnounce(19492, 2)
-local warnImmolate			= mod:NewTargetAnnounce("OptionVersion2", 15732, 2, nil, "Healer")
+local warnImmolate			= mod:NewTargetNoFilterAnnounce(15732, 2, nil, false, 3)
 
-local timerAntiMagicPulseCD	= mod:NewCDTimer(16, 19492)--16-20 variation
+local timerAntiMagicPulseCD	= mod:NewCDTimer(15.7, 19492, nil, nil, nil, 2)--15.7-20 variation
 
 function mod:OnCombatStart(delay)
 	timerAntiMagicPulseCD:Start(10-delay)

@@ -3,6 +3,7 @@ local EQ = E:NewModule('Equipment', 'AceHook-3.0', 'AceEvent-3.0');
 
 -- Based on ElvUI Improved Spec Switch Datatext
 -- Author: Lockslap
+-- Updated for Legion by NickBock/Feraldin
 
 local changingEquipmentSet = nil
 local join = string.join
@@ -21,7 +22,8 @@ end
 function EQ:CheckForGearChange()
 	if InCombatLockdown() or GetNumEquipmentSets() == 0 or not self.db then return end
 
-	local active, activeSet = GetActiveSpecGroup(), EQ:GetCurrentEquipmentSet()
+	local activeSet = EQ:GetCurrentEquipmentSet()
+	local currentSpec = GetSpecialization()
 	
 	if self.db.battleground.enable then
 		local inInstance, instanceType = IsInInstance()
@@ -34,10 +36,10 @@ function EQ:CheckForGearChange()
 			return
 		end
 	end
-	
+
 	if not GetSpecializationInfo(1) then return end
 	if self.db.specialization.enable then
-		local set = active == 1 and self.db.primary or self.db.secondary
+		local set = currentSpec == 1 and self.db.spec1 or currentSpec == 2 and self.db.spec2 or currentSpec == 3 and self.db.spec3 or currentSpec == 4 and self.db.spec4
 		if set ~= "none" and set ~= activeSet then
 			changingEquipmentSet = set
 			UseEquipmentSet(set)			
@@ -47,14 +49,12 @@ end
 
 function EQ:UpdateTalentConfiguration()
 	if not E.Options.args.equipment then return end
+	local numSpecs = GetNumSpecializations(false, self.isPet);
+	local sex = self.isPet and UnitSex("pet") or UnitSex("player");
 
-	local specialization = GetSpecialization(false, false, 1)
-	if (specialization) then
-		E.Options.args.equipment.args.specialization.args.primary.name = select(2, GetSpecializationInfo(specialization)) or L["Primary Talent"]
-	end
-	specialization = GetSpecialization(false, false, 2)
-	if (specialization) then
-		E.Options.args.equipment.args.specialization.args.secondary.name = select(2, GetSpecializationInfo(specialization)) or L["Secondary Talent"]
+	for i = 1, numSpecs do
+		local _, name, description, icon = GetSpecializationInfo(i, false, self.isPet, nil, sex);
+		E.Options.args.equipment.args.specialization.args["spec"..i].name = name
 	end
 end
 
@@ -76,7 +76,6 @@ function EQ:Initialize()
 	self:RegisterEvent("CHARACTER_POINTS_CHANGED", "UpdateTalentConfiguration")
 	self:RegisterEvent("PLAYER_TALENT_UPDATE", "UpdateTalentConfiguration")
 	
-	-- self:RegisterEvent("EQUIPMENT_SWAP_PENDING", "PendingEquipmentSwap")
 	self:RegisterEvent("EQUIPMENT_SWAP_FINISHED", "EquipmentSwapFinished")
 	
 	self:UpdateTalentConfiguration()

@@ -31,8 +31,7 @@ L:SetWarningLocalization{
 L:SetOptionLocalization{
 	WarnAddsSoon				= "Zeige Vorwarnung für erscheinende Adds",
 	WarnReanimating				= "Zeige Warnung, wenn ein Add wiederbelebt wird",
-	TimerAdds					= "Zeige Zeit bis neue Adds erscheinen",
-	ShieldHealthFrame			= "Zeige Lebensanzeige mit einem Balken für $spell:70842"
+	TimerAdds					= "Zeige Zeit bis neue Adds erscheinen"
 }
 
 L:SetMiscLocalization{
@@ -86,8 +85,7 @@ L:SetGeneralLocalization{
 
 L:SetOptionLocalization{
 	RangeFrame				= "Zeige Abstandsfenster (12m)",
-	RunePowerFrame			= "Zeige Lebensanzeige und einen Balken für $spell:72371",
-	BeastIcons				= "Setze Zeichen auf Blutbestien"
+	RunePowerFrame			= "Zeige Lebensanzeige und einen Balken für $spell:72371"
 }
 
 L:SetMiscLocalization{
@@ -132,8 +130,7 @@ L:SetWarningLocalization{
 L:SetOptionLocalization{
 	WarnOozeSpawn				= "Zeige Warnung für Erscheinen eines Kleinen Schlamm",
 	SpecWarnLittleOoze			= "Spezialwarnung, wenn du von einem Kleinen Schlamm angegriffen wirst",
-	RangeFrame					= "Zeige Abstandsfenster (8m)",
-	TankArrow					= "Zeige DBM-Pfeil zum Kiter von 'Großer Schlamm'" 
+	RangeFrame					= "Zeige Abstandsfenster (8m)"
 }
 
 L:SetMiscLocalization{
@@ -151,8 +148,7 @@ L:SetGeneralLocalization{
 }
 
 L:SetOptionLocalization{
-	MalleableGooIcon			= "Setze Zeichen auf erstes Ziel von $spell:72295",
-	GooArrow					= "Zeige DBM-Pfeil, wenn $spell:72295 in deiner Nähe ist"
+	MalleableGooIcon			= "Setze Zeichen auf erstes Ziel von $spell:72295"
 }
 
 ----------------------------
@@ -178,8 +174,7 @@ L:SetOptionLocalization{
 	WarnTargetSwitchSoon	= "Zeige Vorwarnung für Zielwechsel",
 	TimerTargetSwitch		= "Zeige Zeit bis Zielwechsel",
 	ActivePrinceIcon		= "Setze Zeichen auf den machterfüllten Prinzen (Totenkopf)",
-	RangeFrame				= "Zeige Abstandsfenster (12m)",
-	VortexArrow				= "Zeige DBM-Pfeil, wenn $spell:72037 in deiner Nähe ist"
+	RangeFrame				= "Zeige Abstandsfenster (12m)"
 }
 
 L:SetMiscLocalization{
@@ -310,7 +305,6 @@ L:SetOptionLocalization{
 	PhaseTransition			= "Dauer der Phasenübergänge anzeigen",
 	ValkyrWarning			= "Verkünde Griffziele der Schattenwächterinnen der Val'kyr",
 	SpecWarnYouAreValkd		= "Spezialwarnung, wenn du von einer Schattenwächterin der Val'kyr gegriffen wurdest",--npc36609
-	ValkyrIcon				= "Setze Zeichen auf Schattenwächterinnen der Val'kyr",
 	AnnounceValkGrabs		= "Verkünde Griffziele der Schattenwächterinnen der Val'kyr im SZ-Chat (benötigt aktivierte Mitteilungen und Leiter-/Assistentenstatus)",
 	SpecWarnValkyrLow		= "Spezialwarnung, wenn eine Schattenwächterin der Val'kyr unter 55% Lebenspunkte ist",
 	AnnouncePlagueStack		= "Verkünde $spell:70337 Stapel an den Schlachtzug (ab 10 Stapel, danach alle 5 Stapel) (nur als Leiter/Assistent)"

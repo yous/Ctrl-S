@@ -16,7 +16,7 @@ L:SetOptionLocalization{
 	TimerAddsSpawn	= "為第一次小怪重生顯示計時器"
 }
 L:SetMiscLocalization{
-	Phase2Emote	= "失去能量，停止運作!",
+	Phase2Emote	= "在寶珠的控制力消失之前逃走。",
 	YellPull 	= "入侵者闖入孵化室了!警報!不惜一切代價保護蛋!"
 }
 -------------------
@@ -103,19 +103,16 @@ L:SetGeneralLocalization{
 	name = "奈法利安"
 }
 L:SetWarningLocalization{
-	WarnClassCall		= "%s呼喊",
-	WarnPhase			= "第%s階段"
+	WarnClassCall		= "%s呼喊"
 }
 L:SetTimerLocalization{
-	TimerClassCall		= "%s呼喊"
+	TimerClassCall		= "%s呼喊結束"
 }
 L:SetOptionLocalization{
 	TimerClassCall		= "為職業呼喊持續時間顯示計時器",
-	WarnClassCall		= "提示職業呼喊",
-	WarnPhase			= "提示轉換階段"
+	WarnClassCall		= "提示職業呼喊"
 }
 L:SetMiscLocalization{
-	YellPull	= "讓賽事開始吧!",
 	YellP2		= "幹得好，我的手下。凡人的勇氣開始消退!現在，現在讓我們看看他們如何應對黑石之王的力量!!!",
 	YellP3		= "不可能!出現吧，我的僕人!再次為我的主人服務!",
 	YellShaman	= "薩滿，讓我看看",

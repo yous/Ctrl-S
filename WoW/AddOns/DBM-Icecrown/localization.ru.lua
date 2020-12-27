@@ -32,8 +32,7 @@ L:SetWarningLocalization{
 L:SetOptionLocalization{
 	WarnAddsSoon				= "Предупреждать заранее о призыве помощников",
 	WarnReanimating				= "Предупреждение при воскрешении помощников",	-- Reanimated Adherent/Fanatic spawning
-	TimerAdds					= "Отсчет времени до призыва помощников",
-	ShieldHealthFrame			= "Показывать здоровье босса с индикатором здоровья для <br/>$spell:70842"
+	TimerAdds					= "Отсчет времени до призыва помощников"
 }
 
 L:SetMiscLocalization{
@@ -87,8 +86,7 @@ L:SetGeneralLocalization{
 
 L:SetOptionLocalization{
 	RangeFrame				= "Показывать окно проверки дистанции (12 м)",
-	RunePowerFrame			= "Показывать здоровье босса + индикатор для $spell:72371",
-	BeastIcons				= "Устанавливать метки на Кровавые чудовища"
+	RunePowerFrame			= "Показывать здоровье босса + индикатор для $spell:72371"
 }
 
 L:SetMiscLocalization{
@@ -134,8 +132,7 @@ L:SetWarningLocalization{
 L:SetOptionLocalization{
 	WarnOozeSpawn				= "Предупреждение при появлении Малого слизнюка",
 	SpecWarnLittleOoze			= "Спец-предупреждение, когда вас атакует Малый слизнюк",--creatureid 36897
-	RangeFrame					= "Показывать окно проверки дистанции (8 м)",
-	TankArrow					= "Показывать стрелку для кайтера Большого слизнюка"
+	RangeFrame					= "Показывать окно проверки дистанции (8 м)"
 }
 
 L:SetMiscLocalization{
@@ -153,8 +150,7 @@ L:SetGeneralLocalization{
 }
 
 L:SetOptionLocalization{
-	MalleableGooIcon			= "Устанавливать метку на первую цель заклинания $spell:72295",
-	GooArrow					= "Показывать стрелку, когда $spell:72295 около вас"
+	MalleableGooIcon			= "Устанавливать метку на первую цель заклинания $spell:72295"
 }
 
 ----------------------------
@@ -180,8 +176,7 @@ L:SetOptionLocalization{
 	WarnTargetSwitchSoon	= "Предупреждать заранее о смене цели",-- Every ~47 secs, you have to dps a different Prince
 	TimerTargetSwitch		= "Отсчет времени до смены цели",
 	ActivePrinceIcon		= "Устанавливать метку на наполненного силой Принца (череп)",
-	RangeFrame				= "Показывать окно проверки дистанции (12 м)",
-	VortexArrow				= "Показывать стрелку, когда $spell:72037 около вас"
+	RangeFrame				= "Показывать окно проверки дистанции (12 м)"
 }
 
 L:SetMiscLocalization{
@@ -312,7 +307,6 @@ L:SetOptionLocalization{
 	PhaseTransition			= "Отсчет времени для переходной фазы",
 	ValkyrWarning			= "Объявлять, кого схватили Валь'киры",
 	SpecWarnYouAreValkd		= "Спец-предупреждение, когда вас схватила Валь'кира",
-	ValkyrIcon				= "Устанавливать метки на Валь'кир",
 	AnnounceValkGrabs		= "Объявлять игроков, схваченных Валь'кирами, в рейд-чат<br/>(требуются права помощника)",
 	SpecWarnValkyrLow		= "Спец-предупреждение, когда у Валь'киры меньше 55% HP",
 	AnnouncePlagueStack		= "Объявлять стаки заклинания $spell:73912 в рейд-чат (10<br/>стаков, далее каждые 5) (требуются права помощника)"

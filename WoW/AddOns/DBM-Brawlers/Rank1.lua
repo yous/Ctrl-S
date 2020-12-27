@@ -1,96 +1,74 @@
 local mod	= DBM:NewMod("BrawlRank1", "DBM-Brawlers")
 local L		= mod:GetLocalizedStrings()
 
-mod:SetRevision(("$Revision: 12458 $"):sub(12, -3))
-mod:SetModelID(46327)--Last Boss of Rank 1
-mod:SetZone()
+mod:SetRevision("20201102223314")
+--mod:SetModelID(46327)--Last Boss of Rank 1
 
 mod:RegisterEvents(
-	"SPELL_CAST_START 135342 132666 33975 136334 39945",
-	"SPELL_AURA_APPLIED 134624 134650 126209",
-	"SPELL_AURA_APPLIED_DOSE 134624",
-	"SPELL_AURA_REMOVED 126209 134650",
-	"UNIT_SPELLCAST_CHANNEL_START target focus"
+	"SPELL_CAST_START 135342 290486 140983"
+--	"SPELL_AURA_APPLIED",
+--	"SPELL_AURA_REMOVED"
 )
 
-local warnLumberingCharge		= mod:NewSpellAnnounce(134527, 4)--Goredome
-local warnPyroblast				= mod:NewCastAnnounce(33975, 3)--Sanoriak
-local warnFireWall				= mod:NewSpellAnnounce(132666, 4)--Sanoriak
-local warnToughLuck				= mod:NewStackAnnounce(134624, 1)--Smash Hoofstomp
-local warnShieldWaller			= mod:NewSpellAnnounce(134650, 2)--Smash Hoofstomp
-local warnShadowStrikes			= mod:NewSpellAnnounce(126209, 3)--Akama
-local warnChainLightning		= mod:NewSpellAnnounce(39945, 3)--Akama
+local warnChomp					= mod:NewSpellAnnounce(135342, 4, nil, false, 2)--Bruce
+local warnDaFifHammer			= mod:NewSpellAnnounce(290486, 3)--Thog Hammerspace
+local warnCantataofFlooting		= mod:NewSpellAnnounce(140983, 3)
 
-local specWarnLumberingCharge	= mod:NewSpecialWarningDodge(134527)--Goredome
-local specWarnFireWall			= mod:NewSpecialWarningSpell(132666)--Sanoriak
-local specWarnShadowStrikes		= mod:NewSpecialWarningDispel(126209, "MagicDispeller")--Akama
-local specWarnChainLightning	= mod:NewSpecialWarningInterrupt(39945)--Akama
+local specWarnChomp				= mod:NewSpecialWarningDodge(135342, nil, nil, nil, 3, 2)--Bruce
+local specWarnDaFifHammer		= mod:NewSpecialWarningDodge(290486, nil, nil, nil, 1, 2)--Thog Hammerspace
+local specWarnCantataofFlooting	= mod:NewSpecialWarningInterrupt(140983, "HasInterrupt", nil, nil, 1, 2)--Grandpa Grumplefloot
 
-local timerLumberingChargeCD	= mod:NewCDTimer(7, 134527)--Goredome
-local timerShieldWaller			= mod:NewBuffActiveTimer(10, 134650)
-local timerFirewallCD			= mod:NewCDTimer(18, 132666)--Sanoriak
-local timerShadowStrikes		= mod:NewBuffActiveTimer(15, 126209)--Akama
-local timerChainLightningCD		= mod:NewCDTimer(17, 39945)--Akama
+local timerChompCD				= mod:NewCDTimer(8, 135342, nil, nil, nil, 3, nil, DBM_CORE_L.DEADLY_ICON)--Bruce
+local timerDaFifHammerCD		= mod:NewCDTimer(22.6, 290486, nil, nil, nil, 3)--Thog Hammerspace
+--local timerCantataofFlootingCD	= mod:NewCDTimer(8, 140983, nil, nil, nil, 4, nil, DBM_CORE_L.INTERRUPT_ICON)
 
-mod:RemoveOption("HealthFrame")
-mod:RemoveOption("SpeedKillTimer")
-
-local brawlersMod = DBM:GetModByName("Brawlers")
+local brawlersMod = DBM:GetModByName("BrawlersGeneral")
 
 function mod:SPELL_CAST_START(args)
 	if not brawlersMod.Options.SpectatorMode and not brawlersMod:PlayerFighting() then return end--Spectator mode is disabled, do nothing.
-	if args:IsSpellID(33975, 136334) then--Spellid is used by 5 diff mobs in game, but SetZone sould filter the other 4 mobs.
-		warnPyroblast:Show()
-	elseif args.spellId == 132666 then
-		warnFireWall:Show()
-		timerFirewallCD:Start()--First one is 5 seconds after combat start
-		if brawlersMod:PlayerFighting() then
-			specWarnFireWall:Show()
+	local spellId = args.spellId
+	if spellId == 135342 then
+		timerChompCD:Start()--And timers (first one is after 6 seconds)
+		if brawlersMod:PlayerFighting() then--Only give special warnings if you're in arena though.
+			specWarnChomp:Show()
+			specWarnChomp:Play("shockwave")
+		else
+			warnChomp:Show()--Give reg warnings for spectators
+			timerChompCD:SetSTFade(true)
 		end
-	elseif args.spellId == 39945 then
-		warnChainLightning:Show()
-		timerChainLightningCD:Start()
-		if brawlersMod:PlayerFighting() then
-			specWarnChainLightning:Show(args.sourceName)
+	elseif spellId == 290486 then
+		timerDaFifHammerCD:Start()
+		if brawlersMod:PlayerFighting() then--Only give special warnings if you're in arena though.
+			specWarnDaFifHammer:Show()
+			specWarnDaFifHammer:Play("shockwave")
+		else
+			warnDaFifHammer:Show()--Give reg warnings for spectators
+			timerDaFifHammerCD:SetSTFade(true)
+		end
+	elseif spellId == 140983 then
+		--timerCantataofFlootingCD:Start()
+		if brawlersMod:PlayerFighting() then--Only give special warnings if you're in arena though.
+			specWarnCantataofFlooting:Show(args.sourceName)
+			specWarnCantataofFlooting:Play("kickcast")
+		else
+			warnCantataofFlooting:Show()--Give reg warnings for spectators
+			--timerCantataofFlootingCD:SetSTFade(true)
 		end
 	end
 end
 
+--[[
 function mod:SPELL_AURA_APPLIED(args)
 	if not brawlersMod.Options.SpectatorMode and not brawlersMod:PlayerFighting() then return end
-	if args.spellId == 134624 then
-		warnToughLuck:Show(args.destName, args.amount or 1)
-	elseif args.spellId == 134650 then
-		warnShieldWaller:Show()
-		timerShieldWaller:Start()
-	elseif args.spellId == 126209 then
-		warnShadowStrikes:Show()
-		timerShadowStrikes:Start()
-		if brawlersMod:PlayerFighting() then
-			specWarnShadowStrikes:Show(args.destName)
-		end
+	if args.spellId == 126209 then
+
 	end
 end
-mod.SPELL_AURA_APPLIED_DOSE = mod.SPELL_AURA_APPLIED
 
 function mod:SPELL_AURA_REMOVED(args)
 	if not brawlersMod.Options.SpectatorMode and not brawlersMod:PlayerFighting() then return end
-	if args.spellId == 134650 then
-		timerShieldWaller:Cancel()
-	elseif args.spellId == 126209 then
-		timerShadowStrikes:Cancel()
-	end
-end
+	if args.spellId == 126209 then
 
---This event won't really work well for spectators if they target the player instead of boss. This event only fires if boss is on target/focus
---It is however the ONLY event you can detect this spell using.
-function mod:UNIT_SPELLCAST_CHANNEL_START(uId, _, _, _, spellId)
-	if not brawlersMod.Options.SpectatorMode and not brawlersMod:PlayerFighting() then return end--Spectator mode is disabled, do nothing.
-	if spellId == 134527 and self:AntiSpam() then
-		warnLumberingCharge:Show()
-		timerLumberingChargeCD:Start()
-		if brawlersMod:PlayerFighting() then
-			specWarnLumberingCharge:Show()
-		end
 	end
 end
+--]]

@@ -7,7 +7,7 @@
 --		Banjankri of Blackrock, Predeter of Proudmoore, Xenyr of Aszune
 
 -- Currently maintained by
--- Cybeloras of Aerie Peak/Detheroc/Mal'Ganis
+-- Cybeloras of Aerie Peak
 -- --------------------
 
 
@@ -47,10 +47,21 @@ function Condition:OnNewInstance(category, order, identifier)
 	self.identifier = identifier
 	self.order = order
 
+
 	if self.texttable and not self.formatter then
 		self.formatter = TMW.C.Formatter:New(self.texttable)
 		self.texttable = nil
-	elseif not self.formatter then
+	end
+	
+	if self.bool then
+		self.min = 0
+		self.max = 1
+		self.formatter = self.formatter or TMW.C.Formatter.BOOL
+		self.nooperator = true
+		self.levelChecks = true
+	end
+
+	if not self.formatter then
 		self.formatter = TMW.C.Formatter.COMMANUMBER
 	end
 
@@ -69,6 +80,10 @@ function Condition:OnNewInstance(category, order, identifier)
 		self.noslide = true
 	end
 
+	if not self.noslide and not self.range and not self.max then
+		error("max must be specified if range is not for condition " .. identifier)
+	end	
+
 	CNDT.ConditionsByType[identifier] = self
 end
 
@@ -81,11 +96,26 @@ function Condition:ShouldList()
 end
 
 function Condition:ShouldHide()
-	return get(self.hidden, self)
+	if CNDT.CurrentConditionSet.ConditionTypeFilter then
+		if not CNDT.CurrentConditionSet:ConditionTypeFilter(self) then
+			return true
+		end
+	end
+
+	return get(self.hidden, self)			
 end
 
 function Condition:IsDeprecated()
 	return self.funcstr == "DEPRECATED"
+end
+
+function Condition:UsesTabularBitflags() 
+	if not self.bitFlags then return false end
+	for index, _ in pairs(self.bitFlags) do
+		if type(index) ~= "number" or index >= 32 or index < 1 then
+			return true
+		end
+	end
 end
 
 function Condition:PrepareEnv()

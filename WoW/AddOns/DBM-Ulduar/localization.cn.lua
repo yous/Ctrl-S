@@ -18,7 +18,7 @@ L:SetGeneralLocalization{
 
 L:SetTimerLocalization{
 }
-	
+
 L:SetMiscLocalization{
 	YellPull			= "检测到敌对实体。威胁评定协议启动。向主要目标发动攻击。30秒后重新评估。",
 	Emote				= "%%s开始追赶(%S+)%。"
@@ -100,7 +100,7 @@ L:SetMiscLocalization{
 	YellAir2			= "火灭了！准备重建炮台！",
 	YellGround			= "快一点！她马上就要挣脱了！",
 	EmotePhase2			= "%%s被永久地禁锢在地面上！",
-	FlamecastUnknown		= DBM_CORE_UNKNOWN
+	FlamecastUnknown		= DBM_CORE_L.UNKNOWN
 }
 
 ----------------------------
@@ -268,8 +268,7 @@ L:SetTimerLocalization{
 
 L:SetOptionLocalization{
 	SoundWOP = "为重要技能播放额外的警报语音",
-	YellOnStormCloud		= "当你中了$spell:65133时大喊",
-	SetIconOnStormCloud		= "为$spell:65133的目标设置标记"
+	YellOnStormCloud		= "当你中了$spell:65133时大喊"
 }
 
 L:SetMiscLocalization{
@@ -296,7 +295,6 @@ L:SetTimerLocalization{
 L:SetOptionLocalization{
 	SoundWOP = "为重要技能播放额外的警报语音",
 	TimerHardmode			= "为困难模式显示计时条",
-	RangeFrame			= "显示距离框",
 	AnnounceFails			= "公布中了闪电充能的玩家到团队频道<br/>(需要团长或助理权限)"
 }
 
@@ -305,7 +303,7 @@ L:SetMiscLocalization{
 	YellPhase2			= "狂妄的小崽子们，竟敢在我的地盘上挑战我？我要亲自碾碎你们！",
 	YellKill			= "住手！我认输了！",
 	ChargeOn			= "闪电充能 -> %s",
-	Charge				= "中了闪电充能(这一次): %s" 
+	Charge				= "中了闪电充能(这一次): %s"
 }
 
 -------------
@@ -392,13 +390,10 @@ L:SetOptionLocalization{
 	TimeToPhase3			= "为第3阶段开始显示计时条",
 	TimeToPhase4			= "为第4阶段开始显示计时条",
 	MagneticCore			= "提示磁核的拾取者",
-	HealthFramePhase4		= "显示第4阶段的首领血量框架",
-	AutoChangeLootToFFA		= "第3阶段自动转换拾取方式为自由拾取",
 	WarnBombSpawn			= "为炸弹机器人显示警报",
 	TimerHardmode			= "为困难模式显示计时条",
 	ShockBlastWarningInP1		= "为第1阶段的$spell:63631显示特别警报",
-	ShockBlastWarningInP4		= "为第4阶段的$spell:63631显示特别警报",
-	RangeFrame			= "在第1阶段显示距离框(6码)"
+	ShockBlastWarningInP4		= "为第4阶段的$spell:63631显示特别警报"
 }
 
 L:SetMiscLocalization{
@@ -407,9 +402,6 @@ L:SetMiscLocalization{
 	MobPhase3			= "空中指挥单位",
 	YellPull			= "我们时间不多了，朋友们！来帮忙测试一下我所发明的最新型、最强大的机体吧。在你们改变主意之前，请允许我提醒一下，你们把XT-002搞得一团糟，应该算是欠我个人情吧。",
 	YellHardPull			= "嘿，你们为什么要这么做啊？没看到上面写着“不要按这个按钮”吗？你们激活了自毁系统，还怎么完成测试呀？",
-	YellPhase2			= "太棒了！测试结果非常好！外壳完整率百分之九十八点九！几乎没有划伤！继续。",
-	YellPhase3			= "非常感谢，朋友们！你们的帮助使我获得了一些极其珍贵的数据！下面，我要让你们——咦，我把它放哪去了？哦！这里。",
-	YellPhase4			= "初步测试阶段完成。真正的测试开始啦！",
 	LootMsg				= "(.+)获得了物品：.*Hitem:(%d+)"
 }
 
@@ -434,8 +426,6 @@ L:SetWarningLocalization{
 
 L:SetOptionLocalization{
 	SoundWOP = "为重要技能播放额外的警报语音",
-	SetIconOnShadowCrash		= "为$spell:62660的目标设置标记 (骷髅)",
-	SetIconOnLifeLeach		= "为$spell:63276的目标设置标记 (十字)",
 	SpecialWarningShadowCrash	= "为$spell:62660显示特别警报(必须至少有一名团队成员设置首领为焦点目标)",
 	SpecialWarningShadowCrashNear	= "当你附近的人中了$spell:62660时显示特别警报",
 	SpecialWarningLLNear		= "当你附近的人中了$spell:63276时显示特别警报",
@@ -464,8 +454,7 @@ L:SetGeneralLocalization{
 L:SetMiscLocalization{
 	YellPull 			= "攻击这头野兽要害的时刻即将来临！将你们的愤怒和仇恨倾泻到它的爪牙身上！",
 	YellPhase2			= "我是清醒的梦境。",
-	Sara 				= "萨拉",
-	WarningYellSqueeze		= "我被触须抓住了 - 快救我"
+	Sara 				= "萨拉"
 }
 
 L:SetWarningLocalization{
@@ -494,13 +483,8 @@ L:SetOptionLocalization{
 	SpecWarnGuardianLow		= "当尤格萨隆的卫士(第1阶段)血量过低时显示特别警报 (输出职业用)",
 	WarnBrainPortalSoon		= "为脑部传送门显示提前警报",
 	SpecWarnMadnessOutNow		= "为疯狂诱导结束前显示特别警报",
-	SetIconOnFearTarget		= "为心灵疾病的目标设置标记 (骷髅)",
 	SpecWarnFervorCast		= "当萨拉的热情正在对你施放时显示特别警报 (必须至少有一名团队成员设置首领为焦点目标)",
 	specWarnBrainPortalSoon		= "为下一次脑部传送门显示特别警报",
-	WarningSqueeze			= "当你中了挤压(触须绑人)时大喊",
 	NextPortal			= "为下一次传送门显示计时条",
-	SetIconOnFervorTarget		= "为萨拉的热情的目标设置标记",
-	ShowSaraHealth			= "显示萨拉在第1阶段的血量 (必须至少有一名团队成员设置首领为焦点目标)",
-	SetIconOnBrainLinkTarget		= "为$spell:63802的目标设置标记",
 	MaladyArrow			= "当你附近的人中了$spell:63881时显示DBM箭头"
 }

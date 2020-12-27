@@ -1,0 +1,90 @@
+
+if not LOCALE_ruRU then return end
+local addon,ns=...;
+local L=FollowerLocationInfoData.Locale;
+
+--[=[ addon ]=]
+	L["Add waypoint to TomTom"] = "Добавить маршрут в TomTom" -- Needs review
+	-- L["Broker button text"] = ""
+	L["Chat commands"] = "Команды чата" -- Needs review
+	-- L["Chat command usage"] = ""
+	-- L["Choose what you want to look on broker button"] = ""
+	L["Choose your favorite website for further informations"] = "Выберете избранный вэб-сайт для получения дополнительной информации" -- Needs review
+	-- L["Collect group"] = ""
+	L["Collecting quest data... (%d entries)"] = "Сбор данных о задании... (%d)" -- Needs review
+	L["Collection vendor data..."] = "Сбор данных о вендорах" -- Needs review
+	L["<command>"] = "<команда>" -- Needs review
+	L["Commands:"] = "Команды:" -- Needs review
+	L["Coordinations"] = "Координаты" -- Needs review
+	L["Couldn't load FollowerLocationInfo_Journal. Please check if FollowerLocationInfo_Data is enabled."] = "Не удается  загрузить FollowerLocationInfo_Journal. Пожалуйста, проверьте включен ли FollowerLocationInfo_Data." -- Needs review
+	-- L["Counters"] = ""
+	L["Error: Could not get zone name."] = "Ошибка: Не могу получить имя локации" -- Needs review
+	L["Favorite website"] = "Избранный веб-сайт" -- Needs review
+	-- L["Follower count on broker"] = ""
+	L["FollowerID"] = "ID соратника" -- Needs review
+	L["Garrison building"] = "Строение гарнизона" -- Needs review
+	L["Image"] = "Изображение" -- Needs review
+	L["Init description generator..."] = "Инициализация генератора описаний..." -- Needs review
+	-- L["In your Questlog"] = ""
+	L["is already your follower."] = "является соратником." -- Needs review
+	-- L["Label"] = ""
+	L["Left-click"] = "Левый клик" -- Needs review
+	-- L["Link to"] = ""
+	L["Minimap"] = "Миникарта" -- Needs review
+	L["More filters"] = "Больше фильтров" -- Needs review
+	L["(mouse over to show image)"] = "(навести курсор для отображения)" -- Needs review
+	-- L["Not learned"] = ""
+	L["NPC"] = "НИП" -- Needs review
+	-- L["Obtainable by"] = ""
+	L["Open"] = "Открыть" -- Needs review
+	-- L["Opening a dialog popup with the Address"] = ""
+	-- L["Open option menu"] = ""
+	L["or"] = "или" -- Needs review
+	-- L["or higher"] = ""
+	-- L["Other members"] = ""
+	-- L["Outpost building"] = ""
+	L["Query data (npcID: %d)..."] = "Запрос информации (НИП-ID: %d)..." -- Needs review
+	-- L["Query data (questID: %d)..."] = ""
+	L["Recruited"] = "Нанято" -- Needs review
+	L["Reset addon settings |cffff6666and automatically reloading the UI!|r"] = "Сброс настроек |cffff6666с аваматической перезагрузкой UI!|r" -- Needs review
+	L["Right-click"] = "Правый клик" -- Needs review
+	-- L["Show amount of collected and available followers on broker button"] = ""
+	-- L["Show collected followers on broker"] = ""
+	-- L["Show coordinates on broker"] = ""
+	-- L["Show current target coordinates on broker button"] = ""
+	L["Show FollowerID"] = "Показывать ID соратника" -- Needs review
+	L["Show followerIDs in follower list"] = "Показывать ID соратника в списке" -- Needs review
+	L["Show/Hide followerID in journal"] = "Показывать/скрывать ID соратника в журнале" -- Needs review
+	L["Show/Hide journal frame"] = "Показывать/скрывать рамку журнала" -- Needs review
+	L["Show/Hide minimap button"] = "Показать/скрыть кнопку на миникарте" -- Needs review
+	L["Show minimap button"] = "Показывать кнопку на миникарте" -- Needs review
+	-- L["Show your current coordinates on broker button"] = ""
+	-- L["Toggle FollowerLocationInfo Journal"] = ""
+	-- L["Usage"] = ""
+	L["Without description"] = "Без описания" -- Needs review
+	-- L["You can only obtain one follower from this group"] = ""
+	L["Your installed version of FollowerLocationInfo requires an additional addon to work.|nPlease install FollowerLocationInfo_Data."] = "Для работы FollowerLocationInfo требуется дополнительный аддон.|nПожалуйста, установите FollowerLocationInfo_Data." -- Needs review
+	L["Your installed version of FollowerLocationInfo requires a newer version of FollowerLocationInfo_Data.|nPlease update it..."] = "FollowerLocationInfo требуется новая версия FollowerLocationInfo_Data.|nПожалуйста, обновите..." -- Needs review
+
+--[=[ gameobjects ]=]
+	L["object_233229"] = "Фолиант проклятий Совета Теней";
+
+--[=[ follower descriptions ]=]
+--	L["desc_32_neutral"] = "";
+--	L["desc_157_alliance"] = "";
+--	L["desc_170_neutral"] = "";
+--	L["desc_171_neutral"] = "";
+--	L["desc_179_alliance"] = "";
+--	L["desc_184_alliance"] = "";
+--	L["desc_184_horde"] = "";
+--	L["desc_190_neutral"] = "";
+--	L["desc_192_neutral"] = "";
+--	L["desc_193_neutral"] = "";
+--	L["desc_194_neutral"] = "";
+--	L["desc_195_neutral"] = "";
+--	L["desc_208_neutral"] = "";
+--	L["desc_209_neutral"] = "";
+--	L["desc_216_alliance"] = "";
+--	L["desc_219_neutral"] = "";
+--	L["desc_224_neutral"] = "";
+--	L["desc_467_neutral"] = "";

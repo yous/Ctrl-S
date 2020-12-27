@@ -1,9 +1,8 @@
 local mod	= DBM:NewMod("BWDTrash", "DBM-BlackwingDescent")
 local L		= mod:GetLocalizedStrings()
 
-mod:SetRevision(("$Revision: 51 $"):sub(12, -3))
+mod:SetRevision("20200806141910")
 mod:SetModelID(29539)
-mod:SetZone()
 mod.isTrashMod = true
 
 mod:RegisterEvents(
@@ -22,9 +21,6 @@ local warnWhirlwind			= mod:NewTargetAnnounce(80652, 2)--Whirlwind used by spiri
 local timerChargeCD			= mod:NewNextTimer(30, 79630)--Guesswork
 local timerSacrifice		= mod:NewTargetTimer(20, 80727)
 local timerWhirlwind		= mod:NewTargetTimer(5, 80652)
-
-mod:RemoveOption("HealthFrame")
-mod:RemoveOption("SpeedKillTimer")
 
 local drakonidDied = 0
 

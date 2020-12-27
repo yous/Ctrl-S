@@ -9,525 +9,613 @@
 local TSM = select(2, ...)
 local Post = TSM:NewModule("Post", "AceEvent-3.0")
 local L = LibStub("AceLocale-3.0"):GetLocale("TradeSkillMaster_Auctioning") -- loads the localization table
+local private = {queue={}, threadId=nil, postInfo=nil}
 
-local bagInfo, bagState = {}, {}
-local bagInfoUpdate = 0
-local postQueue, currentItem, itemLocations = {}, {}, {}
-local totalToPost, totalPosted, count = 0, 0
-local isScanning, GUI
+local QUICK_POST_OPERATION = {
+	isFake = true,
+	-- general
+	matchStackSize = nil,
+	blacklist = "",
+	ignoreLowDuration = 0,
+	-- post
+	stackSize = 1,
+	stackSizeIsCap = nil,
+	postCap = 100,
+	keepQuantity = 0,
+	keepQtySources = {},
+	duration = 24,
+	bidPercent = 1,
+	undercut = 4,
+	maxExpires = 0,
+	priceReset = "none",
+	aboveMax = "normalPrice",
+	-- prices are set in Post:OnEnable() based on the modules which are present
+	minPrice = nil,
+	maxPrice = nil,
+	normalPrice = nil,
+}
 
-function Post:ValidateOperation(itemString, operation)
-	local itemLink, salePrice = TSMAPI:Select({2, 11}, TSMAPI:GetSafeItemInfo(itemString))
-	local prices = TSM.Util:GetItemPrices(operation, itemString, {minPrice=true, normalPrice=true, maxPrice=true, undercut=true})
 
-	-- don't post this item if their settings are invalid
-	if operation.postCap == 0 then
-		return -- posting is disabled
-	elseif not prices.minPrice then
-		if not TSM.db.global.disableInvalidMsg then
-			TSM:Printf(L["Did not post %s because your minimum price (%s) is invalid. Check your settings."], itemLink or itemString, operation.minPrice)
-		end
-		TSM.Log:AddLogRecord(itemString, "post", "Skip", "invalid", operation)
-	elseif not prices.maxPrice then
-		if not TSM.db.global.disableInvalidMsg then
-			TSM:Printf(L["Did not post %s because your maximum price (%s) is invalid. Check your settings."], itemLink or itemString, operation.maxPrice)
-		end
-		TSM.Log:AddLogRecord(itemString, "post", "Skip", "invalid", operation)
-	elseif not prices.normalPrice then
-		if not TSM.db.global.disableInvalidMsg then
-			TSM:Printf(L["Did not post %s because your normal price (%s) is invalid. Check your settings."], itemLink or itemString, operation.normalPrice)
-		end
-		TSM.Log:AddLogRecord(itemString, "post", "Skip", "invalid", operation)
-	elseif not prices.undercut then
-		if not TSM.db.global.disableInvalidMsg then
-			TSM:Printf(L["Did not post %s because your undercut (%s) is invalid. Check your settings."], itemLink or itemString, operation.undercut)
-		end
-		TSM.Log:AddLogRecord(itemString, "post", "Skip", "invalid")
-	elseif prices.normalPrice < prices.minPrice then
-		if not TSM.db.global.disableInvalidMsg then
-			TSM:Printf(L["Did not post %s because your normal price (%s) is lower than your minimum price (%s). Check your settings."], itemLink or itemString, operation.normalPrice, operation.minPrice)
-		end
-		TSM.Log:AddLogRecord(itemString, "post", "Skip", "invalid", operation)
-	elseif prices.maxPrice < prices.minPrice then
-		if not TSM.db.global.disableInvalidMsg then
-			TSM:Printf(L["Did not post %s because your maximum price (%s) is lower than your minimum price (%s). Check your settings."], itemLink or itemString, operation.maxPrice, operation.minPrice)
-		end
-		TSM.Log:AddLogRecord(itemString, "post", "Skip", "invalid", operation)
-	elseif salePrice > 0 and prices.minPrice <= salePrice*1.05 then
-		TSM:Printf(L["WARNING: You minimum price for %s is below its vendorsell price (with AH cut taken into account). Consider raising your minimum price, or vendoring the item."], itemLink or itemString)
-		return true -- just a warning, doesn't make this invalid
-	else
-		return true
+function Post:OnEnable()
+	-- generate the quick posting prices based on the modules they have installed
+	local priceSources = {}
+	if TSMAPI:HasModule("Crafting") then
+		tinsert(priceSources, "crafting")
 	end
+	if TSMAPI:HasModule("AuctionDB") then
+		tinsert(priceSources, "dbmarket")
+		tinsert(priceSources, "dbglobalminbuyoutavg")
+		tinsert(priceSources, "dbglobalmarketavg")
+	end
+	if TSMAPI:HasModule("WoWuction") then
+		tinsert(priceSources, "wowuctionmarket")
+		tinsert(priceSources, "wowuctionregionmarket")
+	end
+
+	if #priceSources == 0 then
+		tinsert(priceSources, "vendorsell")
+	end
+
+	QUICK_POST_OPERATION.minPrice = format("max(0.25*avg(%s), 1.5*vendorsell)", table.concat(priceSources, ","))
+	QUICK_POST_OPERATION.maxPrice = format("max(5*avg(%s), 30*vendorsell)", table.concat(priceSources, ","))
+	QUICK_POST_OPERATION.normalPrice = format("max(2*avg(%s), 12*vendorsell)", table.concat(priceSources, ","))
 end
 
-function Post:UpdateBagState()
-	if time() == bagInfoUpdate then return end
+function Post:StartScan(isGroup, scanInfo)
+	wipe(private.queue)
+	wipe(TSM.operationLookup)
+	TSM.operationNameLookup[QUICK_POST_OPERATION] = "|cffff0000"..L["Quick Post"].."|r"
+
+	local scanList = {}
+	local bagState = private:GetBagState()
+
+	for itemString, numHave in pairs(bagState) do
+		if isGroup then
+			if scanInfo[itemString] then
+				local validOperations = {}
+				-- get the operations which we have enough items in our bags to satisfy
+				for _, operation in ipairs(scanInfo[itemString]) do
+					if operation.postCap > 0 and private:HasEnoughToPost(itemString, operation, numHave) then
+						local isValid = true
+						if operation.maxExpires > 0 and TSMAPI:HasModule("Accounting") then
+							local numExpires = select(2, TSMAPI:ModuleAPI("Accounting", "getAuctionStatsSinceLastSale", itemString))
+							if type(numExpires) == "number" and numExpires > operation.maxExpires then
+								isValid = false
+								TSM.Log:AddLogRecord(itemString, "post", "Skip", "maxExpires", operation)
+							end
+						end
+						if isValid then
+							tinsert(validOperations, operation)
+						end
+					elseif operation.postCap > 0 then
+						TSM.Log:AddLogRecord(itemString, "post", "Skip", "notEnough", operation)
+					end
+				end
+				-- check if any operation is invalid
+				local hasInvalidOperation = false
+				for i, operation in ipairs(validOperations) do
+					if not private:ValidateOperation(itemString, operation) then
+						hasInvalidOperation = true
+						break
+					end
+				end
+				if not hasInvalidOperation and #validOperations > 0 then
+					TSM.operationLookup[itemString] = validOperations
+					tinsert(scanList, itemString)
+				end
+			end
+		else
+			local quality = TSMAPI.Item:GetQuality(itemString) or 0
+			if quality > 0 and not TSMAPI.Operations:GetFirstByItem(itemString, "Auctioning") and private:HasEnoughToPost(itemString, QUICK_POST_OPERATION, numHave) then
+				if private:ValidateOperation(itemString, QUICK_POST_OPERATION, true) then
+					TSM.operationLookup[itemString] = {QUICK_POST_OPERATION}
+					tinsert(scanList, itemString)
+				else
+					-- assume it's invalid due to not having any pricing data
+					TSM:Printf(L["Could not post %s because there is no pricing data for this item. Please ensure that you have AuctionDB and/or WoWuction price data."], TSMAPI.Item:GetLink(itemString))
+				end
+			end
+		end
+	end
+
+	TSM.GUI:UpdateSTData()
+	if #scanList == 0 then return false end
+	if isGroup then
+		TSM:AnalyticsEvent("POST_GROUP_START")
+	else
+		TSM:AnalyticsEvent("QUICK_POST_START")
+	end
+	private.threadId = TSMAPI.Threading:Start(private.PostScanThread, 0.7, TSM.Manage.StopScan, scanList)
+	return true
+end
+
+local bagState, bagInfo, bagInfoUpdate = {}, {}, 0
+function private:GetBagState(forceUpdate)
+	if bagInfoUpdate == time() and not forceUpdate then
+		return bagState, bagInfo
+	end
 	wipe(bagInfo)
 	wipe(bagState)
-	for bag, slot, itemString, quantity in TSMAPI:GetBagIterator(true) do
+	for bag, slot, itemString, quantity in TSMAPI.Inventory:BagIterator(true) do
 		tinsert(bagInfo, {bag, slot, itemString, quantity})
 		bagState[itemString] = (bagState[itemString] or 0) + quantity
 	end
 	bagInfoUpdate = time()
+	return bagState, bagInfo
 end
 
-function Post:GetScanListAndSetup(GUIRef, options)
-	-- setup stuff
-	GUI = GUIRef
-	isScanning = true
-	wipe(postQueue)
-	wipe(currentItem)
-	wipe(itemLocations)
-	wipe(TSM.operationLookup)
-	totalToPost, totalPosted, count = 0, 0, 0
-
-	local tempList, scanList = {}, {}
-	
-	Post:UpdateBagState()
-	
-	local function HasEnoughToPost(operation, itemString)
-		local maxStackSize = select(8, TSMAPI:GetSafeItemInfo(itemString)) or 1
-		local perAuction = min(maxStackSize, operation.stackSize)
-		local perAuctionIsCap = operation.stackSizeIsCap
-		local num = (bagState[itemString] or 0) - operation.keepQuantity
-		return num >= perAuction or (perAuctionIsCap and num > 0)
+function private:HasEnoughToPost(itemString, operation, numHave)
+	local maxStackSize = TSMAPI.Item:GetMaxStack(itemString) or 1
+	local perAuction = min(maxStackSize, operation.stackSize)
+	local perAuctionIsCap = operation.stackSizeIsCap
+	local keepQuantity = operation.keepQuantity
+	if operation.keepQtySources.bank then
+		keepQuantity = keepQuantity - TSMAPI.Inventory:GetBankQuantity(itemString) - TSMAPI.Inventory:GetReagentBankQuantity(itemString)
+	end
+	if operation.keepQtySources.guild then
+		keepQuantity = keepQuantity - TSMAPI.Inventory:GetGuildQuantity(itemString)
 	end
 
-	for itemString in pairs(bagState) do
-		local operations = options.itemOperations[itemString]
-		if not tempList[itemString] and operations then
-			for _, operation in ipairs(operations) do
-				if operation.postCap > 0 and HasEnoughToPost(operation, itemString) then
-					tempList[itemString] = tempList[itemString] or {}
-					tinsert(tempList[itemString], operation)
-				end
-			end
-		end
-	end
-
-	for itemString, operations in pairs(tempList) do
-		TSM.operationLookup[itemString] = operations
-		local isValid = true
-		for _, operation in ipairs(operations) do
-			if not Post:ValidateOperation(itemString, operation) then
-				isValid = nil
-				break
-			end
-		end
-		if #options.itemOperations[itemString] ~= #operations then
-			local j = 1
-			for i=1, #options.itemOperations[itemString] do
-				if options.itemOperations[itemString][i] ~= operations[j] then
-					TSM.Log:AddLogRecord(itemString, "post", "Skip", "notEnough", options.itemOperations[itemString][i])
-				else
-					j = j + 1
-				end
-			end
-		end
-		if isValid then
-			tinsert(scanList, itemString)
-		end
-	end
-	
-	TSMAPI:FireEvent("AUCTIONING:POST:START", {numItems=#scanList, isGroup=true})
-	return scanList
+	local num = numHave - max(keepQuantity, 0)
+	return num >= perAuction or (perAuctionIsCap and num > 0)
 end
 
-function Post:ProcessItem(itemString)
-	local operations = TSM.operationLookup[itemString]
-	if not operations then return end
+function private:ValidateOperation(itemString, operation, silent)
+	local errMsg = nil
+	local maxStackSize = TSMAPI.Item:GetMaxStack(itemString)
+	local vendorSellPrice = TSMAPI.Item:GetVendorPrice(itemString) or 0
+	local prices = TSM.Util:GetItemPrices(operation, itemString, false, {minPrice=true, normalPrice=true, maxPrice=true, undercut=true})
 
-	local numInBags = Post:GetNumInBags(itemString)
-	for _, operation in ipairs(operations) do
-		local toPost, reason, buyout
-		numInBags = numInBags - operation.keepQuantity
-		toPost, reason, numInBags = Post:ShouldPost(itemString, operation, numInBags)
-		numInBags = numInBags + operation.keepQuantity -- restore for the next operation if there are multiple
-		local data = {}
+	if not prices.minPrice then
+		errMsg = format(L["Did not post %s because your minimum price (%s) is invalid. Check your settings."], TSMAPI.Item:GetLink(itemString), operation.minPrice)
+	elseif not prices.maxPrice then
+		errMsg = format(L["Did not post %s because your maximum price (%s) is invalid. Check your settings."], TSMAPI.Item:GetLink(itemString), operation.maxPrice)
+	elseif not prices.normalPrice then
+		errMsg = format(L["Did not post %s because your normal price (%s) is invalid. Check your settings."], TSMAPI.Item:GetLink(itemString), operation.normalPrice)
+	elseif not prices.undercut then
+		errMsg = format(L["Did not post %s because your undercut (%s) is invalid. Check your settings."], TSMAPI.Item:GetLink(itemString), operation.undercut)
+	elseif prices.normalPrice < prices.minPrice then
+		errMsg = format(L["Did not post %s because your normal price (%s) is lower than your minimum price (%s). Check your settings."], TSMAPI.Item:GetLink(itemString), operation.normalPrice, operation.minPrice)
+	elseif prices.maxPrice < prices.minPrice then
+		errMsg = format(L["Did not post %s because your maximum price (%s) is lower than your minimum price (%s). Check your settings."], TSMAPI.Item:GetLink(itemString), operation.maxPrice, operation.minPrice)
+	end
 
-		if toPost then
-			local bid
-			bid, buyout, reason = Post:GetPostPrice(itemString, operation)
+	if errMsg then
+		if not silent and not TSM.db.global.disableInvalidMsg then
+			TSM:Print(errMsg)
+		end
+		TSM.Log:AddLogRecord(itemString, "post", "Skip", "invalid", operation)
+		return false
+	else
+		if vendorSellPrice > 0 and prices.minPrice <= vendorSellPrice*1.05 then
+			-- just a warning, not an error
+			TSM:Printf(L["WARNING: You minimum price for %s is below its vendorsell price (with AH cut taken into account). Consider raising your minimum price, or vendoring the item."], TSMAPI.Item:GetLink(itemString))
+		end
+		return true
+	end
+end
+
+function private.PostScanThread(self, scanList)
+	self:SetThreadName("AUCTIONING_POST_SCAN")
+	local numToPost, numPosted, numConfirmed = 0, 0, 0
+	local pendingBagChanges = {}
+	local lastBagUpdate = 0
+	local confirmQueue = {}
+	local failedQueue = {}
+	private.postInfo = {currentItem=nil, doneScanning=nil, hasPosted={}}
+	TSM.GUI:SetScanThreadId(self:GetThreadId())
+	TSM.Scan:StartItemScan(scanList, self:GetThreadId())
+	self:RegisterEvent("CHAT_MSG_SYSTEM", function(_, msg) if msg == ERR_AUCTION_STARTED then self:SendMsgToSelf("ACTION_CONFIRMED") end end)
+	local ERR_MESSAGES_NO_RETRY = {ERR_AUCTION_REPAIR_ITEM, ERR_AUCTION_LIMITED_DURATION_ITEM, ERR_AUCTION_USED_CHARGES, ERR_AUCTION_WRAPPED_ITEM, ERR_AUCTION_BAG}
+	local ERR_MESSAGES = {ERR_ITEM_NOT_FOUND, ERR_AUCTION_DATABASE_ERROR,}
+	self:RegisterEvent("UI_ERROR_MESSAGE", function(_, msg) if tContains(ERR_MESSAGES, msg) or tContains(ERR_MESSAGES_NO_RETRY, msg) then ClearCursor() self:SendMsgToSelf("ACTION_FAILED", tContains(ERR_MESSAGES_NO_RETRY, msg) and true) end end)
+	self:RegisterEvent("BAG_UPDATE", function()
+		if GetTime() > lastBagUpdate then
+			lastBagUpdate = GetTime()
+			wipe(pendingBagChanges)
+		end
+	end)
+	while true do
+		local args = self:ReceiveMsg()
+		local event = tremove(args, 1)
+		if event == "PROCESS_ITEM" then
+			-- process a newly scanned item
+			local itemString = unpack(args)
+			numToPost = numToPost + private:ProcessItem(itemString)
+		elseif event == "REPROCESS_ITEM" then
+			self:Sleep(0.1)
+			-- re-process the specified item
+			local itemString = unpack(args)
+			-- Remove any existing entries for this item from the queue and log
+			for i=#private.queue, 1, -1 do
+				if private.queue[i].itemString == itemString then
+					tremove(private.queue, i)
+					numToPost = numToPost - 1
+				end
+			end
+			local logData = TSM.Log:GetData()
+			for i=#logData, 1, -1 do
+				if logData[i].itemString == itemString then
+					tremove(logData, i)
+				end
+			end
+			TSM.Scan:ClearLowestAuctionCache()
+			numToPost = numToPost + private:ProcessItem(itemString, 1)
+		elseif event == "DONE_SCANNING" then
+			-- we are done scanning
+			private.postInfo.doneScanning = true
+			TSM.GUI:UpdateSTData()
+			TSMAPI:DoPlaySound(TSM.db.global.scanCompleteSound)
+		elseif event == "ACTION_BUTTON" then
+			-- post an auction
+			TSM.GUI:SetButtonsEnabled(false)
+			private.postInfo.hasPosted[private.postInfo.currentItem.itemString] = true
+			ClearCursor()
+			AuctionFrameAuctions.duration = private.postInfo.currentItem.postTime -- required to avoid Blizzard errors
+			local bag, slot = private:FindItemSlot(private.postInfo.currentItem.itemString, pendingBagChanges, private.postInfo.currentItem.stackSize)
+			if bag and slot then
+				PickupContainerItem(bag, slot)
+				ClickAuctionSellItemButton(AuctionsItemButton, "LeftButton")
+				StartAuction(private.postInfo.currentItem.bid, private.postInfo.currentItem.buyout, private.postInfo.currentItem.postTime, private.postInfo.currentItem.stackSize, 1)
+				private:UpdatePendingChanges(pendingBagChanges, bag, slot, private.postInfo.currentItem.stackSize, private.postInfo.currentItem.itemString)
+				-- wait for the create auction interface to clear
+				local timeout = debugprofilestop() + 5000 -- stop waiting after 5 seconds
+				while select(3, GetContainerItemInfo(bag, slot)) and AuctionsCreateAuctionButton:IsEnabled() and debugprofilestop() < timeout do self:Yield(true) end
+				tinsert(confirmQueue, tremove(private.queue, 1))
+				numPosted = numPosted + 1
+			else
+				-- they could have deleted or otherwise posted the item in which case just pretend we posted it
+				tinsert(confirmQueue, tremove(private.queue, 1))
+				numPosted = numPosted + 1
+			end
+		elseif event == "ACTION_CONFIRMED" then
+			-- a post has been confirmed by the server
+			numConfirmed = numConfirmed + 1
+		elseif event == "ACTION_FAILED" then
+			-- a post has failed
+			numConfirmed = numConfirmed + 1
+			local noRetry = unpack(args)
+			local info = confirmQueue[numConfirmed]
+			if not noRetry then
+				tinsert(failedQueue, info)
+			end
+			TSM:LOG_INFO("Posting auction %d failed (itemString=%s, bid=%s, buyout=%s, stackSize=%d, numStacks=%d, postTime=%d)", numConfirmed, info.itemString, info.bid, info.buyout, info.stackSize, info.numStacks, info.postTime)
+		elseif event == "SKIP_BUTTON" then
+			-- skip the current item
+			for i=#private.queue, 1, -1 do
+				if private.queue[i].itemString == private.postInfo.currentItem.itemString and private.queue[i].bid == private.postInfo.currentItem.bid and private.queue[i].buyout == private.postInfo.currentItem.buyout then
+					tinsert(confirmQueue, tremove(private.queue, i))
+					numConfirmed = numConfirmed + 1
+					numPosted = numPosted + 1
+				end
+			end
+		elseif event == "EDIT_POST_PRICE" then
+			-- change the post price of the current item
+			local itemString, buyout, operation, duration = unpack(args)
+			for _, data in ipairs(private.queue) do
+				if data.itemString == itemString then
+					data.buyout = buyout
+					data.bid = buyout * operation.bidPercent
+					data.postTime = (duration == 48 and 3) or (duration == 24 and 2) or 1
+				end
+			end
+		else
+			error("Unpexected message: "..tostring(event))
+		end
+
+		if private.postInfo.doneScanning and numConfirmed == numToPost and #failedQueue > 0 then
+			TSM:Printf(L["Blizzard failed to properly post %d auction(s). They have been re-added to the post queue so you can try posting them again."], #failedQueue)
+			for i=1, #failedQueue do
+				tinsert(private.queue, failedQueue[i])
+				numToPost = numToPost + 1
+			end
+			wipe(failedQueue)
+			wipe(pendingBagChanges)
+			private:GetBagState(true)
+		end
+
+		-- update the current item / button state
+		ClearCursor()
+		private.postInfo.currentItem = #private.queue > 0 and private.queue[1] or nil
+		TSM.GUI:SetButtonsEnabled(private.postInfo.currentItem and true or false)
+		TSM.Manage:SetCurrentItem(private.postInfo.currentItem)
+		if numToPost > 0 then
+			TSM.Manage:UpdateStatus("manage", numPosted, numToPost)
+			TSM.Manage:UpdateStatus("confirm", numConfirmed, numToPost)
+		end
+
+		if private.postInfo.doneScanning and numConfirmed == numToPost then
+			-- we're done posting
+			TSMAPI:DoPlaySound(TSM.db.global.confirmCompleteSound)
+			TSM.Manage:StopScan() -- will kill this thread
+			return
+		end
+	end
+end
+
+function private:ProcessItem(itemString, queueIndex)
+	if not TSM.operationLookup[itemString] then return 0 end
+	local numToPost = 0
+	local bagState = private:GetBagState()
+	local numInBags = bagState[itemString] or 0
+	local pendingPosts = {}
+	for _, operation in ipairs(TSM.operationLookup[itemString]) do
+		local keepQuantity = operation.keepQuantity
+		if operation.keepQtySources.bank then
+			keepQuantity = keepQuantity - TSMAPI.Inventory:GetBankQuantity(itemString) - TSMAPI.Inventory:GetReagentBankQuantity(itemString)
+		end
+		if operation.keepQtySources.guild then
+			keepQuantity = keepQuantity - TSMAPI.Inventory:GetGuildQuantity(itemString)
+		end
+		keepQuantity = max(keepQuantity, 0)
+		local reason, posts, logBuyout = private:ShouldPost(itemString, operation, numInBags-keepQuantity, pendingPosts)
+		if posts then
 			local postTime = (operation.duration == 48 and 3) or (operation.duration == 24 and 2) or 1
-
-			for i = 1, #toPost do
-				local stackSize, numStacks = unpack(toPost[i])
-
-				-- Increase the bid/buyout based on how many items we're posting
-				local stackBid, stackBuyout = floor(bid * stackSize), floor(buyout * stackSize)
-				Post:QueueItemToPost(itemString, numStacks, stackSize, stackBid, stackBuyout, postTime, operation)
-				tinsert(data, { numStacks = numStacks, stackSize = stackSize, buyout = buyout, postTime = postTime })
+			for _, info in ipairs(posts) do
+				local stackSize, numStacks, bid, buyout = unpack(info)
+				numInBags = numInBags - (stackSize * numStacks)
+				for i=1, numStacks do
+					tinsert(pendingPosts, {bid=bid, buyout=buyout, postTime=postTime, stackSize=stackSize, numStacks=(numStacks-i+1), itemString=itemString, operation=operation})
+					numToPost = numToPost + 1
+				end
 			end
 		end
-
-		TSM.Log:AddLogRecord(itemString, "post", (toPost and L["Post"] or L["Skip"]), reason, operation, buyout)
-		if #postQueue > 0 and not currentItem.bag then
-			Post:SetupForAction()
-		end
-
-		if numInBags < 0 then error("less than 0") end
+		TSM.Log:AddLogRecord(itemString, "post", (posts and L["Post"] or L["Skip"]), reason, operation, logBuyout)
 		if numInBags == 0 then break end
 	end
+	for _, postInfo in ipairs(pendingPosts) do
+		if queueIndex then
+			tinsert(private.queue, queueIndex, postInfo)
+			queueIndex = queueIndex + 1
+		else
+			tinsert(private.queue, postInfo)
+		end
+	end
+	TSM.GUI:UpdateSTData()
+
+	return numToPost
 end
 
-function Post:ShouldPost(itemString, operation, numInBags)
-	local maxStackSize = select(8, TSMAPI:GetSafeItemInfo(itemString))
-	local perAuction = min(maxStackSize, operation.stackSize)
-	local maxCanPost = floor(numInBags / perAuction)
-	local perAuctionIsCap = operation.stackSizeIsCap
+function private:ShouldPost(itemString, operation, numInBags, pendingPosts)
+	local maxStackSize = TSMAPI.Item:GetMaxStack(itemString)
+	if operation.stackSize > maxStackSize and not operation.stackSizeIsCap then
+		return "notEnough"
+	end
+	local perAuction = min(operation.stackSize, maxStackSize)
+	local maxCanPost = min(floor(numInBags / perAuction), operation.postCap)
 
 	if maxCanPost == 0 then
-		if perAuctionIsCap then
+		if operation.stackSizeIsCap then
 			perAuction = numInBags
 			maxCanPost = 1
 		else
-			return nil, "notEnough", numInBags -- not enough for single post
+			 -- not enough for single post
+			return "notEnough"
 		end
 	end
 
+	local lowestAuction = TSM.Scan:GetLowestAuction(itemString, operation)
+	local prices = TSM.Util:GetItemPrices(operation, itemString, false, {minPrice=true, maxPrice=true, normalPrice=true, resetPrice=true, undercut=true, aboveMax=true})
+
+	local reason, bid, buyout
 	local activeAuctions = 0
-	local extraStack
-	local buyout, bid, _, isWhitelist, isBlacklist, isPlayer, isInvalidSeller = TSM.Scan:GetLowestAuction(itemString, operation)
-
-	if isInvalidSeller then
-		TSM:Printf(L["Seller name of lowest auction for item %s was not returned from server. Skipping this item."], select(2, TSMAPI:GetSafeItemInfo(itemString)))
-		return nil, "invalidSeller", numInBags
-	end
-
-	local prices = TSM.Util:GetItemPrices(operation, itemString, {minPrice=true, resetPrice=true})
-	if buyout and buyout <= prices.minPrice and not isBlacklist then
-		-- lowest is below min price
+	if not lowestAuction then
+		-- post as many as we can at the normal price
+		reason = "postingNormal"
+		buyout = prices.normalPrice
+	elseif lowestAuction.hasInvalidSeller then
+		-- we didn't get all the necessary seller info
+		TSM:Printf(L["The seller name of the lowest auction for %s was not given by the server. Skipping this item."], TSMAPI.Item:GetLink(itemString))
+		return "invalidSeller"
+	elseif lowestAuction.isBlacklist and lowestAuction.isPlayer then
+		TSM:Printf(L["Did not post %s because you or one of your alts (%s) is on the blacklist which is not allowed. Remove this character from your blacklist."], TSMAPI.Item:GetLink(itemString), lowestAuction.seller)
+		return "invalid"
+	elseif lowestAuction.isBlacklist and lowestAuction.isWhitelist then
+		TSM:Printf(L["Did not post %s because the owner of the lowest auction (%s) is on both the blacklist and whitelist which is not allowed. Adjust your settings to correct this issue."], TSMAPI.Item:GetLink(itemString), lowestAuction.seller)
+		return "invalid"
+	elseif lowestAuction.buyout <= prices.minPrice then
 		if prices.resetPrice then
 			-- lowest is below the min price, but there is a reset price
-			local priceResetBuyout = prices.resetPrice
-			local priceResetBid = priceResetBuyout * operation.bidPercent
-			activeAuctions = TSM.Scan:GetPlayerAuctionCount(itemString, priceResetBuyout, priceResetBid, perAuction, operation)
+			local resetReasonLookup = {minPrice="postingResetMin", maxPrice="postingResetMax", normalPrice="postingResetNormal"}
+			TSMAPI:Assert(resetReasonLookup[operation.priceReset], "Unexpected 'below minimum price' setting: "..tostring(operation.priceReset))
+			reason = resetReasonLookup[operation.priceReset]
+			buyout = prices.resetPrice
+			bid = max(bid or buyout * operation.bidPercent, prices.minPrice)
+			activeAuctions = TSM.Scan:GetPlayerAuctionCount(itemString, buyout, bid, perAuction, operation)
+		elseif lowestAuction.isBlacklist then
+			-- undercut the blacklisted player
+			reason = "undercuttingBlacklist"
+			buyout = lowestAuction.buyout - prices.undercut
 		else
-			-- lowest is below the min price and we're not going to post this item
-			return nil, "belowMinPrice", numInBags
+			-- don't post this item
+			return "belowMinPrice"
 		end
-	elseif isWhitelist and not isPlayer and not TSM.db.global.matchWhitelist then
-		-- lowest is somebody on the whitelist and we aren't price matching
-		return nil, "notPostingWhitelist", numInBags
-	elseif isPlayer or isWhitelist then
-		-- Either the player or a whitelist person is the lowest teir so use this tiers quantity of items
-		activeAuctions = TSM.Scan:GetPlayerAuctionCount(itemString, buyout or 0, bid or 0, perAuction, operation)
-	end
-
-	-- If we have a post cap of 20, and 10 active auctions, but we can only have 5 of the item then this will only let us create 5 auctions
-	-- however, if we have 20 of the item it will let us post another 10
-	local auctionsCreated = min(operation.postCap - activeAuctions, maxCanPost)
-	if auctionsCreated <= 0 then
-		return nil, "tooManyPosted", numInBags
-	end
-
-	if (auctionsCreated + activeAuctions) < operation.postCap then
-		-- can post at least one more
-		local extra = numInBags % perAuction
-		if perAuctionIsCap and extra > 0 then
-			extraStack = extra
-		end
-	end
-
-	if Post:FindItemSlot(itemString) then
-		local posts = { { perAuction, auctionsCreated } }
-		numInBags = numInBags - perAuction * auctionsCreated
-		if extraStack then
-			numInBags = numInBags - extraStack
-			tinsert(posts, { extraStack, 1 })
-		end
-		-- third return value specifies whether there's extra left over in the player's bags after this operation
-		return posts, nil, numInBags
-	end
-end
-
-function Post:GetPostPrice(itemString, operation)
-	local lowestBuyout, lowestBid, lowestOwner, isWhitelist, isBlacklist, isPlayer = TSM.Scan:GetLowestAuction(itemString, operation)
-	local bid, buyout, info
-	local prices = TSM.Util:GetItemPrices(operation, itemString, {minPrice=true, maxPrice=true, normalPrice=true, resetPrice=true, undercut=true, aboveMax=true})
-
-	if not lowestOwner then
-		-- No other auctions up, default to normalPrice
-		info = "postingNormal"
-		buyout = prices.normalPrice
-	elseif prices.resetPrice and lowestBuyout <= prices.minPrice and not isBlacklist then
-		-- item is below min price and a priceReset is set
-		if operation.priceReset == "minPrice" then
-			info = "postingResetMin"
-		elseif operation.priceReset == "maxPrice" then
-			info = "postingResetMax"
-		elseif operation.priceReset == "normalPrice" then
-			info = "postingResetNormal"
+	elseif lowestAuction.isPlayer or (lowestAuction.isWhitelist and TSM.db.global.matchWhitelist) then
+		-- we (or a whitelisted play we should match) is lowest, so match the current price and post as many as we can
+		activeAuctions = TSM.Scan:GetPlayerAuctionCount(itemString, lowestAuction.buyout, lowestAuction.bid, perAuction, operation)
+		if lowestAuction.isPlayer then
+			reason = "postingPlayer"
 		else
-			-- should never happen, but better to throw an error here than cause issues later on
-			error("Unknown 'below minimum' price setting.")
+			reason = "postingWhitelist"
 		end
-		buyout = prices.resetPrice
-	elseif isPlayer or (isWhitelist and lowestBuyout - prices.undercut <= prices.maxPrice) then
-		-- Either we already have one up or someone on the whitelist does
-		bid, buyout = min(lowestBid, lowestBuyout), lowestBuyout
-		info = isPlayer and "postingPlayer" or "postingWhitelist"
+		bid = lowestAuction.bid
+		buyout = lowestAuction.buyout
+	elseif lowestAuction.isWhitelist then
+		-- don't undercut a whitelisted player
+		return "notPostingWhitelist"
+	elseif (lowestAuction.buyout - prices.undercut) > prices.maxPrice then
+		-- we'd be posting above the max price, so resort to the aboveMax setting
+		local aboveMaxReasons = {minPrice="aboveMaxMin", maxPrice="aboveMaxMax", normalPrice="aboveMaxNormal", none="aboveMaxNoPost"}
+		if operation.aboveMax == "none" then
+			return "aboveMaxNoPost"
+		end
+		TSMAPI:Assert(aboveMaxReasons[operation.aboveMax], "Unexpected 'above max price' setting: "..tostring(operation.aboveMax))
+		reason = aboveMaxReasons[operation.aboveMax]
+		buyout = prices.aboveMax
 	else
-		-- we've been undercut and we are going to undercut back
-		buyout = lowestBuyout - prices.undercut
-		-- if the cheapest is above our max price, follow the aboveMax setting
-		if buyout > prices.maxPrice then
-			if operation.aboveMax == "minPrice" then
-				info = "aboveMaxMin"
-			elseif operation.aboveMax == "maxPrice" then
-				info = "aboveMaxMax"
-			elseif operation.aboveMax == "normalPrice" then
-				info = "aboveMaxNormal"
+		-- we just need to do a normal undercut of the lowest auction
+		reason = "postingUndercut"
+		buyout = lowestAuction.buyout - prices.undercut
+	end
+	if reason == "undercuttingBlacklist" then
+		bid = bid or buyout * operation.bidPercent
+	else
+		buyout = max(buyout, prices.minPrice)
+		bid = max(bid or buyout * operation.bidPercent, prices.minPrice)
+	end
+
+	-- check if we can't post anymore
+	for _, info in ipairs(pendingPosts) do
+		if info.stackSize == perAuction and info.buyout/info.stackSize == buyout then
+			activeAuctions = activeAuctions + 1
+		end
+	end
+	maxCanPost = min(operation.postCap - activeAuctions, maxCanPost)
+	if maxCanPost <= 0 then
+		return "tooManyPosted"
+	end
+
+	local extraStack = (maxCanPost < operation.postCap and operation.stackSizeIsCap and (numInBags % perAuction)) or 0
+	local posts = {}
+	tinsert(posts, {perAuction, maxCanPost, bid*perAuction, buyout*perAuction})
+	if extraStack > 0 then
+		tinsert(posts, {extraStack, 1, bid*extraStack, buyout*extraStack})
+	end
+	return reason, posts, buyout
+end
+
+
+function private:GetItemSlotInfo(bagInfo, itemString, pendingBagChanges)
+	local slotInfo = {ascendingList={}, descendingList={}, lookup={}}
+	for _, info in ipairs(bagInfo) do
+		local bag, slot, slotItemString, quantity = unpack(info)
+		if slotItemString == itemString then
+			for _, info in ipairs(pendingBagChanges) do
+				if info.bag == bag and info.slot == slot and info.itemString == itemString then
+					quantity = quantity - info.quantity
+				end
+			end
+			if quantity > 0 then
+				local slotId = (bag * 1000 + slot)
+				slotInfo.lookup[slotId] = quantity
+				tinsert(slotInfo.ascendingList, slotId)
+				tinsert(slotInfo.descendingList, slotId)
+			end
+		end
+	end
+	sort(slotInfo.ascendingList, function(a, b) return a < b end)
+	sort(slotInfo.descendingList, function(a, b) return a > b end)
+	return slotInfo
+end
+
+function private:UpdatePendingChanges(pendingBagChanges, bag, slot, selectedQuantity, itemString, slotInfo)
+	if not slotInfo then
+		slotInfo = private:GetItemSlotInfo(select(2, private:GetBagState()), itemString, pendingBagChanges)
+	end
+	local selectedSlotId = bag * 1000 + slot
+
+	-- try to post completely from the selected slot (rule #2)
+	if (slotInfo.lookup[selectedSlotId] or 0) >= selectedQuantity then
+		tinsert(pendingBagChanges, {bag=bag, slot=slot, quantity=selectedQuantity, itemString=itemString})
+		return
+	end
+
+	-- try and find a stack at a lower slot which has enough to post from (rule #3)
+	for _, slotId in ipairs(slotInfo.ascendingList) do
+		if slotId < selectedSlotId then
+			local num = slotInfo.lookup[slotId]
+			if num >= selectedQuantity then
+				local tempBag, tempSlot = floor(slotId / 1000), slotId % 1000
+				tinsert(pendingBagChanges, {bag=tempBag, slot=tempSlot, quantity=selectedQuantity, itemString=itemString})
+				return
+			end
+		end
+	end
+
+	-- try to post using the selected slot and the lower slots (rule #1)
+	local numNeeded = selectedQuantity
+	local temp = {}
+	for _, slotId in ipairs(slotInfo.descendingList) do
+		if slotId <= selectedSlotId then
+			local num = slotInfo.lookup[slotId]
+			if num > numNeeded then
+				-- we just need part of this stack
+				local tempBag, tempSlot = floor(slotId / 1000), slotId % 1000
+				tinsert(temp, {bag=tempBag, slot=tempSlot, quantity=numNeeded, itemString=itemString})
+				numNeeded = 0
 			else
-				-- should never happen, but better to throw an error here than cause issues later on
-				error("Unknown 'above maximum' price setting.")
+				-- use this entire stack
+				numNeeded = numNeeded - num
+				local tempBag, tempSlot = floor(slotId / 1000), slotId % 1000
+				tinsert(temp, {bag=tempBag, slot=tempSlot, quantity=num, itemString=itemString})
 			end
-			buyout = prices.aboveMax
-		end
-		if isBlacklist and buyout < prices.minPrice then
-			-- we don't care if the buyout/bid are below the min price since we're undercutting a blacklisted player
-			info = "undercuttingBlacklist"
-		else
-			-- make sure the buyout and bid aren't below the minPrice
-			buyout = max(buyout, prices.minPrice)
-			-- Check if the bid is too low
-			bid = max(buyout * operation.bidPercent, prices.minPrice)
-			info = info or "postingUndercut"
+			if numNeeded == 0 then
+				for _, info in ipairs(temp) do
+					tinsert(pendingBagChanges, info)
+				end
+				return
+			end
 		end
 	end
 
-	-- set the bid if it hasn't been set
-	bid = bid or (buyout * operation.bidPercent)
-	return bid, buyout, info
-end
-
-function Post:QueueItemToPost(itemString, numStacks, stackSize, bid, buyout, postTime, operation)
-	itemLocations[itemString] = itemLocations[itemString] or Post:FindItemSlot(itemString, true)
-
-	for i = 1, numStacks do
-		local oBag, oSlot
-		for j = 1, #itemLocations[itemString] do
-			if itemLocations[itemString][j].quantity >= stackSize then
-				oBag, oSlot = itemLocations[itemString][j].bag, itemLocations[itemString][j].slot
-				itemLocations[itemString][j].quantity = itemLocations[itemString][j].quantity - stackSize
-				break
-			end
+	-- try the next highest slot (rule #4)
+	local nextHighestSlotId = nil
+	for _, slotId in ipairs(slotInfo.ascendingList) do
+		if slotId > selectedSlotId then
+			nextHighestSlotId = slotId
+			break
 		end
-		if not oBag or not oSlot then
-			oBag, oSlot = Post:FindItemSlot(itemString)
-			if not (oBag and oSlot) then break end
-		end
-		tinsert(postQueue, { bag = oBag, slot = oSlot, bid = bid, buyout = buyout, postTime = postTime, stackSize = stackSize, numStacks = (numStacks - i + 1), itemString = itemString, operation = operation })
-		totalToPost = totalToPost + 1
 	end
-	TSM.Manage:UpdateStatus("manage", totalPosted, totalToPost)
+	TSMAPI:Assert(nextHighestSlotId, "This should never happen that we don't find the next highest slot!")
+	bag, slot = floor(nextHighestSlotId / 1000), nextHighestSlotId % 1000
+	return private:UpdatePendingChanges(pendingBagChanges, bag, slot, selectedQuantity, itemString, slotInfo)
 end
 
-function Post:FindItemSlot(findItemString, allLocations)
-	local locations = {}
-	Post:UpdateBagState()
+function private:FindItemSlot(findItemString, pendingBagChanges, targetQuantity)
+	local bagInfo = select(2, private:GetBagState())
+	local resultBag, resultSlot, resultExtra = nil, nil, nil
 	for _, data in ipairs(bagInfo) do
 		local bag, slot, itemString, quantity = unpack(data)
 		if findItemString == itemString then
-			if not allLocations then
-				return bag, slot
+			for _, info in ipairs(pendingBagChanges) do
+				if info.bag == bag and info.slot == slot and info.itemString == itemString then
+					quantity = quantity - info.quantity
+				end
 			end
-			tinsert(locations, { bag = bag, slot = slot, quantity = quantity })
+			if quantity > 0 and not resultBag and not resultSlot then
+				resultBag = bag
+				resultSlot = slot
+			end
+			local extra = quantity - targetQuantity
+			if extra == 0 then
+				-- anytime we can use a stack of exactly the right size, we should
+				return bag, slot
+			elseif extra > 0 then
+				if not resultExtra or extra < resultExtra then
+					resultBag = bag
+					resultSlot = slot
+					resultExtra = extra
+				end
+			elseif not resultExtra then
+				resultBag = bag
+				resultSlot = slot
+			end
 		end
 	end
-	return allLocations and locations
+	return resultBag, resultSlot
 end
 
-function Post:GetNumInBags(itemString)
-	local num = 0
-	Post:UpdateBagState()
-	return bagState[itemString] or 0
+function Post:CanBuyAuction(itemString)
+	if not itemString or not private.postInfo then return end
+	if not private.postInfo.doneScanning then return nil, "scanning" end
+	if private.postInfo.hasPosted[itemString] then return nil, "posted" end
+	return true
 end
 
-local timeout = CreateFrame("Frame")
-timeout:Hide()
-timeout:SetScript("OnUpdate", function(self, elapsed)
-	self.timeLeft = self.timeLeft - elapsed
-	if self.timeLeft <= 0 or (postQueue[1] and postQueue[1].bag and postQueue[1].slot and not select(3, GetContainerItemInfo(postQueue[1].bag, postQueue[1].slot)) and not AuctionsCreateAuctionButton:IsEnabled()) then
-		tremove(postQueue, 1)
-		Post:UpdateItem()
-	end
-end)
-
-function Post:SetupForAction()
-	Post:RegisterEvent("CHAT_MSG_SYSTEM")
-	timeout:Hide()
-	ClearCursor()
-	TSM.Manage:UpdateStatus("manage", totalPosted, totalToPost)
-	wipe(currentItem)
-	currentItem = postQueue[1]
-	TSM.Manage:SetCurrentItem(currentItem)
-	GUI.buttons:Enable()
-end
-
--- Check if an auction was posted and move on if so
-function Post:CHAT_MSG_SYSTEM(_, msg)
-	if msg == ERR_AUCTION_STARTED then
-		count = count + 1
-		TSM.Manage:UpdateStatus("confirm", count, totalToPost)
-	end
-end
-
-local countFrame = CreateFrame("Frame")
-countFrame:Hide()
-countFrame.count = -1
-countFrame.timeLeft = 10
-countFrame:SetScript("OnUpdate", function(self, elapsed)
-	self.timeLeft = self.timeLeft - elapsed
-	if count >= totalToPost or self.timeLeft <= 0 then
-		self:Hide()
-		Post:Stop()
-	elseif count ~= self.count then
-		self.count = count
-		self.timeLeft = (totalToPost - count) * 2
-	end
-end)
-
-local function DelayFrame()
-	if #postQueue > 0 then
-		Post:UpdateItem()
-		TSMAPI:CancelFrame("postDelayFrame")
-	elseif not isScanning then
-		TSM.Manage:UpdateStatus("manage", totalPosted, totalToPost)
-		Post:Stop()
-		TSMAPI:CancelFrame("postDelayFrame")
-	end
-end
-
-function Post:UpdateItem()
-	ClearCursor()
-	timeout:Hide()
-	if #postQueue == 0 then
-		GUI.buttons:Disable()
-		if isScanning then
-			TSMAPI:CreateFunctionRepeat("postDelayFrame", DelayFrame)
-		else
-			TSM.Manage:UpdateStatus("manage", totalPosted + 1, totalToPost)
-			countFrame:Show()
-		end
-		return
-	end
-
-	totalPosted = totalPosted + 1
-	TSM.Manage:UpdateStatus("manage", totalPosted, totalToPost)
-	wipe(currentItem)
-	currentItem = postQueue[1]
-	TSM.Manage:SetCurrentItem(currentItem)
-	GUI.buttons:Enable()
-end
-
-function Post:DoAction()
-	timeout.timeLeft = 5
-	timeout:Show()
-	if not AuctionFrameAuctions.duration then
-		-- Fix in case Blizzard_AuctionUI hasn't set this value yet (which could cause an error)
-		AuctionFrameAuctions.duration = 2
-	end
-	
-	if not currentItem.itemString then
-		timeout:Hide()
-		Post:SkipItem()
-		return
-	end
-
-	if type(currentItem.bag) ~= "number" or type(currentItem.slot) ~= "number" then
-		local bag, slot = Post:FindItemSlot(currentItem.itemString)
-		if not bag or not slot then
-			local link = select(2, TSMAPI:GetSafeItemInfo(currentItem.itemString)) or currentItem.itemString
-			TSM:Printf(L["Auctioning could not find %s in your bags so has skipped posting it. Running the scan again should resolve this issue."], link)
-			timeout:Hide()
-			Post:SkipItem()
-			return
-		end
-		currentItem.bag = bag
-		currentItem.slot = slot
-	end
-	local itemString = TSMAPI:GetBaseItemString(GetContainerItemLink(currentItem.bag, currentItem.slot), true)
-	if itemString ~= currentItem.itemString then
-		TSM:Print(L["Please don't move items around in your bags while a post scan is running! The item was skipped to avoid an incorrect item being posted."])
-		timeout:Hide()
-		Post:SkipItem()
-		return
-	end
-
-	PickupContainerItem(currentItem.bag, currentItem.slot)
-	ClickAuctionSellItemButton(AuctionsItemButton, "LeftButton")
-	StartAuction(currentItem.bid, currentItem.buyout, currentItem.postTime, currentItem.stackSize, 1)
-	GUI.buttons:Disable()
-end
-
-function Post:SkipItem()
-	local toSkip = {}
-	local skipped = tremove(postQueue, 1)
-	count = count + 1
-	for i, info in ipairs(postQueue) do
-		if info.itemString == skipped.itemString and info.bid == skipped.bid and info.buyout == skipped.buyout then
-			tinsert(toSkip, i)
-		end
-	end
-	sort(toSkip, function(a, b) return a > b end)
-	for _, index in ipairs(toSkip) do
-		tremove(postQueue, index)
-		count = count + 1
-		totalPosted = totalPosted + 1
-	end
-	TSM.Manage:UpdateStatus("manage", totalPosted, totalToPost)
-	TSM.Manage:UpdateStatus("confirm", count, totalToPost)
-	Post:UpdateItem()
-end
-
-function Post:Stop()
-	GUI:Stopped()
-	TSMAPI:CancelFrame("postDelayFrame")
+function Post:StopPosting()
+	TSMAPI.Threading:Kill(private.threadId)
 	Post:UnregisterAllEvents()
-	TSMAPI:FireEvent("AUCTIONING:POST:STOPPED")
-
-	wipe(currentItem)
-	totalToPost, totalPosted = 0, 0
-	isScanning = false
-end
-
-function Post:GetAHGoldTotal()
-	local total = 0
-	local incomingTotal = 0
-	for i = 1, GetNumAuctionItems("owner") do
-		local count, _, _, _, _, _, _, buyoutAmount = select(3, GetAuctionItemInfo("owner", i))
-		total = total + buyoutAmount
-		if count == 0 then
-			incomingTotal = incomingTotal + buyoutAmount
-		end
-	end
-	return TSMAPI:FormatTextMoneyIcon(total), TSMAPI:FormatTextMoneyIcon(incomingTotal)
-end
-
-function Post:GetCurrentItem()
-	return currentItem
-end
-
-function Post:EditPostPrice(itemString, buyout, operation)
-	local bid = buyout * operation.bidPercent
-
-	if currentItem.itemString == itemString then
-		currentItem.buyout = buyout
-		currentItem.bid = bid
-	end
-
-	for _, data in ipairs(postQueue) do
-		if data.itemString == itemString then
-			data.buyout = buyout
-			data.bid = bid
-		end
-	end
-	TSM.Manage:SetCurrentItem(currentItem)
-end
-
-function Post:DoneScanning()
-	isScanning = false
-	return totalToPost
+	wipe(private.queue)
+	private.threadId = nil
+	private.postInfo = nil
 end

@@ -1,3 +1,69 @@
+3.1.1-beta6
+* Correctly disable nameplate module (caused lua errors for some people)
+
+3.1.1-beta5
+* Updated the equipment changer to the new spec system
+
+3.1.1-beta4
+* Made the minimapbuttons fix a bit more general (tickets 24, 23)
+
+3.1.1-beta3
+* Disabled Eclipse bar libs and functions (thanks whurt74)
+* Fixed small UI alignment bug in the minimap locatioin text
+
+3.1.1-beta2
+* Fixed tapped-bug (Thanks belechannas for the tip)
+* Fixed minimapbuttons (GarrisonLandingPageMinimapButton-fix)
+
+3.1.1-beta1
+* Started work on update for 7.0.3 en ElvUI 10+
+* updated toc file to new WoW version 
+* updated LibBalancePowerTracker to version LibBalancePowerTracker-2.0
+* updated config.lua to work with ElvUi >10
+* updated minimap buttons
+* updated minimap bar
+* updated target class icons
+* disabled nameplate enhancements (for now)
+
+3.1.0-beta5
+* added HFC to progression tooltip
+* progression info is not updated or shown while in combat. This is to fix the performance problems while use mouseover spells during combat.
+
+3.1.0-beta4
+* bumb version for 6.2.0
+
+3.1.0-beta3
+* fixed bug with garrison button skinning
+
+3.1.0-beta2
+* fixed bug: 5-pet-battles-and-garrison-button-skin-error-in-the-minimap/
+
+3.1.0-beta1
+* Fixed role icons hiding in combat
+* Removed the option "Auto role icon" since this is now a feature of WoW and ElvUI it self.
+* Fixed bug when entering or leaving a raid. (Ticket: 4-lua-error-when-i-enter-in-raid)
+* Changed the color of the enhanced settings.
+
+3.0.9
+* Minimapbar: Added the option to add the Garrison button to the minimap button bar. (General -> Minimap Button Bar)
+* Minimapbar: Added the option to add the Calendar button to the minimap button bar. (General -> Minimap Button Bar)
+* Minimapbar: Error with minimapbar in No Anchor mode and TradeSkillMaster. Workaround for the error in place. icon position is not saved on reload.
+* Minimapbar: Bugfix where in no anchor mode the position of the icons would reset onclick.
+* HealGlow: updated Wild Mushroom SpellId
+* HealGlow: Added Paladin Daybreak
+* HealGlow: Fixed for flexraid frames
+
+Known Issue:
+* TradeSkillMaster icon position in NO ANCHOR mode is not saved.
+
+3.0.8
+* updated to 6.1.0
+* fixed location bar position. thanks pletfjerner@curse for the report.
+* fixed raidmarkerbar illegal interface actions error
+
+3.0.7.1
+* Removed Garrison icon from the minimapbutton due to bug. I will re-add it as an option and when i fix the bug.
+
 3.0.7
 * Updated welcome message.
 * Raidmarkerbar: Updated the bar to hide when leaving a party/group.

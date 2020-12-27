@@ -1,13 +1,12 @@
 local mod	= DBM:NewMod(324, "DBM-DragonSoul", nil, 187)
 local L		= mod:GetLocalizedStrings()
 
-mod:SetRevision(("$Revision: 145 $"):sub(12, -3))
+mod:SetRevision("20200806141910")
 mod:SetCreatureID(55308)
 mod:SetEncounterID(1294)
 --mod:DisableRegenDetection()--Uncomment in next dbm release
-mod:SetZone()
 mod:SetUsedIcons()
-mod:SetModelSound("sound\\CREATURE\\WarlordZonozz\\VO_DS_ZONOZZ_INTRO_01.OGG", "sound\\CREATURE\\WarlordZonozz\\VO_DS_ZONOZZ_SPELL_05.OGG")
+--mod:SetModelSound("sound\\CREATURE\\WarlordZonozz\\VO_DS_ZONOZZ_INTRO_01.OGG", "sound\\CREATURE\\WarlordZonozz\\VO_DS_ZONOZZ_SPELL_05.OGG")
 
 mod:RegisterCombat("combat")
 
@@ -32,12 +31,12 @@ local specWarnPsychicDrain		= mod:NewSpecialWarningSpell(104322, false)
 local specWarnShadows			= mod:NewSpecialWarningYou(103434)
 local yellShadows				= mod:NewYell(103434, nil, false, L.ShadowYell)--Requested by 10 man guilds, but a spammy mess in 25s, so off by default. With the option to enable when desired.
 
-local timerVoidofUnmakingCD		= mod:NewNextTimer(90.3, 103571, nil, nil, nil, 103527)
-local timerVoidDiffusionCD		= mod:NewCDTimer(5, 106836)
+local timerVoidofUnmakingCD		= mod:NewNextTimer(90.3, 103571, nil, nil, nil, 5, 103527)
+local timerVoidDiffusionCD		= mod:NewCDTimer(5, 106836, nil, nil, nil, 5)
 local timerFocusedAngerCD		= mod:NewCDTimer(6, 104543, nil, false)--Off by default as it may not be entirely useful information to know, but an option just for heck of it. You know SOMEONE is gonna request it
-local timerPsychicDrainCD		= mod:NewCDTimer(20, 104322)--Every 20-25 seconds, variates.
-local timerShadowsCD			= mod:NewCDTimer(25, 103434)--Every 25-30, variates
-local timerBlackBlood			= mod:NewBuffActiveTimer(30, 104378)
+local timerPsychicDrainCD		= mod:NewCDTimer(20, 104322, nil, "Tank", nil, 5, nil, DBM_CORE_L.TANK_ICON)--Every 20-25 seconds, variates.
+local timerShadowsCD			= mod:NewCDTimer(25, 103434, nil, nil, nil, 3, nil, DBM_CORE_L.MAGIC_ICON)--Every 25-30, variates
+local timerBlackBlood			= mod:NewBuffActiveTimer(30, 104378, nil, nil, nil, 6)
 
 local berserkTimer				= mod:NewBerserkTimer(360)
 
@@ -46,6 +45,7 @@ mod:AddDropdownOption("CustomRangeFrame", {"Never", "Normal", "DynamicPhase2", "
 local shadowsTargets = {}
 local phase2Started = false
 local voidWarned = false
+local filterDebuff = DBM:GetSpellInfo(103434)
 
 local function warnShadowsTargets()
 	warnShadows:Show(table.concat(shadowsTargets, "<, >"))
@@ -56,14 +56,14 @@ end
 local shadowsDebuffFilter
 do
 	shadowsDebuffFilter = function(uId)
-		return UnitDebuff(uId, (GetSpellInfo(103434)))
+		return DBM:UnitDebuff(uId, (filterDebuff))
 	end
 end
 
 --"Never", "Normal", "DynamicPhase2", "DynamicAlways"
 function mod:updateRangeFrame()
 	if self:IsDifficulty("normal10", "normal25", "lfr25") or self.Options.CustomRangeFrame == "Never" then return end
-	if self.Options.CustomRangeFrame == "Normal" or UnitDebuff("player", GetSpellInfo(103434)) or self.Options.CustomRangeFrame == "DynamicPhase2" and not phase2Started then--You have debuff or only want normal range frame or it's phase 1 and you only want dymanic in phase 2
+	if self.Options.CustomRangeFrame == "Normal" or DBM:UnitDebuff("player", filterDebuff) or self.Options.CustomRangeFrame == "DynamicPhase2" and not phase2Started then--You have debuff or only want normal range frame or it's phase 1 and you only want dymanic in phase 2
 		DBM.RangeCheck:Show(10, nil)--Show everyone.
 	else
 		DBM.RangeCheck:Show(10, shadowsDebuffFilter)--Show only people who have debuff.
@@ -104,7 +104,7 @@ function mod:SPELL_CAST_SUCCESS(args)
 		specWarnPsychicDrain:Show()
 		timerPsychicDrainCD:Start()
 	end
-end	
+end
 
 function mod:SPELL_AURA_APPLIED(args)
 	local spellId = args.spellId
@@ -145,7 +145,7 @@ function mod:SPELL_AURA_APPLIED(args)
 			self:Schedule(0.3, warnShadowsTargets)
 		end
 	end
-end		
+end
 mod.SPELL_AURA_APPLIED_DOSE = mod.SPELL_AURA_APPLIED
 
 function mod:SPELL_AURA_REMOVED(args)
@@ -155,7 +155,7 @@ function mod:SPELL_AURA_REMOVED(args)
 	end
 end
 
-function mod:UNIT_SPELLCAST_SUCCEEDED(uId, _, _, _, spellId)
+function mod:UNIT_SPELLCAST_SUCCEEDED(uId, _, spellId)
 	--Void of the unmaking cast, do not use spellname because we want to ignore events using spellid 103627 which fires when the sphere dispurses on the boss.
 	--It looks this event doesn't fire in raid finder. It seems to still fire in normal and heroic modes.
 	if spellId == 103571 and not voidWarned then

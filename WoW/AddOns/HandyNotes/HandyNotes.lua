@@ -7,8 +7,12 @@ HandyNotes
 HandyNotes = LibStub("AceAddon-3.0"):NewAddon("HandyNotes", "AceConsole-3.0", "AceEvent-3.0")
 local HandyNotes = HandyNotes
 local L = LibStub("AceLocale-3.0"):GetLocale("HandyNotes", false)
-local Astrolabe = DongleStub("Astrolabe-1.0")
 
+local HBD = LibStub("HereBeDragons-2.0")
+local HBDPins = LibStub("HereBeDragons-Pins-2.0")
+local HBDMigrate = LibStub("HereBeDragons-Migrate")
+
+local WoWClassic = select(4, GetBuildInfo()) < 20000
 
 ---------------------------------------------------------
 -- Our db upvalue and db defaults
@@ -31,61 +35,25 @@ local defaults = {
 ---------------------------------------------------------
 -- Localize some globals
 local floor = floor
-local tconcat = table.concat
 local pairs, next, type = pairs, next, type
 local CreateFrame = CreateFrame
-local GetCurrentMapContinent, GetCurrentMapZone = GetCurrentMapContinent, GetCurrentMapZone
-local GetCurrentMapDungeonLevel = GetCurrentMapDungeonLevel
-local GetRealZoneText = GetRealZoneText
-local WorldMapButton, Minimap = WorldMapButton, Minimap
+local Minimap = Minimap
 
 
 ---------------------------------------------------------
--- xpcall safecall implementation, copied from AceAddon-3.0.lua
--- (included in distribution), with permission from nevcairiel
+-- xpcall safecall implementation
 local xpcall = xpcall
 
 local function errorhandler(err)
 	return geterrorhandler()(err)
 end
 
-local function CreateDispatcher(argCount)
-	local code = [[
-		local xpcall, eh = ...
-		local method, ARGS
-		local function call() return method(ARGS) end
-	
-		local function dispatch(func, ...)
-			 method = func
-			 if not method then return end
-			 ARGS = ...
-			 return xpcall(call, eh)
-		end
-	
-		return dispatch
-	]]
-	
-	local ARGS = {}
-	for i = 1, argCount do ARGS[i] = "arg"..i end
-	code = code:gsub("ARGS", tconcat(ARGS, ", "))
-	return assert(loadstring(code, "safecall Dispatcher["..argCount.."]"))(xpcall, errorhandler)
-end
-
-local Dispatchers = setmetatable({}, {__index=function(self, argCount)
-	local dispatcher = CreateDispatcher(argCount)
-	rawset(self, argCount, dispatcher)
-	return dispatcher
-end})
-Dispatchers[0] = function(func)
-	return xpcall(func, errorhandler)
-end
-
 local function safecall(func, ...)
 	-- we check to see if the func is passed is actually a function here and don't error when it isn't
-	-- this safecall is used for optional functions like OnInitialize OnEnable etc. When they are not
+	-- this safecall is used for optional functions like OnEnter OnLeave etc. When they are not
 	-- present execution should continue without hinderance
 	if type(func) == "function" then
-		return Dispatchers[select('#', ...)](func, ...)
+		return xpcall(func, errorhandler, ...)
 	end
 end
 
@@ -94,7 +62,6 @@ end
 -- Our frames recycling code
 local pinCache = {}
 local minimapPins = {}
-local worldmapPins = {}
 local pinCount = 0
 
 local function recyclePin(pin)
@@ -103,9 +70,9 @@ local function recyclePin(pin)
 end
 
 local function clearAllPins(t)
-	for coord, pin in pairs(t) do
+	for key, pin in pairs(t) do
 		recyclePin(pin)
-		t[coord] = nil
+		t[key] = nil
 	end
 end
 
@@ -117,16 +84,18 @@ local function getNewPin()
 	end
 	-- create a new pin
 	pinCount = pinCount + 1
-	pin = CreateFrame("Button", "HandyNotesPin"..pinCount, WorldMapButton)
+	pin = CreateFrame("Button", "HandyNotesPin"..pinCount, Minimap)
 	pin:SetFrameLevel(5)
 	pin:EnableMouse(true)
 	pin:SetWidth(12)
 	pin:SetHeight(12)
-	pin:SetPoint("CENTER", WorldMapButton, "CENTER")
+	pin:SetPoint("CENTER", Minimap, "CENTER")
 	local texture = pin:CreateTexture(nil, "OVERLAY")
 	pin.texture = texture
 	texture:SetAllPoints(pin)
-	pin:RegisterForClicks("LeftButtonDown", "LeftButtonUp", "RightButtonDown", "RightButtonUp")
+	texture:SetTexelSnappingBias(0)
+	texture:SetSnapToPixelGrid(false)
+	pin:RegisterForClicks("AnyUp", "AnyDown")
 	pin:SetMovable(true)
 	pin:Hide()
 	return pin
@@ -144,6 +113,19 @@ In this table, the format is:
 	["Name of plugin"] = {table containing a set of standard functions, which we'll call pluginHandler}
 
 Standard functions we require for every plugin:
+	iter, state, value = pluginHandler:GetNodes2(uiMapID, minimap)
+		Parameters
+		- uiMapID: The zone we want data for
+		- minimap: Boolean argument indicating that we want to get nodes to display for the minimap
+		Returns:
+		- iter: An iterator function that will loop over and return 5 values
+			(coord, uiMapID, iconpath, scale, alpha)
+			for every node in the requested zone. If the uiMapID return value is nil, we assume it is the
+			same uiMapID as the argument passed in. Mainly used for continent uiMapID where the map passed
+			in is a continent, and the return values are coords of subzone maps.
+		- state, value: First 2 args to pass into iter() on the initial iteration
+
+Legacy Alternative - You're strongly urged to update to GetNodes2!
 	iter, state, value = pluginHandler:GetNodes(mapFile, minimap, dungeonLevel)
 		Parameters
 		- mapFile: The zone we want data for
@@ -159,11 +141,11 @@ Standard functions we require for every plugin:
 		- state, value: First 2 args to pass into iter() on the initial iteration
 
 Standard functions you can provide optionally:
-	pluginHandler:OnEnter(mapFile, coord)
+	pluginHandler:OnEnter(uiMapID/mapFile, coord)
 		Function we will call when the mouse enters a HandyNote, you will generally produce a tooltip here.
-	pluginHandler:OnLeave(mapFile, coord)
+	pluginHandler:OnLeave(uiMapID/mapFile, coord)
 		Function we will call when the mouse leaves a HandyNote, you will generally hide the tooltip here.
-	pluginHandler:OnClick(button, down, mapFile, coord)
+	pluginHandler:OnClick(button, down, uiMapID/mapFile, coord)
 		Function we will call when the user clicks on a HandyNote, you will generally produce a menu here on right-click.
 ]]
 
@@ -173,7 +155,6 @@ function HandyNotes:RegisterPluginDB(pluginName, pluginHandler, optionsTable)
 	else
 		self.plugins[pluginName] = pluginHandler
 	end
-	worldmapPins[pluginName] = {}
 	minimapPins[pluginName] = {}
 	options.args.plugins.args[pluginName] = optionsTable
 	pluginsOptionsText[pluginName] = optionsTable and optionsTable.name or pluginName
@@ -182,121 +163,87 @@ end
 
 local pinsHandler = {}
 function pinsHandler:OnEnter(motion)
-	WorldMapBlobFrame:SetScript("OnUpdate", nil) -- override default UI to hide the tooltip
-	safecall(HandyNotes.plugins[self.pluginName].OnEnter, self, self.mapFile, self.coord)
+	safecall(HandyNotes.plugins[self.pluginName].OnEnter, self, self.mapFile or self.uiMapID, self.coord)
 end
 function pinsHandler:OnLeave(motion)
-	WorldMapBlobFrame:SetScript("OnUpdate", WorldMapBlobFrame_OnUpdate) -- restore default UI
-	safecall(HandyNotes.plugins[self.pluginName].OnLeave, self, self.mapFile, self.coord)
+	safecall(HandyNotes.plugins[self.pluginName].OnLeave, self, self.mapFile or self.uiMapID, self.coord)
 end
 function pinsHandler:OnClick(button, down)
-	safecall(HandyNotes.plugins[self.pluginName].OnClick, self, button, down, self.mapFile, self.coord)
+	safecall(HandyNotes.plugins[self.pluginName].OnClick, self, button, down, self.mapFile or self.uiMapID, self.coord)
 end
 
 
 ---------------------------------------------------------
 -- Public functions
 
--- Build data
-local continentMapFile = {
-	[WORLDMAP_COSMIC_ID] = "Cosmic", -- That constant is -1
-	[WORLDMAP_AZEROTH_ID] = "World",
-}
-local continentList = {}
-local zoneList = {}
-local reverseZoneC = {}
-local reverseZoneZ = {}
-local zonetoMapID = {}
-local mapIDtoMapFile = {
-	[WORLDMAP_COSMIC_ID] = "Cosmic",
-	[WORLDMAP_AZEROTH_ID] = "World",
-}
-local mapFiletoMapID = {
-	["Cosmic"] = -1,
-	["World"] = 0,
-}
-local reverseMapFileC = {
-	["Cosmic"] = WORLDMAP_COSMIC_ID,
-	["World"] = WORLDMAP_AZEROTH_ID,
-}
-local reverseMapFileZ = {
-	["Cosmic"] = 0,
-	["World"] = 0,
-}
-local continentTempList = {GetMapContinents()}
-for i = 1, #continentTempList, 2 do
-	local C = (i + 1) / 2
-	local mapID, CName = continentTempList[i], continentTempList[i+1]
-	SetMapZoom(C, 0)
-	local mapFile = GetMapInfo()
-	continentList[C] = CName
-	reverseMapFileC[mapFile] = C
-	reverseMapFileZ[mapFile] = 0
-	reverseZoneC[CName] = C
-	reverseZoneZ[CName] = 0
-	mapIDtoMapFile[mapID] = mapFile
-	mapFiletoMapID[mapFile] = mapID
-	continentMapFile[C] = mapFile
-	zoneList[C] = {}
-	local zoneTempList = {GetMapZones(C)}
-	for j = 1, #zoneTempList, 2 do
-		local mapID, ZName = zoneTempList[j], zoneTempList[j+1]
-		SetMapByID(mapID)
-		local Z = GetCurrentMapZone()
-		local mapFile = GetMapInfo()
-		zoneList[C][Z] = ZName
-		reverseMapFileC[mapFile] = C
-		reverseMapFileZ[mapFile] = Z
-		reverseZoneC[ZName] = C
-		reverseZoneZ[ZName] = Z
-		mapIDtoMapFile[mapID] = mapFile
-		mapFiletoMapID[mapFile] = mapID
-		zonetoMapID[ZName] = mapID
-	end
+local continentZoneList = WoWClassic and {
+	[1414] = true, -- Kalimdor
+	[1415] = true, -- Eastern Kingdoms
 
-	-- map things we don't have on the map zones
-	local areas = GetAreaMaps()
-	for i, mapID in pairs(areas) do
-		SetMapByID(mapID)
-		local mapFile = GetMapInfo()
-		local ZName = GetMapNameByID(mapID)
-		local C, Z = GetCurrentMapContinent(), GetCurrentMapZone()
-		
-		-- nil out invalid C/Z values (Cosmic/World)
-		if C == -1 or C == 0 then C = nil end
-		if Z == 0 then Z = nil end
-		
-		-- insert into the zonelist, but don't overwrite entries
-		if C and zoneList[C] and Z and not zoneList[C][Z] then
-			zoneList[C][Z] = ZName
-		end
-		mapIDtoMapFile[mapID] = mapFile
-		-- since some mapfiles are used twice, don't overwrite them here
-		-- the second usage is usually a much weirder place (instances, scenarios, ...)
-		if not mapFiletoMapID[mapFile] then
-			mapFiletoMapID[mapFile] = mapID
-			reverseMapFileC[mapFile] = C
-			reverseMapFileZ[mapFile] = Z
-		end
-		if not zonetoMapID[ZName] then
-			zonetoMapID[ZName] = mapID
-			reverseZoneC[ZName] = C
-			reverseZoneZ[ZName] = Z
+	-- mapFile compat entries
+	["Kalimdor"]              = 1414,
+	["Azeroth"]               = 1415,
+}
+or {
+	[12]  = true, -- Kalimdor
+	[13]  = true, -- Azeroth
+	[101] = true, -- Outlands
+	[113] = true, -- Northrend
+	[424] = true, -- Pandaria
+	[572] = true, -- Draenor
+	[619] = true, -- Broken Isles
+	[875] = true, -- Zandalar
+	[876] = true, -- Kul Tiras
+	[1550] = true, -- Shadowlands
+
+	-- mapFile compat entries
+	["Kalimdor"]              = 12,
+	["Azeroth"]               = 13,
+	["Expansion01"]           = 101,
+	["Northrend"]             = 113,
+	["TheMaelstromContinent"] = 948,
+	["Vashjir"]               = 203,
+	["Pandaria"]              = 424,
+	["Draenor"]               = 572,
+	["BrokenIsles"]           = 619,
+}
+
+local function fillContinentZoneList(continent)
+	continentZoneList[continent] = {}
+
+	local children = C_Map.GetMapChildrenInfo(continent)
+	if children then
+		for _, child in ipairs(children) do
+			if child.mapType == Enum.UIMapType.Zone then
+				table.insert(continentZoneList[continent], child.mapID)
+			end
 		end
 	end
 end
 
--- Public functions for plugins to convert between MapFile <-> C,Z
-function HandyNotes:GetMapFile(C, Z)
-	if not C or not Z then return end
-	if Z == 0 then
-		return continentMapFile[C]
-	elseif C > 0 then
-		return mapIDtoMapFile[Astrolabe.ContinentList[C][Z]]
+-- Public function to get a list of zones in a continent
+-- Can be called with a uiMapId, in which case it'll also return a list of uiMapIds,
+-- or called with a legacy mapFile, in which case it'll return a list of legacy mapIDs
+function HandyNotes:GetContinentZoneList(uiMapIdOrmapFile)
+	if not continentZoneList[uiMapIdOrmapFile] then return nil end
+	if type(continentZoneList[uiMapIdOrmapFile]) ~= "table" then
+		if type(uiMapIdOrmapFile) == "string" then
+			local uiMapIdContinent = continentZoneList[uiMapIdOrmapFile]
+			if type(continentZoneList[uiMapIdContinent]) ~= "table" then
+				fillContinentZoneList(uiMapIdContinent)
+			end
+			continentZoneList[uiMapIdOrmapFile] = {}
+			for _, uiMapId in ipairs(continentZoneList[uiMapIdContinent]) do
+				local mapId = HBDMigrate:GetLegacyMapInfo(uiMapId)
+				if mapId then
+					table.insert(continentZoneList[uiMapIdOrmapFile], mapId)
+				end
+			end
+		else
+			fillContinentZoneList(uiMapIdOrmapFile)
+		end
 	end
-end
-function HandyNotes:GetCZ(mapFile)
-	return reverseMapFileC[mapFile], reverseMapFileZ[mapFile]
+	return continentZoneList[uiMapIdOrmapFile]
 end
 
 -- Public functions for plugins to convert between coords <--> x,y
@@ -307,78 +254,191 @@ function HandyNotes:getXY(id)
 	return floor(id / 10000) / 10000, (id % 10000) / 10000
 end
 
--- Public functions for plugins to convert between GetRealZoneText() <-> C,Z
-function HandyNotes:GetZoneToCZ(zone)
-	return reverseZoneC[zone], reverseZoneZ[zone]
-end
-function HandyNotes:GetCZToZone(C, Z)
-	if not C or not Z then return end
-	if Z == 0 then
-		return continentList[C]
-	elseif C > 0 then
-		return zoneList[C][Z]
-	end
-end
-
--- Public functions for plugins to convert between MapFile <-> Map ID
+-- Public functions for plugins to convert between legacy MapFile <-> Map ID
+-- DEPRECATED! Update your plugins to use the new "uiMapId" everywhere
 function HandyNotes:GetMapFiletoMapID(mapFile)
-	return mapFiletoMapID[mapFile]
+	if not mapFile then return end
+	local uiMapId = HBDMigrate:GetUIMapIDFromMapFile(mapFile)
+	local mapID = HBDMigrate:GetLegacyMapInfo(uiMapId)
+	return mapID
 end
 function HandyNotes:GetMapIDtoMapFile(mapID)
-	return mapIDtoMapFile[mapID]
+	if not mapID then return end
+	local uiMapId = HBDMigrate:GetUIMapIDFromMapAreaId(mapID)
+	local _, _, mapFile = HBDMigrate:GetLegacyMapInfo(uiMapId)
+	return mapFile
 end
-
--- Public function for plugins to convert between GetRealZoneText() <-> Map ID
-function HandyNotes:GetZoneToMapID(zone)
-	return zonetoMapID[zone]
-end
-
 
 ---------------------------------------------------------
 -- Core functions
 
--- This function gets a mapfile for our current location
-function HandyNotes:WhereAmI()
-	local continent, zone, level = GetCurrentMapContinent(), GetCurrentMapZone(), GetCurrentMapDungeonLevel()
-	local mapID = GetCurrentMapAreaID()
-	local mapFile, _, _, isMicroDungeon, microFile = GetMapInfo()
-	if microFile then
-		mapFile = microFile
-		-- I am not sure if there's a better place for this to happen...
-		-- Note that recording the reverse isn't possible, since multiple mapids as returned
-		-- by GetCurrentAreaMapID will map to a single mapFile due to themicro dungeons.
-		mapFiletoMapID[mapFile] = mapID
-	end
-	if not mapFile then
-		mapFile = self:GetMapFile(continent, zone) -- Fallback for "Cosmic" and "World"
-	end
-	return mapFile, mapID, level
+local function LegacyNodeIterator(t, state)
+	local coord, mapFile2, iconpath, scale, alpha, level2 = t.iter(t.data, state)
+	local uiMapID = HBDMigrate:GetUIMapIDFromMapFile(mapFile2 or t.mapFile, level2 or t.level)
+	return coord, uiMapID, iconpath, scale, alpha
 end
 
--- This function updates all the icons of one plugin on the world map
-function HandyNotes:UpdateWorldMapPlugin(pluginName)
-	if not WorldMapButton:IsVisible() then return end
+local emptyTbl = {}
+local function IterateNodes(pluginName, uiMapID, minimap)
+	local handler = HandyNotes.plugins[pluginName]
+	assert(handler)
+	if handler.GetNodes2 then
+		return handler:GetNodes2(uiMapID, minimap)
+	elseif handler.GetNodes then
+		local _mapID, level, mapFile = HBDMigrate:GetLegacyMapInfo(uiMapID)
+		if not mapFile then
+			return next, emptyTbl
+		end
+		local iter, data, state = handler:GetNodes(mapFile, minimap, level)
+		local t = { mapFile = mapFile, level = level, iter = iter, data = data }
+		return LegacyNodeIterator, t, state
+	else
+		error(("Plugin %s does not have GetNodes or GetNodes2"):format(pluginName))
+	end
+end
 
-	clearAllPins(worldmapPins[pluginName])
+---------------------------------------------------------
+-- World Map Data Provider
+
+HandyNotes.WorldMapDataProvider = CreateFromMixins(MapCanvasDataProviderMixin)
+
+function HandyNotes.WorldMapDataProvider:RemoveAllData()
+	if self:GetMap() then
+		self:GetMap():RemoveAllPinsByTemplate("HandyNotesWorldMapPinTemplate")
+	end
+end
+
+function HandyNotes.WorldMapDataProvider:RefreshAllData(fromOnShow)
+	if not self:GetMap() then return end
+	self:RemoveAllData()
+
+	for pluginName in pairs(HandyNotes.plugins) do
+		safecall(self.RefreshPlugin, self, pluginName)
+	end
+end
+
+function HandyNotes.WorldMapDataProvider:RefreshPlugin(pluginName)
+	if not self:GetMap() then return end
+	for pin in self:GetMap():EnumeratePinsByTemplate("HandyNotesWorldMapPinTemplate") do
+		if pin.pluginName == pluginName then
+			self:GetMap():RemovePin(pin)
+		end
+	end
+
+	if not db.enabledPlugins[pluginName] then return end
+	local uiMapID = self:GetMap():GetMapID()
+	if not uiMapID then return end
+
+	for coord, uiMapID2, iconpath, scale, alpha in IterateNodes(pluginName, uiMapID, false) do
+		local x, y = floor(coord / 10000) / 10000, (coord % 10000) / 10000
+		if uiMapID2 and uiMapID ~= uiMapID2 then
+			x, y = HBD:TranslateZoneCoordinates(x, y, uiMapID2, uiMapID)
+		end
+		local mapFile
+		if not HandyNotes.plugins[pluginName].GetNodes2 then
+			mapFile = select(3, HBDMigrate:GetLegacyMapInfo(uiMapID2 or uiMapID))
+		end
+		if x and y then
+			self:GetMap():AcquirePin("HandyNotesWorldMapPinTemplate", pluginName, x, y, iconpath, scale or 1.0, alpha or 1.0, coord, uiMapID2 or uiMapID, mapFile)
+		end
+	end
+end
+
+--[[ Handy Notes WorldMap Pin ]]--
+HandyNotesWorldMapPinMixin = CreateFromMixins(MapCanvasPinMixin)
+
+function HandyNotesWorldMapPinMixin:OnLoad()
+	self:UseFrameLevelType("PIN_FRAME_LEVEL_AREA_POI")
+	self:SetMovable(true)
+	self:SetScalingLimits(1, 1.0, 1.2);
+end
+
+function HandyNotesWorldMapPinMixin:OnAcquired(pluginName, x, y, iconpath, scale, alpha, originalCoord, originalMapID, legacyMapFile)
+	self.pluginName = pluginName
+	self.coord = originalCoord
+	self.uiMapID = originalMapID
+	self.mapFile = legacyMapFile
+
+	self:SetPosition(x, y)
+
+	local size = 12 * db.icon_scale * scale
+	self:SetSize(size, size)
+	self:SetAlpha(db.icon_alpha * alpha)
+
+	local t = self.texture
+	if type(iconpath) == "table" then
+		if iconpath.tCoordLeft then
+			t:SetTexCoord(iconpath.tCoordLeft, iconpath.tCoordRight, iconpath.tCoordTop, iconpath.tCoordBottom)
+		else
+			t:SetTexCoord(0, 1, 0, 1)
+		end
+		if iconpath.r then
+			t:SetVertexColor(iconpath.r, iconpath.g, iconpath.b, iconpath.a)
+		else
+			t:SetVertexColor(1, 1, 1, 1)
+		end
+		t:SetTexture(iconpath.icon)
+	else
+		t:SetTexCoord(0, 1, 0, 1)
+		t:SetVertexColor(1, 1, 1, 1)
+		t:SetTexture(iconpath)
+	end
+end
+
+function HandyNotesWorldMapPinMixin:OnMouseEnter()
+	pinsHandler.OnEnter(self)
+end
+
+function HandyNotesWorldMapPinMixin:OnMouseLeave()
+	pinsHandler.OnLeave(self)
+end
+
+function HandyNotesWorldMapPinMixin:OnMouseDown(button)
+	pinsHandler.OnClick(self, button, true)
+end
+
+function HandyNotesWorldMapPinMixin:OnMouseUp(button)
+	pinsHandler.OnClick(self, button, false)
+end
+
+function HandyNotes:UpdateWorldMapPlugin(pluginName)
+	if not HandyNotes:IsEnabled() then return end
+	HandyNotes.WorldMapDataProvider:RefreshPlugin(pluginName)
+end
+
+-- This function updates all the icons on the world map for every plugin
+function HandyNotes:UpdateWorldMap()
+	if not HandyNotes:IsEnabled() then return end
+	HandyNotes.WorldMapDataProvider:RefreshAllData()
+end
+
+---------------------------------------------------------
+-- MiniMap Drawing
+
+-- This function updates all the icons of one plugin on the world map
+function HandyNotes:UpdateMinimapPlugin(pluginName)
+	--if not Minimap:IsVisible() then return end
+
+	HBDPins:RemoveAllMinimapIcons("HandyNotes" .. pluginName)
+	clearAllPins(minimapPins[pluginName])
 	if not db.enabledPlugins[pluginName] then return end
 
-	local ourScale, ourAlpha = 12 * db.icon_scale, db.icon_alpha
-	local mapFile, mapID, level = self:WhereAmI()
-	local pluginHandler = self.plugins[pluginName]
-	local frameLevel = WorldMapButton:GetFrameLevel() + 5
-	local frameStrata = WorldMapButton:GetFrameStrata()
+	local uiMapID = HBD:GetPlayerZone()
+	if not uiMapID then return end
 
-	for coord, mapFile2, iconpath, scale, alpha, level2 in pluginHandler:GetNodes(mapFile, false, level) do
-		-- Scarlet Enclave check, only do stuff if we're on that map, since we have no zone translation for it yet in Astrolabe
-		if mapFile2 ~= "ScarletEnclave" or mapFile2 == mapFile then
+	local ourScale, ourAlpha = 12 * db.icon_scale_minimap, db.icon_alpha_minimap
+	local frameLevel = Minimap:GetFrameLevel() + 5
+	local frameStrata = Minimap:GetFrameStrata()
+
+	for coord, uiMapID2, iconpath, scale, alpha in IterateNodes(pluginName, uiMapID, true) do
 		local icon = getNewPin()
-		icon:SetParent(WorldMapButton)
+		icon:SetParent(Minimap)
 		icon:SetFrameStrata(frameStrata)
 		icon:SetFrameLevel(frameLevel)
-		scale = ourScale * scale
+		scale = ourScale * (scale or 1.0)
 		icon:SetHeight(scale) -- Can't use :SetScale as that changes our positioning scaling as well
 		icon:SetWidth(scale)
-		icon:SetAlpha(ourAlpha * alpha)
+		icon:SetAlpha(ourAlpha * (alpha or 1.0))
 		local t = icon.texture
 		if type(iconpath) == "table" then
 			if iconpath.tCoordLeft then
@@ -397,105 +457,29 @@ function HandyNotes:UpdateWorldMapPlugin(pluginName)
 			t:SetVertexColor(1, 1, 1, 1)
 			t:SetTexture(iconpath)
 		end
-		icon:SetScript("OnClick", pinsHandler.OnClick)
+		icon:SetScript("OnClick", nil)
 		icon:SetScript("OnEnter", pinsHandler.OnEnter)
 		icon:SetScript("OnLeave", pinsHandler.OnLeave)
 		local x, y = floor(coord / 10000) / 10000, (coord % 10000) / 10000
-		local mapID2 = HandyNotes:GetMapFiletoMapID(mapFile2 or mapFile)
-		if not mapID2 then
-			icon:ClearAllPoints()
-			icon:SetPoint("CENTER", WorldMapButton, "TOPLEFT", x*WorldMapButton:GetWidth(), -y*WorldMapButton:GetHeight())
-			icon:Show()
-		else
-			Astrolabe:PlaceIconOnWorldMap(WorldMapButton, icon, mapID2, level2 or level, x, y)
-		end
+		HBDPins:AddMinimapIconMap("HandyNotes" .. pluginName, icon, uiMapID2 or uiMapID, x, y, true)
 		t:ClearAllPoints()
 		t:SetAllPoints(icon) -- Not sure why this is necessary, but people are reporting weirdly sized textures
-		worldmapPins[pluginName][(mapID2 or 0)*1e8 + coord] = icon
+		minimapPins[pluginName][icon] = icon
 		icon.pluginName = pluginName
 		icon.coord = coord
-		icon.mapFile = mapFile2 or mapFile
+		if not HandyNotes.plugins[pluginName].GetNodes2 then
+			icon.mapFile = select(3, HBDMigrate:GetLegacyMapInfo(uiMapID2 or uiMapID))
+		else
+			icon.mapFile = nil
 		end
-	end
-end
-
--- This function updates all the icons on the world map for every plugin
-function HandyNotes:UpdateWorldMap()
-	if not WorldMapButton:IsVisible() then return end
-	for pluginName, pluginHandler in pairs(self.plugins) do
-		safecall(self.UpdateWorldMapPlugin, self, pluginName)
-	end
-end
-
-
--- This function updates all the icons of one plugin on the world map
-local levelUpValue
-function HandyNotes:UpdateMinimapPlugin(pluginName)
-	--if not Minimap:IsVisible() then return end
-
-	for coordID, icon in pairs(minimapPins[pluginName]) do
-		Astrolabe:RemoveIconFromMinimap(icon)
-	end
-	clearAllPins(minimapPins[pluginName])
-	if not db.enabledPlugins[pluginName] then return end
-
-	local mapFile, mapID, level = self:WhereAmI()
-	if not (mapID and mapFile) then return end  -- Astrolabe doesn't support instances
-	level = levelUpValue or level
-
-	local ourScale, ourAlpha = 12 * db.icon_scale_minimap, db.icon_alpha_minimap
-	local pluginHandler = self.plugins[pluginName]
-	local frameLevel = Minimap:GetFrameLevel() + 5
-	local frameStrata = Minimap:GetFrameStrata()
-
-	for coord, mapFile2, iconpath, scale, alpha, level2 in pluginHandler:GetNodes(mapFile, true, level) do
-		local mapID2 = HandyNotes:GetMapFiletoMapID(mapFile2 or mapFile)
-		if mapID2 then
-			local icon = getNewPin()
-			icon:SetParent(Minimap)
-			icon:SetFrameStrata(frameStrata)
-			icon:SetFrameLevel(frameLevel)
-			scale = ourScale * scale
-			icon:SetHeight(scale) -- Can't use :SetScale as that changes our positioning scaling as well
-			icon:SetWidth(scale)
-			icon:SetAlpha(ourAlpha * alpha)
-			local t = icon.texture
-			if type(iconpath) == "table" then
-				if iconpath.tCoordLeft then
-					t:SetTexCoord(iconpath.tCoordLeft, iconpath.tCoordRight, iconpath.tCoordTop, iconpath.tCoordBottom)
-				else
-					t:SetTexCoord(0, 1, 0, 1)
-				end
-				if iconpath.r then
-					t:SetVertexColor(iconpath.r, iconpath.g, iconpath.b, iconpath.a)
-				else
-					t:SetVertexColor(1, 1, 1, 1)
-				end
-				t:SetTexture(iconpath.icon)
-			else
-				t:SetTexCoord(0, 1, 0, 1)
-				t:SetVertexColor(1, 1, 1, 1)
-				t:SetTexture(iconpath)
-			end
-			icon:SetScript("OnClick", nil)
-			icon:SetScript("OnEnter", pinsHandler.OnEnter)
-			icon:SetScript("OnLeave", pinsHandler.OnLeave)
-			local x, y = floor(coord / 10000) / 10000, (coord % 10000) / 10000
-			Astrolabe:PlaceIconOnMinimap(icon, mapID2, level2 or level, x, y)
-			t:ClearAllPoints()
-			t:SetAllPoints(icon) -- Not sure why this is necessary, but people are reporting weirdly sized textures
-			minimapPins[pluginName][mapID2*1e8 + coord] = icon
-			icon.pluginName = pluginName
-			icon.coord = coord
-			icon.mapFile = mapFile2 or mapFile
-		end
+		icon.uiMapID = uiMapID2 or uiMapID
 	end
 end
 
 -- This function updates all the icons on the minimap for every plugin
 function HandyNotes:UpdateMinimap()
 	--if not Minimap:IsVisible() then return end
-	for pluginName, pluginHandler in pairs(self.plugins) do
+	for pluginName in pairs(self.plugins) do
 		safecall(self.UpdateMinimapPlugin, self, pluginName)
 	end
 end
@@ -505,41 +489,10 @@ end
 -- Syntax is plugin:SendMessage("HandyNotes_NotifyUpdate", "pluginName")
 function HandyNotes:UpdatePluginMap(message, pluginName)
 	if self.plugins[pluginName] then
-		self:UpdateWorldMapPlugin(pluginName)
 		self:UpdateMinimapPlugin(pluginName)
+		self:UpdateWorldMapPlugin(pluginName)
 	end
 end
-
--- This function is called by Astrolabe whenever a note changes its OnEdge status
-function HandyNotes.AstrolabeEdgeCallback()
-	for pluginName, pluginHandler in pairs(HandyNotes.plugins) do
-		for coordID, icon in pairs(minimapPins[pluginName]) do
-			if Astrolabe.IconsOnEdge[icon] then
-				icon:Hide()
-			else
-				icon:Show()
-			end
-		end
-	end
-end
-
--- OnUpdate frame we use to update the minimap icons
-local updateFrame = CreateFrame("Frame")
-updateFrame:Hide()
-do
-	local zone
-	updateFrame:SetScript("OnUpdate", function()
-		local zone2 = GetRealZoneText()
-		local level = WorldMapFrame:IsShown() and levelUpValue or GetCurrentMapDungeonLevel()
-		if zone ~= zone2 or levelUpValue ~= level then
-			if zone ~= zone2 and WorldMapFrame:IsShown() then level = 0 end
-			zone = zone2
-			levelUpValue = level
-			HandyNotes:UpdateMinimap()
-		end
-	end)
-end
-
 
 ---------------------------------------------------------
 -- Our options table
@@ -673,25 +626,24 @@ function HandyNotes:OnEnable()
 		self:Disable()
 		return
 	end
-	self:RegisterEvent("WORLD_MAP_UPDATE", "UpdateWorldMap")
+
 	self:RegisterMessage("HandyNotes_NotifyUpdate", "UpdatePluginMap")
-	Astrolabe:Register_OnEdgeChanged_Callback(self.AstrolabeEdgeCallback, true)
-	updateFrame:Show()
 	self:UpdateMinimap()
+	WorldMapFrame:AddDataProvider(HandyNotes.WorldMapDataProvider)
 	self:UpdateWorldMap()
+	HBD.RegisterCallback(self, "PlayerZoneChanged", "UpdateMinimap")
 end
 
 function HandyNotes:OnDisable()
 	-- Remove all the pins
-	for pluginName, pluginHandler in pairs(self.plugins) do
-		for coordID, icon in pairs(minimapPins[pluginName]) do
-			Astrolabe:RemoveIconFromMinimap(icon)
-		end
-		clearAllPins(worldmapPins[pluginName])
+	for pluginName in pairs(self.plugins) do
+		HBDPins:RemoveAllMinimapIcons("HandyNotes" .. pluginName)
 		clearAllPins(minimapPins[pluginName])
 	end
-	Astrolabe:Register_OnEdgeChanged_Callback(self.AstrolabeEdgeCallback)
-	updateFrame:Hide()
+	if WorldMapFrame.dataProviders[HandyNotes.WorldMapDataProvider] then
+		WorldMapFrame:RemoveDataProvider(HandyNotes.WorldMapDataProvider)
+	end
+	HBD.UnregisterCallback(self, "PlayerZoneChanged")
 end
 
 function HandyNotes:OnProfileChanged(event, database, newProfileKey)
@@ -699,6 +651,3 @@ function HandyNotes:OnProfileChanged(event, database, newProfileKey)
 	self:UpdateMinimap()
 	self:UpdateWorldMap()
 end
-
-
--- vim: ts=4 noexpandtab

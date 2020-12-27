@@ -17,7 +17,6 @@ L:SetTimerLocalization{
 }
 
 L:SetOptionLocalization{
-	SpineIcon	= DBM_CORE_AUTO_ICONS_OPTION_TEXT:format(39837),
 	RangeFrame	= "Show range frame (10)"--Translate
 }
 
@@ -53,10 +52,9 @@ L:SetOptionLocalization{
 }
 
 L:SetMiscLocalization{
-	PhaseKite		= "в гневе ударяет по земле!",
-	PhaseTank		= "Земля начинает раскалываться!",
+	PhaseTank		= "в гневе ударяет по земле!",--Check if Backwards
+	PhaseKite		= "Земля начинает раскалываться!",--Check if Backwards
 	ChangeTarget	= "атакует новую цель!",
-	KiteWhisper		= "Беги, Форест, беги!",
 	Kite			= "Kite",--Translate
 	Tank			= "Tank"--Translate
 }
@@ -100,7 +98,7 @@ L:SetTimerLocalization{
 
 L:SetOptionLocalization{
 	TimerVengefulSpirit		= "Show timer for Ghost durations",--Translate
-	CrushIcon				= DBM_CORE_AUTO_ICONS_OPTION_TEXT:format(40243)
+	CrushIcon				= DBM_CORE_L.AUTO_ICONS_OPTION_TEXT:format(40243)
 }
 
 L:SetMiscLocalization{
@@ -161,13 +159,10 @@ L:SetOptionLocalization{
 	TimerEnrage		= "Show timer for Enrage",--Translate
 	TimerNextEnrage	= "Show timer for next Enrage",--Translate
 	TimerMana		= "Show timer for zero mana in Phase 2",--Translate
-	SpiteWhisper	= "Send whisper to $spell:41376 targets (requires Raid Leader)",--Translate
-	DrainIcon		= DBM_CORE_AUTO_ICONS_OPTION_TEXT:format(41303),
-	SpiteIcon		= DBM_CORE_AUTO_ICONS_OPTION_TEXT:format(41376)
+	SpiteWhisper	= "Send whisper to $spell:41376 targets (requires Raid Leader)"--Translate
 }
 
 L:SetMiscLocalization{
-	Pull			= "Лишь боль и страдания ждут тебя!",
 	Enrage			= "%s впадает в ярость!",
 	SpiteWhisper	= "Злоба на Вас!",
 	Suffering		= "Essence of Suffering",--Translate
@@ -188,15 +183,6 @@ L:SetWarningLocalization{
 }
 
 L:SetTimerLocalization{
-}
-
-L:SetOptionLocalization{
-	FAIcons		= DBM_CORE_AUTO_ICONS_OPTION_TEXT:format(41001),
-	FAWhisper	= "Send whisper to $spell:41001 targets (requires Raid Leader)"--Translate
-}
-
-L:SetMiscLocalization{
-	FAWhisper	= "Смертельное Притяжение на Вас!"
 }
 
 ----------------------
@@ -224,9 +210,7 @@ L:SetOptionLocalization{
 	WarnFaded		= "Show warning when $spell:41476 fades",--Translate
 	WarnDevAura		= "Show warning for $spell:41452",--Translate
 	WarnResAura		= "Show warning for $spell:41453",--Translate
-	Immune			= "Show warning when Manalde becomes spell or melee immune",--Translate
-	PoisonIcon		= DBM_CORE_AUTO_ICONS_OPTION_TEXT:format(41485),--Translate
-	PoisonWhisper	= "Send whisper to $spell:41485 targets (requires Raid Leader)"--Translate
+	Immune			= "Show warning when Manalde becomes spell or melee immune"--Translate
 }
 
 L:SetMiscLocalization{
@@ -260,8 +244,7 @@ L:SetWarningLocalization{
 L:SetTimerLocalization{
 	TimerCombatStart	= "Combat starts",--Translate
 	TimerNextHuman		= "Next Обычная Фаза",--Translate
-	TimerNextDemon		= "Next Демона Фаза",--Translate
-	TimerPhase4			= "Фаза transition"--Translate
+	TimerNextDemon		= "Next Демона Фаза"--Translate
 }
 
 L:SetOptionLocalization{
@@ -274,9 +257,6 @@ L:SetOptionLocalization{
 	TimerCombatStart= "Show time for start of combat",--Translate
 	TimerNextHuman	= "Show time for Next Human Phase",--Translate
 	TimerNextDemon	= "Show time for Demon Human Phase",--Translate
-	TimerPhase4		= "Show time for Phase 4 transition",--Translate
-	ParasiteIcon	= DBM_CORE_AUTO_ICONS_OPTION_TEXT:format(41917),
-	ParasiteWhisper	= "Send whisper to $spell:41917 targets (requires Raid Leader)",--Translate
 	RangeFrame		= "Show range frame (10 yards) in Phase 3 and 4"--Translate
 }
 

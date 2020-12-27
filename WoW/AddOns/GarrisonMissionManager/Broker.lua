@@ -1,7 +1,8 @@
 local addon_name, addon_env = ...
+if not addon_env.load_this then return end
 
 if not LibStub then return end
-local ldb = LibStub:GetLibrary("LibDataBroker-1.1")
+local ldb = LibStub:GetLibrary("LibDataBroker-1.1", true)
 if not ldb then return end
 
 local broker = ldb:NewDataObject(addon_name, {
@@ -12,4 +13,4 @@ local broker = ldb:NewDataObject(addon_name, {
 })
 addon_env.broker = broker
 
-addon_env.GarrisonBuilding_UpdateAssignRemoveBuildings()
+addon_env.GarrisonBuilding_UpdateBuildings()

@@ -7,7 +7,7 @@
 --		Banjankri of Blackrock, Predeter of Proudmoore, Xenyr of Aszune
 
 -- Currently maintained by
--- Cybeloras of Aerie Peak/Detheroc/Mal'Ganis
+-- Cybeloras of Aerie Peak
 -- --------------------
 
 
@@ -31,15 +31,7 @@ dataobj.OnClick = function(self, button)
 	end
 	
 	if button == "RightButton" then
-		if TMW:CheckCanDoLockedAction() then
-			TMW:LoadOptions()
-
-			if TMW:AssertOptionsInitialized() then
-				return
-			end
-			
-			LibStub("AceConfigDialog-3.0"):Open("TMWStandalone")
-		end
+		TMW:SlashCommand("options")
 	else
 		TMW:LockToggle()
 	end

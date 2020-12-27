@@ -3,8 +3,9 @@
 --------------------------------------------------------------------------
 --[[
 GTFO Spell List - Lich King
-Author: Zensunim of Malygos
 ]]--
+
+if (not GTFO.ClassicMode) then
 
 GTFO.SpellID["62548"] = {
 	--desc = "Scorch (Ignis-10)";
@@ -493,24 +494,28 @@ GTFO.SpellID["69146"] = {
 	--desc = "Coldflame (Lord Marrowgar - Normal 10)";
 	sound = 1;
 	applicationOnly = true;
+	trivialLevel = 90;
 };
 
 GTFO.SpellID["70823"] = {
 	--desc = "Coldflame (Lord Marrowgar - Normal 25)";
 	sound = 1;
 	applicationOnly = true;
+	trivialLevel = 90;
 };
 
 GTFO.SpellID["70824"] = {
 	--desc = "Coldflame (Lord Marrowgar - Heroic 10)";
 	sound = 1;
 	applicationOnly = true;
+	trivialLevel = 90;
 };
 
 GTFO.SpellID["70825"] = {
 	--desc = "Coldflame (Lord Marrowgar - Heroic 25)";
 	sound = 1;
 	applicationOnly = true;
+	trivialLevel = 90;
 };
 
 GTFO.SpellID["71001"] = {
@@ -1134,12 +1139,14 @@ GTFO.SpellID["52659"] = {
 	--desc = "Static Overload (Ionar - Halls of Lightning)";
 	sound = 4;
 	ignoreSelfInflicted = true;
+	negatingBuffSpellID = 59795; -- Static Overload
 };
 
 GTFO.SpellID["59796"] = {
 	--desc = "Static Overload (Ionar - Halls of Lightning Heroic)";
 	sound = 4;
 	ignoreSelfInflicted = true;
+	negatingBuffSpellID = 59795; -- Static Overload
 };
 
 GTFO.SpellID["52671"] = {
@@ -1231,3 +1238,5 @@ GTFO.SpellID["59323"] = {
 	--desc = "Whirlwind (Skadi the Ruthless - Utgarde Pinnacle)";
 	sound = 1;
 };
+
+end

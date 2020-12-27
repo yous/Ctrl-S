@@ -1,5 +1,5 @@
-
-Skada:AddLoadableModule("Dispels", function(Skada, L)
+local _, Skada = ...
+Skada:AddLoadableModule("Dispels", nil, function(Skada, L)
 	if Skada.db.profile.modulesBlocked.Dispels then return end
 
 	local mod = Skada:NewModule(L["Dispels"])
@@ -86,7 +86,7 @@ Skada:AddLoadableModule("Dispels", function(Skada, L)
 	end
 
 	function mod:OnEnable()
-		mod.metadata = {showspots = true}
+		mod.metadata = {showspots = true, icon = "Interface\\Icons\\Ability_priest_focusedwill"}
 
 		Skada:RegisterForCL(SpellDispel, 'SPELL_STOLEN', {src_is_interesting = true})
 		Skada:RegisterForCL(SpellDispel, 'SPELL_DISPEL', {src_is_interesting = true})
@@ -127,4 +127,3 @@ Skada:AddLoadableModule("Dispels", function(Skada, L)
 		return set.dispells
 	end
 end)
-

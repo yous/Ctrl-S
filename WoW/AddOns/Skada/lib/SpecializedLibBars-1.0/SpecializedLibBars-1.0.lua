@@ -1,6 +1,6 @@
 -- LibBars-1.0 by Antiarc, all glory to him, ripped into pieces for Skada.
 local MAJOR = "SpecializedLibBars-1.0"
-local MINOR = 90000 + tonumber(("$Revision: 1 $"):match("%d+"))
+local MINOR = 900000 + tonumber(("$Revision: 1 $"):match("%d+"))
 
 local lib, oldminor = LibStub:NewLibrary(MAJOR, MINOR)
 if not lib then return end -- No Upgrade needed.
@@ -14,7 +14,7 @@ local table_sort, tinsert, tremove, tconcat = _G.table.sort, tinsert, tremove, _
 local next, pairs, assert, error, type, xpcall = next, pairs, assert, error, type, xpcall
 
 --[[
-	 xpcall safecall implementation
+	xpcall safecall implementation
 ]]
 local function errorhandler(err)
 	return geterrorhandler()(err)
@@ -22,19 +22,19 @@ end
 
 local function CreateDispatcher(argCount)
 	local code = [[
-		local xpcall, eh = ...
-		local method, ARGS
-		local function call() return method(ARGS) end
+    local xpcall, eh = ...
+    local method, ARGS
+    local function call() return method(ARGS) end
 
-		local function dispatch(func, ...)
-			 method = func
-			 if not method then return end
-			 ARGS = ...
-			 return xpcall(call, eh)
-		end
+    local function dispatch(func, ...)
+      method = func
+      if not method then return end
+      ARGS = ...
+      return xpcall(call, eh)
+    end
 
-		return dispatch
-	]]
+    return dispatch
+  ]]
 
 	local ARGS = {}
 	for i = 1, argCount do ARGS[i] = "arg"..i end
@@ -315,23 +315,62 @@ function barListPrototype:AddButton(title, description, normaltex, highlighttex,
 	btn:SetWidth(12)
 	btn:SetNormalTexture(normaltex)
 	btn:SetHighlightTexture(highlighttex, 1.0)
-	btn:SetAlpha(0.5)
+	btn:SetAlpha(0.25)
 	btn:RegisterForClicks("LeftButtonUp", "RightButtonUp")
 	btn:SetScript("OnClick", clickfunc)
 	btn:SetScript("OnEnter",
 		function(this)
 			GameTooltip_SetDefaultAnchor(GameTooltip, this)
 			GameTooltip:SetText(title)
-            GameTooltip:AddLine(description, 1, 1, 1, true)
+			GameTooltip:AddLine(description, 1, 1, 1, true)
 			GameTooltip:Show()
 		end)
 	btn:SetScript("OnLeave", function() GameTooltip:Hide() end)
 	btn:Show()
 
 	-- Add to our list of buttons.
-	table.insert(self.buttons, btn)
+	tinsert(self.buttons, btn)
 
 	self:AdjustButtons()
+end
+
+function barListPrototype:SetSmoothing(smoothing)
+	self.smoothing = smoothing
+
+	if smoothing then
+		self:SetScript("OnUpdate", function()
+
+			if bars[self] then
+				for k, v in pairs(bars[self]) do
+					if v.targetamount and v:IsShown() then
+
+						local amt
+						if v.targetamount > v.lastamount then
+							amt = min(((v.targetamount - v.lastamount) / 10) + v.lastamount, v.targetamount)
+						else
+							amt = max(v.lastamount - ((v.lastamount - v.targetamount) / 10), v.targetamount)
+						end
+						v.lastamount = amt
+						if amt == v.targetamount then
+							v.targetamount = nil
+						end
+						v:SetTextureValue(amt, v.targetdist)
+
+					end
+				end
+			end
+
+		end)
+
+	else
+		self:SetScript("OnUpdate", nil)
+	end
+end
+
+function barListPrototype:SetButtonsOpacity(alpha)
+	for i, btn in ipairs(self.buttons) do
+		btn:SetAlpha(alpha)
+	end
 end
 
 function barListPrototype:AdjustButtons()
@@ -342,7 +381,7 @@ function barListPrototype:AdjustButtons()
 
 		if btn:IsShown() then
 			if nr == 0 then
-				btn:SetPoint("TOPRIGHT", self.button, "TOPRIGHT", -5, 0 - (math.max(self.button:GetHeight() - btn:GetHeight(), 0) / 2))
+				btn:SetPoint("TOPRIGHT", self.button, "TOPRIGHT", -5, 0 - (max(self.button:GetHeight() - btn:GetHeight(), 0) / 2))
 			else
 				btn:SetPoint("TOPRIGHT", lastbtn, "TOPLEFT", 0, 0)
 			end
@@ -411,7 +450,7 @@ do
 		orientation = orientation == "LEFT" and lib.LEFT_TO_RIGHT or orientation
 		orientation = orientation == "RIGHT" and lib.RIGHT_TO_LEFT or orientation
 
-		local list = setmetatable(CreateFrame("Frame", frameName, UIParent), barListPrototype_mt)
+		local list = setmetatable(CreateFrame("Frame", frameName, UIParent, "BackdropTemplate"), barListPrototype_mt)
 		list:SetMovable(true)
 		list:SetClampedToScreen(true)
 		list.enablemouse = true
@@ -433,7 +472,7 @@ do
 		local myfont = CreateFont("MyTitleFont")
 		myfont:CopyFontObject(ChatFontSmall)
 
-		list.button = CreateFrame("Button", nil, list)
+		list.button = CreateFrame("Button", nil, list, "BackdropTemplate")
 		list.button:SetText(name)
 		list.button:SetBackdrop(frame_defaults)
 		list.button:SetNormalFontObject(myfont)
@@ -711,9 +750,9 @@ function barListPrototype:UpdateColors()
 	if bars[self] then
 		for k, v in pairs(bars[self]) do
 			v:UpdateColor()
---             if not v.isTimer then
---                 v:UpdateColor()
---             end
+			-- if not v.isTimer then
+			-- 	v:UpdateColor()
+			-- end
 		end
 	end
 end
@@ -821,15 +860,8 @@ end
 function barListPrototype:UpdateOrientationLayout()
 	local length, thickness = self.length, self.thickness
 	barListPrototype.super.SetWidth(self, length)
---		barListPrototype.super.SetHeight(self, thickness)
 	self.button:SetWidth(length)
---	self.button:SetHeight(thickness)
-
---	self.button:SetText(self.name)
 	self:ReverseGrowth(self.growup)
-	-- self.button:SetWidth(vertical and 15 or length)
-	-- self.button:SetHeight(vertical and length or 15)
-	-- self:SortBars()
 end
 
 function barListPrototype:SetLength(length)
@@ -921,11 +953,16 @@ do
 	function barListPrototype:SortBars()
 		local lastBar = self
 		local ct = 0
+		local has_fixed = false
+
 		if not bars[self] then return end
 		for k, v in pairs(bars[self]) do
 			ct = ct + 1
 			values[ct] = v
 			v:Hide()
+			if v.fixed then
+				has_fixed = true
+			end
 		end
 		for i = ct + 1, #values do
 			values[i] = nil
@@ -942,21 +979,31 @@ do
 		local thickness, showIcon = self.thickness, self.showIcon
 		local offset = self.offset
 		local x1, y1, x2, y2 = 0, 0, 0, 0
-		local maxbars = math.min(#values, math.floor(self:GetHeight() / (thickness + spacing)))
+		local maxbars = min(#values, floor(self:GetHeight() / (thickness + spacing)))
 
 		local start, stop, step
 		if growup then
 			from = "BOTTOM"
 			to = "TOP"
-			start = math.min(#values, maxbars + offset)
-			stop = math.min(#values, 1 + offset)
+			start = min(#values, maxbars + offset)
+			stop = min(#values, 1 + offset)
 			step = -1
 		else
 			from = "TOP"
 			to = "BOTTOM"
-			start = math.min(1 + offset, #values)
-			stop = math.min(maxbars + offset, #values)
+			start = min(1 + offset, #values)
+			stop = min(maxbars + offset, #values)
 			step = 1
+		end
+
+		-- Fixed bar replaces the last bar
+		if has_fixed and stop < #values then
+			for i = stop + 1, #values, 1 do
+				if values[i].fixed then
+					tinsert(values, stop, values[i])
+					break
+				end
+			end
 		end
 
 		local shown = 0
@@ -979,7 +1026,11 @@ do
 
 			-- Silly hack to fix icon positions. I should just rewrite the whole thing, really. WTB energy.
 			if showIcon and lastBar == self then
-				x1 = thickness
+				if orientation == 1 then
+					x1 = thickness
+				else
+					x2 = -thickness
+				end
 			end
 
 			if shown <= maxbars then
@@ -1003,8 +1054,6 @@ do
 	end
 end
 
-
-
 --[[
 ****************************************************************
 ***	Bar methods
@@ -1024,7 +1073,7 @@ do
 	end
 
 
-	local DEFAULT_ICON = [[Interface\ICONS\INV_Misc_QuestionMark]]
+	local DEFAULT_ICON = 134400
 	function barPrototype:Create(text, value, maxVal, icon, orientation, length, thickness)
 
 		self.callbacks = self.callbacks or CallbackHandler:New(self)
@@ -1041,13 +1090,14 @@ do
 		if icon then
 			self:ShowIcon()
 		end
-		self.icon:SetTexCoord(0.07,0.93,0.07,0.93);
+		self.icon:SetTexCoord(0.07,0.93,0.07,0.93)
 
 		-- Lame frame solely used for handling mouse input on icon.
 		self.iconFrame = self.iconFrame or CreateFrame("Frame", nil, self)
 		self.iconFrame:SetAllPoints(self.icon)
 
 		self.label = self.label or self:CreateFontString(nil, "OVERLAY", "ChatFontNormal")
+		self.label:SetWordWrap(false)
 		self.label:SetText(text)
 		self.label:ClearAllPoints()
 		self.label:SetPoint("LEFT", self, "LEFT", 3, 0)
@@ -1067,12 +1117,6 @@ do
 
 		self:SetScale(1)
 		self:SetAlpha(1)
-		--[[
-		self.texture:SetAlpha(1)
-		self.bgtexture:SetAlpha(0.6)
-		self.icon:SetAlpha(1)
-		]]--
-
 
 		self.length = length or 200
 		self.thickness = thickness or 15
@@ -1158,9 +1202,6 @@ end
 
 function barPrototype:SetIconWithCoord(icon, coord)
 	if icon then
-		if type(icon) == "number" then
-			icon = select(3, GetSpellInfo(icon))
-		end
 		self.icon:SetTexture(icon)
 		self.icon:SetTexCoord(unpack(coord))
 		if self.showIcon then
@@ -1174,9 +1215,6 @@ end
 
 function barPrototype:SetIcon(icon)
 	if icon then
-		if type(icon) == "number" then
-			icon = select(3, GetSpellInfo(icon))
-		end
 		self.icon:SetTexture(icon)
 		if self.showIcon then
 			self.icon:Show()
@@ -1419,7 +1457,7 @@ do
 		local width = max(0.0001, length - iconSize)
 		local height = thickness
 		barPrototype.super.SetWidth(self, width)
-        barPrototype.super.SetHeight(self, height)
+		barPrototype.super.SetHeight(self, height)
 		self.icon:SetWidth(thickness)
 		self.icon:SetHeight(thickness)
 	end
@@ -1464,8 +1502,20 @@ function barPrototype:SetValue(val)
 	end
 	local amt = min(1, val / max(displayMax, 0.000001))
 	local dist = (ownerGroup and ownerGroup:GetLength()) or self.length
-	self:SetTextureValue(max(amt, 0.000001), dist)
+	amt = max(amt, 0.000001)
+
+	if ownerGroup and ownerGroup.smoothing and self.lastamount then
+		self:SetTextureTarget(amt, dist)
+	else
+		self.lastamount = amt
+		self:SetTextureValue(amt, dist)
+	end
 	self:UpdateColor()
+end
+
+function barPrototype:SetTextureTarget(amt, dist)
+	self.targetamount = amt
+	self.targetdist = dist
 end
 
 function barPrototype:SetTextureValue(amt, dist)

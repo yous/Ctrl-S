@@ -1,7 +1,6 @@
-﻿local Postal = LibStub("AceAddon-3.0"):NewAddon("Postal", "AceEvent-3.0", "AceHook-3.0")
+local Postal = LibStub("AceAddon-3.0"):NewAddon("Postal", "AceEvent-3.0", "AceHook-3.0")
 local L = LibStub("AceLocale-3.0"):GetLocale("Postal")
 _G["Postal"] = Postal
-local TOC = select(4, GetBuildInfo())
 
 -- defaults for storage
 local defaults = {
@@ -14,7 +13,6 @@ local defaults = {
 		Select = {
 			SpamChat = true,
 			KeepFreeSpace = 1,
-			UseMrPlow = true,
 		},
 		OpenAll = {
 			AHCancelled = true,
@@ -27,10 +25,10 @@ local defaults = {
 			NeutralAHOutbid = true,
 			NeutralAHSuccess = true,
 			NeutralAHWon = true,
+			Postmaster = true,
 			Attachments = true,
 			SpamChat = true,
 			KeepFreeSpace = 1,
-			UseMrPlow = true,
 		},
 		Express = {
 			EnableAltClick = true,
@@ -71,9 +69,7 @@ Postal_DropDownMenu.info = {}
 Postal_DropDownMenu.levelAdjust = 0
 Postal_DropDownMenu.UncheckHack = function(dropdownbutton)
 	_G[dropdownbutton:GetName().."Check"]:Hide()
-	if TOC >= 40000 then
-		_G[dropdownbutton:GetName().."UnCheck"]:Hide()
-	end
+	_G[dropdownbutton:GetName().."UnCheck"]:Hide()
 end
 Postal_DropDownMenu.HideMenu = function()
 	if UIDROPDOWNMENU_OPEN_MENU == Postal_DropDownMenu then
@@ -100,6 +96,9 @@ end
 ---------------------------
 
 function Postal:OnInitialize()
+
+	--print("Postal is Active and Running");
+
 	-- Version number
 	if not self.version then self.version = GetAddOnMetadata("Postal", "Version") end
 
@@ -146,12 +145,6 @@ function Postal:OnInitialize()
 		b:SetScript("OnEnter", subjectHoverIn)
 		b:SetScript("OnLeave", subjectHoverOut)
 	end
-
-	-- To fix Blizzard's bug caused by the new "self:SetFrameLevel(2);"
-	if TOC < 40000 and not IsAddOnLoaded("!BlizzBugsSuck") then
-		hooksecurefunc("UIDropDownMenu_CreateFrames", Postal.FixMenuFrameLevels)
-	end
-
 	self.OnInitialize = nil
 end
 
@@ -240,35 +233,21 @@ StaticPopupDialogs["POSTAL_NEW_PROFILE"] = {
 	button2 = CANCEL,
 	hasEditBox = 1,
 	maxLetters = 128,
-	hasWideEditBox = 1,  -- Not needed in Cata
 	editBoxWidth = 350,  -- Needed in Cata
 	OnAccept = function(self)
-		if TOC < 40000 then
-			Postal.db:SetProfile(strtrim(self.wideEditBox:GetText()))
-		else
-			Postal.db:SetProfile(strtrim(self.editBox:GetText()))
-		end
+		Postal.db:SetProfile(strtrim(self.editBox:GetText()))
 	end,
 	OnShow = function(self)
-		if TOC < 40000 then
-			self.wideEditBox:SetText(Postal.db:GetCurrentProfile())
-			self.wideEditBox:SetFocus()
-		else
-			self.editBox:SetText(Postal.db:GetCurrentProfile())
-			self.editBox:SetFocus()
-		end
+		self.editBox:SetText(Postal.db:GetCurrentProfile())
+		self.editBox:SetFocus()
 	end,
-	OnHide = StaticPopupDialogs[TOC < 40000 and "SET_GUILDMOTD" or "SET_GUILDPLAYERNOTE"].OnHide,
+	OnHide = StaticPopupDialogs["SET_GUILDPLAYERNOTE"].OnHide,
 	EditBoxOnEnterPressed = function(self)
 		local parent = self:GetParent()
-		if TOC < 40000 then
-			Postal.db:SetProfile(strtrim(parent.wideEditBox:GetText()))
-		else
-			Postal.db:SetProfile(strtrim(parent.editBox:GetText()))
-		end
+		Postal.db:SetProfile(strtrim(parent.editBox:GetText()))
 		parent:Hide()
 	end,
-	EditBoxOnEscapePressed = StaticPopupDialogs[TOC < 40000 and "SET_GUILDMOTD" or "SET_GUILDPLAYERNOTE"].EditBoxOnEscapePressed,
+	EditBoxOnEscapePressed = StaticPopupDialogs["SET_GUILDPLAYERNOTE"].EditBoxOnEscapePressed,
 	timeout = 0,
 	exclusive = 1,
 	whileDead = 1,
@@ -348,6 +327,14 @@ function Postal.Menu(self, level)
 	elseif level == 2 then
 		if UIDROPDOWNMENU_MENU_VALUE == "OpenSpeed" then
 			local speed = Postal.db.profile.OpenSpeed
+			for i = 0, 0 do
+				local s = 0
+				info.text = format("%0.2f", s)
+				info.func = Postal.SetOpenSpeed
+				info.checked = s == speed
+				info.arg1 = s
+				UIDropDownMenu_AddButton(info, level)
+			end
 			for i = 0, 13 do
 				local s = 0.3 + i*0.05
 				info.text = format("%0.2f", s)
@@ -471,7 +458,7 @@ function Postal:CreateAboutFrame()
 		aboutFrame.editBox = Chatter:GetModule("Chat Copy").editBox
 	end
 	if not aboutFrame or not aboutFrame.editBox then
-		aboutFrame = CreateFrame("Frame", "PostalAboutFrame", UIParent)
+		aboutFrame = CreateFrame("Frame", "PostalAboutFrame", UIParent, BackdropTemplateMixin and "BackdropTemplate")
 		tinsert(UISpecialFrames, "PostalAboutFrame")
 		aboutFrame:SetBackdrop({
 			bgFile = [[Interface\DialogFrame\UI-DialogBox-Background]],
@@ -519,7 +506,7 @@ function Postal.About()
 	tinsert(t, "-----")
 	tinsert(t, "")
 	for name, module in Postal:IterateModules() do
-		tinsert(t, "|cffffcc00"..name.."|r")
+		tinsert(t, "|cffffcc00"..L[name].."|r")
 		if module.description then
 			tinsert(t, module.description)
 		end
@@ -530,32 +517,13 @@ function Postal.About()
 		tinsert(t, "")
 	end
 	tinsert(t, "-----")
-	tinsert(t, L["Please post bugs or suggestions at the wowace forums thread at |cFF00FFFFhttp://forums.wowace.com/showthread.php?t=3909|r. When posting bugs, indicate your locale and Postal's version number v%s."]:format(version))
+	tinsert(t, L["Please post bugs or suggestions at the CurseForge forums thread at |cFF00FFFFhttp://www.curseforge.com/wow/addons/postal/issues|r. When posting bugs, indicate your locale and Postal's version number v%s."]:format(version))
 	tinsert(t, "")
 	tinsert(t, "- Xinhuan (Blackrock/Barthilas US Alliance)")
 	tinsert(t, "")
 	Postal.aboutFrame.editBox:SetText(table.concat(t, "\n"))
 	Postal.aboutFrame:Show()
 	wipe(t) -- For garbage collection
-end
-
-if TOC < 40000 and not IsAddOnLoaded("!BlizzBugsSuck") then
-	-- To fix Blizzard's bug caused by the new "self:SetFrameLevel(2);"
-	local function FixFrameLevel(level, ...)
-		for i = 1, select("#", ...) do
-			local button = select(i, ...)
-			button:SetFrameLevel(level)
-		end
-	end
-	function Postal.FixMenuFrameLevels()
-		-- Postal only uses up to 4 levels of menus
-		for i = 1, 4 do
-			local f = _G["DropDownList"..i]
-			if f then
-				FixFrameLevel(f:GetFrameLevel() + 2, f:GetChildren())
-			end
-		end
-	end
 end
 
 ---------------------------
@@ -569,14 +537,14 @@ function Postal:DisableInbox(disable)
 		if not self:IsHooked("InboxFrame_OnClick") then
 			self:RawHook("InboxFrame_OnClick", noop, true)
 			for i = 1, 7 do
-				_G["MailItem" .. i .. "ButtonIcon"]:SetDesaturated(1)
+				_G["MailItem" .. i .. "ButtonIcon"]:SetDesaturated(true)
 			end
 		end
 	else
 		if self:IsHooked("InboxFrame_OnClick") then
 			self:Unhook("InboxFrame_OnClick")
 			for i = 1, 7 do
-				_G["MailItem" .. i .. "ButtonIcon"]:SetDesaturated(nil)
+				_G["MailItem" .. i .. "ButtonIcon"]:SetDesaturated(false)
 			end
 		end
 	end

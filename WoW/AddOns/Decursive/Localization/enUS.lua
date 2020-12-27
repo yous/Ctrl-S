@@ -1,19 +1,22 @@
 --[[
     This file is part of Decursive.
-    
-    Decursive (v 2.7.3.6) add-on for World of Warcraft UI
-    Copyright (C) 2006-2014 John Wellesz (archarodim AT
-    teaser.fr) ( http://www.2072productions.com/to/decursive.php )
 
-    Starting from 2009-10-31 and until said otherwise by its author, Decursive
-    is no longer free software, all rights are reserved to its author (John
-    Wellesz).
+    Decursive (v 2.7.8) add-on for World of Warcraft UI
+    Copyright (C) 2006-2019 John Wellesz (Decursive AT 2072productions.com) ( http://www.2072productions.com/to/decursive.php )
 
-    The only official and allowed distribution means are
-    www.2072productions.com, www.wowace.com and curse.com.
-    To distribute Decursive through other means a special authorization is
-    required.
-    
+    Decursive is free software: you can redistribute it and/or modify
+    it under the terms of the GNU General Public License as published by
+    the Free Software Foundation, either version 3 of the License, or
+    (at your option) any later version.
+
+    Decursive is distributed in the hope that it will be useful,
+    but WITHOUT ANY WARRANTY; without even the implied warranty of
+    MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+    GNU General Public License for more details.
+
+    You should have received a copy of the GNU General Public License
+    along with Decursive.  If not, see <https://www.gnu.org/licenses/>.
+
 
     Decursive is inspired from the original "Decursive v1.9.4" by Patrick Bohnet (Quu).
     The original "Decursive 1.9.4" is in public domain ( www.quutar.com )
@@ -21,7 +24,7 @@
     Decursive is distributed in the hope that it will be useful, but WITHOUT
     ANY WARRANTY.
 
-    This file was last updated on 2014-10-13T09:20:46Z
+    This file was last updated on 2020-11-21T16:50:01Z
 --]]
 -------------------------------------------------------------------------------
 
@@ -114,9 +117,9 @@ L["COLORSTATUS"] = "Set the color for the '%s' MUF status."
 L["CTRL"] = "Ctrl"
 L["CURE_PETS"] = "Scan and cure pets"
 L["CURSE"] = "Curse"
-L["DEBUG_REPORT_HEADER"] = [=[|cFF11FF33Please report the content of this window to Archarodim+DcrReport@teaser.fr|r
+L["DEBUG_REPORT_HEADER"] = [=[|cFF11FF33Please email the content of this window to <%s>|r
 |cFF009999(Use CTRL+A to select all and then CTRL+C to put the text in your clip-board)|r
-Also tell in your report if you noticed any strange behavior of Decursive.
+Also tell in your report if you noticed any strange behavior of %s.
 ]=]
 L["DECURSIVE_DEBUG_REPORT"] = "**** |cFFFF0000Decursive Debug Report|r ****"
 L["DECURSIVE_DEBUG_REPORT_BUT_NEW_VERSION"] = [=[|cFF11FF33Decursive crashed but fear not! A NEW version of Decursive has been detected (%s). You simply need to update. Go to curse.com and search for 'Decursive' or use Curse's client, it'll update automatically all your beloved add-ons.|r
@@ -166,6 +169,8 @@ L["HLP_LEFTCLICK"] = "Left-Click"
 L["HLP_LL_ONCLICK_TEXT"] = [=[The Live-List is not meant to be clicked. Please, read the documentation to learn how to use this add-on. Just search for 'Decursive' on WoWAce.com
 (To move this list move the Decursive bar, /dcrshow and left-alt-click to move)]=]
 L["HLP_MIDDLECLICK"] = "Middle-Click"
+L["HLP_MOUSE4"] = "Mouse Button 4"
+L["HLP_MOUSE5"] = "Mouse Button 5"
 L["HLP_NOTHINGTOCURE"] = "There is nothing to cure!"
 L["HLP_RIGHTCLICK"] = "Right-Click"
 L["HLP_USEXBUTTONTOCURE"] = "Use \"%s\" to cure this affliction!"
@@ -192,15 +197,19 @@ Go to |cFFFF0000WoWAce.com|r to get it!
 --------]=]
 L["NORMAL"] = "Normal"
 L["NOSPELL"] = "No spell available"
+L["NOTICE_FRAME_TEMPLATE"] = [=[|cFFFF0000Decursive - Notice|r
+
+%s
+]=]
 L["OPT_ABOLISHCHECK_DESC"] = "select whether units with an active 'Abolish' spell are shown and cured"
 L["OPT_ABOUT"] = "About"
-L["OPT_ADD_A_CUSTOM_SPELL"] = "Add a custom spell"
-L["OPT_ADD_A_CUSTOM_SPELL_DESC"] = "Click here and shift-click on a spell from your spell book. You can also directly write its name or its numeric ID."
+L["OPT_ADD_A_CUSTOM_SPELL"] = "Add a custom spell / item"
+L["OPT_ADD_A_CUSTOM_SPELL_DESC"] = "Drag and drop a spell or usable item here. You can also directly write its name, its numeric ID or use shift-click."
 L["OPT_ADDDEBUFF"] = "Add a custom affliction"
 L["OPT_ADDDEBUFF_DESC"] = "Adds a new affliction to this list"
-L["OPT_ADDDEBUFFFHIST"] = "Add a recent affliction"
-L["OPT_ADDDEBUFFFHIST_DESC"] = "Add an affliction using the history"
-L["OPT_ADDDEBUFF_USAGE"] = "<Affliction name>"
+L["OPT_ADDDEBUFF_USAGE"] = "<Affliction spell ID> (you can find spell IDs in WoWHead.com URLs)"
+L["OPT_ADDDEBUFFFHIST"] = "Add a recently dispelled affliction"
+L["OPT_ADDDEBUFFFHIST_DESC"] = "Add an affliction using the history of the afflictions you've recently dispelled"
 L["OPT_ADVDISP"] = "Advance display Options"
 L["OPT_ADVDISP_DESC"] = "Allow to set Transparency of the border and center separately, to set the space between each MUF"
 L["OPT_AFFLICTEDBYSKIPPED"] = "%s afflicted by %s will be skipped"
@@ -236,8 +245,8 @@ L["OPT_CMD_DISBLED"] = "Disabled"
 L["OPT_CMD_ENABLED"] = "Enabled"
 L["OPT_CREATE_VIRTUAL_DEBUFF"] = "Create a virtual test affliction"
 L["OPT_CREATE_VIRTUAL_DEBUFF_DESC"] = "Lets you see how Decursive looks when an affliction is found."
-L["OPT_CUREPETS_DESC"] = "Pets will be managed and cured"
 L["OPT_CURE_PRIORITY_NUM"] = "Priority #%d"
+L["OPT_CUREPETS_DESC"] = "Pets will be managed and cured"
 L["OPT_CURINGOPTIONS"] = "Curing Options"
 L["OPT_CURINGOPTIONS_DESC"] = "Curing options including options to change priority for each affliction type"
 L["OPT_CURINGOPTIONS_EXPLANATION"] = [=[Select the types of affliction you want to cure, unchecked types will be completely ignored by Decursive.
@@ -280,12 +289,17 @@ L["OPT_CUSTOM_SPELL_PRIORITY_DESC"] = [=[When several spells can cure the same a
 Note that default abilities managed by Decursive have a priority ranging from 0 to 9.
 
 Thus, if you give your custom spell a negative priority, it will only be chosen if the default ability is not available.]=]
-L["OPT_CUSTOMSPELLS"] = "Custom spells"
+L["OPT_CUSTOM_SPELL_UNAVAILABLE"] = "unavailable"
+L["OPT_CUSTOM_SPELL_UNIT_FILTER"] = "Unit Filtering"
+L["OPT_CUSTOM_SPELL_UNIT_FILTER_DESC"] = "Select units that can benefit from this spell"
+L["OPT_CUSTOM_SPELL_UNIT_FILTER_NONE"] = "All units"
+L["OPT_CUSTOM_SPELL_UNIT_FILTER_NONPLAYER"] = "Others only"
+L["OPT_CUSTOM_SPELL_UNIT_FILTER_PLAYER"] = "Player only"
+L["OPT_CUSTOMSPELLS"] = "Custom spells / items"
 L["OPT_CUSTOMSPELLS_DESC"] = [=[Here you can add spells to extend Decursive's automatic configuration.
 Your custom spells always have a higher priority and will override and replace the default spells (if and only if your character can use those spells).
 ]=]
 L["OPT_CUSTOMSPELLS_EFFECTIVE_ASSIGNMENTS"] = "Effective spells assignments:"
-L["OPT_CUSTOM_SPELL_UNAVAILABLE"] = "unavailable"
 L["OPT_DEBCHECKEDBYDEF"] = [=[
 
 Checked by default]=]
@@ -301,13 +315,14 @@ L["OPT_DISEASECHECK_DESC"] = "If checked you'll be able to see and cure diseased
 L["OPT_DISPLAYOPTIONS"] = "Display options"
 L["OPT_DONOTBLPRIO_DESC"] = "Prioritized units won't be blacklisted"
 L["OPT_ENABLE_A_CUSTOM_SPELL"] = "Enable"
-L["OPT_ENABLEDEBUG"] = "Enable Debugging"
-L["OPT_ENABLEDEBUG_DESC"] = "Enable Debugging output"
-L["OPT_ENABLEDECURSIVE"] = "Enable Decursive"
 L["OPT_ENABLE_LIVELIST"] = "Enable the live-list"
 L["OPT_ENABLE_LIVELIST_DESC"] = [=[Displays an informative list of afflicted people.
 
 You can move this list by moving the Decursive bar (type /DCRSHOW to display that bar).]=]
+L["OPT_ENABLEDEBUG"] = "Enable Debugging"
+L["OPT_ENABLEDEBUG_DESC"] = "Enable Debugging output"
+L["OPT_ENABLEDECURSIVE"] = "Enable Decursive"
+L["OPT_FILTERED_DEBUFF_RENAMED"] = "Filtered affliction \"%s\" automatically renamed to \"%s\" for Spell ID %d"
 L["OPT_FILTEROUTCLASSES_FOR_X"] = "%q will be ignored on the specified classes while you are in combat."
 L["OPT_GENERAL"] = "General options"
 L["OPT_GROWDIRECTION"] = "Reverse MUFs Display"
@@ -326,7 +341,7 @@ L["OPT_INPUT_SPELL_BAD_INPUT_ALREADY_HERE"] = "Spell already listed!"
 L["OPT_INPUT_SPELL_BAD_INPUT_DEFAULT_SPELL"] = "Decursive already manage this spell. Shift-click the spell or type its ID to add a special rank."
 L["OPT_INPUT_SPELL_BAD_INPUT_ID"] = "Invalid spell ID!"
 L["OPT_INPUT_SPELL_BAD_INPUT_NOT_SPELL"] = "Spell not found in your spell book!"
-L["OPTION_MENU"] = "Decursive Options Menu"
+L["OPT_ISNOTVALID_SPELLID"] = "is not a valid Spell ID"
 L["OPT_LIVELIST"] = "Live list"
 L["OPT_LIVELIST_DESC"] = [=[These are the settings concerning the list of afflicted units displayed beneath the "Decursive" bar.
 
@@ -411,6 +426,11 @@ L["OPT_RESTPROFILECONF"] = [=[Are you sure you want to reset the profile
  to default options?]=]
 L["OPT_REVERSE_LIVELIST_DESC"] = "The live-list fills itself from bottom to top"
 L["OPT_SCANLENGTH_DESC"] = "Defines the time between each scan"
+L["OPT_SETAFFTYPECOLOR_DESC"] = [=[Set the color of the "%s" affliction type.
+
+(Mostly appears in the MUF's tooltips and on the Live list)]=]
+L["OPT_SHOW_STEALTH_STATUS"] = "Show stealth status"
+L["OPT_SHOW_STEALTH_STATUS_DESC"] = "When a player is stealthed, his MUF will take a special color"
 L["OPT_SHOWBORDER"] = "Show the class-colored borders"
 L["OPT_SHOWBORDER_DESC"] = "A colored border will be displayed around the MUFs representing the unit's class"
 L["OPT_SHOWHELP"] = "Show help"
@@ -419,9 +439,10 @@ L["OPT_SHOWMFS"] = "Show the Micro Units Frame"
 L["OPT_SHOWMFS_DESC"] = "This must be enabled if you want to cure by clicking"
 L["OPT_SHOWMINIMAPICON"] = "Minimap Icon"
 L["OPT_SHOWMINIMAPICON_DESC"] = "Toggle the minimap icon."
-L["OPT_SHOW_STEALTH_STATUS"] = "Show stealth status"
-L["OPT_SHOW_STEALTH_STATUS_DESC"] = "When a player is stealthed, his MUF will take a special color"
 L["OPT_SHOWTOOLTIP_DESC"] = "Shows a detailed tooltips about curses in the live-list and on the MUFs"
+L["OPT_SPELL_DESCRIPTION_LOADING"] = "Description is loading... come back later."
+L["OPT_SPELL_DESCRIPTION_UNAVAILABLE"] = "description not available"
+L["OPT_SPELLID_MISSING_READD"] = "You need to re-add this affliction using its Spell ID to see a proper description instead of this message."
 L["OPT_STICKTORIGHT"] = "Align MUF window to the right"
 L["OPT_STICKTORIGHT_DESC"] = "The MUF window will grow from right to left, the handle will be moved as necessary."
 L["OPT_TESTLAYOUT"] = "Test Layout"
@@ -429,9 +450,9 @@ L["OPT_TESTLAYOUT_DESC"] = [=[Create fake units so you can test the display layo
 (Wait a few seconds after clicking)]=]
 L["OPT_TESTLAYOUTUNUM"] = "Unit number"
 L["OPT_TESTLAYOUTUNUM_DESC"] = "Set the number of fake units to create."
+L["OPT_TIE_LIVELIST_DESC"] = "The live-list display is tied to \"Decursive\" bar display"
 L["OPT_TIECENTERANDBORDER"] = "Tie center and border transparency"
 L["OPT_TIECENTERANDBORDER_OPT"] = "The transparency of the border is half the center transparency when checked"
-L["OPT_TIE_LIVELIST_DESC"] = "The live-list display is tied to \"Decursive\" bar display"
 L["OPT_TIEXYSPACING"] = "Tie horizontal and vertical spacing"
 L["OPT_TIEXYSPACING_DESC"] = "The horizontal and vertical space between MUFs are the same"
 L["OPT_UNITPERLINES"] = "Number of units per row"
@@ -441,6 +462,7 @@ L["OPT_XSPACING"] = "Horizontal spacing"
 L["OPT_XSPACING_DESC"] = "Set the Horizontal space between MUFs"
 L["OPT_YSPACING"] = "Vertical spacing"
 L["OPT_YSPACING_DESC"] = "Set the Vertical space between MUFs"
+L["OPTION_MENU"] = "Decursive Options Menu"
 L["PLAY_SOUND"] = "Play a sound when there is someone to cure"
 L["POISON"] = "Poison"
 L["POPULATE"] = "p"
@@ -477,9 +499,9 @@ You need to update Decursive to fix potential incompatibilities and runtime erro
 Go to curse.com and search for 'Decursive' or use Curse's client to update all your add-ons at once.
 
 This notice will be displayed again in 2 days.]=]
+L["TOO_MANY_ERRORS_ALERT"] = [=[There are too many Lua errors in your User Interface (%d errors). Your game experience may be degraded. Disable or update the failing add-ons to turn off this message.
+You may want to turn on Lua error reporting (/console scriptErrors 1).]=]
 L["TOOFAR"] = "Too far"
-L["TOO_MANY_ERRORS_ALERT"] = [=[There are too many Lua errors in your User Interface (%d). Your game experience is currently degraded. Disable or update the failing add-ons to turn off this message and regain a proper frame rate.
-You may want to turn on Lua error reporting ('Help' section of World of Warcraft's interface options) to identify the problematic add-ons.]=]
 L["UNITSTATUS"] = "Unit Status: "
 L["UNSTABLERELEASE"] = "Unstable release"
 
@@ -487,4 +509,4 @@ L["UNSTABLERELEASE"] = "Unstable release"
 
 
 
-T._LoadedFiles["enUS.lua"] = "2.7.3.6";
+T._LoadedFiles["enUS.lua"] = "2.7.8";

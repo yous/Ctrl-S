@@ -7,7 +7,7 @@
 --		Banjankri of Blackrock, Predeter of Proudmoore, Xenyr of Aszune
 
 -- Currently maintained by
--- Cybeloras of Aerie Peak/Detheroc/Mal'Ganis
+-- Cybeloras of Aerie Peak
 -- --------------------
 
 local TMW = TMW
@@ -25,6 +25,7 @@ local pairs, wipe, strlower =
 local OnGCD = TMW.OnGCD
 local SpellHasNoMana = TMW.SpellHasNoMana
 local GetSpellTexture = TMW.GetSpellTexture
+local GetRuneCooldownDuration = TMW.GetRuneCooldownDuration
 
 local _, pclass = UnitClass("Player")
 
@@ -38,15 +39,17 @@ Type.name = L["ICONMENU_SPELLCOOLDOWN"]
 Type.desc = L["ICONMENU_SPELLCOOLDOWN_DESC"]
 Type.menuIcon = "Interface\\Icons\\spell_holy_divineintervention"
 
+local STATE_USABLE           = TMW.CONST.STATE.DEFAULT_SHOW
+local STATE_UNUSABLE         = TMW.CONST.STATE.DEFAULT_HIDE
+local STATE_UNUSABLE_NORANGE = TMW.CONST.STATE.DEFAULT_NORANGE
+local STATE_UNUSABLE_NOMANA  = TMW.CONST.STATE.DEFAULT_NOMANA
 
 -- AUTOMATICALLY GENERATED: UsesAttributes
+Type:UsesAttributes("state")
 Type:UsesAttributes("spell")
-Type:UsesAttributes("charges, maxCharges")
-Type:UsesAttributes("start, duration")
-Type:UsesAttributes("alpha")
-Type:UsesAttributes("noMana")
-Type:UsesAttributes("inRange")
+Type:UsesAttributes("charges, maxCharges, chargeStart, chargeDur")
 Type:UsesAttributes("reverse")
+Type:UsesAttributes("start, duration")
 Type:UsesAttributes("stack, stackText")
 Type:UsesAttributes("texture")
 -- END AUTOMATICALLY GENERATED: UsesAttributes
@@ -63,18 +66,27 @@ Type:RegisterIconDefaults{
 	-- True to cause the icon to act as unusable when the ability lacks power to be used.
 	ManaCheck				= false,
 
+	-- True to treat the spell as unusable if it is on the GCD.
+	GCDAsUnusable			= false,
+
 	-- True to prevent rune cooldowns from causing the ability to be deemed unusable.
 	IgnoreRunes				= false,
 }
 
+TMW:RegisterUpgrade(80004, {
+	icon = function(self, ics)
+		-- Multistate cooldown icon type has been removed (no longer needed)
+		-- We added a flag to icon settings that used to be multistate cooldowns in case an emergency rollback was needed.
+		-- It never ended up being needed, so now we can remove this flag.
+		ics.wasmscd = nil
+	end,
+})
 TMW:RegisterUpgrade(72022, {
 	icon = function(self, ics)
 		-- Multistate cooldown icon type has been removed (no longer needed)
 		if ics.Type == "multistate" then
 			ics.Type = "cooldown"
 			ics.IgnoreRunes = false -- mscd icons didnt have this setting. Make sure it is disabled.
-			ics.wasmscd = true -- flag this so we can undo this change if we need to. TODO: remove this flag from all icons when we're sure this is an OK change.
-			-- also TODO: remove static formats and localization strings for things that were used for mscd.
 		end
 	end,
 })
@@ -84,36 +96,38 @@ Type:RegisterConfigPanel_XMLTemplate(100, "TellMeWhen_ChooseName", {
 	text = L["CHOOSENAME_DIALOG"] .. "\r\n\r\n" .. L["CHOOSENAME_DIALOG_PETABILITIES"],
 })
 
-Type:RegisterConfigPanel_XMLTemplate(165, "TellMeWhen_WhenChecks", {
-	text = L["ICONMENU_SHOWWHEN"],
-	[0x2] = { text = "|cFF00FF00" .. L["ICONMENU_USABLE"],			},
-	[0x1] = { text = "|cFFFF0000" .. L["ICONMENU_UNUSABLE"],		},
+Type:RegisterConfigPanel_XMLTemplate(165, "TellMeWhen_IconStates", {
+	[STATE_USABLE]           = { text = "|cFF00FF00" .. L["ICONMENU_READY"],   },
+	[STATE_UNUSABLE]         = { text = "|cFFFF0000" .. L["ICONMENU_NOTREADY"], },
+	[STATE_UNUSABLE_NORANGE] = { text = "|cFFFFff00" .. L["ICONMENU_OORANGE"], requires = "RangeCheck" },
+	[STATE_UNUSABLE_NOMANA]  = { text = "|cFFFFff00" .. L["ICONMENU_OOPOWER"], requires = "ManaCheck" },
 })
 
 Type:RegisterConfigPanel_ConstructorFunc(150, "TellMeWhen_CooldownSettings", function(self)
-	self.Header:SetText(Type.name)
-	TMW.IE:BuildSimpleCheckSettingFrame(self, {
-		{
-			setting = "RangeCheck",
-			title = L["ICONMENU_RANGECHECK"],
-			tooltip = L["ICONMENU_RANGECHECK_DESC"],
-		},
-		{
-			setting = "ManaCheck",
-			title = L["ICONMENU_MANACHECK"],
-			tooltip = L["ICONMENU_MANACHECK_DESC"],
-		},
-		pclass == "DEATHKNIGHT" and {
-			setting = "IgnoreRunes",
-			title = L["ICONMENU_IGNORERUNES"],
-			tooltip = L["ICONMENU_IGNORERUNES_DESC"],
-		},
+	self:SetTitle(Type.name)
+	self:BuildSimpleCheckSettingFrame({
+		function(check)
+			check:SetTexts(L["ICONMENU_RANGECHECK"], L["ICONMENU_RANGECHECK_DESC"])
+			check:SetSetting("RangeCheck")
+		end,
+		function(check)
+			check:SetTexts(L["ICONMENU_MANACHECK"], L["ICONMENU_MANACHECK_DESC"])
+			check:SetSetting("ManaCheck")
+		end,
+		function(check)
+			check:SetTexts(L["ICONMENU_GCDASUNUSABLE"], L["ICONMENU_GCDASUNUSABLE_DESC"])
+			check:SetSetting("GCDAsUnusable")
+		end,
+		pclass == "DEATHKNIGHT" and function(check)
+			check:SetTexts(L["ICONMENU_IGNORERUNES"], L["ICONMENU_IGNORERUNES_DESC"])
+			check:SetSetting("IgnoreRunes")
+		end,
 	})
 end)
 
 
 
-local function AutoShot_OnEvent(icon, event, unit, _, _, _, spellID)
+local function AutoShot_OnEvent(icon, event, unit, _, spellID)
 	if event == "UNIT_SPELLCAST_SUCCEEDED" and unit == "player" and spellID == 75 then
 		-- When an autoshot happens, set the timer for the next one.
 
@@ -142,59 +156,47 @@ local function AutoShot_OnUpdate(icon, time)
 
 	if ready and inrange then
 		icon:SetInfo(
-			"alpha; start, duration; spell; inRange",
-			icon.Alpha,
+			"state; start, duration; spell",
+			STATE_USABLE,
 			0, 0,
-			NameString,
-			inrange
+			NameString
 		)
 	else
 		icon:SetInfo(
-			"alpha; start, duration; spell; inRange",
-			icon.UnAlpha,
+			"state; start, duration; spell",
+			not inrange and STATE_UNUSABLE_NORANGE or STATE_UNUSABLE,
 			icon.asStart, asDuration,
-			NameString,
-			inrange
+			NameString
 		)
 	end
 end
-
 
 local usableData = {}
 local unusableData = {}
 local function SpellCooldown_OnUpdate(icon, time)    
 	-- Upvalue things that will be referenced a lot in our loops.
-	local IgnoreRunes, RangeCheck, ManaCheck, NameArray, NameStringArray =
-	icon.IgnoreRunes, icon.RangeCheck, icon.ManaCheck, icon.Spells.Array, icon.Spells.StringArray
+	local IgnoreRunes, RangeCheck, ManaCheck, GCDAsUnusable, NameArray, NameStringArray =
+	icon.IgnoreRunes, icon.RangeCheck, icon.ManaCheck, icon.GCDAsUnusable, icon.Spells.Array, icon.Spells.StringArray
+
+	local usableAlpha = icon.States[STATE_USABLE].Alpha
+	local runeCD = IgnoreRunes and GetRuneCooldownDuration()
 
 	local usableFound, unusableFound
 
 	for i = 1, #NameArray do
 		local iName = NameArray[i]
 		
-		local start, duration, stack
-		
-		local charges, maxCharges, start_charge, duration_charge = GetSpellCharges(iName)
-		if charges then
-			if charges < maxCharges then
-				-- If the ability has charges and isn't at max charges, 
-				-- the timer on the icon should be the time until the next charge is gained.
-				start, duration = start_charge, duration_charge
-			else
-				start, duration = GetSpellCooldown(iName)
-			end
-			stack = charges
-		else
-			start, duration = GetSpellCooldown(iName)
-			stack = GetSpellCount(iName)
-		end
+		local start, duration = GetSpellCooldown(iName)
+		local charges, maxCharges, chargeStart, chargeDur = GetSpellCharges(iName)
+		local stack = charges or GetSpellCount(iName)
+
 		
 		if duration then
-			if IgnoreRunes and duration == 10 then
+			if IgnoreRunes and duration == runeCD then
 				-- DK abilities that are on cooldown because of runes are always reported
-				-- as having a cooldown duration of 10 seconds. We use this fact to filter out rune cooldowns.
-				-- We used to have to make sure the ability being checked wasn't Mind Freeze before doing this,
-				-- but Mind Freeze has a 15 second cooldown now (instead of 10), so we don't have to worry.
+				-- as having a cooldown duration equal to the current rune cooldown duration.
+				-- We use this fact to filter out rune cooldowns. GetSpellCooldown reports with a precision of 
+				-- 3 digits past the decimal, so we need to trim off extra trailing digits from GetRuneCooldown.
 				start, duration = 0, 0
 			end
 
@@ -215,42 +217,51 @@ local function SpellCooldown_OnUpdate(icon, time)
 			-- We store all our data in tables here because we need to keep track of both the first
 			-- usable cooldown and the first unusable cooldown found. We can't always determine which we will
 			-- use until we've found one of each. 
-			if inrange and not nomana and (duration == 0 or (charges and charges > 0) or OnGCD(duration)) then --usable
+			if
+				inrange and not nomana and (
+					-- If the cooldown duration is 0 and there arent charges, then its usable
+					(duration == 0 and not charges)
+					-- If the spell has charges and they aren't all depeleted, its usable
+					or (charges and charges > 0)
+					-- If we're just on a GCD, its usable
+					or (not GCDAsUnusable and OnGCD(duration))
+				)
+			then --usable
 				if not usableFound then
-					wipe(usableData)
-					usableData.alpha = icon.Alpha
+					--wipe(usableData)
+					usableData.state = STATE_USABLE
 					usableData.tex = GetSpellTexture(iName)
-					usableData.inrange = inrange
-					usableData.nomana = nomana
 					usableData.iName = iName
 					usableData.stack = stack
 					usableData.charges = charges
 					usableData.maxCharges = maxCharges
+					usableData.chargeStart = chargeStart
+					usableData.chargeDur = chargeDur
 					usableData.start = start
 					usableData.duration = duration
 					
 					usableFound = true
 					
-					if icon.Alpha > 0 then
+					if usableAlpha > 0 then
 						break
 					end
 				end
 			elseif not unusableFound then
-				wipe(unusableData)
-				unusableData.alpha = icon.UnAlpha
+				--wipe(unusableData)
+				unusableData.state = not inrange and STATE_UNUSABLE_NORANGE or nomana and STATE_UNUSABLE_NOMANA or STATE_UNUSABLE
 				unusableData.tex = GetSpellTexture(iName)
-				unusableData.inrange = inrange
-				unusableData.nomana = nomana
 				unusableData.iName = iName
 				unusableData.stack = stack
 				unusableData.charges = charges
 				unusableData.maxCharges = maxCharges
+				unusableData.chargeStart = chargeStart
+				unusableData.chargeDur = chargeDur
 				unusableData.start = start
 				unusableData.duration = duration
 				
 				unusableFound = true
 				
-				if icon.Alpha == 0 then
+				if usableAlpha == 0 then
 					break
 				end
 			end
@@ -258,26 +269,26 @@ local function SpellCooldown_OnUpdate(icon, time)
 	end
 	
 	local dataToUse
-	if usableFound and icon.Alpha > 0 then
+	if usableFound and usableAlpha > 0 then
 		dataToUse = usableData
 	elseif unusableFound then
 		dataToUse = unusableData
+	elseif usableFound then
+		dataToUse = usableData
 	end
 	
 	if dataToUse then
 		icon:SetInfo(
-			"alpha; texture; start, duration; charges, maxCharges; stack, stackText; spell; inRange; noMana",
-			dataToUse.alpha,
+			"state; texture; start, duration; charges, maxCharges, chargeStart, chargeDur; stack, stackText; spell",
+			dataToUse.state,
 			dataToUse.tex,
 			dataToUse.start, dataToUse.duration,
-			dataToUse.charges, dataToUse.maxCharges,
+			dataToUse.charges, dataToUse.maxCharges, dataToUse.chargeStart, dataToUse.chargeDur,
 			dataToUse.stack, dataToUse.stack,
-			dataToUse.iName,
-			dataToUse.inrange,
-			dataToUse.nomana
+			dataToUse.iName
 		)
 	else
-		icon:SetInfo("alpha", 0)
+		icon:SetInfo("state", 0)
 	end
 end
 
@@ -303,33 +314,34 @@ function Type:Setup(icon)
 		icon:SetScript("OnEvent", AutoShot_OnEvent)
 		
 		icon:SetUpdateFunction(AutoShot_OnUpdate)
-	else
-		icon.FirstTexture = GetSpellTexture(icon.Spells.First)
+		icon:Update()
 		
-		icon:SetInfo("texture; reverse; spell", Type:GetConfigIconTexture(icon), false, icon.Spells.First)
-		
-		
-		if not icon.RangeCheck then
-			-- There are no events for when you become in range/out of range for a spell
+		return
+	end
 
-			icon:RegisterSimpleUpdateEvent("SPELL_UPDATE_COOLDOWN")
-			icon:RegisterSimpleUpdateEvent("SPELL_UPDATE_USABLE")
-			icon:RegisterSimpleUpdateEvent("SPELL_UPDATE_CHARGES")
-			if icon.IgnoreRunes then
-				icon:RegisterSimpleUpdateEvent("RUNE_POWER_UPDATE")
-				icon:RegisterSimpleUpdateEvent("RUNE_TYPE_UPDATE")
-			end    
-			if icon.ManaCheck then
-				icon:RegisterSimpleUpdateEvent("UNIT_POWER_FREQUENT", "player")
-				-- icon:RegisterSimpleUpdateEvent("SPELL_UPDATE_USABLE")-- already registered
-			end
-			
-			icon:SetUpdateMethod("manual")
+	icon.FirstTexture = GetSpellTexture(icon.Spells.First)
+	
+	icon:SetInfo("texture; reverse; spell", Type:GetConfigIconTexture(icon), false, icon.Spells.First)
+	
+	
+	if not icon.RangeCheck then
+		-- There are no events for when you become in range/out of range for a spell
+
+		icon:RegisterSimpleUpdateEvent("SPELL_UPDATE_COOLDOWN")
+		icon:RegisterSimpleUpdateEvent("SPELL_UPDATE_USABLE")
+		icon:RegisterSimpleUpdateEvent("SPELL_UPDATE_CHARGES")
+		if icon.IgnoreRunes then
+			icon:RegisterSimpleUpdateEvent("RUNE_POWER_UPDATE")
+		end    
+		if icon.ManaCheck then
+			icon:RegisterSimpleUpdateEvent("UNIT_POWER_FREQUENT", "player")
+			-- icon:RegisterSimpleUpdateEvent("SPELL_UPDATE_USABLE")-- already registered
 		end
 		
-		icon:SetUpdateFunction(SpellCooldown_OnUpdate)
+		icon:SetUpdateMethod("manual")
 	end
 	
+	icon:SetUpdateFunction(SpellCooldown_OnUpdate)
 	icon:Update()
 end
 

@@ -7,7 +7,7 @@
 --		Banjankri of Blackrock, Predeter of Proudmoore, Xenyr of Aszune
 
 -- Currently maintained by
--- Cybeloras of Aerie Peak/Detheroc/Mal'Ganis
+-- Cybeloras of Aerie Peak
 -- --------------------
 
 
@@ -40,7 +40,7 @@ end)
 
 
 ---------- Events ----------
-function Animations:SetupEventDisplay(eventID)
+function Animations:GetEventDisplayText(eventID)
 	if not eventID then return end
 
 	local subHandlerData, subHandlerIdentifier = self:GetSubHandler(eventID)
@@ -51,174 +51,26 @@ function Animations:SetupEventDisplay(eventID)
 			text = "|cff808080" .. text
 		end
 
-		EVENTS.EventHandlerFrames[eventID].DataText:SetText("|cffcccccc" .. L["ANIM_TAB"] .. ":|r " .. text)
+		return ("|cffcccccc" .. L["ANIM_TAB"] .. ":|r " .. text)
 	else
-		EVENTS.EventHandlerFrames[eventID].DataText:SetText("|cffcccccc" .. L["ANIM_TAB"] .. ":|r UNKNOWN: " .. (subHandlerIdentifier or "?"))
+		return ("|cffcccccc" .. L["ANIM_TAB"] .. ":|r UNKNOWN: " .. (subHandlerIdentifier or "?"))
 	end
 end
 
 
 
 ---------- Interface ----------
-local Load_Generic_Slider = Animations.Load_Generic_Slider
-local Load_Generic_Check = Animations.Load_Generic_Check
-
 
 TMW.IE:RegisterRapidSetting("Duration")
-Animations:RegisterConfigFrame("Duration", {
-	frame = "Duration",
-	topPadding = 13,
-	bottomPadding = 13,
-
-	text = L["ANIM_DURATION"],
-	desc = L["ANIM_DURATION_DESC"],
-	
-	Load = Load_Generic_Slider,
-})
-
 TMW.IE:RegisterRapidSetting("Magnitude")
-Animations:RegisterConfigFrame("Magnitude", {
-	frame = "Magnitude",
-	topPadding = 13,
-	bottomPadding = 13,
-
-	text = L["ANIM_MAGNITUDE"],
-	desc = L["ANIM_MAGNITUDE_DESC"],
-	
-	Load = Load_Generic_Slider,
-})
-
 TMW.IE:RegisterRapidSetting("Period")
-Animations:RegisterConfigFrame("Period", {
-	frame = "Period",
-	topPadding = 13,
-	bottomPadding = 13,
-
-	text = L["ANIM_PERIOD"],
-	desc = L["ANIM_PERIOD_DESC"],
-	
-	Load = Load_Generic_Slider,
-})
-
 TMW.IE:RegisterRapidSetting("Thickness")
-Animations:RegisterConfigFrame("Thickness", {
-	frame = "Thickness",
-	topPadding = 13,
-	bottomPadding = 13,
-
-	text = L["ANIM_THICKNESS"],
-	desc = L["ANIM_THICKNESS_DESC"],
-	
-	Load = Load_Generic_Slider,
-})
-
 TMW.IE:RegisterRapidSetting("Size_anim")
-Animations:RegisterConfigFrame("Size_anim", {
-	frame = "Size_anim",
-	topPadding = 13,
-	bottomPadding = 13,
-
-	text = L["ANIM_SIZE_ANIM"],
-	desc = L["ANIM_SIZE_ANIM_DESC"],
-	
-	Load = Load_Generic_Slider,
-})
-
-Animations:RegisterConfigFrame("AlphaStandalone", {
-	frame = "AlphaStandalone",
-	topPadding = 13,
-	bottomPadding = 13,
-
-	text = L["ANIM_ALPHASTANDALONE"],
-	desc = L["ANIM_ALPHASTANDALONE_DESC"],
-	
-	Load = Load_Generic_Slider,
-})
-
+TMW.IE:RegisterRapidSetting("Scale")
 TMW.IE:RegisterRapidSetting("SizeX")
-Animations:RegisterConfigFrame("SizeX", {
-	frame = "SizeX",
-	topPadding = 13,
-	bottomPadding = 13,
-
-	text = L["ANIM_SIZEX"],
-	desc = L["ANIM_SIZEX_DESC"],
-	
-	Load = Load_Generic_Slider,
-})
-
 TMW.IE:RegisterRapidSetting("SizeY")
-Animations:RegisterConfigFrame("SizeY", {
-	frame = "SizeY",
-	topPadding = 13,
-	bottomPadding = 13,
+TMW.IE:RegisterRapidSetting("AnimColor")
 
-	text = L["ANIM_SIZEY"],
-	desc = L["ANIM_SIZEY_DESC"],
-	
-	Load = Load_Generic_Slider,
-})
-
-Animations:RegisterConfigFrame("Fade", {
-	frame = "Fade",
-	--topPadding = 13,
-	--bottomPadding = 13,
-
-	text = L["ANIM_FADE"],
-	desc = L["ANIM_FADE_DESC"],
-
-	Load = Load_Generic_Check,
-})
-
-Animations:RegisterConfigFrame("Infinite", {
-	frame = "Infinite",
-	--topPadding = 13,
-	--bottomPadding = 13,
-
-	text = L["ANIM_INFINITE"],
-	desc = L["ANIM_INFINITE_DESC"],
-
-
-	Load = Load_Generic_Check,
-})
-
-
-Animations:RegisterConfigFrame("Image", {
-	frame = "Image",
-	topPadding = 4,
-	bottomPadding = 7,
-	
-	Load = function(self, frame, EventSettings)
-		frame:SetText(EventSettings.Image)
-	end,
-})
-
-TMW.IE:RegisterRapidSetting("r_anim")
-TMW.IE:RegisterRapidSetting("g_anim")
-TMW.IE:RegisterRapidSetting("b_anim")
-TMW.IE:RegisterRapidSetting("a_anim")
-Animations:RegisterConfigFrame("Color", {
-	frame = "Color",
-	topPadding = 4,
-	bottomPadding = 4,
-	
-	Load = function(self, frame, EventSettings)
-		local r, g, b, a = EventSettings.r_anim, EventSettings.g_anim, EventSettings.b_anim, EventSettings.a_anim
-		frame:GetNormalTexture():SetVertexColor(r, g, b, 1)
-		frame.background:SetAlpha(a)
-	end,
-})
-
-
-Animations:RegisterConfigFrame("AnchorTo", {
-	frame = "AnchorTo",
-	topPadding = 14,
-	bottomPadding = 4,
-	
-	Load = function(self, frame, EventSettings)
-		Animations:AnchorTo_Dropdown_SetText(EventSettings.AnchorTo)
-	end,
-})
 
 function Animations:AnchorTo_Dropdown()
 	for _, IconModule in pairs(TMW.CI.icon.Modules) do

@@ -9,117 +9,88 @@
 -- register this file with Ace Libraries
 local TSM = select(2, ...)
 TSM = LibStub("AceAddon-3.0"):NewAddon(TSM, "TSM_Accounting", "AceEvent-3.0", "AceConsole-3.0")
-TSM.SELL_KEYS = { "itemString", "itemName", "stackSize", "quantity", "price", "buyer", "player", "time", "source" }
-TSM.BUY_KEYS = { "itemString", "itemName", "stackSize", "quantity", "price", "seller", "player", "time", "source" }
+TSM.SELL_KEYS = { "itemString", "stackSize", "quantity", "price", "buyer", "player", "time", "source" }
+TSM.BUY_KEYS = { "itemString", "stackSize", "quantity", "price", "seller", "player", "time", "source" }
 TSM.INCOME_KEYS = { "type", "amount", "source", "player", "time" }
 TSM.EXPENSE_KEYS = { "type", "amount", "destination", "player", "time" }
-TSM.EXPIRED_KEYS = { "itemString", "itemName", "stackSize", "quantity", "player", "time" }
-TSM.CANCELLED_KEYS = { "itemString", "itemName", "stackSize", "quantity", "player", "time" }
+TSM.EXPIRED_KEYS = { "itemString", "stackSize", "quantity", "player", "time" }
+TSM.CANCELLED_KEYS = { "itemString", "stackSize", "quantity", "player", "time" }
 TSM.GOLD_LOG_KEYS = { "startMinute", "endMinute", "copper" }
 local MAX_CSV_RECORDS = 55000
 local L = LibStub("AceLocale-3.0"):GetLocale("TradeSkillMaster_Accounting") -- loads the localization table
 local LibParse = LibStub("LibParse")
+local baseItemLookup = { update = 0 }
 
-local savedDBDefaults = {
+local settingsInfo = {
+	version = 2,
 	global = {
-		itemStrings = {},
-		infoID = 0,
+		displayTransfers = { type = "boolean", default = true, lastModifiedVersion = 1 },
+		trackTrades = { type = "boolean", default = true, lastModifiedVersion = 1 },
+		autoTrackTrades = { type = "boolean", default = false, lastModifiedVersion = 1 },
+		displayGreys = { type = "boolean", default = true, lastModifiedVersion = 1 },
+		timeFormat = { type = "string", default = "ago", lastModifiedVersion = 1 },
+		priceFormat = { type = "string", default = "avg", lastModifiedVersion = 1 },
+		mvSource = { type = "string", default = "dbmarket", lastModifiedVersion = 1 },
+		itemStrings = { type = "table", default = {}, lastModifiedVersion = 1 },
 	},
 	realm = {
-		csvSales = "",
-		csvBuys = "",
-		csvIncome = "",
-		csvExpense = "",
-		csvExpired = "",
-		csvCancelled = "",
-		timeFormat = "ago",
-		mvSource = "adbmarket",
-		priceFormat = "avg",
-		tooltip = { sale = false, purchase = false },
-		smartBuyPrice = false,
-		expiredAuctions = false,
-		cancelledAuctions = false,
-		saleRate = false,
-		trackTrades = true,
-		autoTrackTrades = false,
-		displayGreys = true,
-		goldLog = {},
-		displayTransfers = true,
-		saveTimeSales = "",
-		saveTimeBuys = "",
-		trimmed = {},
-		combinedFactions = false,
+		smartBuyPrice = { type = "boolean", default = false, lastModifiedVersion = 1 },
+		csvSales = { type = "string", default = "", lastModifiedVersion = 1 },
+		csvBuys = { type = "string", default = "", lastModifiedVersion = 1 },
+		csvIncome = { type = "string", default = "", lastModifiedVersion = 1 },
+		csvExpense = { type = "string", default = "", lastModifiedVersion = 1 },
+		csvExpired = { type = "string", default = "", lastModifiedVersion = 1 },
+		csvCancelled = { type = "string", default = "", lastModifiedVersion = 1 },
+		saveTimeSales = { type = "string", default = "", lastModifiedVersion = 1 },
+		saveTimeBuys = { type = "string", default = "", lastModifiedVersion = 1 },
+		saveTimeExpires = { type = "string", default = "", lastModifiedVersion = 2 },
+		saveTimeCancels = { type = "string", default = "", lastModifiedVersion = 2 },
+		goldGraphCharacter = { type = "string", default = nil, lastModifiedVersion = 1 },
+		goldGraphTimeframe = { type = "number", default = 30, lastModifiedVersion = 1 },
+		goldLog = { type = "table", default = {}, lastModifiedVersion = 1 },
+		trimmed = { type = "table", default = {}, lastModifiedVersion = 1 },
 	},
+}
+local tooltipDefaults = {
+	sale = true,
+	expiredAuctions = false,
+	cancelledAuctions = false,
+	saleRate = false,
+	purchase = true,
 }
 
 -- Called once the player has loaded WOW.
 function TSM:OnInitialize()
-	-- merge factions for 6.0.1
-	local realmKey = GetRealmName()
-	local factionKey = UnitFactionGroup("player")
-	local factionrealmKey = factionKey .. " - " .. realmKey
-	if (factionKey == "Horde" or factionKey == "Alliance") and TradeSkillMaster_AccountingDB and (not TradeSkillMaster_AccountingDB.realm or not TradeSkillMaster_AccountingDB.realm[realmKey] or not TradeSkillMaster_AccountingDB.realm[realmKey].combinedFactions) then
-		local mergedData = {}
-		local factionrealms = {factionrealmKey, ((factionKey == "Horde") and "Alliance" or "Horde").." - "..realmKey}
-		for _, factionrealm in ipairs(factionrealms) do
-			local data = TradeSkillMaster_AccountingDB.factionrealm and TradeSkillMaster_AccountingDB.factionrealm[factionrealm]
-			if data then
-				-- combine CSV data
-				local csvKeys = {"csvSales", "csvBuys", "csvIncome", "csvExpense", "csvExpired", "csvCancelled"}
-				for _, key in ipairs(csvKeys) do
-					local location = strfind(data[key] or "", "\n")
-					if location then
-						if mergedData[key] then
-							mergedData[key] = mergedData[key]..strsub(data[key], location+1)
-						else
-							mergedData[key] = data[key]
-						end
-					end
-				end
-				-- combine gold log
-				if data.goldLog then
-					mergedData.goldLog = mergedData.goldLog or {}
-					for player, data in pairs(data.goldLog) do
-						mergedData.goldLog[player] = data
-					end
-				end
-				-- combine general settings
-				local settingKeys = {"timeFormat", "mvSource", "priceFormat", "tooltip", "smartBuyPrice", "expiredAuctions", "saleRate", "trackTrades", "autoTrackTrades", "displayGreys", "displayTransfers"}
-				for _, key in ipairs(settingKeys) do
-					if mergedData[key] == nil and data[settingKeys] ~= nil then
-						mergedData[key] = data[settingKeys]
-					end
-				end
-			end
-			if TradeSkillMaster_AccountingDB.factionrealm then
-				TradeSkillMaster_AccountingDB.factionrealm[factionrealm] = nil
-			end
-		end
-		mergedData.combinedFactions = true
-		TradeSkillMaster_AccountingDB.realm = TradeSkillMaster_AccountingDB.realm or {}
-		TradeSkillMaster_AccountingDB.realm[realmKey] = mergedData
+	if TradeSkillMasterModulesDB then
+		TradeSkillMasterModulesDB.Accounting = TradeSkillMaster_AccountingDB
 	end
 
-	-- load the savedDB into TSM.db
-	TSM.db = LibStub:GetLibrary("AceDB-3.0"):New("TradeSkillMaster_AccountingDB", savedDBDefaults, true)
+	-- load settings
+	TSM.db = TSMAPI.Settings:Init("TradeSkillMaster_AccountingDB", settingsInfo)
 
 	for module in pairs(TSM.modules) do
 		TSM[module] = TSM.modules[module]
 	end
 
+	-- update for TSM3
+	for name, itemString in pairs(TSM.db.global.itemStrings) do
+		TSM.db.global.itemStrings[name] = TSMAPI.Item:ToItemString(itemString)
+	end
+
 	-- register with TSM
 	TSM:RegisterModule()
-	
+
 	for key, timestamp in pairs(TSM.db.realm.trimmed) do
-		TSM:Printf(L["|cffff0000IMPORTANT:|r When TSM_Accounting last saved data for this realm, it was too big for WoW to handle, so old data was automatically trimmed in order to avoid corruption of the saved variables. The last %s of %s data has been preserved."], SecondsToTime(time()-timestamp), key)
+		TSM:Printf(L["|cffff0000IMPORTANT:|r When TSM_Accounting last saved data for this realm, it was too big for WoW to handle, so old data was automatically trimmed in order to avoid corruption of the saved variables. The last %s of %s data has been preserved."], SecondsToTime(time() - timestamp), key)
 	end
 	TSM.db.realm.trimmed = {}
 
 	TSM.Data:Load()
+	TSMAPI.Sync:ClearMirror("ACCOUNTING_GOLD_LOG")
 
 	-- fix issues in gold log
-	for player, playerData in pairs(TSM.db.realm.goldLog) do
-		for i=#playerData, 1, -1 do
+	for player, playerData in pairs(TSM.goldLog) do
+		for i = #playerData, 1, -1 do
 			local data = playerData[i]
 			data.startMinute = floor(data.startMinute)
 			data.endMinute = floor(data.endMinute)
@@ -127,28 +98,35 @@ function TSM:OnInitialize()
 				tremove(playerData, i)
 			else
 				-- round to nearest 1k gold
-				data.copper = TSM:Round(data.copper, COPPER_PER_GOLD*1000)
+				data.copper = TSMAPI.Util:Round(data.copper, COPPER_PER_GOLD * 1000)
 			end
 		end
 		if #playerData >= 2 then
-			for i=2, #playerData do
-				playerData[i].startMinute = playerData[i-1].endMinute + 1
+			for i = 2, #playerData do
+				playerData[i].startMinute = playerData[i - 1].endMinute + 1
 			end
-			for i=#playerData-1, 1, -1 do
-				if playerData[i].copper == playerData[i+1].copper then
-					playerData[i].endTime = playerData[i+1].endTime
-					tremove(playerData, i+1)
+			for i = #playerData - 1, 1, -1 do
+				if playerData[i].copper == playerData[i + 1].copper then
+					playerData[i].endTime = playerData[i + 1].endTime
+					tremove(playerData, i + 1)
 				end
 			end
-			for i=#playerData-2, 1, -1 do
-				i = min(i, #playerData-2)
+			for i = #playerData - 2, 1, -1 do
+				i = min(i, #playerData - 2)
 				if i < 1 then break end
-				if playerData[i].copper == playerData[i+2].copper and playerData[i+1].copper == 0 then
-					playerData[i].endTime = playerData[i+2].endTime
-					tremove(playerData, i+2)
-					tremove(playerData, i+1)
+				if playerData[i].copper == playerData[i + 2].copper and playerData[i + 1].copper == 0 then
+					playerData[i].endTime = playerData[i + 2].endTime
+					tremove(playerData, i + 2)
+					tremove(playerData, i + 1)
 				end
 			end
+		end
+	end
+
+	-- fix issues with repair expenses
+	for i, data in pairs(TSM.money.expense) do
+		if data.key == "Repair" and data.copper > 8000000 then
+			tremove(TSM.money.expense, i)
 		end
 	end
 end
@@ -156,186 +134,206 @@ end
 -- registers this module with TSM by first setting all fields and then calling TSMAPI:NewModule().
 function TSM:RegisterModule()
 	TSM.icons = {
-		{ side = "module", desc = "Accounting", slashCommand = "accounting", callback = "GUI:Load", icon = "Interface\\Icons\\Inv_Misc_Coin_02" },
+		{ side = "module", desc = "Accounting", slashCommand = "accounting", callback = "Viewer:Load", icon = "Interface\\Icons\\Inv_Misc_Coin_02" },
 	}
+	TSM.moduleOptions = { callback = "Options:Load" }
 	TSM.priceSources = {
-		{ key = "avgSell", label = L["Avg Sell Price"], callback = "GetAvgSellPrice" },
-		{ key = "avgBuy", label = L["Avg Buy Price"], callback = "GetAvgBuyPrice" },
-		{ key = "maxSell", label = L["Max Sell Price"], callback = "GetMaxSellPrice" },
-		{ key = "maxBuy", label = L["Max Buy Price"], callback = "GetMaxBuyPrice" },
+		{ key = "avgSell", label = L["Avg Sell Price"], callback = "GetAvgSellPrice", takeItemString = true },
+		{ key = "avgBuy", label = L["Avg Buy Price"], callback = "GetAvgBuyPrice", takeItemString = true },
+		{ key = "maxSell", label = L["Max Sell Price"], callback = "GetMaxSellPrice", takeItemString = true },
+		{ key = "maxBuy", label = L["Max Buy Price"], callback = "GetMaxBuyPrice", takeItemString = true },
+		{ key = "minSell", label = L["Min Sell Price"], callback = "GetMinSellPrice", takeItemString = true },
+		{ key = "minBuy", label = L["Min Buy Price"], callback = "GetMinBuyPrice", takeItemString = true },
 	}
-	TSM.tooltipOptions = { callback = "GUI:LoadTooltipOptions" }
+	TSM.moduleAPIs = {
+		{ key = "getAuctionStatsSinceLastSale", callback = "GetAuctionStatsSinceLastSale" },
+	}
+	TSM.tooltip = { callbackLoad = "LoadTooltip", callbackOptions = "Options:LoadTooltipOptions", defaults = tooltipDefaults }
 
 	TSMAPI:NewModule(TSM)
 end
 
-local tooltipCache = {buys={}, sales={}}
-function TSM:GetTooltip(itemString)
-	if not (TSM.db.realm.tooltip.sale or TSM.db.realm.tooltip.purchase) then return end
-	if not TSM.items[itemString] then return end
-	TSM.cache[itemString] = TSM.cache[itemString] or {}
-	local text = {}
+function TSM:LoadTooltip(itemString, quantity, options, moneyCoins, lines)
+	TSM:UpdateBaseItemLookup()
+	if not TSM.items[itemString] and not baseItemLookup[itemString] then return end
+	local numStartingLines = #lines
+	TSM.cache[itemString] = TSMAPI.Util:WipeOrCreateTable(TSM.cache[itemString])
 
-	local avgSalePrice, totalSaleNum = TSM:GetAvgSellPrice(itemString)
-	totalSaleNum = totalSaleNum or 0
-	local numSaleRecords = #TSM.items[itemString].sales
-	local lastSold = numSaleRecords > 0 and TSM.items[itemString].sales[numSaleRecords].time or 0
-	local moneyCoinsTooltip = TSMAPI:GetMoneyCoinsTooltip()
-	if TSM.db.realm.tooltip.sale and numSaleRecords > 0 then
+	local avgSalePrice, totalSaleNum = nil, nil
+	if options.sale or options.saleRate then
+		avgSalePrice, totalSaleNum = TSM:GetAvgSellPrice(itemString)
+		totalSaleNum = totalSaleNum or 0
+	end
+	local lastSold = 0
+	if options.sale and totalSaleNum > 0 then
 		local totalSalePrice = avgSalePrice * totalSaleNum
-
-		if IsShiftKeyDown() then
-			if moneyCoinsTooltip then
-				tinsert(text, { left = "  " .. L["Sold (Total Price):"], right = format("%s (%s)", "|cffffffff" .. totalSaleNum .. "|r", (TSMAPI:FormatTextMoneyIcon(totalSalePrice, "|cffffffff", true) or "|cffffffff" .. "?")) })
-			else
-				tinsert(text, { left = "  " .. L["Sold (Total Price):"], right = format("%s (%s)", "|cffffffff" .. totalSaleNum .. "|r", (TSMAPI:FormatTextMoney(totalSalePrice, "|cffffffff", true) or "|cffffffff" .. "?")) })
+		if TSM.items[itemString] then
+			for i = #TSM.items[itemString].sales, 1, -1 do
+				local record = TSM.items[itemString].sales[i]
+				if record.key ~= "Vendor" then
+					lastSold = record.time
+					break
+				end
 			end
 		else
-			local maxPrice = TSM:GetMaxSellPrice(itemString)
-			if moneyCoinsTooltip then
-				tinsert(text, { left = "  " .. L["Sold (Avg/Max Price):"], right = format("%s (%s / %s)", "|cffffffff" .. totalSaleNum .. "|r", (TSMAPI:FormatTextMoneyIcon(avgSalePrice, "|cffffffff", true) or "|cffffffff" .. "?"), (TSMAPI:FormatTextMoneyIcon(maxPrice, "|cffffffff", true) or "|cffffffff" .. "?")) })
-			else
-				tinsert(text, { left = "  " .. L["Sold (Avg/Max Price):"], right = format("%s (%s / %s)", "|cffffffff" .. totalSaleNum .. "|r", (TSMAPI:FormatTextMoney(avgSalePrice, "|cffffffff", true) or "|cffffffff" .. "?"), (TSMAPI:FormatTextMoney(maxPrice, "|cffffffff", true) or "|cffffffff" .. "?")) })
+			for _, item in ipairs(baseItemLookup[itemString]) do
+				for i = #TSM.items[item].sales, 1, -1 do
+					local record = TSM.items[item].sales[i]
+					if record.key ~= "Vendor" then
+						lastSold = record.time
+						break
+					end
+				end
 			end
+		end
+
+		if IsShiftKeyDown() then
+			tinsert(lines, { left = "  " .. L["Sold (Total Price):"], right = format("%s (%s)", "|cffffffff" .. totalSaleNum .. "|r", (TSMAPI:MoneyToString(totalSalePrice, "|cffffffff", "OPT_PAD", moneyCoins and "OPT_ICON" or nil) or "|cffffffff?|r")) })
+		else
+			local minPrice = TSM:GetMinSellPrice(itemString)
+			local maxPrice = nil
+			if TSM.items[itemString] then
+				maxPrice = TSM:GetMaxSellPrice(itemString)
+			else
+				for _, item in ipairs(baseItemLookup[itemString]) do
+					maxPrice = max(TSM:GetMaxSellPrice(item) or 0, maxPrice or 0)
+				end
+				if maxPrice == 0 then
+					maxPrice = nil
+				end
+			end
+			tinsert(lines, { left = "  " .. L["Sold (Min/Avg/Max Price):"], right = format("%s (%s / %s / %s)", "|cffffffff" .. totalSaleNum .. "|r", (TSMAPI:MoneyToString(minPrice, "|cffffffff", "OPT_PAD", moneyCoins and "OPT_ICON" or nil) or "|cffffffff?|r"), (TSMAPI:MoneyToString(avgSalePrice, "|cffffffff", "OPT_PAD", moneyCoins and "OPT_ICON" or nil) or "|cffffffff?|r"), (TSMAPI:MoneyToString(maxPrice, "|cffffffff", "OPT_PAD", moneyCoins and "OPT_ICON" or nil) or "|cffffffff?|r")) })
 		end
 		if lastSold > 0 then
 			local timeDiff = SecondsToTime(time() - lastSold)
-			tinsert(text, { left = "  " .. L["Last Sold:"], right = "|cffffffff" .. format(L["%s ago"], timeDiff) })
+			tinsert(lines, { left = "  " .. L["Last Sold:"], right = "|cffffffff" .. format(L["%s ago"], timeDiff) })
 		end
 	end
 
-	local cancelledNum, expiredNum, totalFailed = TSM:GetAuctionStats(itemString, (lastSold > 0 and lastSold))
-
-	if expiredNum > 0 and cancelledNum > 0 then
-		tinsert(text, { left = "  " .. L["Failed Since Last Sale (Expired/Cancelled):"], right = format("%s (%s/%s)", "|cffffffff" .. (expiredNum + cancelledNum) .. "|r", "|cffffffff" .. expiredNum .. "|r", "|cffffffff" .. cancelledNum .. "|r") })
-	elseif expiredNum > 0 then
-		tinsert(text, { left = "  " .. L["Expired Since Last Sale:"], right = "|cffffffff" .. expiredNum })
-	elseif cancelledNum > 0 then
-		tinsert(text, { left = "  " .. L["Cancelled Since Last Sale:"], right = "|cffffffff" .. cancelledNum })
+	local cancelledNum, expiredNum, totalFailed = TSM:GetAuctionStats(itemString, lastSold)
+	if expiredNum > 0 and cancelledNum > 0 and options.expiredAuctions and options.cancelledAuctions then
+		tinsert(lines, { left = "  " .. L["Failed Since Last Sale (Expired/Cancelled):"], right = format("|cffffffff%s|r (|cffffffff%s|r/|cffffffff%s|r)", expiredNum + cancelledNum, expiredNum, cancelledNum) })
+	elseif expiredNum > 0 and options.expiredAuctions then
+		tinsert(lines, { left = "  " .. L["Expired Since Last Sale:"], right = "|cffffffff" .. expiredNum .. "|r" })
+	elseif cancelledNum > 0 and options.cancelledAuctions then
+		tinsert(lines, { left = "  " .. L["Cancelled Since Last Sale:"], right = "|cffffffff" .. cancelledNum .. "|r" })
 	end
 
-	if totalSaleNum > 0 and totalFailed > 0 then
-		local saleRate = TSM:Round(totalSaleNum / (totalSaleNum + totalFailed or 0), 0.01)
-		tinsert(text, { left = "  " .. L["Sale Rate:"], right = "|cffffffff" .. saleRate })
+	if options.saleRate and totalSaleNum > 0 and totalFailed > 0 then
+		local saleRate = TSMAPI.Util:Round(totalSaleNum / (totalSaleNum + totalFailed or 0), 0.01)
+		tinsert(lines, { left = "  " .. L["Sale Rate:"], right = "|cffffffff" .. saleRate .. "|r" })
 	end
 
-	if TSM.db.realm.tooltip.purchase and TSM.items[itemString] and #TSM.items[itemString].buys > 0 then
-		local lastPurchased = TSM.items[itemString].buys[#TSM.items[itemString].buys].time
-		local totalPrice, totalNum = 0, 0
-		for _, record in ipairs(TSM.items[itemString].buys) do
-			totalNum = totalNum + record.quantity
-			totalPrice = totalPrice + record.copper * record.quantity
-		end
-
-		if IsShiftKeyDown() then
-			if moneyCoinsTooltip then
-				tinsert(text, { left = "  " .. L["Purchased (Total Price):"], right = format("%s (%s)", "|cffffffff" .. totalNum .. "|r", (TSMAPI:FormatTextMoneyIcon(totalPrice, "|cffffffff", true) or "|cffffffff" .. "?")) })
-			else
-				tinsert(text, { left = "  " .. L["Purchased (Total Price):"], right = format("%s (%s)", "|cffffffff" .. totalNum .. "|r", (TSMAPI:FormatTextMoney(totalPrice, "|cffffffff", true) or "|cffffffff" .. "?")) })
+	local lastPurchased, totalBuyPrice, totalBuyNum = nil, 0, 0
+	if TSM.items[itemString] then
+		for i = #TSM.items[itemString].buys, 1, -1 do
+			local record = TSM.items[itemString].buys[i]
+			if record.key ~= "Vendor" then
+				lastPurchased = lastPurchased or record.time
+				totalBuyPrice = totalBuyPrice + record.copper * record.quantity
+				totalBuyNum = totalBuyNum + record.quantity
 			end
+		end
+	else
+		for _, item in ipairs(baseItemLookup[itemString]) do
+			for i = #TSM.items[item].buys, 1, -1 do
+				local record = TSM.items[item].buys[i]
+				if record.key ~= "Vendor" then
+					lastPurchased = lastPurchased or record.time
+					totalBuyPrice = totalBuyPrice + record.copper * record.quantity
+					totalBuyNum = totalBuyNum + record.quantity
+				end
+			end
+		end
+	end
+	if options.purchase and lastPurchased then
+		if IsShiftKeyDown() then
+			tinsert(lines, { left = "  " .. L["Purchased (Total Price):"], right = format("|cffffffff%s|r (%s)", totalBuyNum, (TSMAPI:MoneyToString(totalBuyPrice, "|cffffffff", "OPT_PAD", moneyCoins and "OPT_ICON" or nil) or "|cffffffff?|r")) })
 		else
+			local minPrice = TSM:GetMinBuyPrice(itemString)
 			local avgPrice = TSM:GetAvgBuyPrice(itemString)
 			local maxPrice = TSM:GetMaxBuyPrice(itemString)
-			if moneyCoinsTooltip then
-				tinsert(text, { left = "  " .. L["Purchased (Avg/Max Price):"], right = format("%s (%s / %s)", "|cffffffff" .. totalNum .. "|r", (TSMAPI:FormatTextMoneyIcon(avgPrice, "|cffffffff", true) or "|cffffffff" .. "?"), (TSMAPI:FormatTextMoneyIcon(maxPrice, "|cffffffff", true) or "|cffffffff" .. "?")) })
-			else
-				tinsert(text, { left = "  " .. L["Purchased (Avg/Max Price):"], right = format("%s (%s / %s)", "|cffffffff" .. totalNum .. "|r", (TSMAPI:FormatTextMoney(avgPrice, "|cffffffff", true) or "|cffffffff" .. "?"), (TSMAPI:FormatTextMoney(maxPrice, "|cffffffff", true) or "|cffffffff" .. "?")) })
-			end
+			tinsert(lines, { left = "  " .. L["Purchased (Min/Avg/Max Price):"], right = format("|cffffffff%s|r (%s / %s / %s)", totalBuyNum, (TSMAPI:MoneyToString(minPrice, "|cffffffff", "OPT_PAD", moneyCoins and "OPT_ICON" or nil) or "|cffffffff?|r"), (TSMAPI:MoneyToString(avgPrice, "|cffffffff", "OPT_PAD", moneyCoins and "OPT_ICON" or nil) or "|cffffffff?|r"), (TSMAPI:MoneyToString(maxPrice, "|cffffffff", "OPT_PAD", moneyCoins and "OPT_ICON" or nil) or "|cffffffff?|r")) })
 		end
-		if lastPurchased then
-			local timeDiff = SecondsToTime(time() - lastPurchased)
-			tinsert(text, { left = "  " .. L["Last Purchased:"], right = "|cffffffff" .. format(L["%s ago"], timeDiff) })
-		end
+		local timeDiff = SecondsToTime(time() - lastPurchased)
+		tinsert(lines, { left = "  " .. L["Last Purchased:"], right = "|cffffffff" .. format(L["%s ago"] .. "|r", timeDiff) })
 	end
 
 	-- add heading
-	if #text > 0 then
-		tinsert(text, 1, "|cffffff00TSM Accounting:")
-		return text
+	if #lines > numStartingLines then
+		tinsert(lines, numStartingLines + 1, "|cffffff00TSM Accounting:|r")
 	end
 end
 
 function TSM:OnTSMDBShutdown()
 	-- process items
-	local appDBSales = {}
 	local sales, buys, cancels, expires = {}, {}, {}, {}
-	local saveTimeSales, saveTimeBuys = {}, {}
+	local saveTimeSales, saveTimeBuys, saveTimeExpires, saveTimeCancels = {}, {}, {}, {}
 	for itemString, data in pairs(TSM.items) do
-		local name = data.itemName or TSMAPI:GetSafeItemInfo(itemString) or TSM:GetItemName(itemString) or "?"
-		name = gsub(name, ",", "") -- can't have commas in the itemNames in the CSV
-		local itemAppData = {}
-		
+		local name = data.itemName or TSMAPI.Item:GetName(itemString) or TSM:GetItemName(itemString) or "?"
+		TSM.db.global.itemStrings[name] = TSM.db.global.itemStrings[name] or itemString
+
 		-- process sales
 		for _, record in ipairs(data.sales) do
 			record.itemString = itemString
-			record.itemName = name
 			record.buyer = record.otherPlayer
 			record.source = record.key
 			record.price = record.copper
 			if record.key == "Auction" then
 				record.saveTime = record.saveTime or time()
 				tinsert(saveTimeSales, record.saveTime)
-				tinsert(itemAppData, {record.copper, record.quantity, record.time, record.saveTime, 2})
 			end
 			tinsert(sales, record)
 		end
-		
+
 		-- process buys
 		for _, record in ipairs(data.buys) do
 			record.itemString = itemString
-			record.itemName = name
 			record.seller = record.otherPlayer
 			record.source = record.key
 			record.price = record.copper
 			if record.key == "Auction" then
 				record.saveTime = record.saveTime or time()
 				tinsert(saveTimeBuys, record.saveTime)
-				tinsert(itemAppData, {record.copper, record.quantity, record.time, record.saveTime, 3})
 			end
 			tinsert(buys, record)
 		end
-		local itemID = TSMAPI:GetItemID(itemString)
-		if itemID and #itemAppData > 0 then
-			itemID = tostring(itemID)
-			if appDBSales[itemID] then
-				for i=1, #itemAppData do
-					tinsert(appDBSales[itemID], itemAppData[i])
-				end
-			else
-				appDBSales[itemID] = itemAppData
-			end
-		end
-		
+
 		-- process auctions
 		for _, record in ipairs(data.auctions) do
 			record.itemString = itemString
-			record.itemName = name
 			if record.key == "Cancel" then
+				record.saveTime = record.saveTime or time()
+				tinsert(saveTimeCancels, record.saveTime)
 				tinsert(cancels, record)
 			elseif record.key == "Expire" then
+				record.saveTime = record.saveTime or time()
+				tinsert(saveTimeExpires, record.saveTime)
 				tinsert(expires, record)
 			end
 		end
 	end
-	
+
 	-- trim anything that'll be too long
-	for key, data in pairs({["sales"]=sales, ["buys"]=buys}) do
+	for key, data in pairs({ ["sales"] = sales, ["buys"] = buys }) do
 		if #data > MAX_CSV_RECORDS then
 			sort(data, function(a, b) return a.time > b.time end)
-			while (#data > floor(MAX_CSV_RECORDS*0.9)) do
+			while (#data > floor(MAX_CSV_RECORDS * 0.9)) do
 				tremove(data)
 			end
 			TSM.db.realm.trimmed[key] = data[#data].time
 		end
 	end
-	
+
 	TSM.db.realm.saveTimeSales = table.concat(saveTimeSales, ",")
 	TSM.db.realm.saveTimeBuys = table.concat(saveTimeBuys, ",")
+	TSM.db.realm.saveTimeExpires = table.concat(saveTimeExpires, ",")
+	TSM.db.realm.saveTimeCancels = table.concat(saveTimeCancels, ",")
 	TSM.db.realm.csvSales = LibParse:CSVEncode(TSM.SELL_KEYS, sales)
 	TSM.db.realm.csvBuys = LibParse:CSVEncode(TSM.BUY_KEYS, buys)
 	TSM.db.realm.csvCancelled = LibParse:CSVEncode(TSM.CANCELLED_KEYS, cancels)
 	TSM.db.realm.csvExpired = LibParse:CSVEncode(TSM.EXPIRED_KEYS, expires)
-	
+
 	-- process income
 	local income = {}
 	for _, record in ipairs(TSM.money.income) do
@@ -344,10 +342,15 @@ function TSM:OnTSMDBShutdown()
 			record.source = record.otherPlayer
 			record.amount = record.copper
 			tinsert(income, record)
+		elseif record.key == "Garrison" then
+			record.type = "Garrison"
+			record.source = "Mission"
+			record.amount = record.copper
+			tinsert(income, record)
 		end
 	end
 	TSM.db.realm.csvIncome = LibParse:CSVEncode(TSM.INCOME_KEYS, income)
-	
+
 	-- process expense
 	local expense = {}
 	for _, record in ipairs(TSM.money.expense) do
@@ -365,35 +368,34 @@ function TSM:OnTSMDBShutdown()
 		end
 	end
 	TSM.db.realm.csvExpense = LibParse:CSVEncode(TSM.EXPENSE_KEYS, expense)
-	
+
 	-- process gold log
-	TSM.Data:LogGold()
-	for player, data in pairs(TSM.db.realm.goldLog) do
+	TSM.GoldTracker:LoggingOut()
+	for player, data in pairs(TSM.goldLog) do
 		if type(data) == "table" then
 			TSM.db.realm.goldLog[player] = LibParse:CSVEncode(TSM.GOLD_LOG_KEYS, data)
 		end
 	end
-	
-	if TSM.appDB then
-		TSM.appDB.realm.sales = appDBSales
-		TradeSkillMasterAppDB.version = max(TradeSkillMasterAppDB.version, 9)
-	end
 end
 
+local itemNameCache = {}
+local itemNameCacheTime = 0
 function TSM:GetItemName(item)
-	for itemName, itemString in pairs(TSM.db.global.itemStrings) do
-		if itemString == item then
-			return itemName
+	if itemNameCacheTime ~= GetTime() then
+		for itemName, itemString in pairs(TSM.db.global.itemStrings) do
+			itemNameCache[itemString] = itemName
 		end
+		itemNameCacheTime = GetTime()
 	end
+	return itemNameCache[item]
 end
 
-local baseItemLookup = { update = 0 }
-function TSM:UpdateBaseItemLookup()
-	if time() - baseItemLookup.update < 30 then return end
-	baseItemLookup = { update = time() }
+function TSM:UpdateBaseItemLookup(force)
+	if time() - baseItemLookup.update < 30 and not force then return end
+	wipe(baseItemLookup)
+	baseItemLookup.update = time()
 	for itemString in pairs(TSM.items) do
-		local baseItemString = TSMAPI:GetBaseItemString(itemString)
+		local baseItemString = TSMAPI.Item:ToBaseItemString(itemString)
 		if baseItemString ~= itemString then
 			baseItemLookup[baseItemString] = baseItemLookup[baseItemString] or {}
 			tinsert(baseItemLookup[baseItemString], itemString)
@@ -403,13 +405,26 @@ end
 
 local function GetAuctionStats(itemString, minTime)
 	local cancel, expire, total = 0, 0, 0
-	for _, record in ipairs(TSM.items[itemString].auctions) do
-		if record.key == "Cancel" and TSM.db.realm.cancelledAuctions and record.time > minTime then
-			cancel = cancel + record.quantity
-		elseif record.key == "Expire" and TSM.db.realm.expiredAuctions and record.time > minTime then
-			expire = expire + record.quantity
+	if TSM.items[itemString] then
+		for _, record in ipairs(TSM.items[itemString].auctions) do
+			if record.key == "Cancel" and record.time > minTime then
+				cancel = cancel + record.quantity
+			elseif record.key == "Expire" and record.time > minTime then
+				expire = expire + record.quantity
+			end
+			total = total + record.quantity
 		end
-		total = total + record.quantity
+	elseif baseItemLookup[itemString] then
+		for _, item in ipairs(baseItemLookup[itemString]) do
+			for _, record in ipairs(TSM.items[item].auctions) do
+				if record.key == "Cancel" and record.time > minTime then
+					cancel = cancel + record.quantity
+				elseif record.key == "Expire" and record.time > minTime then
+					expire = expire + record.quantity
+				end
+				total = total + record.quantity
+			end
+		end
 	end
 	return cancel, expire, total
 end
@@ -417,6 +432,10 @@ end
 function TSM:GetAuctionStats(itemString, minTime)
 	minTime = minTime or 0
 	if not itemString then return end
+	if not TSM.cache[itemString] then
+		TSM:UpdateBaseItemLookup()
+		TSM.cache[itemString] = TSMAPI.Util:WipeOrCreateTable(TSM.cache[itemString])
+	end
 	if not TSM.cache[itemString].totalFailed then
 		local cancel, expire, total = GetAuctionStats(itemString, minTime)
 		TSM.cache[itemString].totalCancel = cancel
@@ -437,25 +456,27 @@ local function GetAverageSellPrice(itemString, noBaseItem)
 			end
 		end
 		if totalNum > 0 then
-			return TSM:Round(totalPrice / totalNum)
+			return TSMAPI.Util:Round(totalPrice / totalNum), totalNum
 		end
 	end
-	if not (TSM.items[itemString] and #TSM.items[itemString].sales > 0) then return end
+	if not TSM.items[itemString] then return end
 
 	local totalPrice, totalSaleNum = 0, 0
 	for _, record in ipairs(TSM.items[itemString].sales) do
-		totalSaleNum = totalSaleNum + record.quantity
-		totalPrice = totalPrice + record.copper * record.quantity
+		if record.key ~= "Vendor" then
+			totalSaleNum = totalSaleNum + record.quantity
+			totalPrice = totalPrice + record.copper * record.quantity
+		end
 	end
 
-	return TSM:Round(totalPrice / totalSaleNum), totalSaleNum
+	if totalSaleNum == 0 then return end
+	return TSMAPI.Util:Round(totalPrice / totalSaleNum), totalSaleNum
 end
 
 function TSM:GetAvgSellPrice(itemString)
-	itemString = TSMAPI:GetItemString(select(2, TSMAPI:GetSafeItemInfo(itemString)))
 	if not itemString then return end
 	TSM:UpdateBaseItemLookup()
-	TSM.cache[itemString] = TSM.cache[itemString] or {}
+	TSM.cache[itemString] = TSMAPI.Util:WipeOrCreateTable(TSM.cache[itemString])
 	if not TSM.cache[itemString].avgSellPrice then
 		local price, num = GetAverageSellPrice(itemString)
 		TSM.cache[itemString].avgSellPrice = price
@@ -464,12 +485,12 @@ function TSM:GetAvgSellPrice(itemString)
 	return TSM.cache[itemString].avgSellPrice, TSM.cache[itemString].avgSellNum
 end
 
-local function GetAvgerageBuyPrice(itemString, noBaseItem)
+local function GetAverageBuyPrice(itemString, noBaseItem)
 	if not noBaseItem and itemString and baseItemLookup[itemString] then
 		local totalPrice, totalNum = 0, 0
 		for _, item in ipairs(baseItemLookup[itemString]) do
 			if not baseItemLookup[item] then
-				local price, num = GetAvgerageBuyPrice(item, true)
+				local price, num = GetAverageBuyPrice(item, true)
 				if price and num and num > 0 then
 					totalPrice = totalPrice + price
 					totalNum = totalNum + num
@@ -477,45 +498,35 @@ local function GetAvgerageBuyPrice(itemString, noBaseItem)
 			end
 		end
 		if totalNum > 0 then
-			return TSM:Round(totalPrice / totalNum)
+			return TSMAPI.Util:Round(totalPrice / totalNum), totalNum
 		end
 	end
-	if not (TSM.items[itemString] and #TSM.items[itemString].buys > 0) then return end
+	if not TSM.items[itemString] then return end
 
-	local itemCount = 0
-	if TSM.db.realm.smartBuyPrice then
-		local player, alts = TSMAPI:ModuleAPI("ItemTracker", "playertotal", itemString)
-		if not player then
-			alts = nil
-		end
-		player = player or 0
-		alts = alts or 0
-		local guild = TSMAPI:ModuleAPI("ItemTracker", "guildtotal", itemString) or 0
-		local auctions = TSMAPI:ModuleAPI("ItemTracker", "auctionstotal", itemString) or 0
-		itemCount = player + alts + guild + auctions
-	end
-
-	local num, totalPrice = 0, 0
+	local itemCount = TSM.db.realm.smartBuyPrice and TSMAPI.Inventory:GetTotalQuantity(itemString) or 0
+	local totalNum, totalPrice = 0, 0
 	for i = #TSM.items[itemString].buys, 1, -1 do
 		local record = TSM.items[itemString].buys[i]
-		for j = 1, record.quantity do
-			num = num + 1
-			totalPrice = totalPrice + record.copper
-			if itemCount > 0 and num >= itemCount then break end
+		if record.key ~= "Vendor" then
+			for j = 1, record.quantity do
+				totalNum = totalNum + 1
+				totalPrice = totalPrice + record.copper
+				if itemCount > 0 and totalNum >= itemCount then break end
+			end
+			if itemCount > 0 and totalNum >= itemCount then break end
 		end
-		if itemCount > 0 and num >= itemCount then break end
 	end
 
-	return TSM:Round(totalPrice / num), num
+	if totalNum == 0 then return end
+	return TSMAPI.Util:Round(totalPrice / totalNum), totalNum
 end
 
 function TSM:GetAvgBuyPrice(itemString)
-	itemString = TSMAPI:GetItemString(select(2, TSMAPI:GetSafeItemInfo(itemString)))
 	if not itemString then return end
-	TSM.cache[itemString] = TSM.cache[itemString] or {}
+	TSM.cache[itemString] = TSMAPI.Util:WipeOrCreateTable(TSM.cache[itemString])
 	TSM:UpdateBaseItemLookup()
 	if not TSM.cache[itemString].avgBuyPrice then
-		local price, num = GetAvgerageBuyPrice(itemString)
+		local price, num = GetAverageBuyPrice(itemString)
 		TSM.cache[itemString].avgBuyPrice = price
 		TSM.cache[itemString].avgBuyNum = num
 	end
@@ -523,40 +534,98 @@ function TSM:GetAvgBuyPrice(itemString)
 end
 
 function TSM:GetMaxSellPrice(itemString)
-	itemString = TSMAPI:GetItemString(select(2, TSMAPI:GetSafeItemInfo(itemString)))
 	if not (itemString and TSM.items[itemString] and #TSM.items[itemString].sales > 0) then return end
-	TSM.cache[itemString] = TSM.cache[itemString] or {}
+	TSM.cache[itemString] = TSMAPI.Util:WipeOrCreateTable(TSM.cache[itemString])
 
+	local maxPrice = 0
 	if not TSM.cache[itemString].maxSellPrice then
-		local maxPrice = 0
 		for _, record in ipairs(TSM.items[itemString].sales) do
-			maxPrice = max(maxPrice, record.copper)
+			if record.key ~= "Vendor" then
+				maxPrice = max(maxPrice, record.copper)
+			end
 		end
 		TSM.cache[itemString].maxSellPrice = maxPrice
 	end
-	
+	if maxPrice == 0 then return end
+
 	return TSM.cache[itemString].maxSellPrice
 end
 
 function TSM:GetMaxBuyPrice(itemString)
-	itemString = TSMAPI:GetItemString(select(2, TSMAPI:GetSafeItemInfo(itemString)))
 	if not (itemString and TSM.items[itemString] and #TSM.items[itemString].buys > 0) then return end
-	TSM.cache[itemString] = TSM.cache[itemString] or {}
+	TSM.cache[itemString] = TSMAPI.Util:WipeOrCreateTable(TSM.cache[itemString])
 
+	local maxPrice = 0
 	if not TSM.cache[itemString].maxBuyPrice then
-		local maxPrice = 0
 		for _, record in ipairs(TSM.items[itemString].buys) do
-			maxPrice = max(maxPrice, record.copper)
+			if record.key ~= "Vendor" then
+				maxPrice = max(maxPrice, record.copper)
+			end
 		end
 		TSM.cache[itemString].maxBuyPrice = maxPrice
 	end
-	
+	if maxPrice == 0 then return end
+
 	return TSM.cache[itemString].maxBuyPrice
 end
 
-function TSM:Round(value, sig)
-	sig = sig or 1
-	local gold = value / sig
-	gold = floor(gold + 0.5)
-	return gold * sig
+function TSM:GetMinSellPrice(itemString)
+	if not (itemString and TSM.items[itemString] and #TSM.items[itemString].sales > 0) then return end
+	TSM.cache[itemString] = TSMAPI.Util:WipeOrCreateTable(TSM.cache[itemString])
+
+	local minPrice = 0
+	if not TSM.cache[itemString].minSellPrice then
+		for _, record in ipairs(TSM.items[itemString].sales) do
+			if record.key ~= "Vendor" then
+				minPrice = (minPrice > 0 and min(minPrice, record.copper)) or record.copper
+			end
+		end
+		TSM.cache[itemString].minSellPrice = minPrice
+	end
+	if minPrice == 0 then return end
+
+	return TSM.cache[itemString].minSellPrice
+end
+
+function TSM:GetMinBuyPrice(itemString)
+	if not (itemString and TSM.items[itemString] and #TSM.items[itemString].buys > 0) then return end
+	TSM.cache[itemString] = TSMAPI.Util:WipeOrCreateTable(TSM.cache[itemString])
+
+	local minPrice = 0
+	if not TSM.cache[itemString].minBuyPrice then
+		for _, record in ipairs(TSM.items[itemString].buys) do
+			if record.key ~= "Vendor" then
+				minPrice = (minPrice > 0 and min(minPrice, record.copper)) or record.copper
+			end
+		end
+		TSM.cache[itemString].minBuyPrice = minPrice
+	end
+	if minPrice == 0 then return end
+
+	return TSM.cache[itemString].minBuyPrice
+end
+
+function TSM:GetAuctionStatsSinceLastSale(itemString)
+	if not TSM.items[itemString] and not baseItemLookup[itemString] then return 0 end
+	local lastSold = 0
+	if TSM.items[itemString] then
+		for i = #TSM.items[itemString].sales, 1, -1 do
+			local record = TSM.items[itemString].sales[i]
+			if record.key ~= "Vendor" then
+				lastSold = record.time
+				break
+			end
+		end
+	else
+		for _, item in ipairs(baseItemLookup[itemString]) do
+			for i = #TSM.items[item].sales, 1, -1 do
+				local record = TSM.items[item].sales[i]
+				if record.key ~= "Vendor" then
+					lastSold = record.time
+					break
+				end
+			end
+		end
+	end
+	return TSM:GetAuctionStats(itemString, lastSold)
 end

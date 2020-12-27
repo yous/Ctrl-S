@@ -10,908 +10,956 @@ local TSM = select(2, ...)
 local L = LibStub("AceLocale-3.0"):GetLocale("TradeSkillMaster_Auctioning") -- loads the localization table
 local GUI = TSM:NewModule("GUI", "AceEvent-3.0", "AceHook-3.0")
 local AceGUI = LibStub("AceGUI-3.0")
-local private = {}
+local private = {scanThreadId=nil, logSTCache={}}
+TSMAPI.Auction:GetTabShowFunction("Auctioning") -- not currently used, but prevents anybody else from getting it
 
-function private:CreateButtons(parent)
-	local height = 24
-	local frame = CreateFrame("Frame", nil, parent)
-	frame:SetHeight(height)
-	frame:SetWidth(210)
-	frame:SetPoint("BOTTOMRIGHT", -92, 5)
-	
-	frame.Enable = function(self)
-		if private.mode == "Post" then
-			self.post:Enable()
-		elseif private.mode == "Cancel" then
-			self.cancel:Enable()
-		end
-		self.skip:Enable()
-		self.stop:Enable()
-	end
-	
-	frame.Disable = function(self)
-		if private.mode == "Post" then
-			self.post:Disable()
-		elseif private.mode == "Cancel" then
-			self.cancel:Disable()
-		end
-		self.skip:Disable()
-	end
-	
-	frame.UpdateMode = function(self)
-		if private.mode == "Post" then
-			self.post:Show()
-			self.cancel:Hide()
-			self.cancel:Disable()
-		elseif private.mode == "Cancel" then
-			self.post:Hide()
-			self.post:Disable()
-			self.cancel:Show()
-		end
-		self.stop:Enable()
-	end
-	
-	local function OnClick(self)
-		if self.which == "stop" and self.isDone then
-			GUI:HideSelectionFrame()
-			private.selectionFrame:Show()
-		elseif frame:IsVisible() and private.OnAction then
-			private:OnAction(self.which)
-		end
-	end
-	
-	local button = TSMAPI.GUI:CreateButton(frame, 22, "TSMAuctioningPostButton")
-	button:SetPoint("TOPLEFT")
-	button:SetWidth(80)
-	button:SetHeight(height)
-	button:SetText(L["Post"])
-	button.which = "action"
-	button:SetScript("OnClick", OnClick)
-	frame.post = button
-	
-	local button = TSMAPI.GUI:CreateButton(frame, 22, "TSMAuctioningCancelButton")
-	button:SetPoint("TOPLEFT")
-	button:SetWidth(80)
-	button:SetHeight(height)
-	button:SetText(L["Cancel"])
-	button.which = "action"
-	button:SetScript("OnClick", OnClick)
-	frame.cancel = button
-	
-	local button = TSMAPI.GUI:CreateButton(frame, 18)
-	button:SetPoint("TOPLEFT", frame.post, "TOPRIGHT", 5, 0)
-	button:SetWidth(60)
-	button:SetHeight(height)
-	button:SetText(L["Skip"])
-	button.which = "skip"
-	button:SetScript("OnClick", OnClick)
-	frame.skip = button
-	
-	local button = TSMAPI.GUI:CreateButton(frame, 18)
-	button:SetPoint("TOPLEFT", frame.skip, "TOPRIGHT", 5, 0)
-	button:SetWidth(70)
-	button:SetHeight(height)
-	button:SetText(L["Stop"])
-	button.which = "stop"
-	button:SetScript("OnClick", OnClick)
-	frame.stop = button
-	
-	return frame
-end
 
-function private:CreateContentButtons(parent)
-	local frame = CreateFrame("Frame", nil, parent)
-	frame:SetAllPoints(parent)
-	
-	frame.UpdateMode = function(self)
-		if private.mode == "Post" then
-			self.currAuctionsButton:Show()
-			self.editPriceButton:Show()
-			self.editPriceButton:Disable()
-		elseif private.mode == "Cancel" then
-			self.currAuctionsButton:Show()
-			self.editPriceButton:Hide()
-		end
-	end
-	
-	frame.UnlockHighlight = function(self)
-		self.auctionsButton:UnlockHighlight()
-		self.logButton:UnlockHighlight()
-		self.currAuctionsButton:UnlockHighlight()
-		self.editPriceButton:UnlockHighlight()
-	end
-	
-	local function OnClick(self)
-		frame:UnlockHighlight()
-		self:LockHighlight()
-		frame.editPriceFrame:Hide()
-		
-		if self.which == "log" then
-			private.auctionsST:Hide()
-			private.logST:Show()
-			private:UpdateLogSTData()
-		elseif self.which == "auctions" then
-			private.logST:Hide()
-			private.auctionsST:Show()
-			private.auctionsST.isCurrentItem = nil
-			private:UpdateAuctionsSTData()
-		elseif self.which == "currAuctions" then
-			private.logST:Hide()
-			private.auctionsST:Show()
-			private.auctionsST.isCurrentItem = true
-			private:UpdateAuctionsSTData()
-		elseif self.which == "editPrice" then
-			frame.editPriceFrame:Show()
-		end
+function private:CreateSelectionFrame(parent)
+	if private.selectionFrame then return end
+
+	local actionBtnWidth = (parent.content:GetWidth() - 240) / 3
+	local durationList = {}
+	local durationText = {L["Under 30min"], L["30min to 2hrs"], L["2 to 12 hrs"]} -- use our own short-hand strings
+	for i=1, 3 do -- go up to long duration
+		durationList[i] = format("%s (%s)", _G["AUCTION_TIME_LEFT"..i], durationText[i])
 	end
 
-	local auctionsButton = TSMAPI.GUI:CreateButton(frame, 16)
-	auctionsButton:SetPoint("TOPRIGHT", -10, -20)
-	auctionsButton:SetHeight(17)
-	auctionsButton:SetWidth(150)
-	auctionsButton.which = "auctions"
-	auctionsButton:SetScript("OnClick", OnClick)
-	auctionsButton:SetText(L["Show All Auctions"])
-	frame.auctionsButton = auctionsButton
-	
-	local currAuctionsButton = TSMAPI.GUI:CreateButton(frame, 16)
-	currAuctionsButton:SetPoint("TOPRIGHT", -170, -20)
-	currAuctionsButton:SetHeight(17)
-	currAuctionsButton:SetWidth(150)
-	currAuctionsButton.which = "currAuctions"
-	currAuctionsButton:SetScript("OnClick", OnClick)
-	currAuctionsButton:SetText(L["Show Item Auctions"])
-	frame.currAuctionsButton = currAuctionsButton
-	
-	local logButton = TSMAPI.GUI:CreateButton(frame, 16)
-	logButton:SetPoint("TOPRIGHT", -10, -45)
-	logButton:SetHeight(17)
-	logButton:SetWidth(150)
-	logButton.which = "log"
-	logButton:SetScript("OnClick", OnClick)
-	logButton:SetText(L["Show Log"])
-	frame.logButton = logButton
-	
-	local editPriceButton = TSMAPI.GUI:CreateButton(frame, 16)
-	editPriceButton:SetPoint("TOPRIGHT", -170, -45)
-	editPriceButton:SetHeight(17)
-	editPriceButton:SetWidth(150)
-	editPriceButton.which = "editPrice"
-	editPriceButton:SetScript("OnClick", OnClick)
-	editPriceButton:SetText(L["Edit Post Price"])
-	frame.editPriceButton = editPriceButton
-	
-	local editPriceFrame = CreateFrame("Frame", nil, frame)
-	TSMAPI.Design:SetFrameBackdropColor(editPriceFrame)
-	editPriceFrame:SetPoint("CENTER")
-	editPriceFrame:SetFrameStrata("DIALOG")
-	editPriceFrame:SetWidth(300)
-	editPriceFrame:SetHeight(150)
-	editPriceFrame:EnableMouse(true)
-	editPriceFrame:SetScript("OnShow", function(self)
-			editPriceFrame:SetFrameStrata("DIALOG")
-			MoneyInputFrame_SetCopper(TSMPostPriceChangeBox, self.info.buyout)
-			self.linkLabel:SetText(self.info.link)
-		end)
-	editPriceFrame:SetScript("OnUpdate", function()
-			if not TSMAPI:AHTabIsVisible("Auctioning") then
-				editPriceFrame:Hide()
-			end
-		end)
-	frame.editPriceFrame = editPriceFrame
-	
-	local linkLabel = TSMAPI.GUI:CreateLabel(editPriceFrame)
-	linkLabel:SetPoint("TOP", 0, -14)
-	linkLabel:SetJustifyH("CENTER")
-	linkLabel:SetText("")
-	editPriceFrame.linkLabel = linkLabel
-	
-	local bg = editPriceFrame:CreateTexture(nil, "BACKGROUND")
-	bg:SetPoint("TOPLEFT", linkLabel, -2, 2)
-	bg:SetPoint("BOTTOMRIGHT", linkLabel, 2, -2)
-	TSMAPI.Design:SetContentColor(bg)
-	linkLabel.bg = bg
-	
-	local priceBoxLabel = TSMAPI.GUI:CreateLabel(editPriceFrame)
-	priceBoxLabel:SetPoint("TOPLEFT", 14, -40)
-	priceBoxLabel:SetText(L["Auction Buyout (Stack Price):"])
-	editPriceFrame.priceBoxLabel = priceBoxLabel
-	
-	local priceBox = CreateFrame("Frame", "TSMPostPriceChangeBox", editPriceFrame, "MoneyInputFrameTemplate")
-	priceBox:SetPoint("TOPLEFT", 20, -60)
-	priceBox:SetHeight(20)
-	priceBox:SetWidth(120)
-	editPriceFrame.priceBox = priceBox
-	
-	local saveButton = TSMAPI.GUI:CreateButton(editPriceFrame, 16)
-	saveButton:SetPoint("BOTTOMLEFT", 10, 10)
-	saveButton:SetPoint("BOTTOMRIGHT", editPriceFrame, "BOTTOM", -2, 10)
-	saveButton:SetHeight(20)
-	saveButton:SetScript("OnClick", function()
-			TSM.Post:EditPostPrice(editPriceFrame.info.itemString, MoneyInputFrame_GetCopper(TSMPostPriceChangeBox), editPriceFrame.info.operation)
-			editPriceFrame:Hide()
-		end)
-	saveButton:SetText(L["Save New Price"])
-	editPriceFrame.saveButton = saveButton
-	
-	local cancelButton = TSMAPI.GUI:CreateButton(editPriceFrame, 16)
-	cancelButton:SetPoint("BOTTOMLEFT", editPriceFrame, "BOTTOM", 2, 10)
-	cancelButton:SetPoint("BOTTOMRIGHT", -10, 10)
-	cancelButton:SetHeight(20)
-	cancelButton:SetScript("OnClick", function()
-			editPriceFrame:Hide()
-		end)
-	cancelButton:SetText(L["Cancel"])
-	editPriceFrame.cancelButton = cancelButton
-	
-	return frame
-end
-
-function private:CreateInfoText(parent)
-	local frame = CreateFrame("Frame", nil, parent)
-	frame:SetAllPoints()
-	
-	frame.SetInfo = function(self, info)
-		private:UpdateLogSTHighlight()
-		if type(info) == "string" then
-			self.icon:Hide()
-			self.linkText:Hide()
-			self.linkText.bg:Hide()
-			self.stackText:Hide()
-			self.bidText:Hide()
-			self.buyoutText:Hide()
-			self.quantityText:Hide()
-			self.statusText:Show()
-			
-			local status, _, gold, gold2 = ("\n"):split(info)
-			if gold then
-				self.goldText:Show()
-				self.goldText2:Show()
-				self.goldText:SetText(gold)
-				self.goldText2:SetText(gold2)
-			else
-				self.goldText:Hide()
-				self.goldText2:Hide()
-			end
-			self.statusText:SetText(status)
-		elseif info.isReset then
-			self.icon:Show()
-			self.linkText:Show()
-			self.linkText.bg:Show()
-			self.stackText:Show()
-			self.bidText:Show()
-			self.buyoutText:Show()
-			self.statusText:Hide()
-			self.goldText:Hide()
-			self.goldText2:Hide()
-			
-			local itemID = TSMAPI:GetItemID(info.itemString)
-			local total = TSM.Reset:GetTotalQuantity(info.itemString)
-			self.quantityText:Show()
-			self.quantityText:SetText(TSMAPI.Design:GetInlineColor("link")..L["Currently Owned:"].."|r "..total)
-			
-			local _,link,_,_,_,_,_,_,_,texture = TSMAPI:GetSafeItemInfo(info.itemString)
-			self.linkText:SetText(link)
-			if self.linkText:GetStringWidth() > 200 then
-				self.linkText:SetWidth(200)
-			else
-				self.linkText:SetWidth(self.linkText:GetStringWidth())
-			end
-			self.icon.link = link
-			self.icon:GetNormalTexture():SetTexture(texture)
-			self.stackText:SetText(format(L["%s item(s) to buy/cancel"], info.num..TSMAPI.Design:GetInlineColor("link")))
-			self.bidText:SetText(TSMAPI.Design:GetInlineColor("link")..L["Target Price:"].."|r "..TSMAPI:FormatTextMoneyIcon(info.targetPrice))
-			self.buyoutText:SetText(TSMAPI.Design:GetInlineColor("link")..L["Profit:"].."|r "..TSMAPI:FormatTextMoneyIcon(info.profit))
-		else
-			self.icon:Show()
-			self.linkText:Show()
-			self.linkText.bg:Show()
-			self.stackText:Show()
-			self.bidText:Show()
-			self.buyoutText:Show()
-			self.statusText:Hide()
-			self.quantityText:Hide()
-			self.goldText:Hide()
-			self.goldText2:Hide()
-		
-			local _,link,_,_,_,_,_,_,_,texture = TSMAPI:GetSafeItemInfo(info.itemString)
-			self.linkText:SetText(link)
-			if self.linkText:GetStringWidth() > 200 then
-				self.linkText:SetWidth(200)
-			else
-				self.linkText:SetWidth(self.linkText:GetStringWidth())
-			end
-			self.icon.link = link
-			self.icon:GetNormalTexture():SetTexture(texture)
-			
-			local sText = format("%s "..TSMAPI.Design:GetInlineColor("link")..L["auctions of|r %s"], info.numStacks, info.stackSize)
-			self.stackText:SetText(sText)
-			
-			self.bidText:SetText(TSMAPI.Design:GetInlineColor("link")..BID..":|r "..TSMAPI:FormatTextMoneyIcon(info.bid))
-			self.buyoutText:SetText(TSMAPI.Design:GetInlineColor("link")..BUYOUT..":|r "..TSMAPI:FormatTextMoneyIcon(info.buyout))
-
-			private.contentButtons.editPriceButton:Enable()
-			private.contentButtons.editPriceFrame.itemString = info.itemString
-			private.contentButtons.editPriceFrame.info = {itemString=info.itemString, link=link, buyout=info.buyout, operation=info.operation}
-			
-			TSMAPI:CreateTimeDelay("AuctioningLogHLDelay", 0.01, function() private:UpdateLogSTHighlight(info) end)
-		end
-	end
-	
-	frame.UpdateMode = function(self) end
-	
-	local icon = CreateFrame("Button", nil, frame)
-	icon:SetPoint("TOPLEFT", 85, -20)
-	icon:SetWidth(50)
-	icon:SetHeight(50)
-	local tex = icon:CreateTexture()
-	tex:SetAllPoints(icon)
-	icon:SetNormalTexture(tex)
-	icon:SetScript("OnEnter", function(self)
-		if self.link and self.link ~= "" then
-			GameTooltip:SetOwner(self, "ANCHOR_RIGHT")
-			TSMAPI:SafeTooltipLink(self.link)
-			GameTooltip:Show()
-		end
-	end)
-	icon:SetScript("OnLeave", function()
-		BattlePetTooltip:Hide()
-		GameTooltip:ClearLines()
-		GameTooltip:Hide()
-	end)
-	icon:SetScript("OnClick", function(self)
-		if IsModifiedClick() then
-			HandleModifiedItemClick(self.link)
-		end
-	end)
-	frame.icon = icon
-	
-	local linkText = TSMAPI.GUI:CreateLabel(frame)
-	linkText:SetPoint("LEFT", icon, "RIGHT", 4, 0)
-	linkText:SetJustifyH("LEFT")
-	linkText:SetJustifyV("CENTER")
-	frame.linkText = linkText
-	
-	local bg = frame:CreateTexture(nil, "BACKGROUND")
-	bg:SetPoint("TOPLEFT", linkText, -2, 2)
-	bg:SetPoint("BOTTOMRIGHT", linkText, 2, -2)
-	TSMAPI.Design:SetContentColor(bg)
-	linkText.bg = bg
-	
-	local stackText = TSMAPI.GUI:CreateLabel(frame)
-	stackText:SetPoint("TOPLEFT", 350, -18)
-	stackText:SetWidth(175)
-	stackText:SetHeight(18)
-	stackText:SetJustifyH("LEFT")
-	stackText:SetJustifyV("CENTER")
-	frame.stackText = stackText
-	
-	local bidText = TSMAPI.GUI:CreateLabel(frame)
-	bidText:SetPoint("TOPLEFT", 350, -38)
-	bidText:SetWidth(175)
-	bidText:SetHeight(18)
-	bidText:SetJustifyH("LEFT")
-	bidText:SetJustifyV("CENTER")
-	frame.bidText = bidText
-	
-	local buyoutText = TSMAPI.GUI:CreateLabel(frame)
-	buyoutText:SetPoint("TOPLEFT", 350, -58)
-	buyoutText:SetWidth(175)
-	buyoutText:SetHeight(18)
-	buyoutText:SetJustifyH("LEFT")
-	buyoutText:SetJustifyV("CENTER")
-	frame.buyoutText = buyoutText
-	
-	local statusText = TSMAPI.GUI:CreateLabel(frame)
-	statusText:SetPoint("TOP", frame, "TOPLEFT", 300, -15)
-	statusText:SetJustifyH("CENTER")
-	statusText:SetJustifyV("CENTER")
-	frame.statusText = statusText
-	
-	local goldText = TSMAPI.GUI:CreateLabel(frame)
-	goldText:SetPoint("TOP", statusText, "BOTTOM", 0, -15)
-	goldText:SetJustifyH("CENTER")
-	goldText:SetJustifyV("CENTER")
-	frame.goldText = goldText
-	
-	local goldText2 = TSMAPI.GUI:CreateLabel(frame)
-	goldText2:SetPoint("TOP", goldText, "BOTTOM")
-	goldText2:SetJustifyH("CENTER")
-	goldText2:SetJustifyV("CENTER")
-	frame.goldText2 = goldText2
-	
-	local quantityText = TSMAPI.GUI:CreateLabel(frame)
-	quantityText:SetPoint("TOPLEFT", 535, -58)
-	quantityText:SetWidth(175)
-	quantityText:SetHeight(18)
-	quantityText:SetJustifyH("LEFT")
-	quantityText:SetJustifyV("CENTER")
-	frame.quantityText = quantityText
-	
-	return frame
-end
-
-function private:CreateAuctionsST(parent)
-	local frame = CreateFrame("Frame", nil, parent)
-	frame:SetAllPoints()
-
-	local handlers = {
-		OnClick = function(_, data, self, button)
-		end,
-	}
-	
-	local rt = TSMAPI:CreateAuctionResultsTable(frame, handlers)
-	rt:SetData({})
-	rt:SetSort(7, true)
-	rt:Hide()
-	
-	return rt
-end
-
-function private:CreateLogST(parent)
-	local function GetPriceColumnText()
-		if TSM.db.global.priceColumn == 1 then
-			return L["Your Buyout"]
-		elseif TSM.db.global.priceColumn == 2 then
-			return L["Lowest Buyout"]
-		end
-	end
-	
-	local stCols = {
-		{
-			name = L["Item"],
-			width = 0.31,
+	local BFC = TSMAPI.GUI:GetBuildFrameConstants()
+	local frameInfo = {
+		type = "Frame",
+		parent = parent.content,
+		points = "ALL",
+		children = {
+			{
+				type = "GroupTreeFrame",
+				key = "groupTree",
+				groupTreeInfo = {"Auctioning", "Auctioning_AH"},
+				points = {{"TOPLEFT", 5, -25}, {"BOTTOMRIGHT", -225, 35}},
+			},
+			{
+				type = "Text",
+				text = L["Select the groups which you would like to include in the scan."],
+				textFont = {TSMAPI.Design:GetContentFont("normal")},
+				justify = {"CENTER", "MIDDLE"},
+				points = {{"BOTTOM", BFC.PREV, "TOP", 0, 2}},
+			},
+			{
+				type = "Button",
+				key = "postBtn",
+				text = L["Start Post Scan"],
+				textHeight = 18,
+				size = {actionBtnWidth, 25},
+				points = {{"BOTTOMLEFT", 5, 5}},
+				scripts = {"OnClick"},
+			},
+			{
+				type = "Button",
+				key = "cancelBtn",
+				text = L["Start Cancel Scan"],
+				textHeight = 18,
+				size = {actionBtnWidth, 25},
+				points = {{"BOTTOMLEFT", BFC.PREV, "BOTTOMRIGHT", 5, 0}},
+				scripts = {"OnClick"},
+			},
+			{
+				type = "Button",
+				key = "resetBtn",
+				text = L["Start Reset Scan"],
+				textHeight = 18,
+				size = {actionBtnWidth, 25},
+				points = {{"BOTTOMLEFT", BFC.PREV, "BOTTOMRIGHT", 5, 0}},
+				scripts = {"OnClick"},
+			},
+			{
+				type = "Frame",
+				key = "customScanFrame",
+				points = {{"TOPLEFT", BFC.PARENT, "TOPRIGHT", -221, 0}, {"BOTTOMRIGHT"}},
+				children = {
+					{
+						type = "Text",
+						text = L["Other Auctioning Searches"],
+						textFont = {TSMAPI.Design:GetContentFont("normal")},
+						justify = {"CENTER", "MIDDLE"},
+						points = {{"TOP", 0, -2}},
+					},
+					{
+						type = "HLine",
+						offset = -20,
+					},
+					{
+						type = "Button",
+						key = "cancelAllBtn",
+						text = L["Cancel All Auctions"],
+						textHeight = 16,
+						tooltip = L["Will cancel all your auctions, including ones which you didn't post with Auctioning."],
+						size = {0, 20},
+						points = {{"TOPLEFT", 4, -24}, {"TOPRIGHT", -4, -24}},
+						scripts = {"OnClick"},
+					},
+					{
+						type = "HLine",
+						offset = -48,
+					},
+					{
+						type = "Text",
+						text = L["Cancel Filter:"],
+						textFont = {TSMAPI.Design:GetContentFont("small")},
+						justify = {"LEFT", "MIDDLE"},
+						points = {{"TOPLEFT", 4, -52}, {"TOPRIGHT", -4, -52}},
+					},
+					{
+						type = "InputBox",
+						key = "filterEditBox",
+						name = "TSMAuctioningCancelFilterEditbox",
+						size = {0, 20},
+						points = {{"TOPLEFT", 4, -72}, {"TOPRIGHT", -4, -72}},
+					},
+					{
+						type = "Button",
+						key = "cancelFilterBtn",
+						text = L["Cancel Items Matching Filter"],
+						textHeight = 16,
+						tooltip = L["Will cancel all your auctions which match the specified filter, including ones which you didn't post with Auctioning."],
+						size = {0, 20},
+						points = {{"TOPLEFT", 4, -96}, {"TOPRIGHT", -4, -96}},
+						scripts = {"OnClick"},
+					},
+					{
+						type = "HLine",
+						offset = -120,
+					},
+					{
+						type = "Dropdown",
+						key = "cancelDurationDropdown",
+						label = L["Low Duration"],
+						list = durationList,
+						value = 1,
+						tooltip = L["Select a duration in this dropdown and click on the button below to cancel all auctions at or below this duration."],
+						points = {{"TOPLEFT", 2, -124}, {"TOPRIGHT", 0, -124}},
+					},
+					{
+						type = "Button",
+						key = "cancelDurationBtn",
+						text = L["Cancel Low Duration"],
+						textHeight = 16,
+						tooltip = L["Will cancel all your auctions at or below the specified duration, including ones you didn't post with Auctioning."],
+						size = {0, 20},
+						points = {{"TOPLEFT", 4, -172}, {"TOPRIGHT", -4, -172}},
+						scripts = {"OnClick"},
+					},
+					{
+						type = "HLine",
+						offset = -196,
+					},
+					{
+						type = "Text",
+						text = L["No-Group Posting:"],
+						textFont = {TSMAPI.Design:GetContentFont("small")},
+						justify = {"LEFT", "MIDDLE"},
+						points = {{"TOPLEFT", 4, -202}, {"TOPRIGHT", -4, -202}},
+					},
+					{
+						type = "Button",
+						key = "quickPostBtn",
+						text = L["Quick Post from Bags"],
+						textHeight = 18,
+						tooltip = L["Will do a post scan for any items in your bags which aren't in a group with an Auctioning operation using some generic settings."],
+						size = {0, 25},
+						points = {{"TOPLEFT", 4, -216}, {"TOPRIGHT", -4, -216}},
+						scripts = {"OnClick"},
+					},
+					{
+						type = "HLine",
+						offset = -245,
+					},
+				},
+			},
 		},
-		{
-			name = L["Operation"],
-			width = 0.17,
-			align = "Center"
-		},
-		{
-			name = GetPriceColumnText(),
-			width = 0.12,
-			align = "RIGHT",
-		},
-		{
-			name = L["Seller"],
-			width = 0.11,
-			align = "CENTER",
-		},
-		{
-			name = L["Info"],
-			width = 0.28,
-			align = "LEFT",
-		},
-		{
-			name = "",
-			width = 0,
+		handlers = {
+			postBtn = {
+				OnClick = function() private:StartScan(parent, "Post") end,
+			},
+			cancelBtn = {
+				OnClick = function() private:StartScan(parent, "Cancel") end,
+			},
+			resetBtn = {
+				OnClick = function() private:StartScan(parent, "Reset") end,
+			},
+			customScanFrame = {
+				cancelAllBtn = {
+					OnClick = function() private:StartScan(parent, "Cancel", {cancelAll=true}) end,
+				},
+				cancelFilterBtn = {
+					OnClick = function(self)
+						local filter = self:GetParent().filterEditBox:GetText()
+						if filter:trim() == "" then
+							TSM:Print(L["The filter cannot be empty. If you'd like to cancel all auctions, use the 'Cancel All Auctions' button."])
+							return
+						end
+						private:StartScan(parent, "Cancel", {filter=filter})
+					end,
+				},
+				cancelDurationBtn = {
+					OnClick = function(self) private:StartScan(parent, "Cancel", {duration=self:GetParent().cancelDurationDropdown:GetValue()}) end,
+				},
+				quickPostBtn = {
+					OnClick = function(self) private:StartScan(parent, "Post", {quickPost=true}) end,
+				},
+			},
 		},
 	}
-	
-	local handlers = {
-		OnEnter = function(_, data, self)
-			if not data.operation then return end
-			local prices = TSM.Util:GetItemPrices(data.operation, data.itemString, {minPrice=true, maxPrice=true, normalPrice=true})
-			
-			GameTooltip:SetOwner(self, "ANCHOR_NONE")
-			GameTooltip:SetPoint("BOTTOMLEFT", self, "TOPLEFT")
-			GameTooltip:AddLine(data.link)
-			GameTooltip:AddLine(L["Minimum Price:"].." "..(TSMAPI:FormatTextMoney(prices.minPrice, "|cffffffff") or "---"))
-			GameTooltip:AddLine(L["Maximum Price:"].." "..(TSMAPI:FormatTextMoney(prices.maxPrice, "|cffffffff") or "---"))
-			GameTooltip:AddLine(L["Normal Price:"].." "..(TSMAPI:FormatTextMoney(prices.normalPrice, "|cffffffff") or "---"))
-			GameTooltip:AddLine(L["Lowest Buyout:"].." |r"..(TSMAPI:FormatTextMoney(data.lowestBuyout, "|cffffffff") or "---"))
-			GameTooltip:AddLine(L["Log Info:"].." "..data.info)
-			GameTooltip:AddLine("\n"..TSMAPI.Design:GetInlineColor("link2")..L["Click to show auctions for this item."].."|r")
-			GameTooltip:AddLine(TSMAPI.Design:GetInlineColor("link2")..format(L["Right-Click to add %s to your friends list."], "|r"..(data.seller or "---")..TSMAPI.Design:GetInlineColor("link2")).."|r")
-			GameTooltip:AddLine(TSMAPI.Design:GetInlineColor("link2")..L["Shift-Right-Click to show the options for this operation."].."|r")
-			GameTooltip:Show()
-		end,
-		OnLeave = function()
-			GameTooltip:Hide()
-		end,
-		OnClick = function(_, data, _, button)
-			if button == "LeftButton" then
-				private.contentButtons:UnlockHighlight()
-				private.logST:Hide()
-				private.auctionsST:Show()
-				private.auctionsST.isCurrentItem = data.itemString
-				private:UpdateAuctionsSTData()
-			elseif button == "RightButton" then
-				if IsShiftKeyDown() then
-					TSMAPI:ShowOperationOptions("Auctioning", TSM.operationNameLookup[data.operation])
-				else
-					if data.seller then
-						AddFriend(data.seller)
-					else
-						TSM:Print(L["This item does not have any seller data."])
+
+	local frame = TSMAPI.GUI:BuildFrame(frameInfo)
+	TSMAPI.Design:SetFrameBackdropColor(frame)
+	TSMAPI.Design:SetFrameColor(frame.customScanFrame)
+	private.selectionFrame = frame
+
+	local helpPlateInfo = {
+		FramePos = {x=0, y=0},
+		FrameSize = {width=frame:GetWidth(), height=frame:GetHeight()},
+		{
+			ButtonPos = {x = 380, y = -75},
+			HighLightBox = {x = 5, y = -5, width = 594, height = 292},
+			ToolTipDir = "UP",
+			ToolTipText = L["If you have created TSM groups and assigned Auctioning operations, they will be listed here for selection."]
+		},
+		{
+			ButtonPos = {x = 380, y = -290},
+			HighLightBox = {x = 5, y = -297, width = 594, height = 30},
+			ToolTipDir = "UP",
+			ToolTipText = L["These buttons will start a Post, Cancel, or Reset scan for the groups you have selected."]
+		},
+		{
+			ButtonPos = {x = 800, y = -100},
+			HighLightBox = {x = 605, y = 0, width = 220, height = 200},
+			ToolTipDir = "RIGHT",
+			ToolTipText = L["These buttons allow you to quickly cancel auctions regardless of having TSM groups with Auctioning operations."]
+		},
+		{
+			ButtonPos = {x = 800, y = -200},
+			HighLightBox = {x = 605, y = -200, width = 220, height = 50},
+			ToolTipDir = "RIGHT",
+			ToolTipText = L["This button lets you quickly post items from your bags without setting up groups / operations for them."]
+		},
+	}
+
+	local mainHelpBtn = CreateFrame("Button", nil, frame, "MainHelpPlateButton")
+	mainHelpBtn:SetPoint("TOP", frame, -300, 70)
+	mainHelpBtn:SetScript("OnClick", function() private:ToggleHelpPlate(frame, helpPlateInfo, mainHelpBtn, true) end)
+	mainHelpBtn:SetScript("OnHide", function() if HelpPlate_IsShowing(helpPlateInfo) then private:ToggleHelpPlate(frame, helpPlateInfo, mainHelpBtn, false) end end)
+
+	if not TSM.db.global.helpPlatesShown.selection then
+		TSM.db.global.helpPlatesShown.selection = true
+		private:ToggleHelpPlate(frame, helpPlateInfo, mainHelpBtn, false)
+	end
+end
+
+function private:ToggleHelpPlate(frame, info, btn, isUser)
+	if not HelpPlate_IsShowing(info) then
+		HelpPlate:SetParent(frame)
+		HelpPlate:SetFrameStrata("DIALOG")
+		HelpPlate_Show(info, frame, btn, isUser)
+	else
+		HelpPlate:SetParent(UIParent)
+		HelpPlate:SetFrameStrata("DIALOG")
+		HelpPlate_Hide(isUser)
+	end
+end
+
+
+function private:CreateScanFrame(parent)
+	if private.scanFrame then return end
+	local BFC = TSMAPI.GUI:GetBuildFrameConstants()
+	local frameInfo = {
+		type = "Frame",
+		parent = parent,
+		points = "ALL",
+		children = {
+			{
+				type = "Frame",
+				key = "content",
+				points = {{"TOPLEFT", parent.content}, {"BOTTOMRIGHT", parent.content}},
+				children = {
+					{
+						type = "StatusBarFrame",
+						key = "statusBar",
+						name = "TSMAuctioningStatusBar",
+						size = {355, 30},
+						points = {{"TOPLEFT", BFC.PARENT, "BOTTOMLEFT", 165, -2}},
+					},
+					{
+						type = "AuctionResultsTableFrame",
+						key = "auctionsST",
+						sortIndex = 9,
+						points = "ALL",
+					},
+					{
+						type = "ScrollingTableFrame",
+						key = "logST",
+						stCols = {{name=L["Item"], width=0.31}, {name=L["Operation"], width=0.17, align="CENTER"}, {name=private:GetLogSTPriceColumnText(), width=0.12, align="RIGHT"}, {name=L["Seller"], width=0.11, align="CENTER"}, {name=L["Info"], width=0.28}, {name="", width=0}},
+						sortInfo = {true, 6},
+						stDisableSelection = true,
+						points = "ALL",
+						scripts = {"OnEnter", "OnLeave", "OnClick", "OnColumnClick"},
+					},
+				},
+			},
+			{
+				type = "Frame",
+				key = "actionButtonsFrame",
+				size = {210, 24},
+				points = {{"BOTTOMRIGHT", -94, 5}},
+				children = {
+					{
+						type = "Button",
+						key = "post",
+						name = "TSMAuctioningPostButton",
+						isSecure = true,
+						text = L["Post"],
+						textHeight = 22,
+						size = {80, 24},
+						points = {{"TOPLEFT"}},
+						scripts = {"OnClick"},
+					},
+					{
+						type = "Button",
+						key = "cancel",
+						name = "TSMAuctioningCancelButton",
+						isSecure = true,
+						text = CANCEL,
+						textHeight = 22,
+						size = {80, 24},
+						points = {{"TOPLEFT"}},
+						scripts = {"OnClick"},
+					},
+					{
+						type = "Button",
+						key = "skip",
+						text = L["Skip"],
+						textHeight = 18,
+						size = {60, 24},
+						points = {{"TOPLEFT", "post", "TOPRIGHT", 4, 0}},
+						scripts = {"OnClick"},
+					},
+					{
+						type = "Button",
+						key = "stop",
+						text = L["Stop"],
+						textHeight = 18,
+						size = {70, 24},
+						points = {{"TOPLEFT", "skip", "TOPRIGHT", 4, 0}},
+						scripts = {"OnClick"},
+					},
+					{
+						type = "Button",
+						key = "restart",
+						text = L["Restart"],
+						textHeight = 18,
+						size = {70, 24},
+						points = {{"TOPLEFT", "skip", "TOPRIGHT", 4, 0}},
+						scripts = {"OnClick"},
+					},
+				},
+			},
+			{
+				type = "Frame",
+				key = "contentButtonsFrame",
+				points = "ALL",
+				children = {
+					{
+						type = "Button",
+						key = "auctionsButton",
+						text = L["Show All Auctions"],
+						textHeight = 16,
+						size = {150, 17},
+						points = {{"TOPRIGHT", -10, -20}},
+						scripts = {"OnClick"},
+					},
+					{
+						type = "Button",
+						key = "currAuctionsButton",
+						text = L["Show Item Auctions"],
+						textHeight = 16,
+						size = {150, 17},
+						points = {{"TOPRIGHT", -170, -20}},
+						scripts = {"OnClick"},
+					},
+					{
+						type = "Button",
+						key = "logButton",
+						text = L["Show Log"],
+						textHeight = 16,
+						size = {150, 17},
+						points = {{"TOPRIGHT", -10, -45}},
+						scripts = {"OnClick"},
+					},
+					{
+						type = "Button",
+						key = "editPriceButton",
+						text = L["Edit Post Price"],
+						textHeight = 16,
+						size = {150, 17},
+						points = {{"TOPRIGHT", -170, -45}},
+						scripts = {"OnClick"},
+					},
+				},
+			},
+			{
+				type = "Frame",
+				key = "editPriceFrame",
+				strata = "DIALOG",
+				mouse = true,
+				hidden = true,
+				size = {350, 150},
+				points = {{"CENTER"}},
+				scripts = {"OnShow", "OnUpdate"},
+				children = {
+					{
+						type = "ItemLinkLabel",
+						key = "linkLabel",
+						text = "",
+						textHeight = 15,
+						size = {0, 20},
+						justify = {"CENTER", "TOP"},
+						points = {{"TOPLEFT", 0, -14}, {"TOPRIGHT", 0, -14}},
+					},
+					{
+						type = "Text",
+						text = L["Auction Buyout (Stack Price):"],
+						textHeight = 12,
+						points = {{"TOPLEFT", 14, -40}},
+					},
+					{
+						type = "MoneyInputBox",
+						name = "TSMPostPriceChangeBox",
+						key = "priceBox",
+						size = {120, 20},
+						points = {{"TOPLEFT", 20, -60}},
+					},
+					{
+						type = "Dropdown",
+						key = "durationDropdown",
+						label = L["Duration"],
+						list = {[12]=AUCTION_DURATION_ONE, [24]=AUCTION_DURATION_TWO, [48]=AUCTION_DURATION_THREE},
+						value = 12,
+						size = {140, 40},
+						points = {{"TOPRIGHT", -5, -40}},
+					},
+					{
+						type = "Button",
+						key = "saveButton",
+						text = L["Save New Price"],
+						textHeight = 16,
+						size = {0, 20},
+						points = {{"BOTTOMRIGHT", BFC.PARENT, "BOTTOM", -2, 10}, {"BOTTOMLEFT", 10, 10}},
+						scripts = {"OnClick"},
+					},
+					{
+						type = "Button",
+						key = "cancelButton",
+						text = CANCEL,
+						textHeight = 16,
+						size = {0, 20},
+						points = {{"BOTTOMLEFT", BFC.PARENT, "BOTTOM", 2, 10}, {"BOTTOMRIGHT", -10, 10}},
+						scripts = {"OnClick"},
+					},
+				},
+			},
+			{
+				type = "Frame",
+				key = "infoTextFrame",
+				points = "ALL",
+				children = {
+					{
+						type = "IconButton",
+						key = "icon",
+						size = {50, 50},
+						points = {{"TOPLEFT", 85, -20}},
+						scripts = {"OnEnter", "OnLeave", "OnClick"},
+					},
+					{
+						type = "ItemLinkLabel",
+						key = "linkText",
+						text = "",
+						textHeight = 15,
+						size = {0, 20},
+						justify = {"LEFT", "MIDDLE"},
+						points = {{"LEFT", "icon", "RIGHT", 4, 0}},
+					},
+					{
+						type = "Text",
+						key = "stackText",
+						justify = {"LEFT", "MIDDLE"},
+						size = {175, 18},
+						points = {{"TOPLEFT", 350, -18}},
+					},
+					{
+						type = "Text",
+						key = "bidText",
+						justify = {"LEFT", "MIDDLE"},
+						size = {175, 18},
+						points = {{"TOPLEFT", 350, -38}},
+					},
+					{
+						type = "Text",
+						key = "buyoutText",
+						justify = {"LEFT", "MIDDLE"},
+						size = {175, 18},
+						points = {{"TOPLEFT", 350, -58}},
+					},
+					{
+						type = "Text",
+						key = "statusText",
+						justify = {"CENTER", "MIDDLE"},
+						points = {{"TOP", BFC.PARENT, "TOPLEFT", 300, -15}},
+					},
+					{
+						type = "Text",
+						key = "goldText",
+						justify = {"CENTER", "MIDDLE"},
+						points = {{"TOP", BFC.PREV, "BOTTOM", 0, -15}},
+					},
+					{
+						type = "Text",
+						key = "goldText2",
+						justify = {"CENTER", "MIDDLE"},
+						points = {{"TOP", BFC.PREV, "BOTTOM"}},
+					},
+					{
+						type = "Text",
+						key = "quantityText",
+						justify = {"LEFT", "MIDDLE"},
+						size = {18, 175},
+						points = {{"TOPLEFT", 535, -58}},
+					},
+				},
+			},
+		},
+		handlers = {
+			content = {
+				logST = {
+					OnEnter = function(_, data, self)
+						if not data.operation or not data.operation.minPrice then return end
+						local prices = TSM.Util:GetItemPrices(data.operation, data.itemString, false, {minPrice=true, maxPrice=true, normalPrice=true})
+
+						GameTooltip:SetOwner(self, "ANCHOR_NONE")
+						GameTooltip:SetPoint("BOTTOMLEFT", self, "TOPLEFT")
+						GameTooltip:AddLine(data.link)
+						GameTooltip:AddLine(L["Group:"].." |cffffffff"..(TSMAPI.Groups:FormatPath(TSMAPI.Groups:GetPath(data.itemString)) or "---").."|r")
+						GameTooltip:AddLine(L["Minimum Price:"].." "..(TSMAPI:MoneyToString(prices.minPrice, "|cffffffff") or "---"))
+						GameTooltip:AddLine(L["Maximum Price:"].." "..(TSMAPI:MoneyToString(prices.maxPrice, "|cffffffff") or "---"))
+						GameTooltip:AddLine(L["Normal Price:"].." "..(TSMAPI:MoneyToString(prices.normalPrice, "|cffffffff") or "---"))
+						GameTooltip:AddLine(L["Lowest Buyout:"].." "..(TSMAPI:MoneyToString(data.lowestBuyout, "|cffffffff") or "---"))
+						if TSMAPI:HasModule("Accounting") then
+							local numExpires = select(2, TSMAPI:ModuleAPI("Accounting", "getAuctionStatsSinceLastSale", data.itemString))
+							if type(numExpires) ~= "number" then
+								numExpires = 0
+							end
+							if data.operation.maxExpires > 0 then
+								GameTooltip:AddLine(L["Expires / Max Expires:"].." |cffffffff("..numExpires.."/"..data.operation.maxExpires..")")
+							else
+								GameTooltip:AddLine(L["Expires:"].." |cffffffff"..numExpires)
+							end
+						end
+						GameTooltip:AddLine(L["Log Info:"].." "..data.info)
+						GameTooltip:AddLine("")
+						GameTooltip:AddLine(TSMAPI.Design:GetInlineColor("link2")..L["Click to show auctions for this item."].."|r")
+						if private.mode == "Post" then
+							GameTooltip:AddLine(TSMAPI.Design:GetInlineColor("link2")..L["Shift-Click to buy auctions for this item."].."|r")
+						end
+						GameTooltip:AddLine(TSMAPI.Design:GetInlineColor("link2")..format(L["Right-Click to add %s to your friends list."], "|r"..(data.seller or "---")..TSMAPI.Design:GetInlineColor("link2")).."|r")
+						if not data.operation.isFake then
+							GameTooltip:AddLine(TSMAPI.Design:GetInlineColor("link2")..L["Shift-Right-Click to show the options for this operation."].."|r")
+						end
+						GameTooltip:Show()
+					end,
+					OnLeave = function()
+						GameTooltip:Hide()
+						private:UpdateLogSTHighlight(TSM.Manage:GetCurrentItem())
+					end,
+					OnClick = function(_, data, _, button)
+						if button == "LeftButton" then
+							if IsShiftKeyDown() and private.mode == "Post" then
+								if not TSMAPI:HasModule("Shopping") then
+									TSM:Print(L["This feature requires the TSM_Shopping module."])
+									return
+								end
+								local canBuy, reason = TSM.Post:CanBuyAuction(data.itemString)
+								if canBuy then
+									TSMAPI:ModuleAPI("Shopping", "startSearchAuctioning", TSMAPI.Item:ToItemString(data.itemString), TSM.Scan:GetDatabase(), function() private:DoCallbackAsync("REPROCESS_ITEM", data.itemString) end, TSM.Scan:GetFilterFunction(data.itemString, data.operation))
+								elseif reason == "scanning" then
+									TSM:Print(L["Cannot buy items until the post scan is complete."])
+								elseif reason == "posted" then
+									TSM:Print(L["Cannot buy this item because you have already posted it."])
+								end
+							else
+								private.scanFrame.contentButtonsFrame.auctionsButton:UnlockHighlight()
+								private.scanFrame.contentButtonsFrame.logButton:UnlockHighlight()
+								private.scanFrame.contentButtonsFrame.currAuctionsButton:UnlockHighlight()
+								private.scanFrame.contentButtonsFrame.editPriceButton:UnlockHighlight()
+								private.scanFrame.content.logST:Hide()
+								private.scanFrame.content.auctionsST:Show()
+								private.scanFrame.content.auctionsST.isCurrentItem = data.itemString
+								private:UpdateAuctionsSTData()
+							end
+						elseif button == "RightButton" then
+							if IsShiftKeyDown() then
+								if not data.operation or data.operation.isFake then return end
+								TSMAPI.Operations:ShowOptions("Auctioning", TSM.operationNameLookup[data.operation])
+							else
+								if data.seller then
+									AddFriend(data.seller)
+								else
+									TSM:Print(L["This item does not have any seller data."])
+								end
+							end
+						end
+					end,
+					OnColumnClick = function(self, button)
+						if self.colNum == 3 and button == "RightButton" then
+							if TSM.db.global.priceColumn == 1 then
+								TSM.db.global.priceColumn = 2
+							else
+								TSM.db.global.priceColumn = 1
+							end
+							self:SetText(private:GetLogSTPriceColumnText())
+							wipe(private.scanFrame.content.logST.cache)
+							private:UpdateLogSTData()
+						end
+						if self.colNum == 5 and button == "RightButton" then
+							-- reset sorting
+							private.scanFrame.content.logST:EnableSorting(true, 6)
+						end
+						wipe(private.logSTCache)
+						private:UpdateLogSTHighlight(TSM.Manage:GetCurrentItem())
+					end,
+				},
+			},
+			actionButtonsFrame = {
+				post = {
+					OnClick = function() if TSMAPI.Util:UseHardwareEvent() then private:DoCallback("ACTION_BUTTON") end end,
+				},
+				cancel = {
+					OnClick = function() if TSMAPI.Util:UseHardwareEvent() then private:DoCallback("ACTION_BUTTON") end end,
+				},
+				skip = {
+					OnClick = function() private:DoCallback("SKIP_BUTTON") end,
+				},
+				stop = {
+					OnClick = function() TSM.Manage:StopScan() end,
+				},
+				restart = {
+					OnClick = function(self)
+						GUI:HideSelectionFrame()
+						private.selectionFrame:Show()
+					end,
+				},
+			},
+			contentButtonsFrame = {
+				auctionsButton = {
+					OnClick = function(self)
+						private:ResetContentButtons()
+						self:LockHighlight()
+						private.scanFrame.content.logST:Hide()
+						private.scanFrame.content.auctionsST:Show()
+						private.scanFrame.content.auctionsST.isCurrentItem = nil
+						private:UpdateAuctionsSTData()
+					end,
+				},
+				currAuctionsButton = {
+					OnClick = function(self)
+						private:ResetContentButtons()
+						self:LockHighlight()
+						private.scanFrame.content.logST:Hide()
+						private.scanFrame.content.auctionsST:Show()
+						private.scanFrame.content.auctionsST.isCurrentItem = true
+						private:UpdateAuctionsSTData()
+					end,
+				},
+				logButton = {
+					OnClick = function(self)
+						private:ResetContentButtons()
+						self:LockHighlight()
+						private.scanFrame.content.auctionsST:Hide()
+						private.scanFrame.content.logST:Show()
+						private:UpdateLogSTData()
+					end,
+				},
+				editPriceButton = {
+					OnClick = function(self)
+						private:ResetContentButtons()
+						self:LockHighlight()
+						private.scanFrame.editPriceFrame:Show()
+					end,
+				},
+			},
+			editPriceFrame = {
+				OnShow = function(self)
+					self:SetFrameStrata("DIALOG")
+					TSMPostPriceChangeBox:SetCopper(self.info.buyout)
+					self.linkLabel:SetText(self.info.link)
+				end,
+				OnUpdate = function(self)
+					if not TSMAPI.Auction:IsTabVisible("Auctioning") then
+						self:Hide()
 					end
-				end
+				end,
+				saveButton = {
+					OnClick = function(self)
+						private:DoCallback("EDIT_POST_PRICE", self:GetParent().info.itemString, TSMPostPriceChangeBox:GetCopper(), self:GetParent().info.operation, self:GetParent().durationDropdown:GetValue())
+						self:GetParent():Hide()
+					end,
+				},
+				cancelButton = {
+					OnClick = function(self) self:GetParent():Hide() end,
+				},
+			},
+			infoTextFrame = {
+				icon = {
+					OnEnter = function(self)
+						if self.link and self.link ~= "" then
+							GameTooltip:SetOwner(self, "ANCHOR_RIGHT")
+							TSMAPI.Util:SafeTooltipLink(self.link)
+							GameTooltip:Show()
+						end
+					end,
+					OnLeave = function(self) GameTooltip:Hide() end,
+					OnClick = function(self) if IsModifiedClick() then HandleModifiedItemClick(self.link) end end,
+				},
+			},
+		},
+	}
+
+	private.scanFrame = TSMAPI.GUI:BuildFrame(frameInfo)
+	TSMAPI.Design:SetFrameColor(private.scanFrame.content)
+	TSMAPI.Design:SetFrameBackdropColor(private.scanFrame.editPriceFrame)
+	local auctionRTInfo = {
+		headers = {{"Auction Bid\n(per item)", "Auction Bid\n(per stack)"}, {"Auction Buyout\n(per item)", "Auction Buyout\n(per stack)"}},
+		pctHeader = L["% Market Value"],
+		GetRowPrices = function(record, isPerItem)
+			if isPerItem then
+				return record.itemDisplayedBid, record.itemBuyout, record.isHighBidder and "|cffffff00" or nil
+			else
+				return record.displayedBid, record.buyout, record.isHighBidder and "|cff00ff00" or nil
 			end
 		end,
-		OnColumnClick = function(self, button)
-			if self.colNum == 3 and button == "RightButton" then
-				TSM.db.global.priceColumn = TSM.db.global.priceColumn + 1
-				TSM.db.global.priceColumn = TSM.db.global.priceColumn > 2 and 1 or TSM.db.global.priceColumn
-				self:SetText(GetPriceColumnText())
-				wipe(private.logST.cache)
-				private:UpdateLogSTData()
-			end
+		GetMarketValue = function(itemString)
+			return TSMAPI:GetItemValue(itemString, "DBMarket") or 0
 		end,
 	}
-	
-	local st = TSMAPI:CreateScrollingTable(parent, stCols, handlers)
-	st:SetParent(parent)
-	st:SetAllPoints()
-	st:EnableSorting(true, 6)
-	st:DisableSelection(true)
-	return st
+	private.scanFrame.content.auctionsST:SetPriceInfo(auctionRTInfo)
+end
+
+function private:UpdateScanMode()
+	if private.mode == "Post" then
+		private.scanFrame.actionButtonsFrame.post:Show()
+		private.scanFrame.actionButtonsFrame.cancel:Hide()
+		private.scanFrame.contentButtonsFrame.currAuctionsButton:Show()
+		private.scanFrame.contentButtonsFrame.editPriceButton:Show()
+		private.scanFrame.contentButtonsFrame.editPriceButton:Disable()
+	elseif private.mode == "Cancel" then
+		private.scanFrame.actionButtonsFrame.post:Hide()
+		private.scanFrame.actionButtonsFrame.cancel:Show()
+		private.scanFrame.contentButtonsFrame.currAuctionsButton:Show()
+		private.scanFrame.contentButtonsFrame.editPriceButton:Hide()
+	end
+end
+
+function private:ResetContentButtons()
+	private.scanFrame.contentButtonsFrame.auctionsButton:UnlockHighlight()
+	private.scanFrame.contentButtonsFrame.logButton:UnlockHighlight()
+	private.scanFrame.contentButtonsFrame.currAuctionsButton:UnlockHighlight()
+	private.scanFrame.contentButtonsFrame.editPriceButton:UnlockHighlight()
+	private.scanFrame.editPriceFrame:Hide()
+end
+
+function private:GetLogSTPriceColumnText()
+	if TSM.db.global.priceColumn == 1 then
+		return L["Your Buyout"]
+	elseif TSM.db.global.priceColumn == 2 then
+		return L["Lowest Buyout"]
+	end
+end
+
+function private:GetCurrentAuctionSTItem()
+	if not private.scanFrame.content.auctionsST:IsVisible() then return end
+	local currentItem = private.scanFrame.content.auctionsST.isCurrentItem
+	if not currentItem then return end
+	if type(currentItem) == "string" then
+		return currentItem
+	else
+		if not TSM.Manage:GetCurrentItem() then
+			return
+		end
+		return TSM.Manage:GetCurrentItem().itemString
+	end
+end
+
+function private.AuctionSTFilterFunc(record)
+	if not private.scanFrame.content.auctionsST.isCurrentItem then return true end
+	local currentItem = private:GetCurrentAuctionSTItem()
+	if not currentItem then return end
+	return record.itemString == currentItem or record.baseItemString == currentItem
 end
 
 function private:UpdateAuctionsSTData()
-	if not private.auctionsST:IsVisible() or not private.auctionsST.sortInfo then return end
-
-	local results = {}
-	if private.auctionsST.isCurrentItem then
-		local itemString
-		if type(private.auctionsST.isCurrentItem) == "string" or type(private.auctionsST.isCurrentItem) == "number" then
-			itemString = private.auctionsST.isCurrentItem
-		else
-			itemString = TSM[private.mode]:GetCurrentItem().itemString
-		end
-		if itemString and TSM.Scan.auctionData[itemString] then
-			tinsert(results, TSM.Scan.auctionData[itemString])
-			private.auctionsST:SetExpanded(itemString, true)
-		end
+	local auctionsST = private.scanFrame.content.auctionsST
+	if not auctionsST:IsVisible() then return end
+	local db = TSM.Scan:GetDatabase()
+	if db then
+		auctionsST:SetDatabase(db, private.AuctionSTFilterFunc, private:GetCurrentAuctionSTItem())
 	else
-		for _, auction in pairs(TSM.Scan.auctionData) do
-			-- combine auctions with the same buyout / count / seller
-			tinsert(results, auction)
-		end
+		auctionsST:Clear()
 	end
-	
-	private.auctionsST:SetData(results)
-end
-
-function private:GetLogSTRow(record, recordIndex)
-	if private.logST.cache[record] then
-		return private.logST.cache[record]
-	end
-	
-	local name, link = TSMAPI:GetSafeItemInfo(record.itemString)
-	local buyout, seller, isWhitelist, isPlayer, lowestBuyout, _
-	if record.reason ~= "cancelAll" then
-		buyout, _, seller, isWhitelist, _, isPlayer = TSM.Scan:GetLowestAuction(record.itemString, record.operation)
-		lowestBuyout = buyout
-		if TSM.db.global.priceColumn == 1 then
-			buyout = record.buyout
-		end
-	end
-	
-	local sellerText
-	if seller then
-		if isPlayer then
-			sellerText = "|cffffff00"..seller.."|r"
-		elseif isWhiteList then
-			sellerText = TSMAPI.Design:GetInlineColor("link2")..seller.."|r"
-		else
-			sellerText = "|cffffffff"..seller.."|r"
-		end
-	else
-		sellerText = "|cffffffff---|r"
-	end
-	
-	local color = TSM.Log:GetColor(record.mode, record.reason)
-	local infoText = (color or "|cffffffff")..(record.info or "---").."|r"
-	
-	local row = {
-		cols = {
-			{
-				value = link,
-				sortArg = name or "",
-			},
-			{
-				value = record.operation and TSM.operationNameLookup[record.operation] or "---",
-				sortArg = record.operation and TSM.operationNameLookup[record.operation] or "---",
-			},
-			{
-				value = TSMAPI:FormatTextMoney(buyout, nil, true) or "---",
-				sortArg = buyout or 0,
-			},
-			{
-				value = sellerText,
-				sortArg = seller or "~",
-			},
-			{
-				value = infoText,
-				sortArg = record.info or "~",
-			},
-			{ -- invisible column at the end for default sorting
-				value = "",
-				sortArg = recordIndex,
-			},
-		},
-		link = link or name or itemString,
-		itemString = record.itemString,
-		operation = record.operation,
-		buyout = buyout,
-		lowestBuyout = lowestBuyout,
-		seller = seller,
-		info = infoText,
-	}
-	
-	private.logST.cache[record] = row
-	return row
+	auctionsST:SetDisabled(false)
 end
 
 function private:UpdateLogSTData()
+	wipe(private.logSTCache)
 	local rows = {}
 	for i, record in ipairs(TSM.Log:GetData()) do
-		tinsert(rows, private:GetLogSTRow(record, i))
+		local row
+		if private.scanFrame.content.logST.cache[record] then
+			row = private.scanFrame.content.logST.cache[record]
+		else
+			local name = TSMAPI.Item:GetName(record.itemString)
+			local link = TSMAPI.Item:GetLink(record.itemString)
+			local lowestAuction = {}
+			local shownBuyout = nil
+			if not TSM.Log:IsNoScanReason(record.mode, record.reason) then
+				lowestAuction = TSM.Scan:GetLowestAuction(record.itemString, record.operation) or {}
+				shownBuyout = TSM.db.global.priceColumn == 1 and record.buyout or lowestAuction.buyout
+			end
+
+			local sellerText
+			if lowestAuction.seller then
+				if lowestAuction.isPlayer then
+					sellerText = "|cffffff00"..lowestAuction.seller.."|r"
+				elseif lowestAuction.isWhitelist then
+					sellerText = TSMAPI.Design:GetInlineColor("link2")..lowestAuction.seller.."|r"
+				else
+					sellerText = "|cffffffff"..lowestAuction.seller.."|r"
+				end
+			else
+				sellerText = "|cffffffff---|r"
+			end
+
+			local color = TSM.Log:GetColor(record.mode, record.reason)
+			local infoText = (color or "|cffffffff")..(record.info or "---").."|r"
+
+			row = {
+				cols = {
+					{
+						value = link,
+						sortArg = name or "",
+					},
+					{
+						value = record.operation and TSM.operationNameLookup[record.operation] or "---",
+						sortArg = record.operation and TSM.operationNameLookup[record.operation] or "---",
+					},
+					{
+						value = TSMAPI:MoneyToString(shownBuyout, "OPT_PAD") or "---",
+						sortArg = shownBuyout or 0,
+					},
+					{
+						value = sellerText,
+						sortArg = lowestAuction.seller or "~",
+					},
+					{
+						value = infoText,
+						sortArg = record.info or "~",
+					},
+					{ -- invisible column at the end for default sorting
+						value = "",
+						sortArg = i,
+					},
+				},
+				link = link or name or record.itemString,
+				itemString = record.itemString,
+				operation = record.operation,
+				buyout = shownBuyout,
+				lowestBuyout = lowestAuction.buyout,
+				seller = lowestAuction.seller,
+				info = infoText,
+			}
+
+			private.scanFrame.content.logST.cache[record] = row
+		end
+		tinsert(rows, row)
 	end
-	private.logST:SetData(rows)
-	
-	if #private.logST.rowData > private.logST.NUM_ROWS then
-		TSMAPI:CreateTimeDelay("logSTOffset", 0.08, function()
-				private.logST:SetScrollOffset(#private.logST.rowData - private.logST.NUM_ROWS)
-			end)
+	private.scanFrame.content.logST:SetData(rows)
+
+	if #private.scanFrame.content.logST.rowData > private.scanFrame.content.logST:GetNumRows() then
+		TSMAPI.Delay:AfterFrame("logSTOffset", 2, function() private.scanFrame.content.logST:SetScrollOffset(#private.scanFrame.content.logST.rowData - private.scanFrame.content.logST:GetNumRows()) end)
 	end
 end
 
 function private:UpdateLogSTHighlight(currentItem)
-	if not currentItem then return private.logST:SetHighlighted() end
-	
-	for i=1, #private.logST.rowData do
-		local data = private.logST.rowData[i]
-		if data and data.operation == currentItem.operation and data.itemString == currentItem.itemString then
-			private.logST:SetHighlighted(i)
+	if not currentItem then return private.scanFrame.content.logST:SetHighlighted() end
+
+	if not next(private.logSTCache) then
+		for i, data in ipairs(private.scanFrame.content.logST.rowData) do
+			private.logSTCache[data.itemString.."@"..tostring(data.operation)] = i
+			if data.operation == currentItem.operation and data.itemString == currentItem.itemString then
+			end
 		end
 	end
+	local index = private.logSTCache[currentItem.itemString.."@"..tostring(currentItem.operation)]
+	if index then
+		private.scanFrame.content.logST:SetHighlighted(index)
+	end
 end
 
-function private:UpdateSTData()
-	private:UpdateLogSTData()
-	private:UpdateAuctionsSTData()
-end
-
-local function SetGoldText()
-	local line1, line2 = TSM.Post:GetAHGoldTotal()
-	local text = format(L["Done Posting\n\nTotal value of your auctions: %s\nIncoming Gold: %s"], line1, line2)
-	private.infoText:SetInfo(text)
-end
-
-function private:Stopped(notDone)
-	TSM.Manage:UnregisterAllMessages()
-	private.buttons:Disable(true)
-	private.statusBar:UpdateStatus(100, 100)
-	private.contentButtons.currAuctionsButton:Hide()
-	
-	if private.mode == "Post" then
-		TSMAPI:CreateTimeDelay(0.5, SetGoldText)
-		SetGoldText()
-		private.statusBar:SetStatusText(L["Post Scan Finished"])
-	elseif private.mode == "Cancel" then
-		private.infoText:SetInfo(L["Done Canceling"])
-		private.statusBar:SetStatusText(L["Cancel Scan Finished"])
-	elseif private.mode == "Reset" then
-		if not notDone then
-			private.infoText:SetInfo(L["No Items to Reset"])
+function private:SetGoldText()
+	local total = 0
+	local incomingTotal = 0
+	for i = 1, GetNumAuctionItems("owner") do
+		local count, buyoutAmount = TSMAPI.Util:Select({3, 10}, GetAuctionItemInfo("owner", i))
+		total = total + buyoutAmount
+		if count == 0 then
+			incomingTotal = incomingTotal + buyoutAmount
 		end
-		private.statusBar:SetStatusText(L["Reset Scan Finished"])
 	end
-	private.buttons.stop:SetText(L["Restart"])
-	private.buttons.stop.isDone = true
+	local text = format(L["Done Posting\n\nTotal value of your auctions: %s\nIncoming Gold: %s"], TSMAPI:MoneyToString(total, "OPT_ICON"), TSMAPI:MoneyToString(incomingTotal, "OPT_ICON"))
+	GUI:SetInfo(text)
 end
 
-
-function GUI:CreateSelectionFrame(parent)
-	local frame = CreateFrame("Frame", nil, parent.content)
-	frame:SetAllPoints()
-	TSMAPI.Design:SetFrameBackdropColor(frame)
-
-	local stContainer = CreateFrame("Frame", nil, frame)
-	stContainer:SetPoint("TOPLEFT", 5, -20)
-	stContainer:SetPoint("BOTTOMRIGHT", -200, 30)
-	TSMAPI.Design:SetFrameColor(stContainer)
-	frame.groupTree = TSMAPI:CreateGroupTree(stContainer, "Auctioning", "Auctioning_AH")
-	
-	local helpText = TSMAPI.GUI:CreateLabel(frame)
-	helpText:SetPoint("TOP", stContainer, 0, 20)
-	helpText:SetJustifyH("CENTER")
-	helpText:SetJustifyV("CENTER")
-	helpText:SetText(L["Select the groups which you would like to include in the scan."])
-	frame.helpText = helpText
-	
-	local btnWidth = floor((stContainer:GetWidth() - 10)/3)
-	local postBtn = TSMAPI.GUI:CreateButton(frame, 16)
-	postBtn:SetPoint("BOTTOMLEFT", 5, 5)
-	postBtn:SetHeight(20)
-	postBtn:SetWidth(btnWidth)
-	postBtn:SetText(L["Start Post Scan"])
-	postBtn:SetScript("OnClick", function()
-			private.mode = "Post"
-			private.specialMode = nil
-			GUI:StartScan(parent)
-		end)
-	frame.postBtn = postBtn
-	
-	local cancelBtn = TSMAPI.GUI:CreateButton(frame, 16)
-	cancelBtn:SetPoint("BOTTOMLEFT", postBtn, "BOTTOMRIGHT", 5, 0)
-	cancelBtn:SetHeight(20)
-	cancelBtn:SetWidth(btnWidth)
-	cancelBtn:SetText(L["Start Cancel Scan"])
-	cancelBtn:SetScript("OnClick", function()
-			private.mode = "Cancel"
-			private.specialMode = nil
-			GUI:StartScan(parent)
-		end)
-	frame.cancelBtn = cancelBtn
-	
-	local resetBtn = TSMAPI.GUI:CreateButton(frame, 16)
-	resetBtn:SetPoint("BOTTOMLEFT", cancelBtn, "BOTTOMRIGHT", 5, 0)
-	resetBtn:SetHeight(20)
-	resetBtn:SetWidth(btnWidth)
-	resetBtn:SetText(L["Start Reset Scan"])
-	resetBtn:SetScript("OnClick", function()
-			private.mode = "Reset"
-			private.specialMode = nil
-			GUI:StartScan(parent)
-		end)
-	frame.resetBtn = resetBtn
-	
-	local customScanFrame = CreateFrame("Frame", nil, frame)
-	customScanFrame:SetPoint("TOPLEFT", stContainer:GetWidth() + 10, 0)
-	customScanFrame:SetPoint("BOTTOMRIGHT")
-	TSMAPI.Design:SetFrameColor(customScanFrame)
-	private.customScanFrame = customScanFrame
-	
-	local title = TSMAPI.GUI:CreateLabel(customScanFrame)
-	title:SetPoint("TOP", 0, -2)
-	title:SetJustifyH("CENTER")
-	title:SetJustifyV("CENTER")
-	title:SetText(L["Other Auctioning Searches"])
-	customScanFrame.title = title
-	
-	TSMAPI.GUI:CreateHorizontalLine(customScanFrame, -20)
-	
-	local cancelAllBtn = TSMAPI.GUI:CreateButton(customScanFrame, 16)
-	cancelAllBtn:SetPoint("TOPLEFT", 4, -24)
-	cancelAllBtn:SetPoint("TOPRIGHT", -4, -24)
-	cancelAllBtn:SetHeight(20)
-	cancelAllBtn:SetText(L["Cancel All Auctions"])
-	cancelAllBtn:SetScript("OnClick", function()
-			private.mode = "Cancel"
-			private.specialMode = "CancelAll"
-			GUI:StartScan(parent)
-		end)
-	cancelAllBtn.tooltip = L["Will cancel all your auctions, including ones which you didn't post with Auctioning."]
-	customScanFrame.cancelAllBtn = cancelAllBtn
-	
-	TSMAPI.GUI:CreateHorizontalLine(customScanFrame, -48)
-	
-	local cancelFilterText = TSMAPI.GUI:CreateLabel(customScanFrame, "small")
-	cancelFilterText:SetPoint("TOPLEFT", 4, -52)
-	cancelFilterText:SetPoint("TOPRIGHT", -4, -52)
-	cancelFilterText:SetJustifyH("LEFT")
-	cancelFilterText:SetJustifyV("CENTER")
-	cancelFilterText:SetText(L["Cancel Filter:"])
-	customScanFrame.cancelFilterText = cancelFilterText
-	
-	local filterEditBox = TSMAPI.GUI:CreateInputBox(customScanFrame, "TSMAuctioningFilterSearchEditbox")
-	filterEditBox:SetPoint("TOPLEFT", 4, -72)
-	filterEditBox:SetPoint("TOPRIGHT", -4, -72)
-	filterEditBox:SetHeight(20)
-	customScanFrame.filterEditBox = filterEditBox
-	
-	local cancelFilterBtn = TSMAPI.GUI:CreateButton(customScanFrame, 16)
-	cancelFilterBtn:SetPoint("TOPLEFT", 4, -96)
-	cancelFilterBtn:SetPoint("TOPRIGHT", -4, -96)
-	cancelFilterBtn:SetHeight(20)
-	cancelFilterBtn:SetText("Cancel Items Matching Filter")
-	cancelFilterBtn:SetScript("OnClick", function()
-			local filter = filterEditBox:GetText():trim()
-			if filter == "" then return TSM:Print(L["The filter cannot be empty. If you'd like to cancel all auctions, use the 'Cancel All Auctions' button."]) end
-			private.mode = "Cancel"
-			private.specialMode = filterEditBox:GetText()
-			GUI:StartScan(parent)
-		end)
-	cancelFilterBtn.tooltip = L["Will cancel all your auctions which match the specified filter, including ones which you didn't post with Auctioning."]
-	customScanFrame.cancelFilterBtn = cancelFilterBtn
-	
-	TSMAPI.GUI:CreateHorizontalLine(customScanFrame, -120)
-	
-	local durationList = {}
-	local durationText = {L["Under 30min"], L["30min to 2hrs"], L["2 to 12 hrs"]}
-	for i=1, 3 do -- go up to long duration
-		durationList[i] = format("%s (%s)", _G["AUCTION_TIME_LEFT"..i], durationText[i])
-	end
-	local cancelDurationDropdown = TSMAPI.GUI:CreateDropdown(customScanFrame, durationList, L["Select a duration in this dropdown and click on the button below to cancel all auctions at or below this duration."])
-	cancelDurationDropdown:SetPoint("TOPLEFT", 2, -124)
-	cancelDurationDropdown:SetPoint("TOPRIGHT", 0, -124)
-	cancelDurationDropdown:SetHeight(20)
-	cancelDurationDropdown:SetLabel(L["Low Duration"])
-	cancelDurationDropdown:SetValue(1)
-	
-	local cancelDurationBtn = TSMAPI.GUI:CreateButton(customScanFrame, 16)
-	cancelDurationBtn:SetPoint("TOPLEFT", 4, -172)
-	cancelDurationBtn:SetPoint("TOPRIGHT", -4, -172)
-	cancelDurationBtn:SetHeight(20)
-	cancelDurationBtn:SetText(L["Cancel Low Duration"])
-	cancelDurationBtn:SetScript("OnClick", function()
-			private.mode = "Cancel"
-			private.specialMode = cancelDurationDropdown:GetValue()
-			GUI:StartScan(parent)
-		end)
-	cancelDurationBtn.tooltip = L["Will cancel all your auctions at or below the specified duration, including ones you didn't post with Auctioning."]
-	customScanFrame.cancelDurationBtn = cancelDurationBtn
-	
-	TSMAPI.GUI:CreateHorizontalLine(customScanFrame, -196)
-	
-	return frame
-end
-
-function GUI:CreateScanFrame(parent)
-	local frame = CreateFrame("Frame", nil, parent)
-	frame:SetAllPoints()
-	local contentFrame = CreateFrame("Frame", nil, frame)
-	contentFrame:SetAllPoints(parent.content)
-	TSMAPI.Design:SetFrameColor(contentFrame)
-	frame.content = contentFrame
-	
-	local statusBarFrame = CreateFrame("Frame", nil, frame.content)
-	statusBarFrame:SetPoint("TOPLEFT", frame.content, "BOTTOMLEFT", 165, -2)
-	statusBarFrame:SetWidth(355)
-	statusBarFrame:SetHeight(30)
-	private.statusBar = TSMAPI.GUI:CreateStatusBar(statusBarFrame, "TSMAuctioningStatusBar")
-	
-	private.buttons = private:CreateButtons(frame)
-	
-	private.contentButtons = private.contentButtons or private:CreateContentButtons(frame)
-	private.contentButtons:Show()
-	private.contentButtons:UpdateMode()
-	
-	private.infoText = private.infoText or private:CreateInfoText(frame)
-	private.infoText:Show()
-	
-	private.auctionsST = private:CreateAuctionsST(frame.content)
-	private.logST = private:CreateLogST(frame.content)
-	return frame
-end
-
-function GUI:StartScan(frame)
+function private:StartScan(frame, mode, options)
+	private.mode = mode
 	private.selectionFrame:Hide()
-	private.scanFrame = private.scanFrame or GUI:CreateScanFrame(frame)
+	private:CreateScanFrame(frame)
 	private.scanFrame:Show()
-	private.statusBar:Show()
-	private.buttons:Show()
-	private.buttons:UpdateMode()
-	private.buttons:Disable()
-	private.buttons.stop.isDone = nil
-	private.buttons.stop:SetText(L["Stop"])
-	private.contentButtons:Show()
-	private.contentButtons:UpdateMode()
-	private.infoText:Show()
-	private.contentButtons.logButton:Click()
-	private.auctionsST:SetData({})
-	private.logST:SetData({})
-	private.logST.cache = {}
-	
+	private.scanFrame.content.statusBar:Show()
+	private.scanFrame.actionButtonsFrame:Show()
+	GUI:SetButtonsEnabled(false)
+	private.scanFrame.actionButtonsFrame.stop:Show()
+	private.scanFrame.actionButtonsFrame.restart:Hide()
+	private.scanFrame.contentButtonsFrame:Show()
+	private.scanFrame.infoTextFrame:Show()
+	private.scanFrame.contentButtonsFrame.logButton:Click()
+	private.scanFrame.content.auctionsST:Clear()
+	private.scanFrame.content.logST:EnableSorting(true, 6) -- reset sorting
+	private.scanFrame.content.logST:SetData({})
+	private.scanFrame.content.logST.cache = {}
+	private:UpdateScanMode()
+
 	if private.mode == "Reset" then
-		private.buttons:Hide()
-		private.contentButtons:Hide()
-		private.auctionsST:Hide()
-		private.logST:Hide()
+		private.scanFrame.actionButtonsFrame:Hide()
+		private.scanFrame.contentButtonsFrame:Hide()
+		private.scanFrame.content.auctionsST:Hide()
+		private.scanFrame.content.logST:Hide()
 		TSM.Reset:Show(frame)
 	end
-	
-	
-	local options = {itemOperations={}}
-	if private.specialMode then
-		options.specialMode = private.specialMode
-	else
+
+	local isGroup = false
+	if not options then
+		-- it's a group scan
+		isGroup = true
+		options = {}
 		for groupName, data in pairs(private.selectionFrame.groupTree:GetSelectedGroupInfo()) do
-			groupName = TSMAPI:FormatGroupPath(groupName, true)
+			groupName = TSMAPI.Groups:FormatPath(groupName, true)
 			for _, opName in ipairs(data.operations) do
-				TSMAPI:UpdateOperation("Auctioning", opName)
+				TSMAPI.Operations:Update("Auctioning", opName)
 				local opSettings = TSM.operations[opName]
 				if not opSettings then
 					-- operation doesn't exist anymore in Auctioning
@@ -920,27 +968,179 @@ function GUI:StartScan(frame)
 					-- it's a valid operation
 					TSM.operationNameLookup[opSettings] = opName
 					for itemString in pairs(data.items) do
-						options.itemOperations[itemString] = options.itemOperations[itemString] or {}
-						tinsert(options.itemOperations[itemString], opSettings)
+						options[itemString] = options[itemString] or {}
+						tinsert(options[itemString], opSettings)
 					end
 				end
 			end
 		end
 	end
-	
-	TSMAPI:CreateTimeDelay("aucStartDelay", 0.1, function() TSM.Manage:StartScan(private, options) end)
+
+	TSM.Log:Clear()
+	TSM.Scan:Clear()
+	GUI:UpdateSTData()
+	TSMAPI.Delay:AfterTime(0, function() TSM.Manage:StartScan(options, private.mode, isGroup) end)
 end
+
+function private:DoCallback(...)
+	if private.scanThreadId then
+		TSMAPI.Threading:SendMsg(private.scanThreadId, {...}, true)
+	end
+end
+
+function private:DoCallbackAsync(...)
+	if private.scanThreadId then
+		TSMAPI.Threading:SendMsg(private.scanThreadId, {...})
+	end
+end
+
+
 
 function GUI:ShowSelectionFrame(frame)
 	if private.scanFrame then private.scanFrame:Hide() end
-	private.selectionFrame = private.selectionFrame or GUI:CreateSelectionFrame(frame)
+	private:CreateSelectionFrame(frame)
 	private.selectionFrame:Show()
-	TSMAPI.AuctionScan:StopScan()
 end
 
 function GUI:HideSelectionFrame()
 	private.selectionFrame:Hide()
 	if private.scanFrame then private.scanFrame:Hide() end
-	TSMAPI.AuctionScan:StopScan()
+	TSM.Manage:StopScan()
 	TSM.Reset:Hide()
+end
+
+function GUI:SetStatusBar(text, major, minor)
+	if text then
+		private.scanFrame.content.statusBar:SetStatusText(text)
+	end
+	if major or minor then
+		private.scanFrame.content.statusBar:UpdateStatus(major, minor)
+	end
+end
+
+function GUI:SetInfo(info)
+	if not info then return private:UpdateLogSTHighlight() end
+	private:UpdateAuctionsSTData()
+
+	if type(info) == "string" then
+		private.scanFrame.infoTextFrame.icon:Hide()
+		private.scanFrame.infoTextFrame.linkText:Hide()
+		private.scanFrame.infoTextFrame.stackText:Hide()
+		private.scanFrame.infoTextFrame.bidText:Hide()
+		private.scanFrame.infoTextFrame.buyoutText:Hide()
+		private.scanFrame.infoTextFrame.quantityText:Hide()
+		private.scanFrame.infoTextFrame.statusText:Show()
+
+		local status, _, gold, gold2 = ("\n"):split(info)
+		if gold then
+			private.scanFrame.infoTextFrame.goldText:Show()
+			private.scanFrame.infoTextFrame.goldText2:Show()
+			private.scanFrame.infoTextFrame.goldText:SetText(gold)
+			private.scanFrame.infoTextFrame.goldText2:SetText(gold2)
+		else
+			private.scanFrame.infoTextFrame.goldText:Hide()
+			private.scanFrame.infoTextFrame.goldText2:Hide()
+		end
+		private.scanFrame.infoTextFrame.statusText:SetText(status)
+	elseif info.isReset then
+		private.scanFrame.infoTextFrame.icon:Show()
+		private.scanFrame.infoTextFrame.linkText:Show()
+		private.scanFrame.infoTextFrame.stackText:Show()
+		private.scanFrame.infoTextFrame.bidText:Show()
+		private.scanFrame.infoTextFrame.buyoutText:Show()
+		private.scanFrame.infoTextFrame.statusText:Hide()
+		private.scanFrame.infoTextFrame.goldText:Hide()
+		private.scanFrame.infoTextFrame.goldText2:Hide()
+
+		local itemID = TSMAPI.Item:ToItemID(info.itemString)
+		local total = TSMAPI.Inventory:GetTotalQuantity(info.itemString)
+		private.scanFrame.infoTextFrame.quantityText:Show()
+		private.scanFrame.infoTextFrame.quantityText:SetText(TSMAPI.Design:GetInlineColor("link")..L["Currently Owned:"].."|r "..total)
+
+		local link = TSMAPI.Item:GetLink(info.itemString)
+		private.scanFrame.infoTextFrame.linkText:SetText(link)
+		if private.scanFrame.infoTextFrame.linkText:GetFontString():GetStringWidth() > 200 then
+			private.scanFrame.infoTextFrame.linkText:SetWidth(200)
+		else
+			private.scanFrame.infoTextFrame.linkText:SetWidth(private.scanFrame.infoTextFrame.linkText:GetFontString():GetStringWidth())
+		end
+		private.scanFrame.infoTextFrame.icon.link = link
+		private.scanFrame.infoTextFrame.icon:SetTexture(TSMAPI.Item:GetTexture(info.itemString))
+		private.scanFrame.infoTextFrame.stackText:SetText(format(L["%s item(s) to buy/cancel"], info.num..TSMAPI.Design:GetInlineColor("link")))
+		private.scanFrame.infoTextFrame.bidText:SetText(TSMAPI.Design:GetInlineColor("link")..L["Target Price:"].."|r "..TSMAPI:MoneyToString(info.targetPrice, "OPT_ICON"))
+		private.scanFrame.infoTextFrame.buyoutText:SetText(TSMAPI.Design:GetInlineColor("link")..L["Profit:"].."|r "..TSMAPI:MoneyToString(info.profit, "OPT_ICON"))
+	else
+		private.scanFrame.infoTextFrame.icon:Show()
+		private.scanFrame.infoTextFrame.linkText:Show()
+		private.scanFrame.infoTextFrame.stackText:Show()
+		private.scanFrame.infoTextFrame.bidText:Show()
+		private.scanFrame.infoTextFrame.buyoutText:Show()
+		private.scanFrame.infoTextFrame.statusText:Hide()
+		private.scanFrame.infoTextFrame.quantityText:Hide()
+		private.scanFrame.infoTextFrame.goldText:Hide()
+		private.scanFrame.infoTextFrame.goldText2:Hide()
+
+		local link = TSMAPI.Item:GetLink(info.itemString)
+		private.scanFrame.infoTextFrame.linkText:SetText(link)
+		if private.scanFrame.infoTextFrame.linkText:GetFontString():GetStringWidth() > 200 then
+			private.scanFrame.infoTextFrame.linkText:SetWidth(200)
+		else
+			private.scanFrame.infoTextFrame.linkText:SetWidth(private.scanFrame.infoTextFrame.linkText:GetFontString():GetStringWidth())
+		end
+		private.scanFrame.infoTextFrame.icon.link = link
+		private.scanFrame.infoTextFrame.icon:SetTexture(TSMAPI.Item:GetTexture(info.itemString))
+
+		local sText = format("%s "..TSMAPI.Design:GetInlineColor("link")..L["auctions of|r %s"], info.numStacks, info.stackSize)
+		private.scanFrame.infoTextFrame.stackText:SetText(sText)
+
+		private.scanFrame.infoTextFrame.bidText:SetText(TSMAPI.Design:GetInlineColor("link")..BID..":|r "..TSMAPI:MoneyToString(info.bid, "OPT_ICON"))
+		private.scanFrame.infoTextFrame.buyoutText:SetText(TSMAPI.Design:GetInlineColor("link")..BUYOUT..":|r "..TSMAPI:MoneyToString(info.buyout, "OPT_ICON"))
+
+		private.scanFrame.contentButtonsFrame.editPriceButton:Enable()
+		private.scanFrame.editPriceFrame.itemString = info.itemString
+		private.scanFrame.editPriceFrame.info = {itemString=info.itemString, link=link, buyout=info.buyout, operation=info.operation}
+
+		TSMAPI.Delay:AfterFrame(2, function() private:UpdateLogSTHighlight(TSM.Manage:GetCurrentItem()) end)
+	end
+end
+
+function GUI:SetButtonsEnabled(enabled)
+	if private.mode == "Post" then
+		private.scanFrame.actionButtonsFrame.post:SetDisabled(not enabled)
+	elseif private.mode == "Cancel" then
+		private.scanFrame.actionButtonsFrame.cancel:SetDisabled(not enabled)
+	end
+	private.scanFrame.actionButtonsFrame.skip:SetDisabled(not enabled)
+end
+
+function GUI:UpdateSTData()
+	private:UpdateLogSTData()
+	private:UpdateAuctionsSTData()
+end
+
+function GUI:Stopped(notDone)
+	if not private.scanFrame or not private.scanFrame.actionButtonsFrame then return end
+	GUI:SetButtonsEnabled(false)
+	private.scanFrame.content.statusBar:UpdateStatus(100, 100)
+	private.scanFrame.contentButtonsFrame.currAuctionsButton:Hide()
+
+	if private.mode == "Post" then
+		TSMAPI.Delay:AfterTime(0.5, private.SetGoldText)
+		private.SetGoldText()
+		private.scanFrame.content.statusBar:SetStatusText(L["Post Scan Finished"])
+	elseif private.mode == "Cancel" then
+		GUI:SetInfo(L["Done Canceling"])
+		private.scanFrame.content.statusBar:SetStatusText(L["Cancel Scan Finished"])
+	elseif private.mode == "Reset" then
+		if not notDone then
+			GUI:SetInfo(L["No Items to Reset"])
+		end
+		private.scanFrame.content.statusBar:SetStatusText(L["Reset Scan Finished"])
+	end
+	private.scanFrame.actionButtonsFrame.stop:Hide()
+	private.scanFrame.actionButtonsFrame.restart:Show()
+end
+
+function GUI:SetScanThreadId(threadId)
+	private.scanThreadId = threadId
 end

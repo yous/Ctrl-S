@@ -1,15 +1,22 @@
 --[[
     This file is part of Decursive.
-    
-    Decursive (v 2.7.3.6) add-on for World of Warcraft UI
-    Copyright (C) 2006-2014 John Wellesz (archarodim AT teaser.fr) ( http://www.2072productions.com/to/decursive.php )
 
-    Starting from 2009-10-31 and until said otherwise by its author, Decursive
-    is no longer free software, all rights are reserved to its author (John Wellesz).
+    Decursive (v 2.7.8) add-on for World of Warcraft UI
+    Copyright (C) 2006-2019 John Wellesz (Decursive AT 2072productions.com) ( http://www.2072productions.com/to/decursive.php )
 
-    The only official and allowed distribution means are www.2072productions.com, www.wowace.com and curse.com.
-    To distribute Decursive through other means a special authorization is required.
-    
+    Decursive is free software: you can redistribute it and/or modify
+    it under the terms of the GNU General Public License as published by
+    the Free Software Foundation, either version 3 of the License, or
+    (at your option) any later version.
+
+    Decursive is distributed in the hope that it will be useful,
+    but WITHOUT ANY WARRANTY; without even the implied warranty of
+    MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+    GNU General Public License for more details.
+
+    You should have received a copy of the GNU General Public License
+    along with Decursive.  If not, see <https://www.gnu.org/licenses/>.
+
 
     Decursive is inspired from the original "Decursive v1.9.4" by Patrick Bohnet (Quu).
     The original "Decursive 1.9.4" is in public domain ( www.quutar.com )
@@ -17,8 +24,8 @@
     Decursive is distributed in the hope that it will be useful,
     but WITHOUT ANY WARRANTY.
 
-    
-    This file was last updated on 2014-10-29T09:50:45Z
+
+    This file was last updated on 2020-03-19T23:14:08Z
 --]]
 -------------------------------------------------------------------------------
 
@@ -57,6 +64,27 @@ local L     = D.L;
 local LC    = D.LC;
 local DC    = T._C;
 
+local _G                = _G;
+local setmetatable      = _G.setmetatable;
+local unpack            = _G.unpack;
+local select            = _G.select;
+local pairs             = _G.pairs;
+local ipairs            = _G.ipairs;
+local bit               = _G.bit;
+local GetTime           = _G.GetTime;
+local IsControlKeyDown  = _G.IsControlKeyDown;
+local IsAltKeyDown      = _G.IsAltKeyDown;
+local IsShiftKeyDown    = _G.IsShiftKeyDown;
+local floor             = _G.math.floor;
+local table             = _G.table;
+local t_insert          = _G.table.insert;
+local UnitExists        = _G.UnitExists;
+local UnitClass         = _G.UnitClass;
+local fmod              = _G.math.fmod;
+local UnitIsUnit        = _G.UnitIsUnit;
+local InCombatLockdown  = _G.InCombatLockdown;
+local GetRaidTargetIndex= _G.GetRaidTargetIndex;
+local CreateFrame       = _G.CreateFrame;
 
 -- NS def
 D.MicroUnitF = {};
@@ -72,10 +100,6 @@ function MicroUnitF:new(...)
 end
 
 
-
--- since there are tens of thousands of globals defined at all times, lets use some locals!
-local BOOKTYPE_PET      = BOOKTYPE_PET;
-local BOOKTYPE_SPELL    = BOOKTYPE_SPELL;
 
 -- Init object factory defaults
 --MicroUnitF.ExistingPerID          = {};
@@ -103,44 +127,29 @@ local EMPTY_TABLE           = DC.EMPTY_TABLE;
 -- Those are the different colors used for the MUFs main texture
 local MF_colors = { };
 
-local _G                = _G;
-local unpack            = _G.unpack;
-local select            = _G.select;
-local pairs             = _G.pairs;
-local ipairs            = _G.ipairs;
-local bit               = _G.bit;
-local GetTime           = _G.GetTime;
-local IsControlKeyDown  = _G.IsControlKeyDown;
-local floor             = _G.math.floor;
-local table             = _G.table;
-local t_insert          = _G.table.insert;
-local str_format        = _G.string.format;
-local table             = _G.table;
-local string            = _G.string;
-local UnitExists        = _G.UnitExists;
-local UnitClass         = _G.UnitClass;
-local fmod              = _G.math.fmod;
-local UnitIsUnit        = _G.UnitIsUnit;
-local str_upper         = _G.string.upper;
-local InCombatLockdown  = _G.InCombatLockdown;
-local GetRaidTargetIndex= _G.GetRaidTargetIndex;
-local CreateFrame       = _G.CreateFrame;
 
 
 DC.MouseButtonsReadable = { -- {{{
-    ["*%s1"]         =   L["HLP_LEFTCLICK"], -- left mouse button
-    ["*%s2"]         =   L["HLP_RIGHTCLICK"], -- right mouse button
-    ["*%s3"]         =   L["HLP_MIDDLECLICK"], -- middle mouse button
+    ["*%s1"]        =   L["HLP_LEFTCLICK"],   -- left mouse button
+    ["*%s2"]        =   L["HLP_RIGHTCLICK"],  -- right mouse button
+    ["*%s3"]        =   L["HLP_MIDDLECLICK"], -- middle mouse button
+    ["*%s4"]        =   L["HLP_MOUSE4"],      -- 4th mouse button
+    ["*%s5"]        =   L["HLP_MOUSE5"],      -- 5th mouse button
     ["ctrl-%s1"]    =   L["CTRL"]  .. "-" .. L["HLP_LEFTCLICK"],
     ["ctrl-%s2"]    =   L["CTRL"]  .. "-" .. L["HLP_RIGHTCLICK"],
     ["ctrl-%s3"]    =   L["CTRL"]  .. "-" .. L["HLP_MIDDLECLICK"],
+    ["ctrl-%s4"]    =   L["CTRL"]  .. "-" .. L["HLP_MOUSE4"],
+    ["ctrl-%s5"]    =   L["CTRL"]  .. "-" .. L["HLP_MOUSE5"],
     ["shift-%s1"]   =   L["SHIFT"] .. "-" .. L["HLP_LEFTCLICK"],
     ["shift-%s2"]   =   L["SHIFT"] .. "-" .. L["HLP_RIGHTCLICK"],
     ["shift-%s3"]   =   L["SHIFT"] .. "-" .. L["HLP_MIDDLECLICK"],
+    ["shift-%s4"]   =   L["SHIFT"] .. "-" .. L["HLP_MOUSE4"],
+    ["shift-%s5"]   =   L["SHIFT"] .. "-" .. L["HLP_MOUSE5"],
     ["alt-%s1"]     =   L["ALT"]   .. "-" .. L["HLP_LEFTCLICK"],
     ["alt-%s2"]     =   L["ALT"]   .. "-" .. L["HLP_RIGHTCLICK"],
     ["alt-%s3"]     =   L["ALT"]   .. "-" .. L["HLP_MIDDLECLICK"],
-    -- 3, -- middle mouse button || RESERVED FOR TARGETTING
+    ["alt-%s4"]     =   L["ALT"]   .. "-" .. L["HLP_MOUSE4"],
+    ["alt-%s5"]     =   L["ALT"]   .. "-" .. L["HLP_MOUSE5"],
 }; -- }}}
 
 -- modifier for the macro
@@ -205,9 +214,8 @@ function MicroUnitF:Create(Unit, ID) -- {{{
         return false;
     end
 
-    -- if we attempt to create a MUF that already exists, update it instead
-    if (self.ExistingPerUNIT[Unit]) then
-        return self.ExistingPerUNIT[Unit];
+    if self.ExistingPerUNIT[Unit] then
+        return false;
     end
 
 
@@ -258,6 +266,7 @@ function MicroUnitF:ResetAllPositions () -- {{{
         end
 
         self:Place();
+        return true;
 
     end, 0.5);
 
@@ -379,7 +388,7 @@ function MicroUnitF:MFsDisplay_Update () -- {{{
                 --D:Debug("|cFF88AA00Show schedule for MUF", Unit, "UnitShown:", self.UnitShown);
             end
         else
-            --D:errln("showhide: no muf for", Unit); -- call delay display up 
+            --D:errln("showhide: no muf for", Unit); -- call delay display up
             self:Delayed_MFsDisplay_Update ();
         end
 
@@ -456,11 +465,14 @@ function MicroUnitF:Force_FullUpdate () -- {{{
         --end
 
         MF.CenterFontString:SetTextColor(unpack(MF_colors["COLORCHRONOS"]));
-        MF.InnerTexture:SetTexture(unpack(MF_colors[CHARMED_STATUS]));
+
+        MF.InnerTexture:SetColorTexture(unpack(MF_colors[CHARMED_STATUS]));
 
         D:ScheduleDelayedCall("Dcr_Update"..MF.CurrUnit, MF.UpdateWithCS, D.profile.DebuffsFrameRefreshRate * (0.9 + i / D.profile.DebuffsFramePerUPdate), MF);
         i = i + 1;
     end
+
+    return true
 end -- }}}
 
 
@@ -505,7 +517,7 @@ do
             D:AddDelayedFunctionCall (
             "MicroUnitFPlace", self.Place,
             self);
-            return;
+            return false;
         end
 
         local UIParent = UIParent;
@@ -520,8 +532,6 @@ do
         local current_x, current_y = self.Frame:GetRect();
         current_x = current_x * FrameScale;
         current_y = current_y * FrameScale;
-
-        --D:Debug("xDelta=", current_x - saved_x, "yDelta=", current_y - saved_y); -- XXX will crash
 
         -- If executed for the very first time, then put it in the top right corner of the screen
         if (not saved_x or not saved_y) then
@@ -592,7 +602,7 @@ do
             end
         end
 
-        -- y 
+        -- y
         if y_out_arrays[1] then
             if y_out_arrays[1] < 0 then
                 Handle_y_offset = -  y_out_arrays[1];
@@ -625,6 +635,8 @@ do
             D:Debug("|cff00ff00Handle moved|r");
 
         end
+
+        return true
 
 
     end -- }}}
@@ -722,11 +734,15 @@ end
 do
     local UnitGUID = _G.UnitGUID;
     local GetSpellInfo = _G.GetSpellInfo;
-    local TooltipButtonsInfo = {}; -- help tooltip text table
+    local ttHelpLines = {}; -- help tooltip text
     local TooltipUpdate = 0; -- help tooltip change update check
-    local DcrDisplay_Tooltip = _G.DcrDisplay_Tooltip;
-    local GameTooltip_SetDefaultAnchor = _G.GameTooltip_SetDefaultAnchor;
-    local GameTooltip = _G.GameTooltip;
+
+    T._CatchAllErrors = 'LibQTip';
+    local LibQTip = LibStub('LibQTip-1.0');
+    T._CatchAllErrors = false;
+
+    local MUFtoolTip = nil;
+
     -- This function is responsible for showing the tooltip when the mouse pointer is over a MUF
     -- it also handles Unstable Affliction detection and warning.
     function MicroUnitF:OnEnter(frame) -- {{{
@@ -756,7 +772,7 @@ do
         MF:SetClassBorder(); -- set the border if it wasn't possible at the time the unit was discovered
 
         if not Unit then
-            return; -- If the user overs the MUF befor it's completely initialized
+            return; -- If the user overs the MUF before it's completely initialized
         end
 
         --Test for unstable affliction like spells
@@ -778,19 +794,23 @@ do
         end
 
         if D.profile.AfflictionTooltips then
+            MUFtoolTip = LibQTip:Acquire("DecursiveMUFToolTip", 1, "LEFT");
+            MUFtoolTip:SetAutoHideDelay(.3, frame, function() MUFtoolTip = nil end)
+            MUFtoolTip:Clear()
 
             -- removes the CHARMED_STATUS bit from Status, we don't need it
             Status = bit.band(MF.UnitStatus,  bit.bnot(CHARMED_STATUS));
 
             -- First, write the name of the unit in its class color
             if UnitExists(MF.CurrUnit) then
-                TooltipText =
-                ((DC.RAID_ICON_LIST[GetRaidTargetIndex(Unit)]) and (DC.RAID_ICON_LIST[GetRaidTargetIndex(Unit)] .. "0:0:0:0|t ") or ""  ) ..
+            MUFtoolTip:AddLine(
+                ((DC.RAID_ICON_LIST[GetRaidTargetIndex(Unit)]) and (DC.RAID_ICON_LIST[GetRaidTargetIndex(Unit)] .. "0:0:0:0|t ") or "")
                 -- Colored unit name
-                D:ColorText(            (D:PetUnitName(       Unit, true    ))
-                , "FF" .. ((UnitClass(Unit)) and DC.HexClassColor[ (select(2, UnitClass(Unit))) ] or "AAAAAA")) .. "  |cFF3F3F3F(".. Unit .. ")|r";
+                .. D:ColorTextNA((D:PetUnitName(Unit, true)), ((UnitClass(Unit)) and DC.HexClassColor[ (select(2, UnitClass(Unit))) ] or "AAAAAA"))
+                .. "  |cFF3F3F3F(".. Unit .. ")|r"
+                );
             else
-                TooltipText = MF.CurrUnit;
+                MUFtoolTip:AddLine(MF.CurrUnit);
             end
 
 
@@ -802,7 +822,7 @@ do
                 StatusText = L["NORMAL"];
 
             elseif Status == ABSENT then
-                StatusText = str_format(L["ABSENT"], Unit);
+                StatusText = L["ABSENT"]:format(Unit);
 
             elseif Status == FAR then
                 StatusText = L["TOOFAR"];
@@ -812,98 +832,97 @@ do
 
             elseif MF.Debuffs[1] and (Status == AFFLICTED or Status == AFFLICTED_NIR) then
                 local DebuffType = MF.Debuffs[1].Type;
-                StatusText = str_format(L["AFFLICTEDBY"], D:ColorText( L[str_upper(DC.TypeNames[DebuffType])], "FF" .. DC.TypeColors[DebuffType]) );
+                StatusText = L["AFFLICTEDBY"]:format(D:ColorTextNA( L[DC.TypeNames[DebuffType]:upper()], D.profile.TypeColors[DebuffType]) );
 
             elseif Status == STEALTHED then
                 StatusText = L["STEALTHED"];
             end
 
             -- Unit Status
-            TooltipText = TooltipText .. "\n" .. StatusText;
+            MUFtoolTip:AddLine(StatusText);
 
             -- list the debuff(s) names
             if MF.Debuffs[1] then
                 for i, Debuff in ipairs(MF.Debuffs) do
                     if Debuff.Type then
                         local DebuffApps = Debuff.Applications;
-                        TooltipText = TooltipText .. "\n" .. str_format("%s", D:ColorText(Debuff.Name, "FF" .. DC.TypeColors[Debuff.Type])) .. (DebuffApps>0 and str_format(" (%d)", DebuffApps) or "");
+                        MUFtoolTip:AddLine(D:ColorTextNA(Debuff.Name, D.profile.TypeColors[Debuff.Type]) .. (DebuffApps > 0 and (" (%d)"):format(DebuffApps) or ""));
                     end
                 end
             end
 
             -- Display the tooltip
-            D:DisplayTooltip(TooltipText, self.Frame, "ANCHOR_TOPLEFT");
-
-            DcrDisplay_Tooltip:ClearAllPoints();
-            DcrDisplay_Tooltip:SetPoint(self:GetHelperAnchor());
+            MUFtoolTip:ClearAllPoints();
+            MUFtoolTip:SetClampedToScreen(true)
+            MUFtoolTip:SetPoint(self:GetHelperAnchor());
+            MUFtoolTip:Show();
 
             -- if the tooltip is at the top of the screen it means it's overlaping the MUF, let's move the tooltip beneath the first MUF.
-            if floor(DcrDisplay_Tooltip:GetTop() + 0.5) == floor(UIParent:GetTop() + 0.5) then -- if at top
-                DcrDisplay_Tooltip:ClearAllPoints();
-                DcrDisplay_Tooltip:SetPoint(self:GetHelperAnchor(true));
+            if floor(MUFtoolTip:GetTop() + 0.5) >= floor(UIParent:GetTop() + 0.5) then -- if at top -- XXX attempt to perform arithmetic on a nil value, reported on 2018-08-16 and 2020-01-29
+                MUFtoolTip:ClearAllPoints();
+                MUFtoolTip:SetPoint(self:GetHelperAnchor(true));
             end
         end
 
         -- show a help text in the Game default tooltip
         if D.profile.DebuffsFrameShowHelp then
             -- if necessary we will update the help tooltip text
-            if (D.Status.SpellsChanged ~= TooltipUpdate) then
-                TooltipButtonsInfo = {};
+            if (D.Status.SpellsChanged ~= TooltipUpdate and not D.Status.Combat) then
+                ttHelpLines = {};
                 local MouseButtons = D.db.global.MouseButtons;
 
                 for Spell, Prio in pairs(D.Status.CuringSpellsPrio) do
-                    TooltipButtonsInfo[Prio] =
-                    str_format("%s: %s%s", D:ColorText(DC.MouseButtonsReadable[MouseButtons[Prio]], D:NumToHexColor(MF_colors[Prio])), (GetSpellInfo(Spell)) or Spell, (D.Status.FoundSpells[Spell] and D.Status.FoundSpells[Spell][5]) and "|cFFFF0000*|r" or "");
+                    ttHelpLines[Prio] = {[D:ColorText(DC.MouseButtonsReadable[MouseButtons[Prio]], D:NumToHexColor(MF_colors[Prio]))] =
+
+                    ("%s%s"):format((GetSpellInfo(Spell)) or Spell, (D.Status.FoundSpells[Spell] and D.Status.FoundSpells[Spell][5]) and "|cFFFF0000*|r" or "")}
                 end
 
-                t_insert(TooltipButtonsInfo, str_format("%s: %s", DC.MouseButtonsReadable[MouseButtons[#MouseButtons - 1]], L["TARGETUNIT"]));
-                t_insert(TooltipButtonsInfo, str_format("%s: %s", DC.MouseButtonsReadable[MouseButtons[#MouseButtons    ]], L["FOCUSUNIT"]));
-                TooltipButtonsInfo = table.concat(TooltipButtonsInfo, "\n");
+                t_insert(ttHelpLines, {[DC.MouseButtonsReadable[MouseButtons[#MouseButtons - 1]]] = ("%s"):format(L["TARGETUNIT"])});
+                t_insert(ttHelpLines, {[DC.MouseButtonsReadable[MouseButtons[#MouseButtons    ]]] = ("%s"):format(L["FOCUSUNIT"])});
+
                 TooltipUpdate = D.Status.SpellsChanged;
             end
 
-            GameTooltip_SetDefaultAnchor(GameTooltip, frame);
-            GameTooltip:SetText(TooltipButtonsInfo);
-            GameTooltip:Show();
-
+            D:DisplayLQTGameTooltip(ttHelpLines, frame)
         end
 
     end -- }}}
 
-    function MicroUnitF:OnLeave() -- {{{
+    function MicroUnitF:OnLeave(frame) -- {{{
         D.Status.MouseOveringMUF = false;
-        --D:Debug("Micro unit Hidden");
-        DcrDisplay_Tooltip:Hide();
-
-        if (D.profile.DebuffsFrameShowHelp) then
-            GameTooltip:Hide();
-        end
     end -- }}}
-end
 
+    local keyTemplate = "|cFF11FF11%s|r-|cFF11FF11%s|r";
 
-function D.MicroUnitF:OnCornerEnter(frame)
-    if (D.profile.DebuffsFrameShowHelp) then
-        D:DisplayGameTooltip(frame,
-        str_format(
-        "|cFF11FF11%s|r-|cFF11FF11%s|r: %s\n\n"..
-        --"|cFF11FF11%s|r: %s\n"..
-        "|cFF11FF11%s|r-|cFF11FF11%s|r: %s\n\n"..
-        "|cFF11FF11%s|r-|cFF11FF11%s|r: %s\n"..
-        "|cFF11FF11%s|r-|cFF11FF11%s|r: %s\n\n"..
-        "|cFF11FF11%s|r-|cFF11FF11%s|r: %s",
+    local keyHelp;
 
-        D.L["ALT"],             D.L["HLP_LEFTCLICK"],   D.L["HANDLEHELP"],
+    function D.MicroUnitF:OnCornerLeave(frame)
+    end
 
-        --D.L["HLP_RIGHTCLICK"],  D.L["STR_OPTIONS"],
-        D.L["ALT"],             D.L["HLP_RIGHTCLICK"],  D.L["BINDING_NAME_DCRSHOWOPTION"],
+    function D.MicroUnitF:OnCornerEnter(frame)
 
-        D.L["CTRL"],            D.L["HLP_LEFTCLICK"],   D.L["BINDING_NAME_DCRPRSHOW"], 
-        D.L["SHIFT"],           D.L["HLP_LEFTCLICK"],   D.L["BINDING_NAME_DCRSKSHOW"],
+        if MUFtoolTip then
+            MUFtoolTip:Release();
+            MUFtoolTip = nil;
+        end
 
-        D.L["SHIFT"],           D.L["HLP_RIGHTCLICK"],  D.L["BINDING_NAME_DCRSHOW"]
-        ));
-    end;
+        if not keyHelp then
+            keyHelp = {
+                {[keyTemplate:format(D.L["ALT"],   D.L["HLP_LEFTCLICK"]) ] = D.L["HANDLEHELP"]},
+                {[-1] =  -1},
+                {[keyTemplate:format(D.L["ALT"],   D.L["HLP_RIGHTCLICK"])] = D.L["BINDING_NAME_DCRSHOWOPTION"]},
+                {[-1] =  -1},
+                {[keyTemplate:format(D.L["CTRL"],  D.L["HLP_LEFTCLICK"]) ] = D.L["BINDING_NAME_DCRPRSHOW"] },
+                {[keyTemplate:format(D.L["SHIFT"], D.L["HLP_LEFTCLICK"]) ] = D.L["BINDING_NAME_DCRSKSHOW"] },
+                {[-1] =  -1},
+                {[keyTemplate:format(D.L["SHIFT"], D.L["HLP_RIGHTCLICK"])] = D.L["BINDING_NAME_DCRSHOW"] },
+            }
+        end
+
+        if D.profile.DebuffsFrameShowHelp then
+            D:DisplayLQTGameTooltip(keyHelp, frame);
+        end;
+    end
 end
 
 
@@ -916,39 +935,44 @@ end
 function MicroUnitF.OnPreClick(frame, Button) -- {{{
     D:Debug("Micro unit Preclicked: ", Button);
 
-    local Unit = frame.Object.CurrUnit; -- shortcut
+    local RequestedPrio;
+    local ButtonsString = "";
+    local modifier;
 
-    if (frame.Object.UnitStatus == NORMAL and (Button == "LeftButton" or Button == "RightButton")) then
+    if IsControlKeyDown() then
+        modifier = "ctrl-";
+    elseif IsAltKeyDown() then
+        modifier = "alt-";
+    elseif IsShiftKeyDown() then
+        modifier = "shift-";
+    end
+
+    if Button == "LeftButton" then
+        ButtonsString = "*%s1";
+    elseif Button == "RightButton" then
+        ButtonsString = "*%s2";
+    elseif Button == "MiddleButton" then
+        ButtonsString = "*%s3";
+    elseif Button == "Button4" then
+        ButtonsString = "*%s4";
+    elseif Button == "Button5" then
+        ButtonsString = "*%s5";
+    else
+        D:Debug("unknown button", Button);
+        return;
+    end
+
+    RequestedPrio = D:tGiveValueIndex(D.db.global.MouseButtons, modifier and (modifier .. ButtonsString:sub(-3)) or ButtonsString);
+
+    D:Debug("RequestedPrio:", RequestedPrio);
+    if frame.Object.UnitStatus == NORMAL and D:tcheckforval(D.Status.CuringSpellsPrio, RequestedPrio) then
 
         D:Println(L["HLP_NOTHINGTOCURE"]);
 
     elseif (frame.Object.UnitStatus == AFFLICTED and frame.Object.Debuffs[1]) then
         local NeededPrio = D:GiveSpellPrioNum(frame.Object.Debuffs[1].Type);
-        local RequestedPrio;
-        local ButtonsString = "";
-        local modifier;
+        local Unit = frame.Object.CurrUnit; -- shortcut
 
-        if IsControlKeyDown() then
-            modifier = "ctrl-";
-        elseif IsAltKeyDown() then
-            modifier = "alt-";
-        elseif IsShiftKeyDown() then
-            modifier = "shift-";
-        end
-
-        if Button == "LeftButton" then
-            ButtonsString = "*%s1";
-        elseif Button == "RightButton" then
-            ButtonsString = "*%s2";
-        elseif Button == "MiddleButton" then
-            ButtonsString = "*%s3";
-        else
-            D:Debug("unknown button");
-            return;
-        end
-
-        RequestedPrio = D:tGiveValueIndex(D.db.global.MouseButtons, modifier and (modifier .. ButtonsString:sub(-3)) or ButtonsString);
-        D:Debug("RequestedPrio:", RequestedPrio);
 
         -- there is no spell for the requested prio ? (no spell registered to this modifier+mousebutton)
         if modifier and RequestedPrio and not D:tcheckforval(D.Status.CuringSpellsPrio, RequestedPrio) then
@@ -973,10 +997,10 @@ function MicroUnitF.OnPreClick(frame, Button) -- {{{
             D:errln(L["HLP_WRONGMBUTTON"]);
             if NeededPrio and MF_colors[NeededPrio] then
                 D:Println(L["HLP_USEXBUTTONTOCURE"], D:ColorText(DC.MouseButtonsReadable[ D.db.global.MouseButtons[NeededPrio] ], D:NumToHexColor(MF_colors[NeededPrio])));
-                --[===[@debug@
+                --[==[@debug@
             else
                 D:AddDebugText("Button wrong click info bug: NeededPrio:", NeededPrio, "Unit:", Unit, "RequestedPrio:", RequestedPrio, "Button clicked:", Button, "MF_colors:", unpack(MF_colors), "Debuff Type:", frame.Object.Debuffs[1].Type);
-                --@end-debug@]===]
+                --@end-debug@]==]
             end
         elseif RequestedPrio and D.Status.HasSpell then
             D.Status.ClickCastingWIP = true;
@@ -985,8 +1009,8 @@ function MicroUnitF.OnPreClick(frame, Button) -- {{{
             D.Status.ClickedMF.SPELL_CAST_SUCCESS = false;
             local spell = D.Status.CuringSpells[frame.Object.Debuffs[1].Type];
 
-            D.Status.ClickedMF.CastingSpell = "notyet" -- (GetSpellInfo(spell)); -- store the spell name but without its rank
-            D:Debuff_History_Add(frame.Object.Debuffs[1].Name, frame.Object.Debuffs[1].TypeName);
+            D.Status.ClickedMF.CastingSpell = "notyet";
+            D:Debuff_History_Add(frame.Object.Debuffs[1].Name, frame.Object.Debuffs[1].TypeName, frame.Object.Debuffs[1].SpellID);
         end
     end
 end -- }}}
@@ -1086,7 +1110,7 @@ function MicroUnitF.prototype:init(Container, Unit, FrameNum, ID) -- {{{
     self.InnerTexture:SetPoint("TOPRIGHT",self.Frame ,"TOPRIGHT",0,0);
     self.InnerTexture:SetHeight(7 - petminus);
     self.InnerTexture:SetWidth(7 - petminus);
-    self.InnerTexture:SetTexture(unpack(MF_colors[CHARMED_STATUS]));
+    self.InnerTexture:SetColorTexture(unpack(MF_colors[CHARMED_STATUS]));
 
     -- CenterText Font string
     self.CenterFontString = self.Frame:CreateFontString(nil, "ARTWORK", "DcrMicroUnitChronoFont");
@@ -1133,9 +1157,9 @@ function MicroUnitF.prototype:Update(SkipSetColor, SkipDebuffs, CheckStealth)
         end
         -- if the guid changed we really need to rescan the unit!
         SkipSetColor = false; SkipDebuffs = false; CheckStealth = true;
-        --[===[@debug@
+        --[==[@debug@
         D:Debug("|cFF00CC00MUF:Update(): Guid change rescanning", Unit, "|r");
-        --@end-debug@]===]
+        --@end-debug@]==]
     end
 
     -- Update the frame attributes if necessary (Spells priority or unit id changes)
@@ -1260,6 +1284,18 @@ do
             self.Frame:SetAttribute("ctrl-type3", "macro");
             self.Frame:SetAttribute("alt-type3", "macro");
             self.Frame:SetAttribute("shift-type3", "macro");
+
+            -- set the mouse 4th-button actions on all modifiers
+            self.Frame:SetAttribute("*type4", "macro");
+            self.Frame:SetAttribute("ctrl-type4", "macro");
+            self.Frame:SetAttribute("alt-type4", "macro");
+            self.Frame:SetAttribute("shift-type4", "macro");
+
+            -- set the mouse 4th-button actions on all modifiers
+            self.Frame:SetAttribute("*type5", "macro");
+            self.Frame:SetAttribute("ctrl-type5", "macro");
+            self.Frame:SetAttribute("alt-type5", "macro");
+            self.Frame:SetAttribute("shift-type5", "macro");
         end
 
         local MouseButtons = D.db.global.MouseButtons;
@@ -1275,8 +1311,9 @@ do
                 if not D.UnitFilteringTest (Unit, D.Status.FoundSpells[Spell][6]) then
                     --the [target=%s, help][target=%s, harm] prevents the 'please select a unit' cursor problem (Blizzard should fix this...)
                     -- -- XXX this trick may cause issues or confusion when for some reason the unit is invalid, nothing will happen when clicking
-                    self:SetUnstableAttribute(MouseButtons[Prio]:format("macrotext"), ("%s/cast [@%s, help][@%s, harm] %s"):format(
-                    ((not D.Status.FoundSpells[Spell][1]) and "/stopcasting\n" or ""),
+                    self:SetUnstableAttribute(MouseButtons[Prio]:format("macrotext"), ("%s/%s [@%s, help][@%s, harm] %s"):format(
+                    not D.Status.FoundSpells[Spell][1] and "/stopcasting\n" or "", -- pet test
+                    D.Status.FoundSpells[Spell][2] > 0 and "cast" or "use", -- item test
                     Unit,Unit,
                     Spell));
                 end
@@ -1336,6 +1373,8 @@ do
 
     -- global access optimization
     local IsSpellInRange    = D.IsSpellInRange;
+    local IsItemInRange     = _G.IsItemInRange;
+    local IsUsableItem      = _G.IsUsableItem;
     local UnitClass         = _G.UnitClass;
     local UnitExists        = _G.UnitExists;
     local UnitIsVisible     = _G.UnitIsVisible;
@@ -1345,11 +1384,13 @@ do
     local GetTime           = _G.GetTime;
     local floor             = _G.math.floor;
     local fmod              = _G.math.fmod;
-    local CooldownFrame_SetTimer = _G.CooldownFrame_SetTimer;
-    local GetSpellCooldown = _G.GetSpellCooldown;
+    local CooldownFrame_Set = _G.CooldownFrame_Set;
+    local GetSpellCooldown  = _G.GetSpellCooldown;
+    local GetItemCooldown   = _G.GetItemCooldown;
     local GetRaidTargetIndex= _G.GetRaidTargetIndex;
-    local bor = _G.bit.bor;
-    local band = _G.bit.band;
+    local bor               = _G.bit.bor;
+    local band              = _G.bit.band;
+    local SpellID;
 
     function MicroUnitF.prototype:SetColor() -- {{{
 
@@ -1425,12 +1466,14 @@ do
                     PrioChanged = true;
                 end
 
+                SpellID = Status.FoundSpells[Status.CuringSpells[DebuffType]][2];
+
                 -- Test if the spell we are going to use is in range
                 -- Some time can elaps between the instant the debuff is detected and the instant it is shown.
                 -- Between those instants, a reconfiguration can happen (pet dies or some spells become unavailable)
                 -- So we test before calling this api that we can still cure this debuff type
                 if Status.CuringSpells[DebuffType] then
-                    RangeStatus = IsSpellInRange(Status.CuringSpells[DebuffType], Unit);
+                    RangeStatus = SpellID > 0 and IsSpellInRange(Status.CuringSpells[DebuffType], Unit) or D:isItemUsable(-1 * SpellID) and IsItemInRange(-1 * SpellID, Unit);
                 else
                     RangeStatus = false;
                 end
@@ -1438,7 +1481,11 @@ do
                 Time = GetTime();
 
                 if RangeStatus and self.UpdateCD < Status.UpdateCooldown then
-                    CooldownFrame_SetTimer (self.CooldownFrame, GetSpellCooldown(Status.CuringSpells[DebuffType]) );
+                    if SpellID > 0 then
+                        CooldownFrame_Set (self.CooldownFrame, GetSpellCooldown(Status.CuringSpells[DebuffType]));
+                    else
+                        CooldownFrame_Set (self.CooldownFrame, GetItemCooldown(-1 * SpellID));
+                    end
                     self.UpdateCD = Time;
                 end
 
@@ -1571,21 +1618,27 @@ do
                     Status.SoundPlayed = false;
                 end
             end
-            
+
             if band(self.UnitStatus, AFFLICTED)~=0 then
                 MicroUnitF.UnitsDebuffedInRange =  MicroUnitF.UnitsDebuffedInRange + 1;
                 D:Debug("SetColor(): UnitsDebuffedInRange INCREASED:",  MicroUnitF.UnitsDebuffedInRange);
 
                 if not Status.SoundPlayed then
-                    D:PlaySound (self.CurrUnit, "SetColor()" .. MicroUnitF.UnitsDebuffedInRange );
+                    D:PlaySound (self.CurrUnit, "SetColor()");
                 end
             end
 
             if PrioChanged then PrioChanged = false; end
 
+            --[==[@debug@
+            D:Debug('Setting MUF texture color...');
+            --@end-debug@]==]
             -- Set the main texture
-            self.Texture:SetTexture(self.Color[1], self.Color[2], self.Color[3], Alpha);
+            self.Texture:SetColorTexture(self.Color[1], self.Color[2], self.Color[3], Alpha); -- XXX reported to cause rare "script ran too long" errors" on 2016-09-25 and 2016-12-30
             --self.Texture:SetAlpha(Alpha);
+            --[==[@debug@
+            D:Debug('Setting MUF texture color... done');
+            --@end-debug@]==]
 
 
 
@@ -1630,10 +1683,10 @@ do
             if (Class and Class ~= self.UnitClass) then
                 ClassColor = DC.ClassesColors[Class];
                 -- update the border color (the four borders)
-                self.OuterTexture1:SetTexture(  unpack(ClassColor) );
-                self.OuterTexture2:SetTexture(  unpack(ClassColor) );
-                self.OuterTexture3:SetTexture(  unpack(ClassColor) );
-                self.OuterTexture4:SetTexture(  unpack(ClassColor) );
+                self.OuterTexture1:SetColorTexture(  unpack(ClassColor) );
+                self.OuterTexture2:SetColorTexture(  unpack(ClassColor) );
+                self.OuterTexture3:SetColorTexture(  unpack(ClassColor) );
+                self.OuterTexture4:SetColorTexture(  unpack(ClassColor) );
 
                 -- save the class for futur reference
                 self.UnitClass = Class;
@@ -1732,9 +1785,9 @@ do
                 -- test for GUID change and force a debuff update in this case
                 if UnitToGUID[MF.CurrUnit] ~= MF.UnitGUID then
                     MF.UpdateCountDown = 0; -- will force MF:Update() to be called
-                    --[===[@debug@
+                    --[==[@debug@
                     --D:Println("|cFFFFAA55GUID change detected while placing for |r", MicroFrameUpdateIndex, UnitToGUID[MF.CurrUnit], MF.UnitGUID );
-                    --@end-debug@]===]
+                    --@end-debug@]==]
                 end
 
                 ActionsDone = ActionsDone + 1;
@@ -1812,6 +1865,6 @@ local MF_Textures = { -- unused
 
 -- }}}
 
-T._LoadedFiles["Dcr_DebuffsFrame.lua"] = "2.7.3.6";
+T._LoadedFiles["Dcr_DebuffsFrame.lua"] = "2.7.8";
 
 -- Heresy

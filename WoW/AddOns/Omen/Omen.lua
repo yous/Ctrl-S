@@ -9,6 +9,7 @@ Omen.version = GetAddOnMetadata("Omen", "Version")
 Omen.versionstring = "Omen v"..GetAddOnMetadata("Omen", "Version")
 _G["Omen"] = Omen
 
+local WoWClassic = (WOW_PROJECT_ID == WOW_PROJECT_CLASSIC)
 
 -----------------------------------------------------------------------------
 -- Keybinding globals
@@ -19,19 +20,36 @@ BINDING_NAME_OMENTOGGLEFOCUS = L["Toggle Focus"]
 
 -----------------------------------------------------------------------------
 -- Register some media
-LSM:Register("sound", "Rubber Ducky", [[Sound\Doodad\Goblin_Lottery_Open01.wav]])
-LSM:Register("sound", "Cartoon FX", [[Sound\Doodad\Goblin_Lottery_Open03.wav]])
-LSM:Register("sound", "Explosion", [[Sound\Doodad\Hellfire_Raid_FX_Explosion05.wav]])
-LSM:Register("sound", "Shing!", [[Sound\Doodad\PortcullisActive_Closed.wav]])
-LSM:Register("sound", "Wham!", [[Sound\Doodad\PVP_Lordaeron_Door_Open.wav]])
-LSM:Register("sound", "Simon Chime", [[Sound\Doodad\SimonGame_LargeBlueTree.wav]])
-LSM:Register("sound", "War Drums", [[Sound\Event Sounds\Event_wardrum_ogre.wav]])
-LSM:Register("sound", "Cheer", [[Sound\Event Sounds\OgreEventCheerUnique.wav]])
-LSM:Register("sound", "Humm", [[Sound\Spells\SimonGame_Visual_GameStart.wav]])
-LSM:Register("sound", "Short Circuit", [[Sound\Spells\SimonGame_Visual_BadPress.wav]])
-LSM:Register("sound", "Fel Portal", [[Sound\Spells\Sunwell_Fel_PortalStand.wav]])
-LSM:Register("sound", "Fel Nova", [[Sound\Spells\SeepingGaseous_Fel_Nova.wav]])
-LSM:Register("sound", "You Will Die!", [[Sound\Creature\CThun\CThunYouWillDIe.wav]])
+if WoWClassic then
+-- most of these sounds are nto actually in classic
+--LSM:Register("sound", "Rubber Ducky", [[Sound\Doodad\Goblin_Lottery_Open01.ogg]])
+--LSM:Register("sound", "Cartoon FX", [[Sound\Doodad\Goblin_Lottery_Open03.ogg]])
+--LSM:Register("sound", "Explosion", [[Sound\Doodad\Hellfire_Raid_FX_Explosion05.ogg]])
+--LSM:Register("sound", "Shing!", [[Sound\Doodad\PortcullisActive_Closed.ogg]])
+--LSM:Register("sound", "Wham!", [[Sound\Doodad\PVP_Lordaeron_Door_Open.ogg]])
+--LSM:Register("sound", "Simon Chime", [[Sound\Doodad\SimonGame_LargeBlueTree.ogg]])
+--LSM:Register("sound", "War Drums", [[Sound\Event Sounds\Event_wardrum_ogre.ogg]])
+--LSM:Register("sound", "Cheer", [[Sound\Event Sounds\OgreEventCheerUnique.ogg]])
+--LSM:Register("sound", "Humm", [[Sound\Spells\SimonGame_Visual_GameStart.ogg]])
+--LSM:Register("sound", "Short Circuit", [[Sound\Spells\SimonGame_Visual_BadPress.ogg]])
+--LSM:Register("sound", "Fel Portal", [[Sound\Spells\Sunwell_Fel_PortalStand.ogg]])
+--LSM:Register("sound", "Fel Nova", [[Sound\Spells\SeepingGaseous_Fel_Nova.ogg]])
+LSM:Register("sound", "You Will Die!", [[Sound\Creature\CThun\CThunYouWillDIe.ogg]])
+else
+LSM:Register("sound", "Rubber Ducky", 566121) -- [[Sound\Doodad\Goblin_Lottery_Open01.ogg]]
+LSM:Register("sound", "Cartoon FX", 566543) --  [[Sound\Doodad\Goblin_Lottery_Open03.ogg]]
+LSM:Register("sound", "Explosion", 566982) -- [[Sound\Doodad\Hellfire_Raid_FX_Explosion05.ogg]]
+LSM:Register("sound", "Shing!", 566240) -- [[Sound\Doodad\PortcullisActive_Closed.ogg]]
+LSM:Register("sound", "Wham!", 566946) -- [[Sound\Doodad\PVP_Lordaeron_Door_Open.ogg]]
+LSM:Register("sound", "Simon Chime", 566076) -- [[Sound\Doodad\SimonGame_LargeBlueTree.ogg]]
+LSM:Register("sound", "War Drums", 567275) -- [[Sound\Event Sounds\Event_wardrum_ogre.ogg]]
+LSM:Register("sound", "Cheer", 567283) -- [[Sound\Event Sounds\OgreEventCheerUnique.ogg]]
+LSM:Register("sound", "Humm", 569518) -- [[Sound\Spells\SimonGame_Visual_GameStart.ogg]]
+LSM:Register("sound", "Short Circuit", 568975) -- [[Sound\Spells\SimonGame_Visual_BadPress.ogg]]
+LSM:Register("sound", "Fel Portal", 569215) -- [[Sound\Spells\Sunwell_Fel_PortalStand.ogg]]
+LSM:Register("sound", "Fel Nova", 568582) -- [[Sound\Spells\SeepingGaseous_Fel_Nova.ogg]]
+LSM:Register("sound", "You Will Die!", 546633) -- [[Sound\Creature\CThun\CThunYouWillDIe.ogg]]
+end
 LSM:Register("sound", "Omen: Aoogah!", [[Interface\AddOns\Omen\aoogah.ogg]])
 
 
@@ -184,11 +202,6 @@ local testMode = false      -- boolean: Are we in test mode?
 local manualToggle = false  -- boolean: Did we manually toggle Omen?
 local moduleOptions = {}    -- Table for LoD module options registration
 local LDBIconRegistered = false  -- Registered icon?
-local normalizer = 1        -- Default threat normalizer for zones
-local zoneThreatMultipliers = {  -- UnitDetailedThreatSituation returns inconsistent raw threat per zone in 4.3.15050
--- 	[824] = 10 -- Dragon Soul returns threat values 10% of usual
-}
-setmetatable(zoneThreatMultipliers, {__index = function(self, zoneID) self[zoneID] = 1 return 1 end})
 
 Omen.GuidNameLookup = guidNameLookup
 Omen.GuidClassLookup = guidClassLookup
@@ -354,7 +367,7 @@ function Omen:CreateFrames()
 	self.Anchor:SetScript("OnShow", function(self) db.Shown = true Omen:UpdateBars() end)
 
 	-- Create Title
-	self.Title = CreateFrame("Button", "OmenTitle", self.Anchor)
+	self.Title = CreateFrame("Button", "OmenTitle", self.Anchor, BackdropTemplateMixin and "BackdropTemplate" or nil)
 	self.Title:SetPoint("TOPLEFT", self.Anchor, "TOPLEFT")
 	self.Title:SetPoint("TOPRIGHT", self.Anchor, "TOPRIGHT")
 	self.Title:SetHeight(16)
@@ -375,7 +388,7 @@ function Omen:CreateFrames()
 	self.TitleText:SetText(self.defaultTitle)
 
 	-- Create Bar List
-	self.BarList = CreateFrame("Frame", "OmenBarList", self.Anchor)
+	self.BarList = CreateFrame("Frame", "OmenBarList", self.Anchor, BackdropTemplateMixin and "BackdropTemplate" or nil)
 	self.BarList:SetResizable(true)
 	self.BarList:EnableMouse(true)
 	self.BarList:SetPoint("TOPLEFT", self.Title, "BOTTOMLEFT")
@@ -605,7 +618,11 @@ function Omen:OnEnable()
 	self:RegisterEvent("PLAYER_UPDATE_RESTING", "UpdateVisible")
 	self:RegisterEvent("PLAYER_ENTERING_WORLD")
 	self:RegisterEvent("COMBAT_LOG_EVENT_UNFILTERED")
-	self:RegisterEvent("WORLD_MAP_UPDATE")
+
+	if not WoWClassic then
+		self:RegisterEvent("PET_BATTLE_OPENING_START", "UpdateVisible")
+		self:RegisterEvent("PET_BATTLE_CLOSE", "UpdateVisible")
+	end
 
 	if db.ShowWith.HideWhenOOC then
 		self:RegisterEvent("PLAYER_REGEN_DISABLED", "UpdateVisible")
@@ -753,6 +770,14 @@ end
 
 function Omen:UpdateVisible(event)
 	local t = db.ShowWith
+
+	if event == "PET_BATTLE_OPENING_START" then
+		self:_toggle(false)
+		return
+	elseif not WoWClassic and C_PetBattles.IsInBattle() then
+		return
+	end
+
 	if not t.UseShowWith or manualToggle then return end
 
 	-- Hide if HideWhenOOC option is on, we're not in combat, and the triggering event is not
@@ -1342,9 +1367,9 @@ end
 
 
 -- For temporary threat tracking, modified code submitted by Melaar
-local mdtricksActors = {}       -- Format: mdtricksActors[fromGUID] = toGUID
-local mdtricksActiveActors = {} -- Format: mdtricksActors2[fromGUID] = toGUID
-local tempThreat = {}           -- Format: tempThreat[mobGUID][toGUID][fromGUID] = damage
+--local mdtricksActors = {}       -- Format: mdtricksActors[fromGUID] = toGUID
+--local mdtricksActiveActors = {} -- Format: mdtricksActors2[fromGUID] = toGUID
+--local tempThreat = {}           -- Format: tempThreat[mobGUID][toGUID][fromGUID] = damage
 local tempThreatExpire = {}     -- Format: tempThreatExpire[fromGUID] = GetTime()
 local mifadeThreat = {}    		-- Format: mifadeThreat[fromGUID][mobGUID] = threat
 
@@ -1355,25 +1380,36 @@ For Tricks and Misdirect
    threat transfer buff, whichever is earlier
 3. Stop recording on threat transfer buff expiry
 
-For Mirror Image, Fade and Hand of Salvation (Glyphed)
+For Mirror Image, Fade
 1. Watch for the SPELL_AURA_APPLIED buff, which always occurs before the
    SPELL_CAST_SUCCESS and start recording
 2. Stop recording when buff expires
-The combat log offers no hint as to which version of Hand of Salvation is casted,
-so we record anyway.
 ]]
 
-function Omen:COMBAT_LOG_EVENT_UNFILTERED(event, timestamp, eventtype, hideCaster, srcGUID, srcName, srcFlags, srcRaidFlags, dstGUID, dstName, dstFlags, dstRaidFlags, ...)
+function Omen:COMBAT_LOG_EVENT_UNFILTERED(event, ...)
+	if CombatLogGetCurrentEventInfo then
+		timestamp, eventtype, hideCaster, srcGUID, srcName, srcFlags, srcRaidFlags, dstGUID, dstName, dstFlags, dstRaidFlags, arg1, arg2, arg3, arg4 = CombatLogGetCurrentEventInfo()
+	else
+		timestamp, eventtype, hideCaster, srcGUID, srcName, srcFlags, srcRaidFlags, dstGUID, dstName, dstFlags, dstRaidFlags, arg1, arg2, arg3, arg4 = ...
+	end
 	if eventtype == "SPELL_CAST_SUCCESS" then
-		local spellID = ...
+		--[[local spellID = arg1
 		if spellID == 34477 or spellID == 57934 then  -- Misdirection and Tricks of the Trade
 			--self:Print("|cff40ff40"..srcName.."|r cast "..GetSpellLink(spellID).." on |cffff4040"..dstName.."|r")
 			mdtricksActors[srcGUID] = dstGUID
-		end
+		end]]
 
 	elseif eventtype == "SPELL_AURA_APPLIED" then
-		local spellID = ...
-		local mdtricksTarget = mdtricksActors[srcGUID]
+		local spellID = arg1
+
+		if WoWClassic then
+			-- Fade, classic has no spell IDs
+			if arg2 == GetSpellInfo(586) then
+				spellID = 586
+			end
+		end
+
+		--[[local mdtricksTarget = mdtricksActors[srcGUID]
 
 		-- Misdirection and Tricks of the Trade buff
 		if mdtricksTarget and not mdtricksActiveActors[srcGUID] and (spellID == 35079 or spellID == 59628) then
@@ -1384,22 +1420,19 @@ function Omen:COMBAT_LOG_EVENT_UNFILTERED(event, timestamp, eventtype, hideCaste
 			tempThreatExpire[srcGUID] = GetTime() + 30
 			self:ScheduleTimer("ThreatExpire", 30, srcGUID)
 
-		elseif spellID == 55342 or spellID == 586 or spellID == 1038 then -- Mirror Image, Fade and Hand of Salvation buff
+		else]]
+		if spellID == 55342 or spellID == 586 then -- Mirror Image, Fade buff
 			-- The aura event for this always occurs before the one for SPELL_CAST_SUCCESS
 			--self:Print("|cff40ff40"..srcName.."|r casts "..GetSpellLink(spellID).." on ".."|cff40ff40"..dstName.."|r")
 			mifadeThreat[dstGUID] = newTable()
 			if spellID == 55342 then -- Mirror Image
-				tempThreatExpire[dstGUID] = GetTime() + 30
-				self:ScheduleTimer("FadeExpire", 30, dstGUID)
+				tempThreatExpire[dstGUID] = GetTime() + 40
+				self:ScheduleTimer("FadeExpire", 40, dstGUID)
 				mifadeThreat[dstGUID].display = true
 			elseif spellID == 586 then -- Fade
 				tempThreatExpire[dstGUID] = GetTime() + 10
 				self:ScheduleTimer("FadeExpire", 10, dstGUID)
 				mifadeThreat[dstGUID].display = true
-			else -- Hand of Salvation
-				tempThreatExpire[dstGUID] = GetTime() + 10
-				self:ScheduleTimer("FadeExpire", 10, dstGUID)
-				-- Need to determine later if its a glyphed salv or not, so don't display first
 			end
 			self:RecordThreat(dstGUID)
 
@@ -1409,25 +1442,34 @@ function Omen:COMBAT_LOG_EVENT_UNFILTERED(event, timestamp, eventtype, hideCaste
 		end
 
 	elseif eventtype == "SPELL_AURA_REMOVED" then
-		local spellID = ...
-		if spellID == 35079 or spellID == 59628 then
+		local spellID = arg1
+
+		if WoWClassic then
+			-- Fade, classic has no spell IDs
+			if arg2 == GetSpellInfo(586) then
+				spellID = 586
+			end
+		end
+
+		--[[if spellID == 35079 or spellID == 59628 then
 			--self:Print(GetSpellLink(spellID).." fades from |cffff4040"..srcName.."|r")
 			mdtricksActors[dstGUID] = nil
 			mdtricksActiveActors[dstGUID] = nil
-		elseif spellID == 55342 or spellID == 586 or spellID == 1038 then
+		else]]
+		if spellID == 55342 or spellID == 586 then
 			--self:Print(GetSpellLink(spellID).." fades from |cffff4040"..dstName.."|r")
 			self:FadeExpire(dstGUID)
 		end
 
 	else
 		-- Track damage done by players with active MD or Tricks
-		local mdtricksTarget = mdtricksActors[srcGUID]
+		--[[local mdtricksTarget = mdtricksActors[srcGUID]
 		if mdtricksTarget then
-			local _, damage
+			local damage
 			if eventtype == "SPELL_DAMAGE" or eventtype == "RANGE_DAMAGE" or eventtype == "SPELL_PERIODIC_DAMAGE" then
-				_, _, _, damage = ...
+				damage = arg4
 			elseif eventtype == "SWING_DAMAGE" then
-				damage = ...
+				damage = arg1
 			end
 			if damage then
 				-- We assume the first damage event starts the 30 sec timer
@@ -1452,12 +1494,13 @@ function Omen:COMBAT_LOG_EVENT_UNFILTERED(event, timestamp, eventtype, hideCaste
 				t.total = (t.total or 0) + damage
 			end
 
-		elseif mifadeThreat[srcGUID] then
-			local _, damage
+		else--]]
+		if mifadeThreat[srcGUID] then
+			local damage
 			if eventtype == "SPELL_DAMAGE" or eventtype == "RANGE_DAMAGE" or eventtype == "SPELL_PERIODIC_DAMAGE" then
-				_, _, _, damage = ...
+				damage = arg4
 			elseif eventtype == "SWING_DAMAGE" then
-				damage = ...
+				damage = arg1
 			end
 			if damage then
 				--self:Print(eventtype, srcName, damage)
@@ -1467,7 +1510,7 @@ function Omen:COMBAT_LOG_EVENT_UNFILTERED(event, timestamp, eventtype, hideCaste
 	end
 end
 
-function Omen:ThreatExpire(srcGUID)
+--[[function Omen:ThreatExpire(srcGUID)
 	-- Remove all temp threat caused by srcGUID
 	for mobGUID, recvTbl in pairs(tempThreat) do
 		for recvGUID, srcTbl in pairs(recvTbl) do
@@ -1488,7 +1531,7 @@ function Omen:ThreatExpire(srcGUID)
 	mdtricksActors[srcGUID] = nil
 	mdtricksActiveActors[srcGUID] = nil
 	--if next(tempThreat) == nil then print("Good") end -- Sanity check
-end
+end]]
 
 function Omen:FadeExpire(srcGUID)
 	-- Remove all threat caused by srcGUID
@@ -1499,7 +1542,6 @@ end
 local function recordThreat(unitid, mobunitid, srcGUID)
 	if UnitCanAttack(unitid, mobunitid) then
 		local threatValue = select(5, UnitDetailedThreatSituation(unitid, mobunitid))
-		if threatValue then threatValue = threatValue * normalizer end
 		mifadeThreat[srcGUID][UnitGUID(mobunitid)] = threatValue
 	end
 end
@@ -1556,8 +1598,10 @@ function Omen:RecordThreat(srcGUID)
 	end
 	recordThreat(unitID, "target", srcGUID)
 	recordThreat(unitID, "targettarget", srcGUID)
-	recordThreat(unitID, "focus", srcGUID)
-	recordThreat(unitID, "focustarget", srcGUID)
+	if not WoWClassic then
+		recordThreat(unitID, "focus", srcGUID)
+		recordThreat(unitID, "focustarget", srcGUID)
+	end
 	recordThreat(unitID, "mouseover", srcGUID)
 	recordThreat(unitID, "mouseovertarget", srcGUID)
 end
@@ -1579,7 +1623,7 @@ function Omen:UpdateCountDowns()
 				if not timers.UpdateCountDowns then
 					timers.UpdateCountDowns = self:ScheduleTimer("UpdateCountDowns", 0.25)
 				end
-			elseif tempThreat[mobGUID] and tempThreat[mobGUID][guid] then
+			--[[elseif tempThreat[mobGUID] and tempThreat[mobGUID][guid] then
 				local expireTime = 30
 				for srcGUID, damage in pairs(tempThreat[mobGUID][guid]) do
 					if tempThreatExpire[srcGUID] then
@@ -1590,7 +1634,7 @@ function Omen:UpdateCountDowns()
 				bar.Text1:SetFormattedText("%s [%.0f]", guidNameLookup[guid], expireTime)
 				if not timers.UpdateCountDowns then
 					timers.UpdateCountDowns = self:ScheduleTimer("UpdateCountDowns", 0.25)
-				end
+				end]]
 			else
 				bar.Text1:SetText(guidNameLookup[guid])
 			end
@@ -1598,24 +1642,16 @@ function Omen:UpdateCountDowns()
 	end
 end
 
-function Omen:WORLD_MAP_UPDATE()
-	if WorldMapFrame:IsShown() then return end
-	
-	local areaid = GetCurrentMapAreaID()
-	if not areaid then return end
-	normalizer = zoneThreatMultipliers[areaid]
-end
-
 function Omen:PLAYER_ENTERING_WORLD()
 	manualToggle = false
 	wipe(guidNameLookup)
-	wipe(mdtricksActors)
-	wipe(mdtricksActiveActors)
+	--wipe(mdtricksActors)
+	--wipe(mdtricksActiveActors)
 	wipe(tempThreatExpire)
 	delTable(mifadeThreat)
 	mifadeThreat = newTable()
-	delTable(tempThreat)
-	tempThreat = newTable()
+	--[[delTable(tempThreat)
+	tempThreat = newTable()]]
 	self:GROUP_ROSTER_UPDATE()
 end
 
@@ -1677,10 +1713,8 @@ local function updatethreat(unitid, mobunitid)
 	if guid and not threatTable[guid] then
 		local isTanking, state, scaledPercent, rawPercent, threatValue = UnitDetailedThreatSituation(unitid, mobunitid)
 		if threatValue then
-			threatValue = threatValue * normalizer
 			if threatValue == 0 and mifadeThreat[guid] then
 				threatValue = mifadeThreat[guid][UnitGUID(mobunitid)] or 0
-				-- Check for glyphed Hand of Salvation
 				if threatValue > 0 then mifadeThreat[guid].display = true end
 			end
 			if threatValue > topthreat then topthreat = threatValue end
@@ -1819,8 +1853,10 @@ function Omen:UpdateBarsReal()
 		end
 		updatethreat("target", mob)
 		updatethreat("targettarget", mob)
-		updatethreat("focus", mob)
-		updatethreat("focustarget", mob)
+		if not WoWClassic then
+			updatethreat("focus", mob)
+			updatethreat("focustarget", mob)
+		end
 		updatethreat(mobTarget, mob)
 		updatethreat("mouseover", mob)
 		updatethreat("mouseovertarget", mob)
@@ -1829,13 +1865,11 @@ function Omen:UpdateBarsReal()
 
 	if dbBar.ShowAggroBar and tankThreat > 0 then
 		if GetItemInfo(37727) then -- 5 yards (Ruby Acorn - http://www.wowhead.com/?item=37727)
-			threatTable["AGGRO"] = tankThreat * (IsItemInRange(37727, mob) == 1 and 1.1 or 1.3)
+			threatTable["AGGRO"] = tankThreat * (IsItemInRange(37727, mob) and 1.1 or 1.3)
+		elseif GetItemInfo(8149) then -- 5 yards (Voodoo Charm - http://www.wowhead.com/?item=8149)
+			threatTable["AGGRO"] = tankThreat * (IsItemInRange(8149, mob) and 1.1 or 1.3)
 		else -- 9 yards compromise
 			threatTable["AGGRO"] = tankThreat * (CheckInteractDistance(mob, 3) and 1.1 or 1.3)
-			if not queried and not ItemRefTooltip:IsVisible() then
-				ItemRefTooltip:SetHyperlink("item:37727")
-				queried = true -- Only query once per session
-			end
 		end
 	end
 
@@ -1910,7 +1944,7 @@ function Omen:UpdateBarsReal()
 				if not timers.UpdateCountDowns then
 					timers.UpdateCountDowns = self:ScheduleTimer("UpdateCountDowns", 0.25)
 				end
-			elseif tempThreat[mobGUID] and tempThreat[mobGUID][guid] then
+			--[[elseif tempThreat[mobGUID] and tempThreat[mobGUID][guid] then
 				local expireTime = 30
 				for srcGUID, damage in pairs(tempThreat[mobGUID][guid]) do
 					if tempThreatExpire[srcGUID] then
@@ -1921,24 +1955,24 @@ function Omen:UpdateBarsReal()
 				bar.Text1:SetFormattedText("%s [%.0f]", guidNameLookup[guid], expireTime)
 				if not timers.UpdateCountDowns then
 					timers.UpdateCountDowns = self:ScheduleTimer("UpdateCountDowns", 0.25)
-				end
+				end]]
 			else
 				bar.Text1:SetText(guidNameLookup[guid])
 			end
 			if dbBar.ShowPercent and dbBar.ShowValue then
 				if dbBar.ShortNumbers and threat >= 1000 then
-					bar.Text2:SetFormattedText("%2.1fk [%d%%]", threat / 1000, tankThreat == 0 and 0 or threat / tankThreat * 100)
+					bar.Text2:SetFormattedText("%2.1fk [%.0f%%]", threat / 1000, tankThreat == 0 and 0 or threat / tankThreat * 100)
 				else
-					bar.Text2:SetFormattedText("%d [%d%%]", threat, tankThreat == 0 and 0 or threat / tankThreat * 100)
+					bar.Text2:SetFormattedText("%.0f [%.0f%%]", threat, tankThreat == 0 and 0 or threat / tankThreat * 100)
 				end
 			elseif dbBar.ShowValue then
 				if dbBar.ShortNumbers and threat >= 1000 then
 					bar.Text2:SetFormattedText("%2.1fk", threat / 1000)
 				else
-					bar.Text2:SetFormattedText("%d", threat)
+					bar.Text2:SetFormattedText("%.0f", threat)
 				end
 			else
-				bar.Text2:SetFormattedText("%d%%", tankThreat == 0 and 0 or threat / tankThreat * 100)
+				bar.Text2:SetFormattedText("%.0f%%", tankThreat == 0 and 0 or threat / tankThreat * 100)
 			end
 
 			-- Update the color of the bar
@@ -1958,11 +1992,11 @@ function Omen:UpdateBarsReal()
 
 			-- Get temporary threat values
 			local temp = 0
-			if tempThreat[mobGUID] and tempThreat[mobGUID][guid] then
+			--[[if tempThreat[mobGUID] and tempThreat[mobGUID][guid] then
 				temp = tempThreat[mobGUID][guid].total
 				-- self:Print("BARtemp "..tempThreat[mobGUID][guid].total)
 				if temp > threat then temp = threat end  -- Cap the temp threat
-			end
+			end]]
 
 			-- Update the width of the bar, and animate if necessary
 			local width = w * ((threat - temp) / topthreat)
@@ -2011,11 +2045,7 @@ function Omen:UpdateBarsReal()
 		end
 		local t = db.Warnings
 		if lastWarn.mobGUID == mobGUID and myThreatPercent >= t.Threshold and t.Threshold > lastWarn.threatpercent then
-			if not t.DisableWhileTanking or not (myClass == "WARRIOR" and GetShapeshiftFormID() == 18 or
-			  myClass == "DRUID" and GetShapeshiftFormID() == BEAR_FORM or
-			  myClass == "MONK" and GetShapeshiftFormID() == 23 or
-			  myClass == "PALADIN" and UnitAura("player", GetSpellInfo(25780)) or
-			  myClass == "DEATHKNIGHT" and UnitAura("player", GetSpellInfo(48263)) ) then
+			if not WoWClassic and (not t.DisableWhileTanking or not (GetSpecialization() and select(5, GetSpecializationInfo(GetSpecialization())) == "TANK")) then
 				self:Warn(t.Sound, t.Flash, t.Shake, t.Message and L["Passed %s%% of %s's threat!"]:format(t.Threshold, guidNameLookup[lastWarn.tankGUID]))
 			end
 		end
@@ -2116,7 +2146,7 @@ function Omen:UpdateTPS()
 				-- Calculate TPS
 				local ratio = (startTime - threatStoreTime[1]) / (threatStoreTime[2] - threatStoreTime[1])
 				local startThreat = (secondThreat - baseThreat) * ratio + baseThreat
-				bar.Text3:SetFormattedText("%d", (finalThreat - startThreat) / TPSWindow ) -- MoP discarded 100 modifier
+				bar.Text3:SetFormattedText("%.0f", (finalThreat - startThreat) / TPSWindow ) -- MoP discarded 100 modifier
 			else
 				-- We don't have enough data for this unit
 				bar.Text3:SetText("??")
@@ -2168,12 +2198,14 @@ do
 			info.tooltipText = L["Locks Omen in place and prevents it from being dragged or resized."]
 			UIDropDownMenu_AddButton(info, level)
 
-			info.text = L["Use Focus Target"]
-			info.func = toggleFocus
-			info.checked = db.UseFocus
-			info.tooltipTitle = L["Use Focus Target"]
-			info.tooltipText = L["Tells Omen to additionally check your 'focus' and 'focustarget' before your 'target' and 'targettarget' in that order for threat display."]
-			UIDropDownMenu_AddButton(info, level)
+			if not WoWClassic then
+				info.text = L["Use Focus Target"]
+				info.func = toggleFocus
+				info.checked = db.UseFocus
+				info.tooltipTitle = L["Use Focus Target"]
+				info.tooltipText = L["Tells Omen to additionally check your 'focus' and 'focustarget' before your 'target' and 'targettarget' in that order for threat display."]
+				UIDropDownMenu_AddButton(info, level)
+			end
 
 			info.text = L["Test Mode"]
 			info.func = toggleTestMode
@@ -2417,6 +2449,7 @@ Omen.Options = {
 					set = function(info, value)
 						Omen:ToggleFocus()
 					end,
+					hidden = WoWClassic,
 				},
 				TestMode = {
 					type = "toggle",
@@ -3167,7 +3200,7 @@ Omen.Options = {
 					type = "color",
 					order = 24,
 					name = L["Temp Threat Bar Color"],
-					desc = L["The background color for players under the effects of Fade, Mirror Image, glyphed Hand of Salvation, Tricks of the Trade and Misdirection"],
+					desc = L["The background color for players under the effects of Fade, Mirror Image, Tricks of the Trade and Misdirection"],
 					hasAlpha = true,
 					get = function(info)
 						local t = db.Bar.FadeBarColor
@@ -3345,6 +3378,7 @@ Omen.Options = {
 					order = 10,
 					name = L["Disable while tanking"],
 					desc = L["DISABLE_WHILE_TANKING_DESC"],
+					hidden = WoWClassic,
 				},
 				test = {
 					type = "execute",

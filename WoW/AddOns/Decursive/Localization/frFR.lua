@@ -1,18 +1,22 @@
 --[[
     This file is part of Decursive.
-    
-    Decursive (v 2.7.3.6) add-on for World of Warcraft UI
-    Copyright (C) 2006-2014 John Wellesz (archarodim AT teaser.fr) ( http://www.2072productions.com/to/decursive.php )
 
-    Starting from 2009-10-31 and until said otherwise by its author, Decursive
-    is no longer free software, all rights are reserved to its author (John
-    Wellesz).
+    Decursive (v 2.7.8) add-on for World of Warcraft UI
+    Copyright (C) 2006-2019 John Wellesz (Decursive AT 2072productions.com) ( http://www.2072productions.com/to/decursive.php )
 
-    The only official and allowed distribution means are
-    www.2072productions.com, www.wowace.com and curse.com.
-    To distribute Decursive through other means a special authorization is
-    required.
-    
+    Decursive is free software: you can redistribute it and/or modify
+    it under the terms of the GNU General Public License as published by
+    the Free Software Foundation, either version 3 of the License, or
+    (at your option) any later version.
+
+    Decursive is distributed in the hope that it will be useful,
+    but WITHOUT ANY WARRANTY; without even the implied warranty of
+    MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+    GNU General Public License for more details.
+
+    You should have received a copy of the GNU General Public License
+    along with Decursive.  If not, see <https://www.gnu.org/licenses/>.
+
 
     Decursive is inspired from the original "Decursive v1.9.4" by Patrick Bohnet (Quu).
     The original "Decursive 1.9.4" is in public domain ( www.quutar.com )
@@ -20,7 +24,7 @@
     Decursive is distributed in the hope that it will be useful, but WITHOUT
     ANY WARRANTY.
 
-    This file was last updated on 2014-10-13T09:20:46Z
+    This file was last updated on 2019-11-18T13:42:00Z
 --]]
 -------------------------------------------------------------------------------
 
@@ -72,8 +76,8 @@ T._LoadedFiles["frFR.lua"] = false;
 
 local L = LibStub("AceLocale-3.0"):NewLocale("Decursive", "frFR");
 
-if not L then 
-    T._LoadedFiles["frFR.lua"] = "2.7.3.6";
+if not L then
+    T._LoadedFiles["frFR.lua"] = "2.7.8";
     return;
 end
 
@@ -114,9 +118,9 @@ L["COLORSTATUS"] = "Règle la couleur du statut '%s'."
 L["CTRL"] = "Ctrl"
 L["CURE_PETS"] = "Contrôler et guérir les familiers"
 L["CURSE"] = "Malédiction"
-L["DEBUG_REPORT_HEADER"] = [=[|cFF11FF33Merci d'envoyer le contenu de cette fenêtre à Archarodim+DcrReport@teaser.fr|r
+L["DEBUG_REPORT_HEADER"] = [=[|cFF11FF33Merci d'envoyer par email le contenu de cette fenêtre à <%s>|r
 |cFF009999(Faire CTRL+A pour tout sélectionner et CTRL+C pour le copier dans votre "presse papier")|r
-Dîtes également dans votre rapport si vous avez remarqué un comportement étrange de Decursive.
+Dîtes également dans votre rapport si vous avez remarqué un comportement étrange de %s.
 ]=]
 L["DECURSIVE_DEBUG_REPORT"] = "**** |cFFFF0000Rapport de debuggage de Decursive|r ****"
 L["DECURSIVE_DEBUG_REPORT_BUT_NEW_VERSION"] = [=[|cFF11FF33Decursive s'est planté ! Mais n'ayez crainte ! Une NOUVELLE version de Decursive a été détectée (%s). Il suffit simplement de vous mettre à jour. Aller sur Curse.com et chercher 'Decursive' ou utilisez le client de Curse.com, Il mettra à jour tous vos add-ons préférés automatiquement.|r
@@ -164,6 +168,8 @@ L["HLP_LEFTCLICK"] = "Clic Gauche"
 L["HLP_LL_ONCLICK_TEXT"] = [=[Cette liste n'est pas cliquable. Merci de lire la documentation pour apprendre à utiliser cet add-on. Cherchez 'Decursive' sur WoWAce.com
 (Pour bouger cette liste, bougez la barre de Decursive, /dcrshow et alt-clic-gauche pour déplacer)]=]
 L["HLP_MIDDLECLICK"] = "Clic Milieu"
+L["HLP_MOUSE4"] = "Souris 4"
+L["HLP_MOUSE5"] = "Souris 5"
 L["HLP_NOTHINGTOCURE"] = "Il n'y a rien à guérir !"
 L["HLP_RIGHTCLICK"] = "Clic Droit"
 L["HLP_USEXBUTTONTOCURE"] = "Utilisez \"%s\" pour guérir cette affection !"
@@ -190,15 +196,18 @@ Allez sur |cFFFF0000WoWAce.com|r pour l'obtenir !
 --------]=]
 L["NORMAL"] = "Normal"
 L["NOSPELL"] = "Aucun sort disponible"
+L["NOTICE_FRAME_TEMPLATE"] = [=[|cFFFF0000Decursive - Information|r
+
+%s]=]
 L["OPT_ABOLISHCHECK_DESC"] = "Définit si les unités avec un sort 'Abolir' actif sont affichées et soignées"
 L["OPT_ABOUT"] = "À propos"
-L["OPT_ADD_A_CUSTOM_SPELL"] = "Ajouter un sort personnalisé"
-L["OPT_ADD_A_CUSTOM_SPELL_DESC"] = "Cliquez ici et MAJ-cliquez sur un sort dans votre grimoire. Vous pouvez aussi directement taper son nom ou son identifiant numérique."
+L["OPT_ADD_A_CUSTOM_SPELL"] = "Ajouter un sort / objet personnalisé"
+L["OPT_ADD_A_CUSTOM_SPELL_DESC"] = "Glissez-déposez un sort ou un objet utilisable ici. Vous pouvez aussi directement taper son nom, son identifiant numérique ou utiliser MAJ+Clique."
 L["OPT_ADDDEBUFF"] = "Ajouter une affection"
 L["OPT_ADDDEBUFF_DESC"] = "Ajoute une nouvelle affection à cette liste"
-L["OPT_ADDDEBUFFFHIST"] = "Ajouter une affection récente"
-L["OPT_ADDDEBUFFFHIST_DESC"] = "Ajouter une affection depuis l'historique"
-L["OPT_ADDDEBUFF_USAGE"] = "<Nom de l'affection>"
+L["OPT_ADDDEBUFF_USAGE"] = "<Spell ID de l'affection> (Vous pouvez trouver cet ID dans les URLs du site WoWHead.com)"
+L["OPT_ADDDEBUFFFHIST"] = "Ajouter une affection récemment guérie"
+L["OPT_ADDDEBUFFFHIST_DESC"] = "Ajouter une affection depuis l'historique des affections que vous avez récemment guérie."
 L["OPT_ADVDISP"] = "Options avancées"
 L["OPT_ADVDISP_DESC"] = "Permet de régler la transparence de la bordure et du centre séparément, permet de régler l'espace entre les micro-portraits"
 L["OPT_AFFLICTEDBYSKIPPED"] = "%s affecté(e) par %s sera ignoré"
@@ -234,8 +243,8 @@ L["OPT_CMD_DISBLED"] = "Désactivé"
 L["OPT_CMD_ENABLED"] = "Activé"
 L["OPT_CREATE_VIRTUAL_DEBUFF"] = "Créer une affection virtuelle de test"
 L["OPT_CREATE_VIRTUAL_DEBUFF_DESC"] = "Permet de voir ce qu'il se passe lorsqu'une affection est détectée"
-L["OPT_CUREPETS_DESC"] = "Les familiers seront affichés et guéris"
 L["OPT_CURE_PRIORITY_NUM"] = "Priorité #%d"
+L["OPT_CUREPETS_DESC"] = "Les familiers seront affichés et guéris"
 L["OPT_CURINGOPTIONS"] = "Options de guérison"
 L["OPT_CURINGOPTIONS_DESC"] = "Définit les différents aspects du processus de guérison (Types d'affections, et priorités)"
 L["OPT_CURINGOPTIONS_EXPLANATION"] = [=[Sélectionnez les types d'affection que vous souhaitez guérir. Les types non sélectionnés seront complètement ignorés par Decursive.
@@ -278,11 +287,16 @@ L["OPT_CUSTOM_SPELL_PRIORITY_DESC"] = [=[Quand plusieurs sorts peuvent guérir l
 Notez que les sorts par défaut gérés par Decursive ont une priorité allant de 0 à 9.
 
 Ainsi, si vous donnez une priorité négative à l'un de vos sort, il ne sera choisi que si le sort par défaut n'est pas disponible.]=]
-L["OPT_CUSTOMSPELLS"] = "Sorts personnalisés"
+L["OPT_CUSTOM_SPELL_UNAVAILABLE"] = "indisponible"
+L["OPT_CUSTOM_SPELL_UNIT_FILTER"] = "Filtrage"
+L["OPT_CUSTOM_SPELL_UNIT_FILTER_DESC"] = "Sélectionnez les unités qui peuvent bénéficier de cette technique"
+L["OPT_CUSTOM_SPELL_UNIT_FILTER_NONE"] = "Toutes les unités"
+L["OPT_CUSTOM_SPELL_UNIT_FILTER_NONPLAYER"] = "Les autres seulement"
+L["OPT_CUSTOM_SPELL_UNIT_FILTER_PLAYER"] = "Seulement sois-même"
+L["OPT_CUSTOMSPELLS"] = "Sorts / objets personnalisés"
 L["OPT_CUSTOMSPELLS_DESC"] = [=[Ici vous pouvez ajouter des sorts pour étendre la configuration automatique de Decursive.
 Vos sorts personnalisés auront toujours une priorité plus élevée et remplaceront systématiquement les sorts par défaut (si et seulement si votre personnage peut utiliser ces sorts)]=]
 L["OPT_CUSTOMSPELLS_EFFECTIVE_ASSIGNMENTS"] = "Assignations effectives des sorts :"
-L["OPT_CUSTOM_SPELL_UNAVAILABLE"] = "indisponible"
 L["OPT_DEBCHECKEDBYDEF"] = [=[
 
 Cochée par défaut]=]
@@ -298,13 +312,14 @@ L["OPT_DISEASECHECK_DESC"] = "Si cochée, vous pourrez voir et guérir les unit�
 L["OPT_DISPLAYOPTIONS"] = "Options d'affichage"
 L["OPT_DONOTBLPRIO_DESC"] = "Les unités prioritaires ne seront pas blacklistées"
 L["OPT_ENABLE_A_CUSTOM_SPELL"] = "Activer"
-L["OPT_ENABLEDEBUG"] = "Debug"
-L["OPT_ENABLEDEBUG_DESC"] = "Activer les informations de debuggage"
-L["OPT_ENABLEDECURSIVE"] = "Activer Decursive"
 L["OPT_ENABLE_LIVELIST"] = "Activer la liste des affligés"
 L["OPT_ENABLE_LIVELIST_DESC"] = [=[Affiche une liste des gens affligés.
 
 vous pouvez déplacer cette liste en déplaçant la barre de Decursive (tapper /DCRSHOW pour afficher cette barre)]=]
+L["OPT_ENABLEDEBUG"] = "Debug"
+L["OPT_ENABLEDEBUG_DESC"] = "Activer les informations de debuggage"
+L["OPT_ENABLEDECURSIVE"] = "Activer Decursive"
+L["OPT_FILTERED_DEBUFF_RENAMED"] = "L'affection filtrée \"%s\" a automatiquement été renommé par \"%s\" pour le Spell ID %d"
 L["OPT_FILTEROUTCLASSES_FOR_X"] = "%q sera ignoré sur les classes spécifiées pendant que vous êtes en combat."
 L["OPT_GENERAL"] = "Options générales"
 L["OPT_GROWDIRECTION"] = "Inverser l'affichage des micro-portraits"
@@ -323,7 +338,7 @@ L["OPT_INPUT_SPELL_BAD_INPUT_ALREADY_HERE"] = "Le sort est déjà dans la liste 
 L["OPT_INPUT_SPELL_BAD_INPUT_DEFAULT_SPELL"] = "Decursive gère déjà ce sort. MAJ-cliquez sur le sort ou tapez son ID pour ajouter un rang spécial."
 L["OPT_INPUT_SPELL_BAD_INPUT_ID"] = "ID de sort invalide !"
 L["OPT_INPUT_SPELL_BAD_INPUT_NOT_SPELL"] = "Ce sort ne se trouve pas dans votre grimoire !"
-L["OPTION_MENU"] = "Menu options"
+L["OPT_ISNOTVALID_SPELLID"] = "n'est pas un Spell ID valide"
 L["OPT_LIVELIST"] = "Liste des affligés"
 L["OPT_LIVELIST_DESC"] = [=[Ce sont les options concernant la liste des affligés affichée en dessous de la barre "Decursive".
 
@@ -410,6 +425,11 @@ L["OPT_RESTPROFILECONF"] = [=[Êtes-vous sûr de vouloir remettre votre profil
  aux valeurs par défaut ?]=]
 L["OPT_REVERSE_LIVELIST_DESC"] = "La liste des affectés se remplit de bas en haut"
 L["OPT_SCANLENGTH_DESC"] = "Définit le temps entre chaque scan"
+L["OPT_SETAFFTYPECOLOR_DESC"] = [=[Change la couleur des afflictions de type "%s"
+
+(Apparaît principalement dans les infobulles des MUFs et dans la Live list)]=]
+L["OPT_SHOW_STEALTH_STATUS"] = "Montrer le camouflage"
+L["OPT_SHOW_STEALTH_STATUS_DESC"] = "Lorsqu'un joueur est camouflé, son micro-portrait prendra une couleur spéciale."
 L["OPT_SHOWBORDER"] = "Afficher la bordure colorée des classes"
 L["OPT_SHOWBORDER_DESC"] = "Une bordure colorée représentant la classe de l'unité est affichée autour des micro-portraits"
 L["OPT_SHOWHELP"] = "Affiche l'aide"
@@ -418,9 +438,10 @@ L["OPT_SHOWMFS"] = "Affiche la fenêtre de micro-portraits"
 L["OPT_SHOWMFS_DESC"] = "Cette option doit être activée, si vous voulez guérir en cliquant avec la souris"
 L["OPT_SHOWMINIMAPICON"] = "Icône Minicarte"
 L["OPT_SHOWMINIMAPICON_DESC"] = "Active/Désactive l'icône de la minicarte"
-L["OPT_SHOW_STEALTH_STATUS"] = "Montrer le camouflage"
-L["OPT_SHOW_STEALTH_STATUS_DESC"] = "Lorsqu'un joueur est camouflé, son micro-portrait prendra une couleur spéciale."
 L["OPT_SHOWTOOLTIP_DESC"] = "Affiche une bulle d'informations détaillées à propos des affections sur les micro-portraits et dans la liste des affectés."
+L["OPT_SPELL_DESCRIPTION_LOADING"] = "Chargement de la description en cours... revenez plus tard."
+L["OPT_SPELL_DESCRIPTION_UNAVAILABLE"] = "La description n'est pas disponible"
+L["OPT_SPELLID_MISSING_READD"] = "Vous devez ré-ajouter cette affection en utilisant son Spell ID pour avoir une description au lieu de ce message."
 L["OPT_STICKTORIGHT"] = "Aligner la fenêtre à droite"
 L["OPT_STICKTORIGHT_DESC"] = "La fenêtre des micro-portrait se développera de la droite vers la gauche, la poignée sera déplacée automatiquement."
 L["OPT_TESTLAYOUT"] = "Tester la disposition"
@@ -428,9 +449,9 @@ L["OPT_TESTLAYOUT_DESC"] = [=[Créé des unités virtuelles permettant de tester
 (Attendre quelques secondes après avoir cliqué)]=]
 L["OPT_TESTLAYOUTUNUM"] = "Nombre d'unité"
 L["OPT_TESTLAYOUTUNUM_DESC"] = "Règle le nombre d'unité virtuelles à créer."
+L["OPT_TIE_LIVELIST_DESC"] = "L'affichage de la liste des affectés est lié à celui de la barre \"Decursive\""
 L["OPT_TIECENTERANDBORDER"] = "Lier le centre et la bordure"
 L["OPT_TIECENTERANDBORDER_OPT"] = "Quand activée, la transparence de la bordure vaut la moitié de celle du centre"
-L["OPT_TIE_LIVELIST_DESC"] = "L'affichage de la liste des affectés est lié à celui de la barre \"Decursive\""
 L["OPT_TIEXYSPACING"] = "Lier l'espacement horizontale et verticale"
 L["OPT_TIEXYSPACING_DESC"] = "L'espacement horizontale et verticale entre les micro-portraits sont identiques"
 L["OPT_UNITPERLINES"] = "Nombre d'unités par rangée"
@@ -440,6 +461,7 @@ L["OPT_XSPACING"] = "Espacement horizontal"
 L["OPT_XSPACING_DESC"] = "Règle l'espacement horizontal entre les micro-portraits"
 L["OPT_YSPACING"] = "Espacement vertical"
 L["OPT_YSPACING_DESC"] = "Règle l'espacement vertical entre les micro-portraits"
+L["OPTION_MENU"] = "Menu options"
 L["PLAY_SOUND"] = "Jouer un son quand il y a quelqu'un à guérir"
 L["POISON"] = "Poison"
 L["POPULATE"] = "R"
@@ -476,12 +498,12 @@ Vous devez mettre à jour Decursive pour corriger d'éventuelles incompatibilit�
 Allez sur curse.com et cherchez "Decursive" ou utilisez le client de Curse.com pour mettre tous vos add-ons à jour.
 
 Cette note sera affichée de nouveau dans deux jours.]=]
+L["TOO_MANY_ERRORS_ALERT"] = [=[Il y a trop d'erreurs Lua dans votre interface utilisateur (%d erreurs). Votre expérience de jeu peut être dégradée. Désactivez ou mettez à jour les add-ons en erreur pour stopper ce message.
+Vous devriez activer les rapports d'erreur Lua (/console scriptErrors 1).]=]
 L["TOOFAR"] = "Hors de portée"
-L["TOO_MANY_ERRORS_ALERT"] = [=[Il y a trop d'erreurs Lua dans votre interface utilisateur (%d). Votre expérience de jeu s'en retrouve dégradée. Désactivez ou mettez à jour les add-ons en erreur pour stopper ce message et retrouver une fluidité de jeu correcte.
-Vous devriez activer les rapports d'erreur Lua (section 'Aide' des options d'interface de World of Warcraft) afin d’identifier les add-ons problématiques.]=]
 L["UNITSTATUS"] = "Statut de l'unité : "
 L["UNSTABLERELEASE"] = "Version instable"
 
 
 
-T._LoadedFiles["frFR.lua"] = "2.7.3.6";
+T._LoadedFiles["frFR.lua"] = "2.7.8";

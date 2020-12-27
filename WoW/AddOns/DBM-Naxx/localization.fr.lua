@@ -70,7 +70,6 @@ L:SetOptionLocalization({
 })
 
 L:SetMiscLocalization({
-	YellWebWrap			= "Je suis dans un cocon! Aidez-moi!",
 	ArachnophobiaTimer	= "Arachnophobia"
 })
 
@@ -169,17 +168,6 @@ L:SetGeneralLocalization({
 	name = "Grobbulus"
 })
 
-L:SetOptionLocalization({
-	SpecialWarningInjection	= "Activer l'avertissement spécial quand vous êtes affecté par l'Injection mutante"
-})
-
-L:SetWarningLocalization({
-	SpecialWarningInjection	= "Injection mutante sur toi!"
-})
-
-L:SetTimerLocalization({
-})
-
 -------------
 --  Gluth  --
 -------------
@@ -220,10 +208,6 @@ L:SetOptionLocalization({
 L:SetWarningLocalization({
 	WarningChargeChanged	= "Polarité changée : %s",
 	WarningChargeNotChanged	= "Même polarité"
-})
-
-L:SetOptionCatLocalization({
-	Arrows					= "Flèches"
 })
 
 -----------------
@@ -360,7 +344,7 @@ L:SetWarningLocalization({
 L:SetTimerLocalization({
 	TimerAir		   		  = "Envol",
 	TimerLanding			  = "Atterrissage dans",
-	TimerIceBlast			  = "Souffle de givre"	
+	TimerIceBlast			  = "Souffle de givre"
 })
 
 ------------------
@@ -375,8 +359,7 @@ L:SetGeneralLocalization({
 
 L:SetOptionLocalization({
 	TimerPhase2				= "Afficher le timer pour la Phase 2",
-	specwarnP2Soon 			= "Montre un timer pour prévenir 10 secondes avant l'arrivée de Kel'Thuzad",
-	ShowRange				= "Active l'indicateur de portée quand la phase 2 débute"
+	specwarnP2Soon 			= "Montre un timer pour prévenir 10 secondes avant l'arrivée de Kel'Thuzad"
 })
 
 L:SetMiscLocalization({

@@ -18,39 +18,57 @@ TSM.spells = {
 	disenchant = 13262,
 }
 
-local savedDBDefaults = {
+local settingsInfo = {
+	version = 1,
 	global = {
-		history = {},
-		ignore = {},
-		autoStack = true,
-		autoShow = true,
-		timeFormat = "ago",
-		deMaxQuality = 3,
-		logDays = 14,
-		includeSoulbound = false,
-		deCustomPrice = "0c",
-		deAboveVendor = false,
+		autoStack = { type = "boolean", default = true, lastModifiedVersion = 1},
+		includeSoulbound = { type = "boolean", default = false, lastModifiedVersion = 1},
+		deAboveVendor = { type = "boolean", default = false, lastModifiedVersion = 1},
+		autoShow = { type = "boolean", default = true, lastModifiedVersion = 1},
+		logDays = { type = "number", default = 14, lastModifiedVersion = 1},
+		deMaxQuality = { type = "number", default = 3, lastModifiedVersion = 1},
+		deAbovePrice = { type = "string", default = "0c", lastModifiedVersion = 1},
+		timeFormat = { type = "string", default = "ago", lastModifiedVersion = 1},
+		history = { type = "table", default = {}, lastModifiedVersion = 1},
+		ignore = { type = "table", default = {}, lastModifiedVersion = 1},
+		helpPlatesShown = { type = "table", default = { destroyingFrame = nil }, lastModifiedVersion = 1},
 	},
 }
 
 -- Called once the player has loaded WOW.
 function TSM:OnInitialize()
+	if TradeSkillMasterModulesDB then
+		TradeSkillMasterModulesDB.Destroying = TradeSkillMaster_DestroyingDB
+	end
+
+	-- load settings
+	TSM.db = TSMAPI.Settings:Init("TradeSkillMaster_DestroyingDB", settingsInfo)
+
 	-- create shortcuts to all the modules
 	for moduleName, module in pairs(TSM.modules) do
 		TSM[moduleName] = module
 	end
-	
-	-- load the savedDB into TSM.db
-	TSM.db = LibStub:GetLibrary("AceDB-3.0"):New("TradeSkillMaster_DestroyingDB", savedDBDefaults, true)
 
 	-- register this module with TSM
 	TSM:RegisterModule()
-	
+
+	-- update for TSM3
+	for _, spellData in pairs(TSM.db.global.history) do
+		for _, deInfo in ipairs(spellData) do
+			deInfo.item = TSMAPI.Item:ToItemString(deInfo.item)
+		end
+	end
+	local newIgnore = {}
+	for itemString, value in pairs(TSM.db.global.ignore) do
+		newIgnore[TSMAPI.Item:ToItemString(itemString)] = value
+	end
+	TSM.db.global.ignore = newIgnore
+
 	-- request itemInfo for everything in the disenchant log
 	local deSpellName = GetSpellInfo(TSM.spells.disenchant)
 	if deSpellName and TSM.db.global.history[deSpellName] then
 		for _, deInfo in ipairs(TSM.db.global.history[deSpellName]) do
-			TSMAPI:GetSafeItemInfo(deInfo.item)
+			TSMAPI.Item:FetchInfo(deInfo.item)
 		end
 	end
 end
@@ -58,41 +76,14 @@ end
 -- registers this module with TSM by first setting all fields and then calling TSMAPI:NewModule().
 function TSM:RegisterModule()
 	TSM.icons = {
-		{side="module", desc="Destroying", slashCommand = "destroying", callback="Options:Load", icon="Interface\\Icons\\INV_Gizmo_RocketBoot_Destroyed_02"},
+		{ side = "module", desc = "Destroying", slashCommand = "destroying", callback = "Options:Load", icon = "Interface\\Icons\\INV_Gizmo_RocketBoot_Destroyed_02" },
 	}
+	TSM.moduleOptions = { callback = "Options:LoadOptions" }
 	TSM.slashCommands = {
-		{key="destroy", label=L["Opens the Destroying frame if there's stuff in your bags to be destroyed."], callback="GUI:ShowFrame"},
+		{ key = "destroy", label = L["Opens the Destroying frame if there's stuff in your bags to be destroyed."], callback = "GUI:ShowFrame" },
 	}
 
 	TSMAPI:NewModule(TSM)
-end
-
-
-function TSM:OnTSMDBShutdown()
-	local data = {}
-	local iTypeLookup = {[WEAPON]=2, [ARMOR]=4}
-	for _, deInfo in ipairs(TSM.db.global.history[GetSpellInfo(TSM.spells.disenchant)]) do
-		local rarity, iLevel, iType = TSMAPI:Select({3, 4, 6}, TSMAPI:GetSafeItemInfo(deInfo.item))
-		local isValid = true
-		if type(rarity) == "number" and rarity >= 2 and rarity <= 4 and type(iLevel) == "number" and iLevel > 0 and type(iType) == "string" and iTypeLookup[iType] and deInfo.isDraenicEnchanting then
-			local result = {}
-			for itemString, num in pairs(deInfo.result) do
-				local itemID = TSMAPI:GetItemID(itemString)
-				if itemID and num > 0 then
-					tinsert(result, itemID)
-					tinsert(result, num)
-				end
-			end
-			for i=#result+1, 6 do
-				result[i] = 0
-			end
-			tinsert(data, {rarity, iLevel, (iType == WEAPON and 2 or 4), deInfo.time, unpack(result)})
-		end
-	end
-	if TSM.appDB and TSM.appDB.global then
-		TSM.appDB.global.disenchant = data
-		TradeSkillMasterAppDB.version = max(TradeSkillMasterAppDB.version, 1)
-	end
 end
 
 -- determines if an item is millable or prospectable
@@ -102,55 +93,45 @@ function TSM:IsDestroyable(itemString)
 		return unpack(destroyCache[itemString])
 	end
 
-	local quality, iType, iSubType = TSMAPI:Select({3, 6, 7}, TSMAPI:GetSafeItemInfo(itemString))
-	local WEAPON, ARMOR, TRADE_GOODS = TSMAPI:Select({1, 2, 6}, GetAuctionItemClasses())
-	local METAL_AND_STONE, HERB = TSMAPI:Select({4, 6}, GetAuctionItemSubClasses(6))
-	if itemString and not TSMAPI.DisenchantingData.notDisenchantable[itemString] and (iType == ARMOR or iType == WEAPON) and (quality >= 2 and quality <= TSM.db.global.deMaxQuality) then
-		destroyCache[itemString] = {IsSpellKnown(TSM.spells.disenchant) and GetSpellInfo(TSM.spells.disenchant), 1}
+	-- disenchanting
+	local quality = TSMAPI.Item:GetQuality(itemString)
+	if TSMAPI.Item:IsDisenchantable(itemString) and (quality >= 2 and quality <= TSM.db.global.deMaxQuality) then
+		destroyCache[itemString] = { IsSpellKnown(TSM.spells.disenchant) and GetSpellInfo(TSM.spells.disenchant), 1 }
 		return unpack(destroyCache[itemString])
 	end
-	
-	if iType ~= TRADE_GOODS or (iSubType ~= METAL_AND_STONE and iSubType ~= HERB) then
+
+	local classId = TSMAPI.Item:GetClassId(itemString)
+	local subClassId = TSMAPI.Item:GetSubClassId(itemString)
+	if classId ~= LE_ITEM_CLASS_TRADEGOODS or (subClassId ~= 7 and subClassId ~= 9) then
 		destroyCache[itemString] = {}
 		return unpack(destroyCache[itemString])
 	end
-	
 
 	-- milling
-	for _, targetItem in ipairs(TSMAPI:GetConversionTargetItems("mill")) do
-		local herbs = TSMAPI:GetItemConversions(targetItem)
+	for _, targetItem in ipairs(TSMAPI.Conversions:GetTargetItemsByMethod("mill")) do
+		local herbs = TSMAPI.Conversions:GetData(targetItem)
 		if herbs[itemString] then
-			destroyCache[itemString] = {IsSpellKnown(TSM.spells.milling) and GetSpellInfo(TSM.spells.milling), 5}
-			break
+			local isKnown = IsSpellKnown(TSM.spells.milling) or TSMAPI.Inventory:GetBagQuantity("i:114942") > 0
+			destroyCache[itemString] = { isKnown and GetSpellInfo(TSM.spells.milling), 5 }
+			return unpack(destroyCache[itemString])
 		end
 	end
 
 	-- prospecting
-	for _, targetItem in ipairs(TSMAPI:GetConversionTargetItems("prospect")) do
-		local gems = TSMAPI:GetItemConversions(targetItem)
+	for _, targetItem in ipairs(TSMAPI.Conversions:GetTargetItemsByMethod("prospect")) do
+		local gems = TSMAPI.Conversions:GetData(targetItem)
 		if gems[itemString] then
-			destroyCache[itemString] = {IsSpellKnown(TSM.spells.prospect) and GetSpellInfo(TSM.spells.prospect), 5}
-			break
+			destroyCache[itemString] = { IsSpellKnown(TSM.spells.prospect) and GetSpellInfo(TSM.spells.prospect), 5 }
+			return unpack(destroyCache[itemString])
 		end
 	end
-	return unpack(destroyCache[itemString] or {})
-end
 
-function TSM:GetPrice(customPrice, itemString)
-	local price, err
-	if type(customPrice) == "number" then
-		price = customPrice
-	elseif type(customPrice) == "string" then
-		local func, parseErr = TSMAPI:ParseCustomPrice(customPrice)
-		err = parseErr
-		price = func and func(itemString)
-	end
-	return price ~= 0 and price or nil, err
+	return destroyCache[itemString] and unpack(destroyCache[itemString]) or nil
 end
 
 function TSM:HasDraenicEnchanting()
 	local profession1, profession2 = GetProfessions()
-	
+
 	-- check first profession
 	if profession1 then
 		local skillName, _, level, maxLevel = GetProfessionInfo(profession1)
@@ -158,7 +139,7 @@ function TSM:HasDraenicEnchanting()
 			return true
 		end
 	end
-	
+
 	-- check second profession
 	if profession2 then
 		local skillName, _, level, maxLevel = GetProfessionInfo(profession2)

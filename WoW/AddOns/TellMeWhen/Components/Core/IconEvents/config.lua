@@ -7,7 +7,7 @@
 --		Banjankri of Blackrock, Predeter of Proudmoore, Xenyr of Aszune
 
 -- Currently maintained by
--- Cybeloras of Aerie Peak/Detheroc/Mal'Ganis
+-- Cybeloras of Aerie Peak
 -- --------------------
 
 
@@ -30,9 +30,9 @@ EVENTS.CONST = {
 	EVENT_INVALID_REASON_NOEVENT = 4,
 }
 
-local EventsTab = TMW.Classes.IconEditorTab:NewTab("ICONEVENTS", 10, "Events")
-EventsTab:SetText(TMW.L["EVENTS_TAB"])
-TMW:TT(EventsTab, "EVENTS_TAB", "EVENTS_TAB_DESC")
+local EventsTab = TMW.IE:RegisterTab("ICON", "ICONEVENTS", "Events", 10)
+EventsTab:SetHistorySet(TMW.C.HistorySet:GetHistorySet("ICON"))
+EventsTab:SetTexts(L["EVENTS_TAB"], L["EVENTS_TAB_DESC"])
 
 
 
@@ -58,48 +58,13 @@ TMW.IconDragger:RegisterIconDragHandler(120, -- Copy Event Handlers
 	end
 )
 
-TMW:NewClass("Config_Base_Event"){
-	OnNewInstance_Base_Event = function(self, data)
-		TMW:RegisterCallback("TMW_CONFIG_EVENTS_SETTINGS_SETUP_PRE", self, "ReloadSetting")
-	end,
-
-	GetSettingTable = function(self)
-		return TMW.CI.ics and EVENTS:GetEventSettings()
-	end,
-}
-
-TMW:NewClass("Config_CheckButton_Event", "Config_Base_Event", "Config_CheckButton"){
-
-	METHOD_EXTENSIONS = {
-		OnClick = function(self, button)
-			EVENTS:LoadEventSettings()
-		end,
-	},
-
-	CheckInteractionStates = TMW.NULLFUNC,
-}
-
-TMW:NewClass("Config_Slider_Event", "Config_Base_Event", "Config_Slider"){
-	OnNewInstance_Slider_Event = function(self)
-		local color = 34/0xFF
-		self.Low:SetTextColor(color, color, color, 1)
-		self.High:SetTextColor(color, color, color, 1)
-	end,
-
-	CheckInteractionStates = TMW.NULLFUNC,
-}
-
-TMW:NewClass("Config_EditBox_Event", "Config_Base_Event", "Config_EditBox"){
-	METHOD_EXTENSIONS = {
-		SaveSetting = function(self, button)
-			EVENTS:LoadConfig()
-		end,
-	},
-}
 
 
 function EVENTS:LoadConfig()
 	local EventHandlerFrames = EVENTS.EventHandlerFrames
+	EventHandlerFrames.frames = EventHandlerFrames.frames or {} -- Framestack workaround
+	local frames = EventHandlerFrames.frames
+
 	local previousFrame
 
 	local yAdjustTitle, yAdjustText = 0, 0
@@ -122,14 +87,16 @@ function EVENTS:LoadConfig()
 
 
 		-- Get the frame that this event will be listed in.
-		local frame = EVENTS.EventHandlerFrames[eventID]
+		local frame = frames[eventID]
 		if not frame then
 			-- If the frame doesn't exist, then create it.
-			frame = CreateFrame("Button", EventHandlerFrames:GetName().."Event"..eventID, EventHandlerFrames, "TellMeWhen_Event", eventID)
-			EventHandlerFrames[eventID] = frame
+			frame = CreateFrame("CheckButton", nil, EventHandlerFrames, "TellMeWhen_Event", eventID)
+			frames[eventID] = frame
 
-			frame:SetPoint("TOPLEFT", previousFrame, "BOTTOMLEFT", 0, -0.5)
-			frame:SetPoint("TOPRIGHT", previousFrame, "BOTTOMRIGHT", 0, -0.5)
+			if previousFrame then
+				frame:SetPoint("TOPLEFT", previousFrame, "BOTTOMLEFT", 0, -2)
+				frame:SetPoint("TOPRIGHT", previousFrame, "BOTTOMRIGHT", 0, -2)
+			end
 
 			local p, t, r, x, y = frame.EventName:GetPoint(1)
 			frame.EventName:SetPoint(p, t, r, x, y + yAdjustTitle)
@@ -180,7 +147,9 @@ function EVENTS:LoadConfig()
 			-- so that it can put useful information about the user's settings
 			-- (e.g. "Sound: TMW - Pling3" or "Animation: Icon: Shake")
 			local EventHandler = EVENTS:GetEventHandlerForEventSettings(eventID)
-			EventHandler:SetupEventDisplay(eventID)
+
+			local dataText = EventHandler:GetEventDisplayText(eventID)
+			frame.DataText:SetText(dataText)
 
 			if EventHandler.testable then
 				frame.Play:Enable()
@@ -225,54 +194,58 @@ function EVENTS:LoadConfig()
 	end
 
 	-- Hide unused frames
-	for i = max(TMW.CI.ics.Events.n + 1, 1), #EventHandlerFrames do
-		EventHandlerFrames[i]:Hide()
+	for i = max(TMW.CI.ics.Events.n + 1, 1), #frames do
+		frames[i]:Hide()
 	end
 
 	-- Position the first frame
-	if EventHandlerFrames[1] then
-		EventHandlerFrames[1]:SetPoint("TOPLEFT", EventHandlerFrames, "TOPLEFT", 0, 0)
-		EventHandlerFrames[1]:SetPoint("TOPRIGHT", EventHandlerFrames, "TOPRIGHT", 0, 0)
+	if frames[1] then
+		frames[1]:SetPoint("TOPLEFT", EventHandlerFrames, "TOPLEFT", 0, 0)
+		frames[1]:SetPoint("TOPRIGHT", EventHandlerFrames, "TOPRIGHT", 0, 0)
 	end
 
-	-- Set the height of the first 
-	local frame1Height = EventHandlerFrames[1] and EventHandlerFrames[1]:GetHeight() or 0
+	-- Set the height of the container 
+	local frame1Height = frames[1] and frames[1]:GetHeight() or 0
 	EventHandlerFrames:SetHeight(max(TMW.CI.ics.Events.n*frame1Height, 1))
 
 	-- If an event handler's configuration was not loaded for an event,
 	-- hide all handler configuration panels
 	if not didLoad then
 		EVENTS:ShowHandlerPickerButtons()
-		--IE.Events.HelpText:Show()
 	end
 
 	EVENTS:SetTabText()
 end
-TMW:RegisterCallback("TMW_CONFIG_ICON_LOADED", EVENTS, "LoadConfig")
 
 function EVENTS:LoadEventID(eventID)
-	-- Loads the configuration for the specified eventID
-	local eventFrame = eventID and EVENTS.EventHandlerFrames[eventID]
+
+	TMW.IE:SaveSettings()
 	
 	EVENTS.currentEventID = eventID ~= 0 and eventID or nil
 
-	for i, frame in ipairs(EVENTS.EventHandlerFrames) do
-		frame.selected = nil
-		frame:UnlockHighlight()
-		frame:GetHighlightTexture():SetAlpha(0.1)
+
+	-- RESET CONFIGURATION:
+	-- Uncheck all existing notification handlers
+	for i, frame in ipairs(EVENTS.EventHandlerFrames.frames) do
+		frame:SetChecked(false)
 	end
 
-
+	-- Hide the config containers for all handlers
 	for _, EventHandler in pairs(TMW.Classes.EventHandler.instancesByName) do
 		EventHandler.ConfigContainer:Hide()
 	end
 	EVENTS.EventSettingsContainer:Hide()
-	--IE.Events.HelpText:Show()
 
+
+	local eventFrame = eventID and EVENTS.EventHandlerFrames.frames[eventID]
 
 	if not eventFrame or eventID == 0 or not eventFrame:IsShown() then
 		return
 	end
+
+	-- START LOADING NEW EVENT:
+	-- Check the corresponding notification handler list frame.
+	eventFrame:SetChecked(true)
 
 	EVENTS:HidePickerButtons()
 	
@@ -287,10 +260,6 @@ function EVENTS:LoadEventID(eventID)
 		EVENTS:LoadEventSettings()
 	end
 
-
-	eventFrame.selected = 1
-	eventFrame:LockHighlight()
-	eventFrame:GetHighlightTexture():SetAlpha(0.2)
 end
 
 function EVENTS:LoadEventSettings()
@@ -306,31 +275,24 @@ function EVENTS:LoadEventSettings()
 
 	EventSettingsContainer:Show()
 
-	--hide settings
-	EventSettingsContainer.PassThrough				:Hide()
-	EventSettingsContainer.SimplyShown				:Hide()
-	EventSettingsContainer.OnlyShown				:Hide()
-	EventSettingsContainer.Operator					:Hide()
-	EventSettingsContainer.Value					:Hide()
-	EventSettingsContainer.CndtJustPassed			:Hide()
-	EventSettingsContainer.PassingCndt				:Hide()
-	EventSettingsContainer.Frequency				:Hide()
-	EventSettingsContainer.IconEventWhileCondition	:Hide()
-
-	TMW:Fire("TMW_CONFIG_EVENTS_SETTINGS_SETUP_PRE")
-
+	-- Hide all settings frames
+	for k, v in pairs(EventSettingsContainer) do
+		if type(v) == "table" and v:GetParent() == EventSettingsContainer then
+			v:Hide()
+		end
+	end
 
 	local eventData = EVENTS:GetEventData()
 
 	if eventData then
-		IE.Events.EventSettingsContainerEventName:SetText("(" .. EVENTS.currentEventID .. ") " .. eventData.text)
+		IE.Pages.Events.EventSettingsEventName:SetText("(" .. EVENTS.currentEventID .. ") " .. eventData.text)
 
 		if eventSettings.Event == "WCSP" then
 			if EventHandler.frequencyMinimum then
 				EventSettingsContainer.Frequency:Show()
 
 				EventSettingsContainer.Frequency:SetMinMaxValues(EventHandler.frequencyMinimum, math.huge)
-				EventSettingsContainer.Frequency:ReloadSetting()
+				EventSettingsContainer.Frequency:RequestReload()
 			end
 		else
 			EventSettingsContainer.PassThrough:Show()
@@ -348,29 +310,23 @@ function EVENTS:LoadEventSettings()
 			if type(frame) == "table" then
 				local state = settingsUsedByEvent and settingsUsedByEvent[setting]
 
-				if state == "FORCE" then
-					frame:Disable()
-					frame:SetAlpha(1)
-				elseif state == "FORCEDISABLED" then
-					frame:Disable()
-					frame:SetAlpha(0.4)
+				if type(state) == "function" then
+					state(frame)
 				else
-					frame:SetAlpha(1)
-					if frame.Enable then
-						frame:Enable()
-					end
+					frame:Enable()
 				end
-				if state then
-					frame:Show()
+				if state ~= nil then
+					frame:SetShown(not not state)
 				end
 			end
 		end
 
+		-- EventSettingsContainer.PassingCndt:RequestReload()
 		if EventSettingsContainer.PassingCndt				:GetChecked() then
 			EventSettingsContainer.Operator.ValueLabel		:SetFontObject(GameFontHighlight)
 			EventSettingsContainer.Operator					:Enable()
 			EventSettingsContainer.Value					:Enable()
-			if settingsUsedByEvent and not settingsUsedByEvent.CndtJustPassed == "FORCE" then
+			if settingsUsedByEvent and type(settingsUsedByEvent.CndtJustPassed) ~= "function" then
 				EventSettingsContainer.CndtJustPassed		:Enable()
 			end
 		else
@@ -389,7 +345,6 @@ function EVENTS:LoadEventSettings()
 		end
 	end
 
-	
 	TMW:Fire("TMW_CONFIG_EVENTS_SETTINGS_SETUP_POST")
 end
 
@@ -399,14 +354,16 @@ function EVENTS:LoadHandlerPickerButtons()
 	local previousFrame
 
 	-- Handler pickers
-	local HandlerPickers = IE.Events.HandlerPickers
+	local HandlerPickers = IE.Pages.Events.HandlerPickers
+	HandlerPickers.frames = HandlerPickers.frames or {} -- Framestack workaround
+
 	for i, EventHandler in ipairs(TMW.Classes.EventHandler.orderedInstances) do
 
-		local frame = HandlerPickers[i]
+		local frame = HandlerPickers.frames[i]
 		if not frame then
 			-- If the frame doesn't exist, then create it.
-			frame = CreateFrame("Button", HandlerPickers:GetName().."Picker"..i, HandlerPickers, "TellMeWhen_HandlerPicker", i)
-			HandlerPickers[i] = frame
+			frame = CreateFrame("Button", nil, HandlerPickers, "TellMeWhen_HandlerPicker", i)
+			HandlerPickers.frames[i] = frame
 
 			if i == 1 then
 				frame:SetPoint("TOP")
@@ -429,19 +386,22 @@ function EVENTS:LoadEventPickerButtons()
 	local previousFrame
 
 	-- Event (Trigger) pickers
-	local EventPickers = IE.Events.EventPickers
-	for i, frame in ipairs(EventPickers) do
+	local EventPickers = IE.Pages.Events.EventPickers
+	EventPickers.frames = EventPickers.frames or {} -- Framestack workaround
+	
+	for i, frame in ipairs(EventPickers.frames) do
 		frame:Hide()
 	end
 
 	local EventHandler = EVENTS:GetEventHandler(EVENTS.pickedHandler)
+
 	for i, eventData in ipairs(EVENTS:GetValidEvents(EventHandler)) do
 
-		local frame = EventPickers[i]
+		local frame = EventPickers.frames[i]
 		if not frame then
 			-- If the frame doesn't exist, then create it.
-			frame = CreateFrame("Button", EventPickers:GetName().."Picker"..i, EventPickers, "TellMeWhen_EventPicker", i)
-			EventPickers[i] = frame
+			frame = CreateFrame("Button", nil, EventPickers, "TellMeWhen_EventPicker", i)
+			EventPickers.frames[i] = frame
 		end
 
 		frame.Header:SetText(eventData.category)
@@ -449,7 +409,7 @@ function EVENTS:LoadEventPickerButtons()
 		if i == 1 then
 			frame:SetPoint("TOP", 0, -18)
 		else
-			if EventPickers[i-1].Header:GetText() ~= eventData.category then
+			if EventPickers.frames[i-1].Header:GetText() ~= eventData.category then
 				frame:SetPoint("TOP", previousFrame, "BOTTOM", 0, -20)
 				frame.Header:Show()
 			else
@@ -473,26 +433,24 @@ function EVENTS:ShowHandlerPickerButtons()
 	EVENTS:LoadHandlerPickerButtons()
 	EVENTS:LoadEventID(nil)
 
-	IE.Events.AddEvent:LockHighlight()
-	IE.Events.AddEvent:GetHighlightTexture():SetAlpha(0.2)
+	IE.Pages.Events.AddEvent:SetChecked(true)
 
-	IE.Events.HandlerPickers:Show()
-	IE.Events.EventPickers:Hide()
+	IE.Pages.Events.HandlerPickers:Show()
+	IE.Pages.Events.EventPickers:Hide()
 end
 
 function EVENTS:ShowEventPickerButtons()
 	EVENTS:LoadEventPickerButtons()
 
-	IE.Events.HandlerPickers:Hide()
-	IE.Events.EventPickers:Show()
+	IE.Pages.Events.HandlerPickers:Hide()
+	IE.Pages.Events.EventPickers:Show()
 end 
 
 function EVENTS:HidePickerButtons()
-	IE.Events.AddEvent:UnlockHighlight()
-	IE.Events.AddEvent:GetHighlightTexture():SetAlpha(0.1)
+	IE.Pages.Events.AddEvent:SetChecked(false)
 
-	IE.Events.HandlerPickers:Hide()
-	IE.Events.EventPickers:Hide()
+	IE.Pages.Events.HandlerPickers:Hide()
+	IE.Pages.Events.EventPickers:Hide()
 end
 
 function EVENTS:PickEvent(event)
@@ -503,19 +461,25 @@ function EVENTS:PickEvent(event)
 	local eventID = TMW.CI.ics.Events.n
 	local eventSettings = EVENTS:GetEventSettings(eventID)
 
-	eventSettings.Event = event
 	eventSettings.Type = handlerIdentifier
+
+	EVENTS:SetEvent(eventID, event)
+
+	EVENTS.currentEventID = eventID
+	IE.Pages.Events:OnSettingSaved()
+end
+
+function EVENTS:SetEvent(eventID, event)
+	local eventSettings = EVENTS:GetEventSettings(eventID)
+
+	eventSettings.Event = event
 
 	local eventData = TMW.EventList[event]
 	if eventData and eventData.applyDefaultsToSetting then
 		eventData.applyDefaultsToSetting(eventSettings)
 	end
 
-	EVENTS:LoadConfig()
-
-	EVENTS:LoadEventID(eventID)
-
-	TMW.DD:CloseDropDownMenus()
+	IE.Pages.Events:OnSettingSaved()
 end
 
 
@@ -523,32 +487,28 @@ end
 
 function EVENTS:AdjustScrollFrame()
 	local ScrollFrame = EVENTS.EventHandlerFrames.ScrollFrame
-	local eventFrame = EVENTS.EventHandlerFrames[EVENTS.currentEventID]
+	local eventFrame = EVENTS.EventHandlerFrames.frames[EVENTS.currentEventID]
 
 	if not eventFrame then return end
 
-	if eventFrame:GetBottom() and eventFrame:GetBottom() < ScrollFrame:GetBottom() then
-		ScrollFrame:SetVerticalScroll(ScrollFrame:GetVerticalScroll() + (ScrollFrame:GetBottom() - eventFrame:GetBottom()))
-	elseif eventFrame:GetTop() and eventFrame:GetTop() > ScrollFrame:GetTop() then
-		ScrollFrame:SetVerticalScroll(ScrollFrame:GetVerticalScroll() - (eventFrame:GetTop() - ScrollFrame:GetTop()))
-	end
+	ScrollFrame:ScrollToFrame(eventFrame)
 end
 
 function EVENTS:SetTabText()
 	local n = EVENTS:GetNumUsedEvents()
 
 	if n > 0 then
-		EventsTab:SetText(L["EVENTS_TAB"] .. " |cFFFF5959(" .. n .. ")")
+		EventsTab:SetText(L["EVENTS_TAB"] .. ": |cFFFF5959" .. n)
 	else
-		EventsTab:SetText(L["EVENTS_TAB"] .. " (" .. n .. ")")
+		EventsTab:SetText(L["EVENTS_TAB"] .. ": 0")
 	end
 end
-TMW:RegisterCallback("TMW_CONFIG_LOADED", EVENTS, "SetTabText")
+TMW:RegisterCallback("TMW_CONFIG_TAB_CLICKED", EVENTS, "SetTabText")
 
 
 
-function EVENTS:IsEventIDValid(id)
-	local eventSettings = EVENTS:GetEventSettings(id)
+function EVENTS:IsEventIDValid(eventID)
+	local eventSettings = EVENTS:GetEventSettings(eventID)
 
 	local EventHandler = EVENTS:GetEventHandlerForEventSettings(eventSettings)
 
@@ -577,12 +537,15 @@ function EVENTS:IsEventIDValid(id)
 		-- The event is not valid for the current icon configuration
 		return false, EVENTS.CONST.EVENT_INVALID_REASON_MISSINGCOMPONENT
 	end
-
 end
 
 function EVENTS:GetEventSettings(eventID)
+	eventID = eventID or EVENTS.currentEventID
+	local Events = TMW.CI.ics and TMW.CI.ics.Events
 
-	return TMW.CI.ics and TMW.CI.ics.Events[eventID or EVENTS.currentEventID]
+	if Events and eventID and eventID <= Events.n then
+		return Events[eventID]
+	end
 end
 
 function EVENTS:GetEventData(event)
@@ -654,44 +617,55 @@ function EVENTS:GetValidEvents(EventHandler)
 end
 
 
+local function OperatorMenu_DropDown_OnClick(button, dropdown)
+	dropdown:SetUIDropdownText(button.value)
 
-function EVENTS:UpOrDown(button, delta)
-	local ID = button:GetID()
-	local settings = TMW.CI.ics.Events
+	EVENTS:GetEventSettings().Operator = button.value
+	TMW:TT(dropdown, button.tooltipTitle, nil, 1)
 
-	local curdata = settings[ID]
-	local destinationdata = settings[ID+delta]
-	settings[ID] = destinationdata
-	settings[ID+delta] = curdata
-
-	EVENTS:LoadConfig()
+	dropdown:OnSettingSaved()
 end
-
-function EVENTS.OperatorMenu_DropDown(frame)
-	local eventData = EVENTS.EventHandlerFrames[EVENTS.currentEventID].eventData
+function EVENTS.OperatorMenu_DropDown(dropdown)
+	local eventData = EVENTS.EventHandlerFrames.frames[EVENTS.currentEventID].eventData
+	local eventSettings = EVENTS:GetEventSettings()
 
 	for k, v in pairs(TMW.operators) do
 		if not eventData.blacklistedOperators or not eventData.blacklistedOperators[v.value] then
 			local info = TMW.DD:CreateInfo()
-			info.func = EVENTS.OperatorMenu_DropDown_OnClick
+			info.func = OperatorMenu_DropDown_OnClick
 			info.text = v.text
 			info.value = v.value
+			info.checked = v.value == eventSettings.Operator
 			info.tooltipTitle = v.tooltipText
-			info.arg1 = frame
+			info.arg1 = dropdown
 			TMW.DD:AddButton(info)
 		end
 	end
 end
-function EVENTS.OperatorMenu_DropDown_OnClick(button, frame)
-	frame:SetUIDropdownText(button.value)
 
-	EVENTS:GetEventSettings().Operator = button.value
-	TMW:TT(frame, button.tooltipTitle, nil, 1)
+
+local function ChangeEvent_Dropdown_OnClick(button, eventID, event)
+	TMW.DD:CloseDropDownMenus()
+
+	EVENTS:SetEvent(eventID, event)
 end
+local function ChangeEvent_Dropdown_OnClick_Clone(button, eventID)
+	local eventSettings = EVENTS:GetEventSettings(eventID)
 
+	local n = TMW.CI.ics.Events.n + 1
+	TMW:CopyTableInPlaceUsingDestinationMeta(eventSettings, TMW.CI.ics.Events[n], true)
+	TMW.CI.ics.Events.n = n
 
+	TMW.DD:CloseDropDownMenus()
+
+	IE.Pages.Events:OnSettingSaved()
+
+	if EVENTS:IsEventIDValid(n) then
+		EVENTS:LoadEventID(n)
+	end
+end
 function EVENTS:ChangeEvent_Dropdown()
-	local eventButton = self:GetParent()
+	local eventButton = self.eventButton -- This is set in XML when the dropdown is opened.
 	local eventID = eventButton:GetID()
 	local EventHandler = EVENTS:GetEventHandlerForEventSettings(eventID)
 
@@ -699,7 +673,7 @@ function EVENTS:ChangeEvent_Dropdown()
 		local info = TMW.DD:CreateInfo()
 		info.text = L["EVENTS_CLONEHANDLER"]
 		info.arg1 = eventID
-		info.func = EVENTS.ChangeEvent_Dropdown_OnClick_Clone
+		info.func = ChangeEvent_Dropdown_OnClick_Clone
 		info.keepShownOnClick = false
 		info.notCheckable = true
 		TMW.DD:AddButton(info)
@@ -722,42 +696,16 @@ function EVENTS:ChangeEvent_Dropdown()
 
 			info.value = eventData.event
 			info.checked = eventData.event == eventButton.event
-			info.func = EVENTS.ChangeEvent_Dropdown_OnClick
+			info.func = ChangeEvent_Dropdown_OnClick
 			info.keepShownOnClick = false
-			info.arg1 = eventButton
+			info.arg1 = eventButton:GetID()
 			info.arg2 = eventData.event
 
 			TMW.DD:AddButton(info)
 		end
 	end
 end
-function EVENTS:ChangeEvent_Dropdown_OnClick(eventButton, event)
-	local eventID = eventButton:GetID()
-	local eventSettings = EVENTS:GetEventSettings(eventID)
 
-	eventSettings.Event = event
-
-	local eventData = TMW.EventList[event]
-	if eventData and eventData.applyDefaultsToSetting then
-		eventData.applyDefaultsToSetting(eventSettings)
-	end
-
-	EVENTS:LoadConfig()
-end
-function EVENTS:ChangeEvent_Dropdown_OnClick_Clone(eventID)
-	local eventSettings = EVENTS:GetEventSettings(eventID)
-
-	local n = TMW.CI.ics.Events.n + 1
-	TMW:CopyTableInPlaceWithMeta(eventSettings, TMW.CI.ics.Events[n])
-	TMW.CI.ics.Events.n = n
-	--EVENTS.currentEventID = n
-
-	EVENTS:LoadConfig()
-
-	if EVENTS:IsEventIDValid(n) then
-		EVENTS:LoadEventID(n)
-	end
-end
 
 
 
@@ -768,12 +716,14 @@ function ColumnConfig:GetListItemFrame(frameID)
 	
 	local frame = SubHandlerList[frameID]
 	if not frame then
-		frame = CreateFrame("Button", SubHandlerList:GetName().."Item"..frameID, SubHandlerList, "TellMeWhen_EventHandler_SubHandlerListButton", frameID)
+		frame = CreateFrame("CheckButton", SubHandlerList:GetName().."Item"..frameID, SubHandlerList, "TellMeWhen_EventHandler_SubHandlerListButton", frameID)
 		SubHandlerList[frameID] = frame
 
 		local previousFrame = frameID > 1 and SubHandlerList[frameID - 1] or nil
-		frame:SetPoint("TOPLEFT", previousFrame, "BOTTOMLEFT", 0, 0)
-		frame:SetPoint("TOPRIGHT", previousFrame, "BOTTOMRIGHT", 0, 0)
+		if previousFrame then
+			frame:SetPoint("TOPLEFT", previousFrame, "BOTTOMLEFT", 0, -2)
+			frame:SetPoint("TOPRIGHT", previousFrame, "BOTTOMRIGHT", 0, -2)
+		end
 	end
 
 	frame.EventHandler = self
@@ -799,9 +749,9 @@ function ColumnConfig:LoadSettingsForEventID(id)
 		tinsert(subHandlersToDisplay, subHandlerDataParent)
 	end
 	
-	for i, GenericComponent in ipairs(TMW.CI.icon.Components) do
-		if GenericComponent.EventHandlerData then
-			for i, subHandlerDataParent in ipairs(GenericComponent.EventHandlerData) do
+	for i, Component in ipairs(TMW.CI.icon.Components) do
+		if  Component.EventHandlerData and Component.IsEnabled then
+			for i, subHandlerDataParent in ipairs(Component.EventHandlerData) do
 				if subHandlerDataParent.identifier == self.subHandlerDataIdentifier then
 					tinsert(subHandlersToDisplay, subHandlerDataParent)
 				end
@@ -853,17 +803,13 @@ function ColumnConfig:SetSubHandler(subHandlerIdentifier)
 		if old ~= subHandlerIdentifier then
 
 			TMW.EVENTS:GetEventSettings()[self.subHandlerSettingKey] = subHandlerIdentifier
-			TMW.IE:ScheduleIconSetup()
 
-
-			TMW.EVENTS:LoadConfig()
 			local eventSettings = EVENTS:GetEventSettings()
 			if subHandlerData.applyDefaultsToSetting then
 				subHandlerData.applyDefaultsToSetting(eventSettings)
 			end
-
-
-			self:SelectSubHandler(subHandlerIdentifier)
+			
+			TMW.IE.Pages.Events:OnSettingSaved()
 		end
 	end
 end
@@ -875,11 +821,10 @@ function ColumnConfig:SelectSubHandler(subHandlerIdentifier)
 		local f = self.ConfigContainer.SubHandlerList[i]
 		if f and f:IsShown() then
 			if f.subHandlerIdentifier == subHandlerIdentifier then
-				subHandlerListButton = f
+				f:SetChecked(true)
+			else
+				f:SetChecked(false)
 			end
-			f.selected = nil
-			f:UnlockHighlight()
-			f:GetHighlightTexture():SetVertexColor(1, 1, 1, 1)
 		end
 	end
 
@@ -887,26 +832,6 @@ function ColumnConfig:SelectSubHandler(subHandlerIdentifier)
 	self.currentSubHandlerData = subHandlerData
 
 	self:SetupConfig(subHandlerData)
-
-	if subHandlerListButton then
-		subHandlerListButton:LockHighlight()
-		subHandlerListButton:GetHighlightTexture():SetVertexColor(NORMAL_FONT_COLOR.r, NORMAL_FONT_COLOR.g, NORMAL_FONT_COLOR.b, 1)
-	end
-
-	self:SetupEventDisplay(self.currentEventID)
-end
-
-function ColumnConfig:RegisterConfigFrame(identifier, configFrameData)
-	configFrameData.identifier = identifier
-	TMW:ValidateType("identifier", "RegisterConfigFrame(identifier, configFrameData)", identifier, "string")
-	
-	TMW:ValidateType("configFrameData.frame", "RegisterConfigFrame(identifier, configFrameData)", configFrameData.frame, "string;frame")
-	TMW:ValidateType("configFrameData.Load", "RegisterConfigFrame(identifier, configFrameData)", configFrameData.Load, "function")
-	
-	TMW:ValidateType("configFrameData.topPadding", "RegisterConfigFrame(identifier, configFrameData)", configFrameData.topPadding, "number;nil")
-	TMW:ValidateType("configFrameData.bottomPadding", "RegisterConfigFrame(identifier, configFrameData)", configFrameData.bottomPadding, "number;nil")
-	
-	self.ConfigFrameData[identifier] = configFrameData
 end
 
 -- Override this method for handlers that need to blacklist a setting.
@@ -926,16 +851,10 @@ function ColumnConfig:SetupConfig(subHandlerData)
 	end
 
 	assert(Frames, self.className .. " doesn't have a ConfigFrames table!")
+	assert(Frames.ConfigFrames, self.className .. " isn't a TMW.C.Events_ColumnConfigContainer!")
 	
-	for configFrameIdentifier, configFrameData in pairs(self.ConfigFrameData) do
-		
-		local frame = configFrameData.frame
-		if type(frame) == "string" then
-			frame = Frames[frame]
-		end
-		if frame then
-			frame:Hide()
-		end
+	for i, frame in pairs(Frames.ConfigFrames) do
+		frame:Hide()
 	end
 
 	if not desiredFrames then
@@ -945,20 +864,14 @@ function ColumnConfig:SetupConfig(subHandlerData)
 	local lastFrame, lastFrameBottomPadding
 	for i, configFrameIdentifier in ipairs(desiredFrames) do
 		if not self:IsFrameBlacklisted(configFrameIdentifier) then
-			local configFrameData = self.ConfigFrameData[configFrameIdentifier]
+			local frame = Frames[configFrameIdentifier]
 			
-			if not configFrameData then
-				TMW:Error("Values in ConfigFrames for event handler %q must resolve to a table registered via EventHandler_ColumnConfig:RegisterConfigFrame()", subHandlerIdentifier)
+			if not frame then
+				TMW:Error("Column config frame %q could not be found for event handler %q.", configFrameIdentifier, subHandlerIdentifier)
 			else
-				local frame = configFrameData.frame
-				if type(frame) == "string" then
-					frame = Frames[frame]
-					if not frame then
-						TMW:Error("Couldn't find child of %s with key %q for event handler %q", Frames:GetName(), configFrameData.frame, subHandlerIdentifier)
-					end
-				end
-				
-				local yOffset = (configFrameData.topPadding or 0) + (lastFrameBottomPadding or 0)
+				-- Data is the table passed to TMW:CInit(frame, data)
+				local data = frame.data
+				local yOffset = (frame.paddingTop or 0) + (lastFrameBottomPadding or 0)
 				
 				if lastFrame then
 					frame:SetPoint("TOP", lastFrame, "BOTTOM", 0, -yOffset)
@@ -967,34 +880,19 @@ function ColumnConfig:SetupConfig(subHandlerData)
 				end
 				frame:Show()
 				lastFrame = frame
-				
-				TMW.safecall(configFrameData.Load, configFrameData, frame, EventSettings)
-				
-				lastFrameBottomPadding = configFrameData.bottomPadding
+
+				lastFrameBottomPadding = frame.paddingBottom
 			end
 		end
 	end	
 end
 
+TMW:NewClass("Events_ColumnConfigContainer", "Frame"){
+	OnNewInstance = function(self)
+		self.ConfigFrames = {}
 
-function ColumnConfig.Load_Generic_Slider(configFrameData, frame, EventSettings)
-	frame:ReloadSetting()
-
-	if configFrameData.text then
-		frame.text:SetText(configFrameData.text)
-		frame:SetTooltip(configFrameData.text, configFrameData.desc)
-	end
-
-	frame:Enable()
-end
-
-function ColumnConfig.Load_Generic_Check(configFrameData, frame, EventSettings)
-	frame:SetChecked(EventSettings[configFrameData.identifier])
-
-	frame.setting = configFrameData.identifier
-
-	if configFrameData.text then
-		frame.text:SetText(configFrameData.text)
-		TMW:TT(frame, configFrameData.text, configFrameData.desc, 1, 1)
-	end
-end
+		for i, child in TMW:Vararg(self:GetChildren()) do
+			tinsert(self.ConfigFrames, child)
+		end
+	end,
+}

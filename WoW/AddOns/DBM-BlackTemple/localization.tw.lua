@@ -10,10 +10,6 @@ L:SetGeneralLocalization{
 	name = "高階督軍納珍塔斯"
 }
 
-L:SetOptionLocalization{
-	InfoFrame	= "為血量顯示訊息框架(小於8.8千血量)"
-}
-
 L:SetMiscLocalization{
 	HealthInfo	= "血量資訊"
 }
@@ -28,8 +24,7 @@ L:SetGeneralLocalization{
 }
 
 L:SetWarningLocalization{
-	WarnPhase		= "%s階段",
-	WarnKite		= ">%s<被注視了"
+	WarnPhase		= "%s階段"
 }
 
 L:SetTimerLocalization{
@@ -38,14 +33,13 @@ L:SetTimerLocalization{
 
 L:SetOptionLocalization{
 	WarnPhase		= "為下個階段顯示警告",
-	WarnKite		= "提示注視目標",
 	TimerPhase		= "為下個階段顯示計時器",
 	KiteIcon		= "為注視目標設置圖示",
 }
 
 L:SetMiscLocalization{
-	PhaseKite		= "瑟普莫斯憤怒的捶擊地面!",
-	PhaseTank		= "地上開始裂開!",
+	PhaseTank		= "瑟普莫斯憤怒的捶擊地面!",--Check if Backwards
+	PhaseKite		= "地上開始裂開!",--Check if Backwards
 	ChangeTarget	= "瑟普莫斯需要一個新目標!",
 	Kite			= "風箏",
 	Tank			= "坦克"
@@ -109,10 +103,11 @@ L:SetOptionLocalization{
 }
 
 L:SetMiscLocalization{
-	Pull			= "等待你們的只有痛苦與折磨﹗",
 	Suffering		= "受難精華",
 	Desire			= "慾望精華",
-	Anger			= "憤怒精華"
+	Anger			= "憤怒精華",
+	Phase1End		= "I don't want to go back!",
+	Phase2End		= "I won't be far!"
 }
 
 -----------------------
@@ -147,7 +142,6 @@ L:SetWarningLocalization{
 
 L:SetOptionLocalization{
 	Immune			= "當瑪蘭黛法術或物理免疫時顯示警告",
-	PoisonWhisper	= "傳送密語給中了$spell:41485的目標(需要團隊隊長)"
 }
 
 L:SetMiscLocalization{
@@ -175,8 +169,7 @@ L:SetWarningLocalization{
 
 L:SetTimerLocalization{
 	TimerNextHuman		= "人形階段",
-	TimerNextDemon		= "惡魔階段",
-	TimerPhase4			= "階段轉換"
+	TimerNextDemon		= "惡魔階段"
 }
 
 L:SetOptionLocalization{
@@ -184,7 +177,6 @@ L:SetOptionLocalization{
 	WarnDemon		= "為惡魔階段顯示計時器",
 	TimerNextHuman	= "為下一次人形階段顯示計時器",
 	TimerNextDemon	= "為下一次惡魔階段顯示計時器",
-	TimerPhase4		= "為第4階段轉換顯示計時器",
 	RangeFrame		= "為第3和第4階段顯示距離框架(10碼)"
 }
 

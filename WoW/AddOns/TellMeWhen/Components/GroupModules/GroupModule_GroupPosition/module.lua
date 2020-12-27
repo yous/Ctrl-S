@@ -7,7 +7,7 @@
 --		Banjankri of Blackrock, Predeter of Proudmoore, Xenyr of Aszune
 
 -- Currently maintained by
--- Cybeloras of Aerie Peak/Detheroc/Mal'Ganis
+-- Cybeloras of Aerie Peak
 -- --------------------
 
 
@@ -21,15 +21,17 @@ local print = TMW.print
 local GroupPosition = TMW:NewClass("GroupModule_GroupPosition", "GroupModule")
 
 GroupPosition:RegisterGroupDefaults{
-	Scale			= 2.0,
-	Level			= 10,
+	Locked  = false,
+	Scale   = 2.0,
+	Level   = 10,
+	Strata  = "MEDIUM",
 
 	Point = {
-		point 		  = "CENTER",
-		relativeTo 	  = "UIParent",
+		point         = "CENTER",
+		relativeTo    = "UIParent",
 		relativePoint = "CENTER",
-		x 			  = 0,
-		y 			  = 0,
+		x             = 0,
+		y             = 0,
 	},
 }
 
@@ -40,8 +42,10 @@ TMW:RegisterUpgrade(41402, {
 })
 
 
+GroupPosition:RegisterConfigPanel_XMLTemplate(10, "TellMeWhen_GM_GroupPosition")
 
-local function GetAnchoredPoints(group)
+
+local function GetAnchoredPoints(group, wasMove)
 	local _
 	local gs = group:GetSettings()
 	local p = gs.Point
@@ -49,7 +53,7 @@ local function GetAnchoredPoints(group)
 	local relframe = TMW.GUIDToOwner[p.relativeTo] or _G[p.relativeTo] or UIParent
 	local point, relativePoint = p.point, p.relativePoint
 
-	if relframe == UIParent then
+	if relframe == UIParent and wasMove then
 		-- use the smart anchor points provided by UIParent anchoring if it is being used
 		point, _, relativePoint = group:GetPoint(1)
 	end
@@ -190,8 +194,17 @@ function TMW_CursorAnchor:CheckState()
 	end
 end
 
+local warnedFstack = false
 function TMW_CursorAnchor:OnUpdate()
 	local x, y = GetCursorPosition()
+	if FrameStackTooltip and FrameStackTooltip:IsShown() then
+		x = x + 1
+		y = y - 1
+		if not warnedFstack then
+			warnedFstack = true
+			TMW:Print("Framestack detected. Shifting cursor anchor by 1px while fstack is up so it isn't in the way.")
+		end
+	end
 	local scale = self:GetEffectiveScale()
 
 	self:SetPoint("TOPLEFT", UIParent, "BOTTOMLEFT", x/scale, y/scale)
@@ -218,20 +231,70 @@ function GroupPosition:DetectFrame(event, time, Locked)
 	end
 end
 
-function GroupPosition:UpdatePositionAfterMovement()
-	self:CalibrateAnchors()
-	
-	self:SetPos()
-end
-
-
-function GroupPosition:CalibrateAnchors()
+function GroupPosition:UpdatePositionAfterMovement(wasMove)
 	local group = self.group
 	
 	local gs = group:GetSettings()
 	local p = gs.Point
+	
+	-- This may fail if the region is "restricted"
+	-- (https://us.forums.blizzard.com/en/wow/t/ui-changes-in-rise-of-azshara/202487)
+	-- Seems to be no way to determine restrictedness other than
+	-- do a restricted call and see if it fails.
 
-	p.point, p.relativeTo, p.relativePoint, p.x, p.y = GetAnchoredPoints(group)
+	local success, point, relativeTo, relativePoint, x, y = pcall(GetAnchoredPoints, group, wasMove)
+	if success then
+		p.point, p.relativeTo, p.relativePoint, p.x, p.y =
+			point, relativeTo, relativePoint, x, y
+	elseif wasMove then
+		-- Only print this on a move.
+		-- Non-moves happen when a user changes the target/point/relativePoint
+		-- in the settings UI. We don't want to warn that we can't "fix up" the position,
+		-- since not being able to do that is fairly harmless.
+		TMW:Print(L["GROUP_CANNOT_INTERACTIVELY_POSITION"]:format(group:GetGroupName()))
+	end
+	
+	self:SetPos()
+	
+	group:Setup()
+	TMW.IE:LoadGroup(1)
+end
+
+function GroupPosition:SetNewScale(newScale)
+	local group = self.group 
+	local oldScale = group:GetScale()
+
+	local p, rt, rp, oldX, oldY = group:GetPoint()
+
+	local newX = oldX * oldScale / newScale
+	local newY = oldY * oldScale / newScale
+
+
+	group:SetPoint(p, rt, rp, newX, newY)
+
+	group:GetSettings().Scale = newScale
+	group:SetScale(newScale)
+
+	self:UpdatePositionAfterMovement()
+end
+
+function GroupPosition:CanMove()
+
+	local canQuerySize = pcall(self.group.GetLeft, self.group)
+	if not canQuerySize then
+		return false
+	end
+
+	-- Reset this to true. Blizzard sets it false when a frame becomes restricted.
+	self.group:SetMovable(true)
+
+	if not self.group:IsMovable() then return false end
+
+	return not self.group:GetSettings().Locked
+end
+
+
+function GroupPosition:CalibrateAnchors()
 end
 
 function GroupPosition:SetPos()
@@ -296,10 +359,28 @@ function GroupPosition:SetPos()
 	-- For some reason this was 1 on one of my groups, which caused some issues with animations
 	gs.Level = max(gs.Level, 5)
 
+	group:SetFlattensRenderLayers(true)
 	group:SetFrameStrata(gs.Strata)
 	group:SetFrameLevel(gs.Level)
 	group:SetScale(gs.Scale)
+	--group:SetToplevel(true)
 end
 
+function GroupPosition:Reset()
+	local group = self.group
+	local gs = group:GetSettings()
+	
+	for k, v in pairs(TMW.Group_Defaults.Point) do
+		gs.Point[k] = v
+	end
 
+	gs.Level = TMW.Group_Defaults.Level
+	gs.Scale = 1
+	gs.Locked = TMW.Group_Defaults.Locked
+	gs.Strata = TMW.Group_Defaults.Strata
+	
+	group:Setup()
+	
+	TMW.IE:LoadGroup(1)
+end
 

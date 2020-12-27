@@ -10,7 +10,7 @@ L:SetGeneralLocalization{
 }
 
 L:SetOptionLocalization{
-	SetIconOnImpale		= DBM_CORE_AUTO_ICONS_OPTION_TEXT:format(69062)
+	SetIconOnImpale		= DBM_CORE_L.AUTO_ICONS_OPTION_TEXT:format(69062)
 }
 
 -------------------------
@@ -35,10 +35,9 @@ L:SetOptionLocalization{
 	WarnAddsSoon				= "Show pre-warning for adds spawning",
 	WarnReanimating				= "Show warning when an add is being revived",	-- Reanimated Adherent/Fanatic spawning
 	TimerAdds					= "Show timer for new adds",
-	ShieldHealthFrame			= "Show boss health with a health bar for $spell:70842",
-	SetIconOnDominateMind		= DBM_CORE_AUTO_ICONS_OPTION_TEXT:format(71289),
-	SetIconOnDeformedFanatic	= DBM_CORE_AUTO_ICONS_OPTION_TEXT:format(70900),
-	SetIconOnEmpoweredAdherent	= DBM_CORE_AUTO_ICONS_OPTION_TEXT:format(70901)
+	SetIconOnDominateMind		= DBM_CORE_L.AUTO_ICONS_OPTION_TEXT:format(71289),
+	SetIconOnDeformedFanatic	= DBM_CORE_L.AUTO_ICONS_OPTION_TEXT:format(70900),
+	SetIconOnEmpoweredAdherent	= DBM_CORE_L.AUTO_ICONS_OPTION_TEXT:format(70901)
 }
 
 L:SetMiscLocalization{
@@ -91,10 +90,9 @@ L:SetGeneralLocalization{
 }
 
 L:SetOptionLocalization{
-	BoilingBloodIcons		= DBM_CORE_AUTO_ICONS_OPTION_TEXT:format(72385),
+	BoilingBloodIcons		= DBM_CORE_L.AUTO_ICONS_OPTION_TEXT:format(72385),
 	RangeFrame				= "Show range frame (12 yards)",
-	RunePowerFrame			= "Show Boss Health + $spell:72371 bar",
-	BeastIcons				= "Set icons on Blood Beasts"
+	RunePowerFrame			= "Show Boss Health + $spell:72371 bar"
 }
 
 L:SetMiscLocalization{
@@ -113,7 +111,7 @@ L:SetGeneralLocalization{
 
 L:SetOptionLocalization{
 	RangeFrame			= "Show range frame (8 yards)",
-	SetIconOnGasSpore	= DBM_CORE_AUTO_ICONS_OPTION_TEXT:format(69279),
+	SetIconOnGasSpore	= DBM_CORE_L.AUTO_ICONS_OPTION_TEXT:format(69279),
 	AnnounceSporeIcons	= "Announce icons for $spell:69279 targets to raid chat<br/>(requires raid leader)",
 	AchievementCheck	= "Announce 'Flu Shot Shortage' achievement failure to raid<br/>(requires promoted status)"
 }
@@ -141,8 +139,7 @@ L:SetOptionLocalization{
 	WarnOozeSpawn				= "Show warning for Little Ooze spawning",
 	SpecWarnLittleOoze			= "Show special warning when you are attacked by Little Ooze",--creatureid 36897
 	RangeFrame					= "Show range frame (8 yards)",
-	InfectionIcon				= DBM_CORE_AUTO_ICONS_OPTION_TEXT:format(69674),
-	TankArrow					= "Show DBM arrow for Big Ooze kiter"
+	InfectionIcon				= DBM_CORE_L.AUTO_ICONS_OPTION_TEXT:format(69674)
 }
 
 L:SetMiscLocalization{
@@ -160,11 +157,10 @@ L:SetGeneralLocalization{
 }
 
 L:SetOptionLocalization{
-	OozeAdhesiveIcon			= DBM_CORE_AUTO_ICONS_OPTION_TEXT:format(70447),
-	GaseousBloatIcon			= DBM_CORE_AUTO_ICONS_OPTION_TEXT:format(70672),
-	UnboundPlagueIcon			= DBM_CORE_AUTO_ICONS_OPTION_TEXT:format(70911),
-	MalleableGooIcon			= "Set icon on first $spell:72295 target",
-	GooArrow					= "Show DBM arrow when $spell:72295 is near you"
+	OozeAdhesiveIcon			= DBM_CORE_L.AUTO_ICONS_OPTION_TEXT:format(70447),
+	GaseousBloatIcon			= DBM_CORE_L.AUTO_ICONS_OPTION_TEXT:format(70672),
+	UnboundPlagueIcon			= DBM_CORE_L.AUTO_ICONS_OPTION_TEXT:format(70911),
+	MalleableGooIcon			= "Set icon on first $spell:72295 target"
 }
 
 ----------------------------
@@ -189,10 +185,9 @@ L:SetOptionLocalization{
 	WarnTargetSwitch		= "Show warning to switch targets",-- Warn when another Prince needs to be damaged
 	WarnTargetSwitchSoon	= "Show pre-warning to switch targets",-- Every ~47 secs, you have to dps a different Prince
 	TimerTargetSwitch		= "Show timer for target switch cooldown",
-	EmpoweredFlameIcon		= DBM_CORE_AUTO_ICONS_OPTION_TEXT:format(72040),
+	EmpoweredFlameIcon		= DBM_CORE_L.AUTO_ICONS_OPTION_TEXT:format(72040),
 	ActivePrinceIcon		= "Set icon on the empowered Prince (skull)",
-	RangeFrame				= "Show range frame (12 yards)",
-	VortexArrow				= "Show DBM arrow when $spell:72037 is near you"
+	RangeFrame				= "Show range frame (12 yards)"
 }
 
 L:SetMiscLocalization{
@@ -212,9 +207,9 @@ L:SetGeneralLocalization{
 }
 
 L:SetOptionLocalization{
-	SetIconOnDarkFallen		= DBM_CORE_AUTO_ICONS_OPTION_TEXT:format(71340),
-	SwarmingShadowsIcon		= DBM_CORE_AUTO_ICONS_OPTION_TEXT:format(71266),
-	BloodMirrorIcon			= DBM_CORE_AUTO_ICONS_OPTION_TEXT:format(70838),
+	SetIconOnDarkFallen		= DBM_CORE_L.AUTO_ICONS_OPTION_TEXT:format(71340),
+	SwarmingShadowsIcon		= DBM_CORE_L.AUTO_ICONS_OPTION_TEXT:format(71266),
+	BloodMirrorIcon			= DBM_CORE_L.AUTO_ICONS_OPTION_TEXT:format(70838),
 	RangeFrame				= "Show range frame (8 yards)"
 }
 
@@ -282,8 +277,8 @@ L:SetOptionLocalization{
 	TimerNextAirphase		= "Show timer for next air phase",
 	TimerNextGroundphase	= "Show timer for next ground phase",
 	AnnounceFrostBeaconIcons= "Announce icons for $spell:70126 targets to raid chat<br/>(requires raid leader)",
-	SetIconOnFrostBeacon	= DBM_CORE_AUTO_ICONS_OPTION_TEXT:format(70126),
-	SetIconOnUnchainedMagic	= DBM_CORE_AUTO_ICONS_OPTION_TEXT:format(69762),
+	SetIconOnFrostBeacon	= DBM_CORE_L.AUTO_ICONS_OPTION_TEXT:format(70126),
+	SetIconOnUnchainedMagic	= DBM_CORE_L.AUTO_ICONS_OPTION_TEXT:format(69762),
 	ClearIconsOnAirphase	= "Clear all icons before air phase",
 	AchievementCheck		= "Announce 'All You Can Eat' achievement warnings to raid<br/>(requires promoted status)",
 	RangeFrame				= "Show dynamic range frame (10/20) based on last used boss ability and player debuffs"
@@ -328,12 +323,11 @@ L:SetOptionLocalization{
 	PhaseTransition			= "Show time for phase transitions",
 	ValkyrWarning			= "Announce who has been grabbed by Val'kyr Shadowguards",
 	SpecWarnYouAreValkd		= "Show special warning when you have been grabbed by a Val'kyr Shadowguard",--npc36609
-	DefileIcon				= DBM_CORE_AUTO_ICONS_OPTION_TEXT:format(72762),
-	NecroticPlagueIcon		= DBM_CORE_AUTO_ICONS_OPTION_TEXT:format(70337),
-	RagingSpiritIcon		= DBM_CORE_AUTO_ICONS_OPTION_TEXT:format(69200),
-	TrapIcon				= DBM_CORE_AUTO_ICONS_OPTION_TEXT:format(73539),
-	HarvestSoulIcon			= DBM_CORE_AUTO_ICONS_OPTION_TEXT:format(68980),
-	ValkyrIcon				= "Set icons on Valkyrs",
+	DefileIcon				= DBM_CORE_L.AUTO_ICONS_OPTION_TEXT:format(72762),
+	NecroticPlagueIcon		= DBM_CORE_L.AUTO_ICONS_OPTION_TEXT:format(70337),
+	RagingSpiritIcon		= DBM_CORE_L.AUTO_ICONS_OPTION_TEXT:format(69200),
+	TrapIcon				= DBM_CORE_L.AUTO_ICONS_OPTION_TEXT:format(73539),
+	HarvestSoulIcon			= DBM_CORE_L.AUTO_ICONS_OPTION_TEXT:format(68980),
 	AnnounceValkGrabs		= "Announce Val'kyr Shadowguard grab targets to raid chat<br/>(requires announce to be enabled and promoted status)",
 	SpecWarnValkyrLow		= "Show special warning when Valkyr is below 55% HP",
 	AnnouncePlagueStack		= "Announce $spell:70337 stacks to raid (10 stacks, every 5 after 10)<br/>(requires promoted status)"

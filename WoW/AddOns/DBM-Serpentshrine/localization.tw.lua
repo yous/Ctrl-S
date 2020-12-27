@@ -97,7 +97,6 @@ L:SetGeneralLocalization{
 }
 
 L:SetMiscLocalization{
-	YellPull	= "守衛，注意!我們有訪客了...",
 	Caribdis	= "深淵守衛卡利迪斯",
 	Tidalvess	= "提達費斯",
 	Sharkkis	= "深淵守衛沙卡奇斯"
@@ -113,7 +112,6 @@ L:SetGeneralLocalization{
 }
 
 L:SetWarningLocalization{
-	WarnMurlocs		= "魚人出現",
 	SpecWarnMurlocs	= "魚人出現!"
 }
 
@@ -122,7 +120,6 @@ L:SetTimerLocalization{
 }
 
 L:SetOptionLocalization{
-	WarnMurlocs		= "提示魚人",
 	SpecWarnMurlocs	= "為魚人出現顯示特別警告",
 	TimerMurlocs	= "為魚人出現顯示計時器"
 }
@@ -163,7 +160,6 @@ L:SetOptionLocalization{
 	TimerStrider		= "為下一次盤牙旅行者顯示計時器",
 	TimerNaga			= "為下一次盤牙精英顯示計時器",
 	SpecWarnElemental	= "為污染的元素出現顯示特別警告",
-	RangeFrame			= "顯示距離框架(10碼)",
 	AutoChangeLootToFFA	= "第2階段自動轉換拾取方式為自由拾取"
 }
 

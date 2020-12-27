@@ -1,16 +1,15 @@
-﻿## Interface: 60000
+﻿## Interface: 90002
 ## Title: TellMeWhen Options
-## X-Curse-Packaged-Version: 7.2.3
-## X-Curse-Project-Name: TellMeWhen
-## X-Curse-Project-ID: tellmewhen
-## X-Curse-Repository-ID: wow/tellmewhen/mainline
 
-## Author: Cybeloras of Aerie Peak/Detheroc/Mal'Ganis
+## Author: Cybeloras of Aerie Peak
 ## Notes: Options and configuration for TellMeWhen
 ## RequiredDeps: TellMeWhen
 ## LoadOnDemand: 1
 ## SavedVariables: TMWOptDB
 ## X-Category: Combat
+
+## OptionalDeps: LibBabble-CreatureType-3.0, LibBabble-Race-3.0
+## X-Embeds: LibBabble-CreatureType-3.0, LibBabble-Race-3.0
 
 # All files for TellMeWhen_Options are now stored in the main addon.
 # However, they still are not loaded until TellMeWhen_Options, so there is no difference in performance or anything.

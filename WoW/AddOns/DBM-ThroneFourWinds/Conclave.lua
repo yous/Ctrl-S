@@ -1,21 +1,13 @@
 local mod	= DBM:NewMod(154, "DBM-ThroneFourWinds", nil, 75)
 local L		= mod:GetLocalizedStrings()
-local Anshal	= EJ_GetSectionInfo(3166)
-local Nezir	= EJ_GetSectionInfo(3178)
-local Rohash	= EJ_GetSectionInfo(3172)
+local Anshal	= DBM:EJ_GetSectionInfo(3166)
+local Nezir		= DBM:EJ_GetSectionInfo(3178)
+local Rohash	= DBM:EJ_GetSectionInfo(3172)
 
-mod:SetRevision(("$Revision: 145 $"):sub(12, -3))
+mod:SetRevision("20200806141910")
 mod:SetCreatureID(45870, 45871, 45872)
 mod:SetEncounterID(1035)
-mod:DisableEEKillDetection()
-mod:SetZone()
 mod:SetBossHPInfoToHighest()
-
-mod:SetBossHealthInfo(
-	45870, Anshal,
-	45871, Nezir,
-	45872, Rohash
-)
 
 mod:RegisterCombat("combat")
 
@@ -38,32 +30,31 @@ local warnWindBlast			= mod:NewSpellAnnounce(86193, 3)
 local warnStormShield		= mod:NewSpellAnnounce(93059, 3)
 local warnPoisonToxic	 	= mod:NewSpellAnnounce(86281, 3)
 local warnGatherStrength	= mod:NewTargetAnnounce(86307, 4)
-local warnSpecialSoon		= mod:NewAnnounce("warnSpecialSoon", 2, "Interface\\Icons\\INV_Enchant_EssenceMagicLarge")--Hurricane/Sleet Storm/Zephyr in single announce
-local warnSpecial			= mod:NewAnnounce("warnSpecial", 3, "Interface\\Icons\\INV_Enchant_EssenceMagicLarge")--Hurricane/Sleet Storm/Zephyr in single announce
+local warnSpecialSoon		= mod:NewAnnounce("warnSpecialSoon", 2, "132866")--Hurricane/Sleet Storm/Zephyr in single announce
+local warnSpecial			= mod:NewAnnounce("warnSpecial", 3, "132866")--Hurricane/Sleet Storm/Zephyr in single announce
 
 local specWarnSpecial		= mod:NewSpecialWarning("specWarnSpecial", nil, nil, nil, 2)
 local specWarnIcePatch      = mod:NewSpecialWarningMove(86111)
 local specWarnShield		= mod:NewSpecialWarningSpell(93059)
 local specWarnWindBlast		= mod:NewSpecialWarningSpell(86193, false)
 
-local timerNurture			= mod:NewNextTimer(35, 85422)--This this is typically 35 seconds after a special has ended.
+local timerNurture			= mod:NewNextTimer(35, 85422, nil, nil, nil, 1)--This this is typically 35 seconds after a special has ended.
 local timerWindChill		= mod:NewNextTimer(10.5, 84645, nil, false)
 local timerSlicingGale		= mod:NewBuffFadesTimer(45, 86182, nil, false)
 local timerWindBlast		= mod:NewBuffActiveTimer(11.5, 86193)
-local timerWindBlastCD		= mod:NewCDTimer(60, 86193)-- Cooldown: 1st->2nd = 22sec || 2nd->3rd = 60sec || 3rd->4th = 60sec ?
-local timerStormShieldCD	= mod:NewCDTimer(35, 93059)--Heroic ability, seems to have a 35-40second cd and no longer syncs up to nurture since the windblast change. No longer consistent.
+local timerWindBlastCD		= mod:NewCDTimer(60, 86193, nil, nil, nil, 3)-- Cooldown: 1st->2nd = 22sec || 2nd->3rd = 60sec || 3rd->4th = 60sec ?
+local timerStormShieldCD	= mod:NewCDTimer(35, 93059, nil, nil, nil, 5, nil, DBM_CORE_L.HEROIC_ICON)--Heroic ability, seems to have a 35-40second cd and no longer syncs up to nurture since the windblast change. No longer consistent.
 local timerGatherStrength	= mod:NewTargetTimer(60, 86307)
 local timerPoisonToxic		= mod:NewBuffActiveTimer(5, 86281)
 local timerPoisonToxicCD	= mod:NewCDTimer(21, 86281)--is this a CD or a next timer?
-local timerPermaFrostCD		= mod:NewCDTimer(10, 86081)
-local timerSoothingBreezeCD	= mod:NewNextTimer(32.5, 86205)
-local timerSpecial			= mod:NewTimer(95, "timerSpecial", "Interface\\Icons\\INV_Enchant_EssenceMagicLarge")--hurricane/Sleet storm/Zephyr share CD. Shortened cause sometimes slipstreams end early, even though cd is a little longer
-local timerSpecialActive	= mod:NewTimer(15, "timerSpecialActive", "Interface\\Icons\\INV_Enchant_EssenceMagicLarge")
+local timerPermaFrostCD		= mod:NewCDTimer(10, 86081, nil, "Tank", nil, 5, nil, DBM_CORE_L.TANK_ICON)
+local timerSoothingBreezeCD	= mod:NewNextTimer(32.5, 86205, nil, "Tank", nil, 5, nil, DBM_CORE_L.TANK_ICON)
+local timerSpecial			= mod:NewTimer(95, "timerSpecial", "132866", nil, nil, 6)--hurricane/Sleet storm/Zephyr share CD. Shortened cause sometimes slipstreams end early, even though cd is a little longer
+local timerSpecialActive	= mod:NewTimer(15, "timerSpecialActive", "132866", nil, nil, 6)
 
 local enrageTimer			= mod:NewBerserkTimer(480) -- Both normal and heroic mode
 
 mod:AddBoolOption("OnlyWarnforMyTarget", false, "announce")--Default off do to targeting dependance (not great for healers who don't set focus). Has ability to filter all timers/warnings for bosses you are not targeting or focusing.
-mod:AddBoolOption("HealthFrame", false)
 
 local windBlastCounter = 0
 local poisonCounter = 0

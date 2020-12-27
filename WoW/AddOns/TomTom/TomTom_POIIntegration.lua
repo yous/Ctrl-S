@@ -1,5 +1,9 @@
 local addonName, addon = ...
-local astrolabe = addon.astrolabe
+local hbd = LibStub("HereBeDragons-2.0")
+
+if addon.CLASSIC then
+    return
+end
 
 local enableClicks = true       -- True if waypoint-clicking is enabled to set points
 local enableClosest = true      -- True if 'Automatic' quest waypoints are enabled
@@ -18,8 +22,11 @@ local L = TomTomLocals
 local lastWaypoint
 local scanning          -- This function is not re-entrant, stop that
 
-local function getQIDFromIndex(questIndex)
-	return (select(8, GetQuestLogTitle(questIndex)))
+
+local function GetQuestIndexForWatch(questWatchIndex)
+    local questID = C_QuestLog.GetQuestIDForQuestWatchIndex(questWatchIndex)
+    local questIndex = questID and C_QuestLog.GetLogIndexForQuestID(questID)
+    return questIndex
 end
 
 local function ObjectivesChanged()
@@ -36,11 +43,19 @@ local function ObjectivesChanged()
         scanning = true
     end
 
-    local map, floor = GetCurrentMapAreaID()
-    local floors = astrolabe:GetNumFloors(map)
-    floor = (floors == 0 and 0 or 1)
+    local map = C_Map.GetBestMapForUnit("player")
+    if not map then
+        scanning = false
+        return
+    end
 
-    local px, py = GetPlayerMapPosition("player")
+    local player = C_Map.GetPlayerMapPosition(map, "player")
+    if not player then
+        scanning = false
+        return
+    end
+
+    local px, py = player:GetXY()
 
     -- Bail out if we can't get the player's position
     if not px or not py or px <= 0 or py <= 0 then
@@ -56,7 +71,7 @@ local function ObjectivesChanged()
     local closestdist = math.huge
 
     -- This function relies on the above CVar being set, and updates the icon
-    -- position information so it can be queries via the API
+    -- position information so it can be queried via the API
     QuestPOIUpdateIcons()
 
     -- Scan through every quest that is tracked, and find the closest one
@@ -68,12 +83,15 @@ local function ObjectivesChanged()
             break
         end
 
-        local qid = getQIDFromIndex(questIndex)
+        local qid = C_QuestLog.GetQuestIDForQuestWatchIndex(watchIndex)
+        C_QuestLog.SetSelectedQuest(qid)
+        C_QuestLog.GetNextWaypoint(qid)
         local completed, x, y, objective = QuestPOIGetIconInfo(qid)
+        local qmap = GetQuestUiMapID(qid)
 
         if x and y then
-            local dist, xd, yd = astrolabe:ComputeDistance(map, floor, px, py, map, floor, x, y)
-            if dist < closestdist then
+            local dist = hbd:GetZoneDistance(map, px, py, qmap, x, y)
+            if dist and (dist < closestdist) then
                 closest = watchIndex
                 closestdist = dist
             end
@@ -83,9 +101,10 @@ local function ObjectivesChanged()
 
     if closest then
         local questIndex = GetQuestIndexForWatch(closest)
-        local title = GetQuestLogTitle(questIndex)
-        local qid = getQIDFromIndex(questIndex)
+        local title = C_QuestLog.GetTitleForLogIndex(questIndex)
+        local qid = C_QuestLog.GetQuestIDForQuestWatchIndex(closest)
         local completed, x, y, objective = QuestPOIGetIconInfo(qid)
+        local map = GetQuestUiMapID(qid)
 
         if completed then
             title = "Turn in: " .. title
@@ -95,8 +114,8 @@ local function ObjectivesChanged()
         if lastWaypoint then
             -- This is a hack that relies on the UID format, do not use this
             -- in your addons, please.
-            local pm, pf, px, py = unpack(lastWaypoint)
-            if map == pm and floor == pf and x == px and y == py and lastWaypoint.title == title then
+            local pm, px, py = unpack(lastWaypoint)
+            if map == pm and x == px and y == py and lastWaypoint.title == title then
                 -- This is the same waypoint, do nothing
                 setWaypoint = false
             else
@@ -107,7 +126,7 @@ local function ObjectivesChanged()
 
         if setWaypoint then
             -- Set the new waypoint
-            lastWaypoint = TomTom:AddMFWaypoint(map, floor, x, y, {
+            lastWaypoint = TomTom:AddWaypoint(map, x, y, {
                 title = title,
                 persistent = false,
                 arrivaldistance = TomTom.profile.poi.arrival,
@@ -133,6 +152,7 @@ end
 local eventFrame = CreateFrame("Frame")
 eventFrame:RegisterEvent("QUEST_POI_UPDATE")
 eventFrame:RegisterEvent("QUEST_LOG_UPDATE")
+
 
 eventFrame:SetScript("OnEvent", function(self, event, ...)
     if event == "QUEST_POI_UPDATE" then
@@ -160,27 +180,36 @@ local function poi_OnClick(self, button)
         return
     end
 
+    local cvar = GetCVarBool("questPOI")
+    SetCVar("questPOI", 1)
+
     -- Run our logic, and set a waypoint for this button
-    local m, f = GetCurrentMapAreaID()
+    local m
 
-    local questIndex = self.quest and self.quest.questLogIndex
-    if not questIndex and self.questId then
-        -- Lookup the questIndex for the given questId
-        for idx = 1, GetNumQuestLogEntries(), 1 do
-            local qid = getQIDFromIndex(idx)
-            if qid == self.questId then
-                questIndex = idx
-            end
+    QuestPOIUpdateIcons()
+
+    local questIndex = C_QuestLog.GetLogIndexForQuestID(self.questID)
+    local title, completed, x, y
+
+    if questIndex and questIndex ~= 0 then
+        title = C_QuestLog.GetTitleForLogIndex(questIndex)
+        completed, x, y = QuestPOIGetIconInfo(self.questID)
+        m = C_TaskQuest.GetQuestZoneID(self.questID)
+        -- If the WorldMap is open, maybe use the map's MapID, else maybe try the players' map
+        if WorldMapFrame:IsShown() then
+            m = m or WorldMapFrame:GetMapID()
+        else
+            m = m or C_Map.GetBestMapForUnit("player")
         end
+    else
+        -- Must be a World Quest
+        title = C_TaskQuest.GetQuestInfoByQuestID(self.questID)
+        completed = false
+        x, y = C_TaskQuest.GetQuestLocation(self.questID)
+        m = C_TaskQuest.GetQuestZoneID(self.questID)
+        m = m or C_Map.GetBestMapForUnit("player")
     end
 
-    if not questIndex and self.index then
-        questIndex = GetQuestIndexForWatch(self.index)
-    end
-
-    local title = GetQuestLogTitle(questIndex)
-    local qid = getQIDFromIndex(questIndex)
-    local completed, x, y, objective = QuestPOIGetIconInfo(qid)
     if completed then
         title = "Turn in: " .. title
     end
@@ -188,11 +217,14 @@ local function poi_OnClick(self, button)
     if not x or not y then
         -- No coordinate information for this quest/objective
         local header = "|cFF33FF99TomTom|r"
-        print(L["%s: No coordinate information found for '%s' at this map level"]:format(header, title))
+        if TomTom.profile.general.announce then
+            local msg = L["%s: No coordinate information found for '%s' at this map level"]:format(header, title or self.questID)
+            ChatFrame1:AddMessage(msg)
+        end
         return
     end
 
-    local key = TomTom:GetKeyArgs(m, f, x, y, title)
+    local key = TomTom:GetKeyArgs(m, x, y, title)
 
     local alreadySet = false
     if poiclickwaypoints[key] then
@@ -204,13 +236,24 @@ local function poi_OnClick(self, button)
     end
 
     if not alreadySet then
-        local uid = TomTom:AddMFWaypoint(m, f, x, y, {
+        local uid = TomTom:AddWaypoint(m, x, y, {
             title = title,
             arrivaldistance = TomTom.profile.poi.arrival,
         })
         poiclickwaypoints[key] = uid
+    else
+        local uid = poiclickwaypoints[key]
+        TomTom:SetCrazyArrow(uid, TomTom.profile.poi.arrival, title)
     end
+
+    SetCVar("questPOI", cvar and 1 or 0)
 end
+
+
+hooksecurefunc("QuestPOIButton_OnClick", function(self, button)
+    poi_OnClick(self, button)
+end)
+
 
 function TomTom:EnableDisablePOIIntegration()
     enableClicks= TomTom.profile.poi.enable

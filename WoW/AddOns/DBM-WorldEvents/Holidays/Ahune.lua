@@ -1,10 +1,9 @@
 local mod	= DBM:NewMod("d286", "DBM-WorldEvents", 1)
 local L		= mod:GetLocalizedStrings()
 
-mod:SetRevision(("$Revision: 11027 $"):sub(12, -3))
+mod:SetRevision("20200803045206")
 mod:SetCreatureID(25740)--25740 Ahune, 25755, 25756 the two types of adds
 mod:SetModelID(23447)--Frozen Core, ahunes looks pretty bad.
-mod:SetZone()
 
 mod:SetReCombatTime(10)
 mod:RegisterCombat("combat")
@@ -18,10 +17,10 @@ mod:RegisterEventsInCombat(
 local warnSubmerged				= mod:NewSpellAnnounce(37751, 2, "Interface\\AddOns\\DBM-Core\\textures\\CryptFiendBurrow.blp")
 local warnEmerged				= mod:NewAnnounce("Emerged", 2, "Interface\\AddOns\\DBM-Core\\textures\\CryptFiendUnBurrow.blp")
 
-local specWarnAttack			= mod:NewSpecialWarning("specWarnAttack")
+local specWarnAttack			= mod:NewSpecialWarning("specWarnAttack", nil, nil, nil, 1, 2)
 
-local timerEmerge				= mod:NewTimer(35.5, "EmergeTimer", "Interface\\AddOns\\DBM-Core\\textures\\CryptFiendUnBurrow.blp")
-local timerSubmerge				= mod:NewTimer(92, "SubmergTimer", "Interface\\AddOns\\DBM-Core\\textures\\CryptFiendBurrow.blp")--Variable, 92-96
+local timerEmerge				= mod:NewTimer(33.5, "EmergeTimer", "Interface\\AddOns\\DBM-Core\\textures\\CryptFiendUnBurrow.blp", nil, nil, 6)
+local timerSubmerge				= mod:NewTimer(92, "SubmergTimer", "Interface\\AddOns\\DBM-Core\\textures\\CryptFiendBurrow.blp", nil, nil, 6)--Variable, 92-96
 
 function mod:OnCombatStart(delay)
 	timerSubmerge:Start(95-delay)--first is 95, rest are 92
@@ -39,5 +38,6 @@ function mod:SPELL_AURA_REMOVED(args)
 		warnSubmerged:Show()
 		timerEmerge:Start()
 		specWarnAttack:Show()
+		specWarnAttack:Play("changetarget")
 	end
 end

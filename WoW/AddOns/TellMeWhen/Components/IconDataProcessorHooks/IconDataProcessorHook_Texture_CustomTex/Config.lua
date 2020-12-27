@@ -1,4 +1,4 @@
-﻿-- --------------------
+-- --------------------
 -- TellMeWhen
 -- Originally by Nephthys of Hyjal <lieandswell@yahoo.com>
 
@@ -7,7 +7,7 @@
 --		Banjankri of Blackrock, Predeter of Proudmoore, Xenyr of Aszune
 
 -- Currently maintained by
--- Cybeloras of Aerie Peak/Detheroc/Mal'Ganis
+-- Cybeloras of Aerie Peak
 -- --------------------
 
 
@@ -26,7 +26,7 @@ local ItemCache_Cache
 local Module = SUG:NewModule("texture_withVarTex", SUG:GetModule("texture"))
 Module.Slots = {}
 
-function Module:Table_GetSpecialSuggestions_1(suggestions, tbl, ...)
+function Module:Table_GetSpecialSuggestions_1(suggestions)
 	local lastName = SUG.lastName
 	
 	if SUG.lastName:sub(1, 1) == "$" then
@@ -80,7 +80,7 @@ function Module:Entry_AddToList_2(f, id)
 	end
 end
 function Module.Sorter_VarTex(a, b)
-
+	print(a, b)
 	local varTypeA, varDataA = a:match("^$([^%.:]+)%.?([^:]*)$")
 	local varTypeB, varDataB = b:match("^$([^%.:]+)%.?([^:]*)$")
 	
@@ -99,7 +99,4 @@ function Module:Table_GetSorter()
 		return self.Sorter_Spells, self.Sorter_Bucket
 	end
 end
-
-
-
 

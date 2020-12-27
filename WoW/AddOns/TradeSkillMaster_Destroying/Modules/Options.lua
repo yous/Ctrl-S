@@ -8,22 +8,19 @@
 
 -- load the parent file (TSM) into a local variable and register this file as a module
 local TSM = select(2, ...)
-local Options = TSM:NewModule("Options", "AceHook-3.0")
+local Options = TSM:NewModule("Options")
 local AceGUI = LibStub("AceGUI-3.0") -- load the AceGUI libraries
-
--- loads the localization table --
 local L = LibStub("AceLocale-3.0"):GetLocale("TradeSkillMaster_Destroying")
-local logST, averageST, ignoreST
+local private = {ignoreSTCreated=nil}
+
+
 
 function Options:Load(container)
 	local tabGroup = AceGUI:Create("TSMTabGroup")
 	tabGroup:SetLayout("Fill")
-	tabGroup:SetTabs({{text=L["Destroying Log"], value=1}, {text=L["Averages"], value=2}, {text=L["Ignored Items"], value=3}, {text=L["Options"], value=4}})
+	tabGroup:SetTabs({{text=L["Destroying Log"], value=1}, {text=L["Averages"], value=2}, {text=L["Ignored Items"], value=3}})
 	tabGroup:SetCallback("OnGroupSelected", function(self, _, value)
 		tabGroup:ReleaseChildren()
-		if logST then logST:Hide() end
-		if ignoreST then ignoreST:Hide() end
-		if averageST then averageST:Hide() end
 		if value == 1 then
 			-- load Destroying log
 			Options:LoadLog(self)
@@ -33,21 +30,11 @@ function Options:Load(container)
 		elseif value == 3 then
 			-- load ignored items list
 			Options:LoadIgnored(self)
-		elseif value == 4 then
-			-- load Destroying options
-			Options:LoadOptions(self)
 		end
 		tabGroup.children[1]:DoLayout()
 	end)
 	container:AddChild(tabGroup)
 	tabGroup:SelectTab(1)
-	
-	Options:HookScript(tabGroup.frame, "OnHide", function()
-		Options:UnhookAll()
-		if logST then logST:Hide() end
-		if ignoreST then ignoreST:Hide() end
-		if averageST then averageST:Hide() end
-	end)
 end
 
 function Options:GetFormattedTime(rTime)
@@ -66,8 +53,6 @@ function Options:GetFormattedTime(rTime)
 end
 
 function Options:UpdateLogST()
-	if not logST or not logST:IsVisible() then return end
-	
 	-- clear old data
 	for spell, entries in pairs(TSM.db.global.history) do
 		for i=#entries, 1, -1 do
@@ -76,19 +61,16 @@ function Options:UpdateLogST()
 			end
 		end
 	end
-	
+
 	local stData = {}
 	for spell, entries in pairs(TSM.db.global.history) do
 		for _, entry in ipairs(entries) do
 			local result = {}
 			for itemString, quantity in pairs(entry.result) do
-				local link = select(2, TSMAPI:GetSafeItemInfo(itemString)) or itemString
+				local link = TSMAPI.Item:GetLink(itemString) or itemString
 				tinsert(result, format("%sx%d", link, quantity))
 			end
 			sort(result, function(a,b) return a > b end)
-			local name, link = TSMAPI:GetSafeItemInfo(entry.item)
-			name = name or entry.item
-			link = link or entry.item
 			local resultStr = table.concat(result, ", ") or ""
 			local row = {
 				cols = {
@@ -97,8 +79,8 @@ function Options:UpdateLogST()
 						sortArg = spell,
 					},
 					{
-						value = link,
-						sortArg = spell,
+						value = TSMAPI.Item:GetLink(entry.item) or entry.item,
+						sortArg = TSMAPI.Item:GetName(entry.item) or entry.item,
 					},
 					{
 						value = resultStr,
@@ -113,56 +95,50 @@ function Options:UpdateLogST()
 			tinsert(stData, row)
 		end
 	end
-	logST:SetData(stData)
+	TSMAPI.GUI:UpdateTSMScrollingTableData("TSM_DESTROYING_LOG", stData)
 end
 
 function Options:LoadLog(container)
+	local stCols = {
+		{
+			name = L["Spell"],
+			width = 0.08,
+		},
+		{
+			name = L["Destroyed Item"],
+			width = 0.2,
+		},
+		{
+			name = L["Result"],
+			width = 0.56,
+		},
+		{
+			name = L["Time"],
+			width = 0.14,
+		}
+	}
+
 	local page = {
 		{
-			type = "ScrollFrame", -- simple group didn't work here for some reason
+			type = "SimpleGroup",
 			fullHeight = true,
-			layout = "Flow",
-			children = {},
+			layout = "Fill",
+			children = {
+				{
+					type = "ScrollingTable",
+					tag = "TSM_DESTROYING_LOG",
+					colInfo = stCols,
+					defaultSort = -4,
+				},
+			},
 		},
 	}
 
-	TSMAPI:BuildPage(container, page)
-	
-	-- scrolling table
-	local stParent = container.children[1].frame
-
-	if not logST then
-		local stCols = {
-			{
-				name = L["Spell"],
-				width = 0.08,
-			},
-			{
-				name = L["Destroyed Item"],
-				width = 0.2,
-			},
-			{
-				name = L["Result"],
-				width = 0.56,
-			},
-			{
-				name = L["Time"],
-				width = 0.14,
-			}
-		}
-		logST = TSMAPI:CreateScrollingTable(stParent, stCols)
-		logST:EnableSorting(true, -4)
-	end
-
-	logST:Show()
-	logST:SetParent(stParent)
-	logST:SetAllPoints()
+	TSMAPI.GUI:BuildOptions(container, page)
 	Options:UpdateLogST()
 end
 
 function Options:UpdateAverageST()
-	if not averageST or not averageST:IsVisible() then return end
-	
 	local items = {}
 	for spell, entries in pairs(TSM.db.global.history) do
 		for _, entry in ipairs(entries) do
@@ -174,7 +150,7 @@ function Options:UpdateAverageST()
 			end
 		end
 	end
-	
+
 	local stData = {}
 	for destroyedItem, resultItems in pairs(items) do
 		local spell = resultItems.spell
@@ -183,14 +159,11 @@ function Options:UpdateAverageST()
 		resultItems.num = nil
 		local result = {}
 		for itemString, data in pairs(resultItems) do
-			local link = select(2, TSMAPI:GetSafeItemInfo(itemString)) or itemString
+			local link = TSMAPI.Item:GetLink(itemString)
 			local average = floor((data.total/totalNum) * 100 + 0.5) / 100
 			tinsert(result, format("%sx%.2f", link, average))
 		end
 		sort(result, function(a,b) return a > b end)
-		local name, link = TSMAPI:GetSafeItemInfo(destroyedItem)
-		name = name or destroyedItem
-		link = link or destroyedItem
 		local resultStr = table.concat(result, ", ") or ""
 		local row = {
 			cols = {
@@ -203,8 +176,8 @@ function Options:UpdateAverageST()
 					sortArg = totalNum,
 				},
 				{
-					value = link,
-					sorgArg = name,
+					value = TSMAPI.Item:GetLink(destroyedItem) or destroyedItem,
+					sortArg = TSMAPI.Item:GetName(destroyedItem) or destroyedItem,
 				},
 				{
 					value = resultStr,
@@ -214,60 +187,55 @@ function Options:UpdateAverageST()
 		}
 		tinsert(stData, row)
 	end
-	averageST:SetData(stData)
+	TSMAPI.GUI:UpdateTSMScrollingTableData("TSM_DESTROYING_AVERAGES", stData)
 end
 
 function Options:LoadAverages(container)
+	local stCols = {
+		{
+			name = L["Spell"],
+			width = 0.1,
+		},
+		{
+			name = L["Times Destroyed"],
+			width = 0.15,
+		},
+		{
+			name = L["Destroyed Item"],
+			width = 0.3,
+		},
+		{
+			name = L["Average Result (per Destroy)"],
+			width = 0.45,
+		}
+	}
+
 	local page = {
 		{
-			type = "ScrollFrame", -- simple group didn't work here for some reason
+			type = "SimpleGroup",
 			fullHeight = true,
-			layout = "Flow",
-			children = {},
+			layout = "Fill",
+			children = {
+				{
+					type = "ScrollingTable",
+					tag = "TSM_DESTROYING_AVERAGES",
+					colInfo = stCols,
+					defaultSort = -2,
+				},
+			},
 		},
 	}
 
-	TSMAPI:BuildPage(container, page)
-	
-	-- scrolling table
-	local stParent = container.children[1].frame
-
-	if not averageST then
-		local stCols = {
-			{
-				name = L["Spell"],
-				width = 0.1,
-			},
-			{
-				name = L["Times Destroyed"],
-				width = 0.15,
-			},
-			{
-				name = L["Destroyed Item"],
-				width = 0.3,
-			},
-			{
-				name = L["Average Result (per Destroy)"],
-				width = 0.45,
-			}
-		}
-		averageST = TSMAPI:CreateScrollingTable(stParent, stCols)
-		averageST:EnableSorting(true, -2)
-	end
-
-	averageST:Show()
-	averageST:SetParent(stParent)
-	averageST:SetAllPoints()
+	TSMAPI.GUI:BuildOptions(container, page)
 	Options:UpdateAverageST()
 end
 
 function Options:UpdateIgnoreST()
-	if not ignoreST or not ignoreST:IsVisible() then return end
+	if not private.ignoreSTCreated then return end
 	local stData = {}
 	for itemString in pairs(TSM.db.global.ignore) do
-		local name, link = TSMAPI:GetSafeItemInfo(itemString)
-		name = name or itemString
-		link = link or itemString
+		local name = TSMAPI.Item:GetName(itemString) or itemString
+		local link = TSMAPI.Item:GetLink(itemString) or itemString
 		local row = {
 			cols = {
 				{
@@ -281,58 +249,57 @@ function Options:UpdateIgnoreST()
 		tinsert(stData, row)
 	end
 	sort(stData, function(a, b) return a.name < b.name end)
-	ignoreST:SetData(stData)
+	TSMAPI.GUI:UpdateTSMScrollingTableData("TSM_DESTROYING_IGNORE", stData)
 end
 
 function Options:LoadIgnored(container)
+	local stCols = {
+		{
+			name = L["Ignored Item"],
+			width = 1,
+		}
+	}
+	local stHandlers = {
+		OnEnter = function(_, data, self)
+			if not data.itemString then return end
+			GameTooltip:SetOwner(self, "ANCHOR_NONE")
+			GameTooltip:SetPoint("BOTTOMLEFT", self, "TOPLEFT")
+			GameTooltip:AddLine(L["Right click on this row to remove this item from the permanent ignore list."], 1, 1, 1, true)
+			GameTooltip:Show()
+		end,
+		OnLeave = function()
+			GameTooltip:ClearLines()
+			GameTooltip:Hide()
+		end,
+		OnClick = function(_, data, _, button)
+			if not data.itemString then return end
+			if button == "RightButton" then
+				TSM.db.global.ignore[data.itemString] = nil
+				TSM:Printf(L["Removed %s from the permanent ignore list."], data.link)
+				Options:UpdateIgnoreST()
+				TSM.GUI:UpdateST()
+			end
+		end
+	}
+
 	local page = {
 		{
-			type = "ScrollFrame", -- simple group didn't work here for some reason
+			type = "SimpleGroup",
 			fullHeight = true,
-			layout = "Flow",
-			children = {},
+			layout = "Fill",
+			children = {
+				{
+					type = "ScrollingTable",
+					tag = "TSM_DESTROYING_IGNORE",
+					colInfo = stCols,
+					handlers = stHandlers,
+				},
+			},
 		},
 	}
 
-	TSMAPI:BuildPage(container, page)
-	
-	-- scrolling table
-	local stParent = container.children[1].frame
-
-	if not ignoreST then
-		local stCols = {
-			{
-				name = L["Ignored Item"],
-				width = 1,
-			}
-		}
-		local handlers = {
-			OnEnter = function(_, data, self)
-				if not data.itemString then return end
-				GameTooltip:SetOwner(self, "ANCHOR_NONE")
-				GameTooltip:SetPoint("BOTTOMLEFT", self, "TOPLEFT")
-				GameTooltip:AddLine(L["Right click on this row to remove this item from the permanent ignore list."], 1, 1, 1, true)
-				GameTooltip:Show()
-			end,
-			OnLeave = function()
-				GameTooltip:ClearLines()
-				GameTooltip:Hide()
-			end,
-			OnClick = function(_, data, _, button)
-				if not data.itemString then return end
-				if button == "RightButton" then
-					TSM.db.global.ignore[data.itemString] = nil
-					TSM:Printf(L["Removed %s from the permanent ignore list."], data.link)
-					Options:UpdateIgnoreST()
-				end
-			end
-		}
-		ignoreST = TSMAPI:CreateScrollingTable(stParent, stCols, handlers)
-	end
-
-	ignoreST:Show()
-	ignoreST:SetParent(stParent)
-	ignoreST:SetAllPoints()
+	TSMAPI.GUI:BuildOptions(container, page)
+	private.ignoreSTCreated = true
 	Options:UpdateIgnoreST()
 end
 
@@ -364,7 +331,7 @@ function Options:LoadOptions(container)
 						},
 						{
 							type = "Dropdown",
-							label = "Time Format",
+							label = L["Time Format"],
 							relativeWidth = 0.5,
 							list = {["ago"]=L["_ Hr _ Min ago"], ["usdate"]="MM/DD/YY HH:MM", ["aidate"]="YY/MM/DD HH:MM", ["eudate"]="DD/MM/YY HH:MM"},
 							settingInfo = {TSM.db.global, "timeFormat"},
@@ -411,10 +378,10 @@ function Options:LoadOptions(container)
 						{
 							type = "EditBox",
 							label = L["Above Custom Price ('0c' to disable)"],
-							settingInfo = { TSM.db.global, "deCustomPrice" },
+							settingInfo = { TSM.db.global, "deAbovePrice" },
 							relativeWidth = 0.5,
 							acceptCustom = true,
-							tooltip = L["Only disenchantable items which have a disenchant value above this custom price will be displayed in the destroying window."],
+							tooltip = L["Only disenchantable items which have a disenchant value ABOVE this custom price will be displayed in the destroying window."],
 							callback = function(self)
 								TSM.GUI:UpdateST()
 							end,
@@ -435,5 +402,5 @@ function Options:LoadOptions(container)
 		},
 	}
 
-	TSMAPI:BuildPage(container, page)
+	TSMAPI.GUI:BuildOptions(container, page)
 end

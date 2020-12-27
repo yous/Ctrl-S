@@ -1,5 +1,5 @@
 local MAJOR_VERSION = "LibDogTag-Unit-3.0"
-local MINOR_VERSION = 90000 + tonumber(("$Revision: 262 $"):match("%d+")) or 0
+local MINOR_VERSION = 90000 + (tonumber(("20201129180239"):match("%d+")) or 33333333333333)
 
 if MINOR_VERSION > _G.DogTag_Unit_MINOR_VERSION then
 	_G.DogTag_Unit_MINOR_VERSION = MINOR_VERSION
@@ -24,6 +24,8 @@ local currentAuras, currentDebuffTypes, currentAuraTimes, currentNumDebuffs
 
 -- Parnic: support for cataclysm; Divine Intervention was removed
 local wow_400 = select(4, GetBuildInfo()) >= 40000
+local wow_700 = select(4, GetBuildInfo()) >= 70000
+local wow_800 = select(4, GetBuildInfo()) >= 80000
 
 local mt = {__index=function(self, unit)
 	local auras = newList()
@@ -32,7 +34,12 @@ local mt = {__index=function(self, unit)
 	local i = 0
 	while true do
 		i = i + 1
-		local name, _, _, count, _, duration, expirationTime = UnitAura(unit, i, "HELPFUL")
+		local name, count, duration, expirationTime, _
+		if wow_800 then
+			name, _, count, _, duration, expirationTime = UnitAura(unit, i, "HELPFUL")
+		else
+			name, _, _, count, _, duration, expirationTime = UnitAura(unit, i, "HELPFUL")
+		end
 		if not name then
 			break
 		end
@@ -50,7 +57,12 @@ local mt = {__index=function(self, unit)
 	local i = 0
 	while true do
 		i = i + 1
-		local name, _, _, count, dispelType, _, expirationTime = UnitAura(unit, i, "HARMFUL")
+		local name, count, dispelType, expirationTime, _
+		if wow_800 then
+			name, _, count, dispelType, _, expirationTime = UnitAura(unit, i, "HARMFUL")
+		else
+			name, _, _, count, dispelType, _, expirationTime = UnitAura(unit, i, "HARMFUL")
+		end
 		if not name then
 			break
 		end
@@ -103,7 +115,12 @@ DogTag:AddTimerHandler("Unit", function(num, currentTime)
 			local u = newList()
 			local v = newList()
 			for i = 1, 40 do
-				local name, _, _, count, _, _, expirationTime = UnitAura(unit, i, "HELPFUL")
+				local name, count, expirationTime, _
+				if wow_800 then
+					name, _, count, _, _, expirationTime = UnitAura(unit, i, "HELPFUL")
+				else
+					name, _, _, count, _, _, expirationTime = UnitAura(unit, i, "HELPFUL")
+				end
 				if not name then
 					break
 				end
@@ -118,7 +135,12 @@ DogTag:AddTimerHandler("Unit", function(num, currentTime)
 			local numDebuffs = 0
 			local isFriend = UnitIsFriend("player", unit)
 			for i = 1, 40 do
-				local name, _, _, count, dispelType, _, expirationTime = UnitAura(unit, i, "HARMFUL")
+				local name, count, dispelType, expirationTime, _
+				if wow_800 then
+					name, _, count, dispelType, _, expirationTime = UnitAura(unit, i, "HARMFUL")
+				else
+					name, _, _, count, dispelType, _, expirationTime = UnitAura(unit, i, "HARMFUL")
+				end
 				if not name then
 					break
 				end
@@ -221,22 +243,50 @@ DogTag:AddTag("Unit", "RaidStacks", {
 		local numPlayers = GetNumGroupMembers()
     
 		local numAuras = 0
-    
-		if not IsInRaid() then
-			prefix = "party"
-			numPlayers = numPlayers-1
-        
-			local _, _, _, _, _, _, expirationTime, _, _, _, _ = UnitAura("player", aura, nil, "PLAYER|HELPFUL")
-			if expirationTime ~= nil then
-				numAuras = numAuras + 1
+		
+		if wow_800 then
+			-- All this could probably be much more efficient.
+			-- Blizzard removed aura lookups by name in BFA
+
+			aura = aura:lower()
+			if not IsInRaid() then
+				prefix = "party"
+				numPlayers = numPlayers-1
+			
+				for i = 1, 40 do
+					local name, _, _, _, _, expirationTime, _, _, _, _ = UnitAura("player", i, "PLAYER|HELPFUL")
+					if name and name:lower() == aura and expirationTime ~= nil then
+						numAuras = numAuras + 1
+					end
+				end
 			end
-		end
-    
-		for i=1,numPlayers do
-			local unit = prefix..i
-			local _, _, _, _, _, _, expirationTime, _, _, _, _ = UnitAura(unit, aura, nil, "PLAYER|HELPFUL")
-			if expirationTime ~= nil then
-				numAuras = numAuras + 1
+		
+			for i=1,numPlayers do
+				local unit = prefix..i
+				for i = 1, 40 do
+					local name, _, _, _, _, expirationTime, _, _, _, _ = UnitAura(unit, i, "PLAYER|HELPFUL")
+					if name and name:lower() == aura and expirationTime ~= nil then
+						numAuras = numAuras + 1
+					end
+				end
+			end
+		else
+			if not IsInRaid() then
+				prefix = "party"
+				numPlayers = numPlayers-1
+			
+				local _, _, _, _, _, _, expirationTime, _, _, _, _ = UnitAura("player", aura, nil, "PLAYER|HELPFUL")
+				if expirationTime ~= nil then
+					numAuras = numAuras + 1
+				end
+			end
+		
+			for i=1,numPlayers do
+				local unit = prefix..i
+				local _, _, _, _, _, _, expirationTime, _, _, _, _ = UnitAura(unit, aura, nil, "PLAYER|HELPFUL")
+				if expirationTime ~= nil then
+					numAuras = numAuras + 1
+				end
 			end
 		end
 		
@@ -356,6 +406,7 @@ DogTag:AddTag("Unit", "AuraDuration", {
 })
 
 local SHADOWFORM = GetSpellInfo(15473)
+if not wow_700 then
 DogTag:AddTag("Unit", "IsShadowform", {
 	alias = ("HasAura(aura=%q, unit=unit)"):format(SHADOWFORM),
 	arg = {
@@ -365,12 +416,13 @@ DogTag:AddTag("Unit", "IsShadowform", {
 	example = ('[IsShadowform] => %q; [IsShadowform] => ""'):format(L["True"]),
 	category = L["Auras"],
 })
+end
 
 local STEALTH = GetSpellInfo(1784)
-local SHADOWFORM = GetSpellInfo(58984)
+local SHADOWMELD = GetSpellInfo(58984) or GetSpellInfo(743) -- 58984 is the ID in BFA, 743 is the ID in Classic.
 local PROWL = GetSpellInfo(5215)
 DogTag:AddTag("Unit", "IsStealthed", {
-	alias = ("HasAura(aura=%q, unit=unit) or HasAura(aura=%q, unit=unit) or HasAura(aura=%q, unit=unit)"):format(STEALTH, SHADOWFORM, PROWL),
+	alias = ("HasAura(aura=%q, unit=unit) or HasAura(aura=%q, unit=unit) or HasAura(aura=%q, unit=unit)"):format(STEALTH, SHADOWMELD, PROWL),
 	arg = {
 		'unit', 'string;undef', 'player'
 	},
@@ -413,15 +465,17 @@ DogTag:AddTag("Unit", "HasSoulstone", {
 })
 
 local MISDIRECTION = GetSpellInfo(34477)
-DogTag:AddTag("Unit", "HasMisdirection", {
-	alias = ("HasAura(aura=%q, unit=unit)"):format(MISDIRECTION),
-	arg = {
-		'unit', 'string;undef', 'player'
-	},
-	doc = L["Return True if the unit has the Misdirection buff"],
-	example = ('[HasMisdirection] => %q; [HasMisdirection] => ""'):format(L["True"]),
-	category = L["Auras"]
-})
+if MISDIRECTION then -- WoW Classic compat
+	DogTag:AddTag("Unit", "HasMisdirection", {
+		alias = ("HasAura(aura=%q, unit=unit)"):format(MISDIRECTION),
+		arg = {
+			'unit', 'string;undef', 'player'
+		},
+		doc = L["Return True if the unit has the Misdirection buff"],
+		example = ('[HasMisdirection] => %q; [HasMisdirection] => ""'):format(L["True"]),
+		category = L["Auras"]
+	})
+end
 
 local ICE_BLOCK = GetSpellInfo(27619)
 DogTag:AddTag("Unit", "HasIceBlock", {
@@ -446,17 +500,17 @@ DogTag:AddTag("Unit", "HasInvisibility", {
 })
 
 -- Parnic: DI removed in Cataclysm
-if not wow_400 then
 local DIVINE_INTERVENTION = GetSpellInfo(19752)
-DogTag:AddTag("Unit", "HasDivineIntervention", {
-	alias = ("HasAura(aura=%q, unit=unit)"):format(DIVINE_INTERVENTION),
-	arg = {
-		'unit', 'string;undef', 'player'
-	},
-	doc = L["Return True if the unit has the Divine Intervention buff"],
-	example = ('[HasDivineIntervention] => %q; [HasDivineIntervention] => ""'):format(L["True"]),
-	category = L["Auras"]
-})
+if DIVINE_INTERVENTION then
+	DogTag:AddTag("Unit", "HasDivineIntervention", {
+		alias = ("HasAura(aura=%q, unit=unit)"):format(DIVINE_INTERVENTION),
+		arg = {
+			'unit', 'string;undef', 'player'
+		},
+		doc = L["Return True if the unit has the Divine Intervention buff"],
+		example = ('[HasDivineIntervention] => %q; [HasDivineIntervention] => ""'):format(L["True"]),
+		category = L["Auras"]
+	})
 end
 
 DogTag:AddTag("Unit", "HasDebuffType", {

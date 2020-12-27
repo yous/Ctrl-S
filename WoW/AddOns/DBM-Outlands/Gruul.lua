@@ -1,16 +1,17 @@
 local mod	= DBM:NewMod("Gruul", "DBM-Outlands")
 local L		= mod:GetLocalizedStrings()
 
-mod:SetRevision(("$Revision: 204 $"):sub(12, -3))
+mod:SetRevision("20201103194435")
 mod:SetCreatureID(19044)
+mod:SetEncounterID(650)
 mod:SetModelID(18698)
 mod:RegisterCombat("combat")
 
 mod:RegisterEventsInCombat(
-	"SPELL_CAST_START",
-	"SPELL_CAST_SUCCESS",
-	"SPELL_AURA_APPLIED",
-	"SPELL_AURA_APPLIED_DOSE"
+	"SPELL_CAST_START 33525 33654",
+	"SPELL_CAST_SUCCESS 36297",
+	"SPELL_AURA_APPLIED 36300 36240",
+	"SPELL_AURA_APPLIED_DOSE 36300"
 )
 
 local warnGrowth		= mod:NewStackAnnounce(36300, 2, 36300)
@@ -18,14 +19,14 @@ local warnGroundSlam	= mod:NewSpellAnnounce(33525, 3)
 local warnShatter		= mod:NewSpellAnnounce(30403, 4)
 local warnSilence		= mod:NewSpellAnnounce(36297, 4)
 
-local specWarnCaveIn	= mod:NewSpecialWarningMove(36240)
+local specWarnCaveIn	= mod:NewSpecialWarningMove(36240, nil, nil, nil, 1, 2)
 
-local timerGrowthCD		= mod:NewNextTimer(30, 36300)
-local timerGroundSlamCD	= mod:NewCDTimer(74, 36300)--74-80 second variation,and this is just from 2 pulls.
-local timerShatterCD	= mod:NewNextTimer(10, 33654)--10 seconds after ground slam
-local timerSilenceCD	= mod:NewCDTimer(32, 36300)--Also showing a HUGE variation of 32-48 seconds.
+local timerGrowthCD		= mod:NewNextTimer(30, 36300, nil, nil, nil, 6)
+local timerGroundSlamCD	= mod:NewCDTimer(74, 36300, nil, nil, nil, 2)--74-80 second variation,and this is just from 2 pulls.
+local timerShatterCD	= mod:NewNextTimer(10, 33654, nil, nil, nil, 2, nil, DBM_CORE_L.DEADLY_ICON)--10 seconds after ground slam
+local timerSilenceCD	= mod:NewCDTimer(32, 36300, nil, nil, nil, 5, nil, DBM_CORE_L.HEALER_ICON)--Also showing a HUGE variation of 32-48 seconds.
 
-mod:AddBoolOption("RangeFrame", true)
+mod:AddRangeFrameOption(10, 33654)
 
 function mod:OnCombatStart(delay)
 	timerGrowthCD:Start(-delay)
@@ -68,6 +69,7 @@ function mod:SPELL_AURA_APPLIED(args)
 		end
 	elseif args.spellId == 36240 and args:IsPlayer() and not self:IsTrivial(85) then--Cave In
 		specWarnCaveIn:Show()
+		specWarnCaveIn:Play("runaway")
 	end
 end
 mod.SPELL_AURA_APPLIED_DOSE = mod.SPELL_AURA_APPLIED

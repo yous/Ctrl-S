@@ -102,6 +102,8 @@ obj["skillIcons"]	= { label="Skill Icons", tooltip="Display options for skill ic
 
 obj = L.CHECKBOXES
 obj["enableMSBT"]				= { label="Enable Mik's Scrolling Battle Text", tooltip="Enable MSBT."}
+obj["enableBlizzardDamage"]		= { label="Enable Blizzard Damage", tooltip="Enable Blzzard's floating text damage."}
+obj["enableBlizzardHealing"]	= { label="Enable Blizzard Healing", tooltip="Enable Blzzard's floating text healing."}
 obj["stickyCrits"]				= { label="Sticky Crits", tooltip="Display crits using the sticky style."}
 obj["enableSounds"]				= { label="Enable Sounds", tooltip="Play sounds that are assigned to events and triggers."}
 obj["textShadowing"]			= { label="Text Shadowing", tooltip="Apply a shadow effect to text to improve font crispness."}
@@ -119,7 +121,7 @@ obj["colorDamageEntry"]			= { tooltip="Enable coloring for this damage type."}
 obj["colorUnitNames"]			= { label="Color Unit Names", tooltip="Apply specified class colors to unit names."}
 obj["colorClassEntry"]			= { tooltip="Enable coloring for this class."}
 obj["enableScrollArea"]			= { tooltip="Enable the scroll area."}
-obj["inheritField"]				= { label="Inherit", tooltip="Inherit the field's value.  Uncheck to override."}
+obj["inheritField"]				= { label="Inherit", tooltip="Inherit the field's value. Uncheck to override."}
 obj["hideSkillIcons"]			= { label="Hide Icons", tooltip="Do not show icons in this scroll area."}
 obj["stickyEvent"]				= { label="Always Sticky", tooltip="Always display the event using the sticky style."}
 obj["enableTrigger"]			= { tooltip="Enable the trigger."}
@@ -139,6 +141,7 @@ obj["enablePetCooldowns"]		= { label="Pet Cooldowns", tooltip="Display notificat
 obj["enableItemCooldowns"]		= { label="Item Cooldowns", tooltip="Display notifications when item cooldowns complete."}
 obj["lootedItems"]				= { label="Looted Items", tooltip="Display notifications when items are looted."}
 obj["moneyGains"]				= { label="Money Gains", tooltip="Enable money you gain."}
+obj["currencyGains"]			= { label="Currency Gains", tooltip="Display notifications for gained currency."}
 obj["alwaysShowQuestItems"]		= { label="Always show quest items", tooltip="Always show quest items regardless of quality selections."}
 obj["enableIcons"]				= { label="Enable Skill Icons", tooltip="Displays icons for events that have a skill when possible."}
 obj["exclusiveSkills"]			= { label="Exclusive Skill Names", tooltip="Only show skill names when an icon is not available."}
@@ -222,6 +225,7 @@ obj["skillSubstitutions"]		= { label="Skill Substitutions", tooltip="Substitute 
 obj["addSkill"]					= { label="Add Skill", tooltip="Add a new skill to the list."}
 obj["deleteSkill"]				= { tooltip="Click to delete the skill."}
 obj["cooldownExclusions"]		= { label="Cooldown Exclusions", tooltip="Specify skills that will ignore cooldown tracking."}
+obj["ignoreCooldownThreshold"]	= { label="Ignore Cooldown Threshold", tooltip="Specify skills that will ignore the Cooldown Threshold setting."}
 obj["itemsAllowed"]				= { label="Items Allowed", tooltip="Always show specified items regardless of item quality."}
 obj["itemExclusions"]			= { label="Item Exclusions", tooltip="Prevent specified items from being displayed."}
 obj["addItem"]					= { label="Add Item", tooltip="Add a new item to the list."}
@@ -244,7 +248,7 @@ obj["xOffset"]			= { label="X Offset:", tooltip="The X offset of the selected sc
 obj["yOffset"]			= { label="Y Offset:", tooltip="The Y offset of the selected scroll area."}
 obj["eventMessage"]		= { label="Output message:", tooltip="The message that will be displayed when the event occurs."}
 obj["soundFile"]		= { label="Sound filename:", tooltip="The name of the sound file to play when the event occurs."}
-obj["iconSkill"]		= { label="Icon Skill:", tooltip="The name or spell ID of a skill whose icon will be displayed when the event occurs.\n\nMSBT will automatically try to figure out an appropriate icon if one is not specified.\n\nNOTE: A spell ID must be used in place of a name if the skill is not in the spellbook for the class that is playing when the event occurs.  Most online databases such as wowhead can be used to discover it."}
+obj["iconSkill"]		= { label="Icon Skill:", tooltip="The name or spell ID of a skill whose icon will be displayed when the event occurs.\n\nMSBT will automatically try to figure out an appropriate icon if one is not specified.\n\nNOTE: A spell ID must be used in place of a name if the skill is not in the spellbook for the class that is playing when the event occurs. Most online databases such as wowhead can be used to discover it."}
 obj["skillName"]		= { label="Skill name:", tooltip="The name of the skill to add."}
 obj["substitutionText"]	= { label="Substition text:", tooltip="The text to be substituted for the skill name."}
 obj["itemName"]			= { label="Item name:", tooltip="The name of the item to add."}
@@ -297,6 +301,7 @@ obj["ABSORBED_AMOUNT"]		= "%a - Amount of damage absorbed.\n"
 obj["AURA_AMOUNT"]			= "%a - Amount of stacks for the aura.\n"
 obj["ENERGY_AMOUNT"]		= "%a - Amount of energy.\n"
 obj["CHI_AMOUNT"]			= "%a - Amount of chi you have.\n"
+obj["AC_AMOUNT"]			= "%a - Amount of arcane power you have.\n"
 obj["CP_AMOUNT"]			= "%a - Amount of combo points you have.\n"
 obj["HOLY_POWER_AMOUNT"]	= "%a - Amount of holy power you have.\n"
 obj["SHADOW_ORBS_AMOUNT"]	= "%a - Amount of shadow orbs you have.\n" -- TODO: Add to others
@@ -362,10 +367,14 @@ obj["INCOMING_SPELL_ABSORB"]				= { label="Skill Absorbs", tooltip="Enable absor
 obj["INCOMING_SPELL_IMMUNE"]				= { label="Skill Immunes", tooltip="Enable incoming skill damage you are immune to."}
 obj["INCOMING_SPELL_REFLECT"]				= { label="Skill Reflects", tooltip="Enable incoming skill damage you reflected."}
 obj["INCOMING_SPELL_INTERRUPT"]				= { label="Spell Interrupts", tooltip="Enable incoming spell interrupts."}
-obj["INCOMING_HEAL"]						= { label="Heals", tooltip="Enable incoming heals."}
-obj["INCOMING_HEAL_CRIT"]					= { label="Crit Heals", tooltip="Enable incoming crit heals."}
-obj["INCOMING_HOT"]							= { label="Heals Over Time", tooltip="Enable incoming heals over time."}
-obj["INCOMING_HOT_CRIT"]					= { label="Crit Heals Over Time", tooltip="Enable incoming crit heals over time."}
+obj["INCOMING_HEAL"]						= { label="Incoming Heals", tooltip="Enable incoming heals from other players."}
+obj["INCOMING_HEAL_CRIT"]					= { label="Incoming Crit Heals", tooltip="Enable incoming crit heals from other players."}
+obj["INCOMING_HOT"]							= { label="Incoming Heals Over Time", tooltip="Enable incoming heals over time from other players."}
+obj["INCOMING_HOT_CRIT"]					= { label="Incoming Crit Heals Over Time", tooltip="Enable incoming crit heals over time from other players."}
+obj["SELF_HEAL"]							= { label="Self Heals", tooltip="Enable self heals."}
+obj["SELF_HEAL_CRIT"]						= { label="Self Crit Heals", tooltip="Enable self crit heals."}
+obj["SELF_HOT"]								= { label="Self Heals Over Time", tooltip="Enable self heals over time."}
+obj["SELF_HOT_CRIT"]						= { label="Self Crit Heals Over Time", tooltip="Enable self crit heals over time."}
 obj["INCOMING_ENVIRONMENTAL"]				= { label="Environmental Damage", tooltip="Enable environmental (falling, drowning, lava, etc...) damage."}
 
 obj = L.INCOMING_PET_EVENTS
@@ -490,12 +499,12 @@ obj["NOTIFICATION_ALT_POWER_GAIN"]		= { label="Alternate Power Gains", tooltip="
 obj["NOTIFICATION_ALT_POWER_LOSS"]		= { label="Alternate Power Losses", tooltip="Enable when you lose alternate power from drains."}
 obj["NOTIFICATION_CHI_CHANGE"]			= { label="Chi Changes", tooltip="Enable when you change chi."}
 obj["NOTIFICATION_CHI_FULL"]			= { label="Chi Full", tooltip="Enable when you attain full chi."}
+obj["NOTIFICATION_AC_CHANGE"]			= { label="Arcane Charges Changes", tooltip="Enable when you change arcane power."}
+obj["NOTIFICATION_AC_FULL"]				= { label="Arcane Charges Full", tooltip="Enable when you attain full arcane power."}
 obj["NOTIFICATION_CP_GAIN"]				= { label="Combo Point Gains", tooltip="Enable when you gain combo points."}
 obj["NOTIFICATION_CP_FULL"]				= { label="Combo Points Full", tooltip="Enable when you attain full combo points."}
 obj["NOTIFICATION_HOLY_POWER_CHANGE"]	= { label="Holy Power Changes", tooltip="Enable when you change holy power."}
 obj["NOTIFICATION_HOLY_POWER_FULL"]		= { label="Holy Power Full", tooltip="Enable when you attain full holy power."}
-obj["NOTIFICATION_SHADOW_ORBS_CHANGE"]	= { label="Shadow Orb Changes", tooltip="Enable when you change shadow orbs."}
-obj["NOTIFICATION_SHADOW_ORBS_FULL"]	= { label="Shadow Orbs Full", tooltip="Enable when you attain full shadow orbs."}
 obj["NOTIFICATION_HONOR_GAIN"]			= { label="Honor Gains", tooltip="Enable when you gain honor."}
 obj["NOTIFICATION_REP_GAIN"]			= { label="Reputation Gains", tooltip="Enable when you gain reputation."}
 obj["NOTIFICATION_REP_LOSS"]			= { label="Reputation Losses", tooltip="Enable when you lose reputation."}
@@ -552,7 +561,7 @@ obj["SPELL_CAST_FAILED"]		= "Cast Failure"
 obj["SPELL_SUMMON"]				= "Summon"
 obj["SPELL_CREATE"]				= "Create"
 obj["PARTY_KILL"]				= "Killing Blow"
-obj["UNIT_DIED"]				= "Unit Death"
+--obj["UNIT_DIED"]				= "Unit Death"
 obj["UNIT_DESTROYED"]			= "Unit Destroy"
 obj["SPELL_EXTRA_ATTACKS"]		= "Extra Attacks"
 obj["UNIT_HEALTH"]				= "Health Change"
@@ -560,7 +569,7 @@ obj["UNIT_POWER"]				= "Power Change"
 obj["SKILL_COOLDOWN"]			= "Player Cooldown Complete"
 obj["PET_COOLDOWN"]				= "Pet Cooldown Complete"
 obj["ITEM_COOLDOWN"]			= "Item Cooldown Complete"
- 
+
 -- Main event conditions.
 obj["sourceName"]				= "Source Unit Name"
 obj["sourceAffiliation"]		= "Source Unit Affiliation"
@@ -611,7 +620,7 @@ obj["unavailableSkill"]			= "Unavailable Skill"
 obj["warriorStance"]			= "Warrior Stance"
 obj["zoneName"]					= "Zone Name"
 obj["zoneType"]					= "Zone Type"
- 
+
 -- Relationships.
 obj["eq"]						= "Is Equal To"
 obj["ne"]						= "Is Not Equal To"
@@ -619,7 +628,7 @@ obj["like"]						= "Is Like"
 obj["unlike"]					= "Is Not Like"
 obj["lt"]						= "Is Less Than"
 obj["gt"]						= "Is Greater Than"
- 
+
 -- Affiliations.
 obj["affiliationMine"]			= "Mine"
 obj["affiliationParty"]			= "Party Member"
@@ -639,7 +648,7 @@ obj["controlServer"]			= "Server"
 obj["controlHuman"]				= "Human"
 
 -- Unit types.
-obj["unitTypePlayer"]			= PLAYER 
+obj["unitTypePlayer"]			= PLAYER
 obj["unitTypeNPC"]				= "NPC"
 obj["unitTypePet"]				= PET
 obj["unitTypeGuardian"]			= "Guardian"

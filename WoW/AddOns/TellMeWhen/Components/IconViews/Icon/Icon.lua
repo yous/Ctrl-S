@@ -7,7 +7,7 @@
 --		Banjankri of Blackrock, Predeter of Proudmoore, Xenyr of Aszune
 
 -- Currently maintained by
--- Cybeloras of Aerie Peak/Detheroc/Mal'Ganis
+-- Cybeloras of Aerie Peak
 -- --------------------
 
 
@@ -56,6 +56,8 @@ TMW:RegisterDatabaseDefaults{
 						},
 					},
 					
+					Height = 1, -- This is needed in 6.1 - texts with a height of 0 default to wordwrapping now.
+					
 					StringName		= L["TEXTLAYOUTS_DEFAULTS_BINDINGLABEL"],
 					DefaultText		= "",
 					SkinAs			= "HotKey",
@@ -96,9 +98,13 @@ View:RegisterGroupDefaults{
 	SettingsPerView = {
 		icon = {
 			TextLayout = "icon1",
+			BorderColor = "ff000000",
+			BorderIcon = 0,
 		}
 	}
 }
+
+View:RegisterConfigPanel_XMLTemplate(50, "TellMeWhen_GM_IconView")
 
 View:ImplementsModule("IconModule_Alpha", 10, true)
 View:ImplementsModule("IconModule_CooldownSweep", 20, function(Module, icon)
@@ -109,13 +115,12 @@ View:ImplementsModule("IconModule_CooldownSweep", 20, function(Module, icon)
 	Module.cooldown:ClearAllPoints()
 	Module.cooldown:SetSize(ICON_SIZE, ICON_SIZE)
 	Module.cooldown:SetPoint("CENTER", icon)
+	Module.cooldown2:ClearAllPoints()
+	Module.cooldown2:SetSize(ICON_SIZE, ICON_SIZE)
+	Module.cooldown2:SetPoint("CENTER", icon)
 end)
 View:ImplementsModule("IconModule_Texture_Colored", 30, function(Module, icon)
 	Module:Enable()
-	
-	Module.texture:ClearAllPoints()
-	Module.texture:SetSize(ICON_SIZE, ICON_SIZE)
-	Module.texture:SetPoint("CENTER", icon)
 end)
 View:ImplementsModule("IconModule_PowerBar_Overlay", 40, function(Module, icon)
 	if icon.ShowPBar then
@@ -130,27 +135,46 @@ end)
 View:ImplementsModule("IconModule_Texts", 60, true)
 View:ImplementsModule("IconModule_IconContainer_Masque", 100, function(Module, icon)
 	local Modules = icon.Modules
-	local Masque = Module
+
+	local group = icon.group
+	local gspv = group:GetSettingsPerView()
+
+	Module:SetBorder(gspv.BorderIcon, gspv.BorderColor, gspv.BorderInset)
 	
-	Masque.container:ClearAllPoints()
-	Masque.container:SetSize(icon:GetSize())
-	Masque.container:SetAllPoints()	
-	Masque:Enable()
+	local inset = gspv.BorderInset and 0 or gspv.BorderIcon
+	local sizeX, sizeY = icon:GetSize()
+	
+	Module.container:ClearAllPoints()
+	Module.container:SetSize(sizeX - 2*inset, sizeY - 2*inset)
+	Module.container:SetPoint("TOPLEFT", inset, -inset)
+	Module:Enable()
 
 	---------- Skin-Dependent Module Layout ----------
 	local CooldownSweep = Modules.IconModule_CooldownSweep
 	local PowerBar_Overlay = Modules.IconModule_PowerBar_Overlay
 	local TimerBar_Overlay = Modules.IconModule_TimerBar_Overlay
 	local IconModule_Texture_Colored = Modules.IconModule_Texture_Colored
+
+
+	local isDefaultSkin = not Module:IsIconSkinned(icon)
 	
-	local frameLevelOffset = Masque.isDefaultSkin and 1 or -2
+	local frameLevelOffset
+	if (select(2, LibStub("Masque", true)) or 0) >= 80100 then
+		frameLevelOffset = 1
+	else
+		frameLevelOffset = 1 or (isDefaultSkin and 1 or -2)
+	end
 	
 	if CooldownSweep then
 		CooldownSweep.cooldown:SetFrameLevel( icon:GetFrameLevel() + 0 + frameLevelOffset)
 	end
 	
-	local insets = Masque.isDefaultSkin and 1.5 or 0
+	local insets = isDefaultSkin and 1.5 or 0
 	local anchorTo = IconModule_Texture_Colored and IconModule_Texture_Colored.texture or icon
+
+	if IconModule_Texture_Colored then
+		IconModule_Texture_Colored.texture:SetAllPoints(Module.container)
+	end
 	
 	if TimerBar_Overlay then
 		TimerBar_Overlay.bar:SetFrameLevel(icon:GetFrameLevel() + 1 + frameLevelOffset)
@@ -169,13 +193,7 @@ View:ImplementsModule("IconModule_IconContainer_Masque", 100, function(Module, i
 	end
 end)
 
-View:ImplementsModule("GroupModule_Resizer_ScaleXY", 10, function(Module, group)
-	if TMW.Locked or group.Locked then
-		Module:Disable()
-	else
-		Module:Enable()
-	end
-end)
+View:ImplementsModule("GroupModule_Resizer_ScaleXY", 10, true)
 View:ImplementsModule("GroupModule_IconPosition_Sortable", 20, true)
 	
 function View:Icon_SetSize(icon)

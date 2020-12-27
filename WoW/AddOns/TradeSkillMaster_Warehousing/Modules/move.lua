@@ -14,23 +14,23 @@ local TSM = select(2, ...)
 local move = TSM:NewModule("move", "AceEvent-3.0")
 local AceGUI = LibStub("AceGUI-3.0") -- load the AceGUI libraries
 
-function move:restockGroup(grpInfo)
-	local restockItems, next = TSM.data:unIndexRestockGroupTree(grpInfo), next
+function move:restockGroup(grpInfo, src)
+	local restockItems, next = TSM.data:unIndexRestockGroupTree(grpInfo, src), next
 	if next(restockItems) == nil then
 		TSM:Print(L["Nothing to Restock"])
 	else
 		TSM:Print(L["Restocking"])
-		TSMAPI:MoveItems(restockItems, TSM.PrintMsg)
+		TSMAPI:MoveItems(restockItems, TSM.PrintMsg, true)
 	end
 end
 
-function move:groupTree(grpInfo, src)
-	local moveItems, next = TSM.data:unIndexMoveGroupTree(grpInfo, src), next
+function move:groupTree(grpInfo, src, dest)
+	local moveItems, next = TSM.data:unIndexMoveGroupTree(grpInfo, src, dest), next
 	if next(moveItems) == nil then
 		TSM:Print(L["Nothing to Move"])
 	else
 		TSM:Print(L["Preparing to Move"])
-		TSMAPI:MoveItems(moveItems, TSM.PrintMsg)
+		TSMAPI:MoveItems(moveItems, TSM.PrintMsg, true)
 	end
 end
 
@@ -114,7 +114,11 @@ function move:getContainerTable(cnt)
 end
 
 function move:areBanksVisible()
-	if BagnonFrameguildbank and BagnonFrameguildbank:IsVisible() then
+	if BagnonFrameGuildBank and BagnonFrameGuildBank:IsVisible() then
+		return true
+	elseif BagnonFrameguild and BagnonFrameguild:IsVisible() then
+		return true
+	elseif BagnonFrameinventory and BagnonFrameinventory:IsVisible() then
 		return true
 	elseif BagnonFramebank and BagnonFramebank:IsVisible() then
 		return true
@@ -125,6 +129,8 @@ function move:areBanksVisible()
 	elseif (ARKINV_Frame4 and ARKINV_Frame4:IsVisible()) or (ARKINV_Frame3 and ARKINV_Frame3:IsVisible()) then
 		return true
 	elseif (BagginsBag8 and BagginsBag8:IsVisible()) or (BagginsBag9 and BagginsBag9:IsVisible()) or (BagginsBag10 and BagginsBag10:IsVisible()) or (BagginsBag11 and BagginsBag11:IsVisible()) or (BagginsBag12 and BagginsBag12:IsVisible()) then
+		return true
+	elseif (CombuctorFramebank and CombuctorFramebank:IsVisible()) then
 		return true
 	elseif (CombuctorFrame2 and CombuctorFrame2:IsVisible()) then
 		return true
@@ -154,7 +160,13 @@ function move:areBanksVisible()
 		return true
 	elseif NivayacBniv_Bank and NivayacBniv_Bank:IsVisible() then
 		return true
-	elseif DufUIBank and DufUIBank:IsVisble() then
+	elseif DufUIBank and DufUIBank:IsVisible() then
+		return true
+	elseif SVUI_BankContainerFrame and SVUI_BankContainerFrame:IsVisible() then
+		return true
+	elseif LiteBagBank and LiteBagBank:IsVisible() then
+		return true
+	elseif LiteBagInventory and LiteBagInventory:IsVisible() then
 		return true
 	end
 	TSM:Print(L["Canceled"])

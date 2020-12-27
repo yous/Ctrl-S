@@ -1,59 +1,82 @@
 local mod	= DBM:NewMod("BrawlRank3", "DBM-Brawlers")
 local L		= mod:GetLocalizedStrings()
 
-mod:SetRevision(("$Revision: 12554 $"):sub(12, -3))
-mod:SetModelID(28649)
-mod:SetZone()
+mod:SetRevision("20201102223314")
+--mod:SetModelID(28649)
 mod:SetUsedIcons(8)
 
 mod:RegisterEvents(
-	"SPELL_CAST_START 134740 133607 134777 133302",
-	"PLAYER_TARGET_CHANGED"
+	"SPELL_CAST_START 234489 138845 142621 142583",
+--	"SPELL_CAST_SUCCESS 232504",
+	"SPELL_AURA_APPLIED_DOSE 138901",
+	"SPELL_AURA_REMOVED 138901",
+	"SPELL_AURA_REMOVED_DOSE 138901"
 )
 
-local warnVolatileFlames		= mod:NewSpellAnnounce(134740, 3)--Vian the Volatile
-local warnFireLine				= mod:NewCastAnnounce(133607, 4, 2)--Vian the Volatile
-local warnDevastatingThrust		= mod:NewSpellAnnounce(134777, 4)--Ixx
+local warnShotgunRoar				= mod:NewCastAnnounce(234489, 3)--Oso
+local warnBulwark					= mod:NewAddsLeftAnnounce(138901, 2)--Ahoo'ru
+local warnCharge					= mod:NewCastAnnounce(138845, 1)--Ahoo'ru
+local warnCompleteHeal				= mod:NewCastAnnounce(142621, 4)--Ahoo'ru
+local warnDivineCircle				= mod:NewSpellAnnounce(142585, 3)--Ahoo'ru
 
-local specWarnFireLine			= mod:NewSpecialWarningDodge(133607)--Vian the Volatile
-local specWarnDevastatingThrust	= mod:NewSpecialWarningDodge(134777)--Ixx
+local specWarnShotgunRoar			= mod:NewSpecialWarningDodge(234489)--Oso
+local specWarnCharge				= mod:NewSpecialWarningSpell(138845)--Ahoo'ru
+local specWarnCompleteHeal			= mod:NewSpecialWarningInterrupt(142621, nil, nil, nil, 3)--Ahoo'ru
+local specWarnDivineCircle			= mod:NewSpecialWarningDodge(142585)--Ahoo'ru
 
-local timerVolatileFlamesCD		= mod:NewCDTimer(11, 134740)--Vian the Volatile
-local timerFireLineCD			= mod:NewCDTimer(15, 133607)--Vian the Volatile
-local timerDevastatingThrustCD	= mod:NewCDTimer(12, 134777)--Ixx
+local timerShotgunRoarCD			= mod:NewCDTimer(9.9, 234489, nil, nil, nil, 3)--Oso
+local timerDivineCircleCD			= mod:NewCDTimer(26.7, 142585)--Insufficent data to say if accurate with certainty --Ahoo'ru
 
-mod:RemoveOption("HealthFrame")
-mod:RemoveOption("SpeedKillTimer")
-mod:AddBoolOption("SetIconOnBlat", true)--Blat
-
-local brawlersMod = DBM:GetModByName("Brawlers")
-local blatGUID = 0
-local GetRaidTargetIndex = GetRaidTargetIndex
+local brawlersMod = DBM:GetModByName("BrawlersGeneral")
 
 function mod:SPELL_CAST_START(args)
 	if not brawlersMod.Options.SpectatorMode and not brawlersMod:PlayerFighting() then return end--Spectator mode is disabled, do nothing.
-	if args.spellId == 134740 then
-		warnVolatileFlames:Show()
-		timerVolatileFlamesCD:Start()
-	elseif args.spellId == 133607 then
-		warnFireLine:Show()
-		timerFireLineCD:Start()--First one is 9-10 seconds after combat start
+	if args.spellId == 234489 then
+		timerShotgunRoarCD:Start()
 		if brawlersMod:PlayerFighting() then
-			specWarnFireLine:Show()
+			specWarnShotgunRoar:Show()
+		else
+			warnShotgunRoar:Show()
+			timerShotgunRoarCD:SetSTFade(true)
 		end
-	elseif args.spellId == 134777 then
-		warnDevastatingThrust:Show()
-		timerDevastatingThrustCD:Start()--First one is 7-8 seconds after combat start
+	elseif args.spellId == 138845 then
 		if brawlersMod:PlayerFighting() then
-			specWarnDevastatingThrust:Show()
+			specWarnCharge:Show()
+		else
+			warnCharge:Show()
 		end
-	elseif args.spellId == 133302 then--Blat splitting
-		blatGUID = args.sourceGUID
+	elseif args.spellId == 142621 then
+		if brawlersMod:PlayerFighting() then
+			specWarnCompleteHeal:Show(args.sourceName)
+		else
+			warnCompleteHeal:Show()
+		end
+	elseif args.spellId == 142583 then
+		timerDivineCircleCD:Start()
+		if args:IsPlayer() then
+			specWarnDivineCircle:Show()
+		else
+			warnDivineCircle:Show()
+			timerDivineCircleCD:SetSTFade(true)
+		end
 	end
 end
 
-function mod:PLAYER_TARGET_CHANGED()
-	if self.Options.SetIconOnBlat and not DBM.Options.DontSetIcons and UnitGUID("target") == blatGUID and GetRaidTargetIndex("target") ~= 8 then
-		SetRaidTarget("target", 8)
+--[[
+function mod:SPELL_CAST_SUCCESS(args)
+	if not brawlersMod.Options.SpectatorMode and not brawlersMod:PlayerFighting() then return end--Spectator mode is disabled, do nothing.
+	if args.spellId == 232504 then
+
 	end
 end
+--]]
+
+function mod:SPELL_AURA_APPLIED(args)
+	if not brawlersMod.Options.SpectatorMode and not brawlersMod:PlayerFighting() then return end--Spectator mode is disabled, do nothing.
+	if args.spellId == 138901 then
+		warnBulwark:Show(args.amount or 0)
+	end
+end
+mod.SPELL_AURA_APPLIED_DOSE = mod.SPELL_AURA_APPLIED
+mod.SPELL_AURA_REMOVED = mod.SPELL_AURA_APPLIED_DOSE
+mod.SPELL_AURA_REMOVED_DOSE = mod.SPELL_AURA_APPLIED_DOSE

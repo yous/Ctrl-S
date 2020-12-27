@@ -11,7 +11,7 @@
 -- Xenyr of Aszune
 
 -- Currently maintained by
--- Cybeloras of Aerie Peak/Detheroc/Mal'Ganis
+-- Cybeloras of Aerie Peak
 -- --------------------
 
 local TMW = TMW
@@ -32,6 +32,11 @@ local isNumber = TMW.isNumber
 local strlowerCache = TMW.strlowerCache
 local GetSpellTexture = TMW.GetSpellTexture
 
+local GetSpellInfo 
+    = GetSpellInfo
+
+local classSpellNameCache
+
 
 
 local Type = TMW.Classes.IconType:New("unitcooldown")
@@ -44,12 +49,15 @@ Type.DurationSyntax = 1
 Type.unitType = "unitid"
 Type.canControlGroup = true
 
+local STATE_USABLE = TMW.CONST.STATE.DEFAULT_SHOW
+local STATE_USABLE_ALL = 10
+local STATE_UNUSABLE = TMW.CONST.STATE.DEFAULT_HIDE
 
 -- AUTOMATICALLY GENERATED: UsesAttributes
+Type:UsesAttributes("state")
 Type:UsesAttributes("spell")
-Type:UsesAttributes("unit, GUID")
 Type:UsesAttributes("start, duration")
-Type:UsesAttributes("alpha")
+Type:UsesAttributes("unit, GUID")
 Type:UsesAttributes("texture")
 -- END AUTOMATICALLY GENERATED: UsesAttributes
 
@@ -59,7 +67,9 @@ Type:RegisterIconDefaults{
 	-- The unit(s) to check for cooldowns
 	Unit					= "player", 
 
-	-- True to only show the icon if the unit has used the ability at least once.
+	-- False to allow all spells
+	-- True to only show abilities if the unit has used the ability at least once.
+	-- "class" to only show abilities if the unit's class has the ability.
 	OnlySeen				= false,
 
 	-- Sort the cooldowns found by duration
@@ -75,28 +85,56 @@ Type:RegisterConfigPanel_XMLTemplate(105, "TellMeWhen_Unit", {
 	implementsConditions = true,
 })
 
-Type:RegisterConfigPanel_XMLTemplate(165, "TellMeWhen_WhenChecks", {
-	text = L["ICONMENU_SHOWWHEN"],
-	[0x2] = { text = "|cFF00FF00" .. L["ICONMENU_USABLE"], 			},
-	[0x1] = { text = "|cFFFF0000" .. L["ICONMENU_UNUSABLE"], 		},
+Type:RegisterConfigPanel_XMLTemplate(165, "TellMeWhen_IconStates", {
+	[STATE_USABLE_ALL] = { text = "|cFF00FF00" .. L["ICONMENU_ALLSPELLS"], tooltipText = L["ICONMENU_ALLSPELLS_DESC"], order = 1},
+	[STATE_USABLE] =     { text = "|cFF00FF00" .. L["ICONMENU_ANYSPELLS"], tooltipText = L["ICONMENU_ANYSPELLS_DESC"], order = 2},
+	[STATE_UNUSABLE] =   { text = "|cFFFF0000" .. L["ICONMENU_UNUSABLE"],  tooltipText = L["ICONMENU_UNUSABLE_DESC"], order = 3},
 })
 
 Type:RegisterConfigPanel_ConstructorFunc(150, "TellMeWhen_UnitCooldownSettings", function(self)
-	self.Header:SetText(Type.name)
-	TMW.IE:BuildSimpleCheckSettingFrame(self, {
-		{
-			setting = "OnlySeen",
-			title = L["ICONMENU_ONLYSEEN"],
-			tooltip = L["ICONMENU_ONLYSEEN_DESC"],
-		},
+	self:SetTitle(L["ICONMENU_ONLYSEEN_HEADER"])
+	self:BuildSimpleCheckSettingFrame({
+		numPerRow = 2,
+		function(check)
+			check:SetTexts(L["ICONMENU_ONLYSEEN_ALL"], L["ICONMENU_ONLYSEEN_ALL_DESC"])
+			check:SetSetting("OnlySeen", false)
+		end,
+		function(check)
+			check:SetTexts(L["ICONMENU_ONLYSEEN"], L["ICONMENU_ONLYSEEN_DESC"])
+			check:SetSetting("OnlySeen", true)
+		end,
+		function(check)
+			check:SetTexts(L["ICONMENU_ONLYSEEN_CLASS"], L["ICONMENU_ONLYSEEN_CLASS_DESC"])
+			check:SetSetting("OnlySeen", "class")
+		end,
 	})
 end)
 
-Type:RegisterConfigPanel_XMLTemplate(170, "TellMeWhen_SortSettings", {
-	hidden = function(self)
-		return TMW.CI.icon:IsGroupController()
-	end,
-})
+Type:RegisterConfigPanel_ConstructorFunc(170, "TellMeWhen_UCDSortSettings", function(self)
+	self:SetTitle(TMW.L["SORTBY"])
+
+	self:BuildSimpleCheckSettingFrame({
+		numPerRow = 3,
+		function(check)
+			check:SetTexts(TMW.L["SORTBYNONE"], TMW.L["SORTBYNONE_DESC"])
+			check:SetSetting("Sort", false)
+		end,
+		function(check)
+			check:SetTexts(TMW.L["ICONMENU_SORTASC"], TMW.L["ICONMENU_SORTASC_DESC"])
+			check:SetSetting("Sort", -1)
+		end,
+		function(check)
+			check:SetTexts(TMW.L["ICONMENU_SORTDESC"], TMW.L["ICONMENU_SORTDESC_DESC"])
+			check:SetSetting("Sort", 1)
+		end,
+	})
+
+	self:CScriptAdd("PanelSetup", function()
+		if TMW.CI.icon:IsGroupController() then
+			self:Hide()
+		end
+	end)
+end)
 
 
 
@@ -138,10 +176,9 @@ local resetsOnCast = {
 	[11129] = { -- Combustion
 		[108853] = 1, -- Inferno Blast
 	},
-	[11958] = { -- coldsnap
+	[235219] = { -- coldsnap
 		[45438] = 1, -- iceblock
-		[31661] = 1, -- dragon's breath
-		[12043] = 1, -- presence of mind
+		[11426] = 1, -- ice barrier
 		[120] = 1, -- cone of cold
 		[122] = 1, -- frost nova
 	},
@@ -192,7 +229,9 @@ local spellBlacklist = {
 }
 
 
-function Type:COMBAT_LOG_EVENT_UNFILTERED(e, _, cleuEvent, _, sourceGUID, _, _, _, destGUID, _, destFlags, _, spellID, spellName)
+function Type:COMBAT_LOG_EVENT_UNFILTERED(e)
+	local _, cleuEvent, _, sourceGUID, _, _, _, destGUID, _, destFlags, _, spellID, spellName = CombatLogGetCurrentEventInfo()
+	
 	if cleuEvent == "SPELL_CAST_SUCCESS"
 	or cleuEvent == "SPELL_AURA_APPLIED"
 	or cleuEvent == "SPELL_AURA_REFRESH"
@@ -242,6 +281,8 @@ function Type:COMBAT_LOG_EVENT_UNFILTERED(e, _, cleuEvent, _, sourceGUID, _, _, 
 					end
 				end
 			end
+
+
 			cooldownsForGUID[spellName] = spellID
 			cooldownsForGUID[spellID] = TMW.time
 		else
@@ -281,7 +322,7 @@ function Type:COMBAT_LOG_EVENT_UNFILTERED(e, _, cleuEvent, _, sourceGUID, _, _, 
 	end
 end
 
-function Type:UNIT_SPELLCAST_SUCCEEDED(event, unit, spellName, _, _, spellID)
+function Type:UNIT_SPELLCAST_SUCCEEDED(event, unit, _, spellID)
 	local sourceGUID = UnitGUID(unit)
 	if sourceGUID then
 		-- For some reason, this is firing for unit "npc," (yes, there is a comma there).
@@ -292,6 +333,7 @@ function Type:UNIT_SPELLCAST_SUCCEEDED(event, unit, spellName, _, _, spellID)
 		-- so remove all errors and just ignore things without GUIDs.
 		
 		local c = Cooldowns[sourceGUID]
+		local spellName = GetSpellInfo(spellID)
 		spellName = strlowerCache[spellName]
 		
 		c[spellName] = spellID
@@ -367,8 +409,11 @@ local BLANKTABLE = {}
 local function UnitCooldown_OnUpdate(icon, time)
 
 	-- Upvalue things that will be referenced a lot in our loops.
-	local Alpha, NameArray, OnlySeen, Sort, Durations, Units =
-	icon.Alpha, icon.Spells.Array, icon.OnlySeen, icon.Sort, icon.Spells.Durations, icon.Units
+	local NameArray, OnlySeen, Sort, Durations, Units =
+	icon.Spells.Array, icon.OnlySeen, icon.Sort, icon.Spells.Durations, icon.Units
+	
+	local usableAlpha = icon.States[STATE_USABLE].Alpha
+	local usableAllAlpha = icon.States[STATE_USABLE_ALL].Alpha
 
 	-- These variables will hold all the attributes that we pass to SetInfo().
 	local unstart, unname, unduration, usename, dobreak, useUnit, unUnit
@@ -382,7 +427,7 @@ local function UnitCooldown_OnUpdate(icon, time)
 		local GUID = UnitGUID(unit)
 		local cooldowns = GUID and rawget(Cooldowns, GUID)
 
-		if u == 1 and GUID and not cooldowns and not OnlySeen then
+		if u == 1 and GUID and not cooldowns and OnlySeen ~= true then
 			-- If this is the first unit, use a blank cooldowns table for it if it doesn't exist
 			-- so that we can still find the first usable spell.
 			-- Such a dirty, dirty hack.
@@ -392,6 +437,7 @@ local function UnitCooldown_OnUpdate(icon, time)
 		if cooldowns then
 			for i = 1, #NameArray do
 				local iName = NameArray[i]
+				local baseName = iName
 
 				if not isNumber[iName] then
 					-- spell name keys have values that are the spellid of the name,
@@ -400,10 +446,17 @@ local function UnitCooldown_OnUpdate(icon, time)
 				end
 
 				local start
-				if OnlySeen then
+				if OnlySeen == true then
 					-- If we only want cooldowns that have been seen,
 					-- don't default to 0 if it isn't in the table.
 					start = cooldowns[iName]
+				elseif OnlySeen == "class" then
+					local _, class = UnitClass(unit)
+
+					-- we allow (not classSpellNameCache[class]) because of ticket 1144
+					if not classSpellNameCache[class] or classSpellNameCache[class][baseName] then
+						start = cooldowns[iName] or 0
+					end
 				else
 					start = cooldowns[iName] or 0
 				end
@@ -441,7 +494,7 @@ local function UnitCooldown_OnUpdate(icon, time)
 							unUnit = unit
 
 							-- We DONT care about usable cooldowns, so stop looking
-							if Alpha == 0 then 
+							if usableAlpha == 0 and usableAllAlpha == 0 then 
 								dobreak = 1
 								break
 							end
@@ -450,8 +503,8 @@ local function UnitCooldown_OnUpdate(icon, time)
 							usename = iName
 							useUnit = unit
 
-							-- We care about usable cooldowns, so stop looking
-							if Alpha ~= 0 then 
+							-- We care about usable cooldowns (but not all of them), so stop looking
+							if usableAlpha > 0 and usableAllAlpha == 0 then 
 								dobreak = 1
 								break
 							end
@@ -465,9 +518,18 @@ local function UnitCooldown_OnUpdate(icon, time)
 		end
 	end
 	
-	if usename and Alpha > 0 then
-		icon:SetInfo("alpha; texture; start, duration; spell; unit, GUID",
-			icon.Alpha,
+	if usename and usableAllAlpha > 0 and not unname then
+		icon:SetInfo("state; texture; start, duration; spell; unit, GUID",
+			STATE_USABLE_ALL,
+			GetSpellTexture(usename) or "Interface\\Icons\\INV_Misc_PocketWatch_01",
+			0, 0,
+			usename,
+			useUnit, nil
+		)
+
+	elseif usename and usableAlpha > 0 then
+		icon:SetInfo("state; texture; start, duration; spell; unit, GUID",
+			STATE_USABLE,
 			GetSpellTexture(usename) or "Interface\\Icons\\INV_Misc_PocketWatch_01",
 			0, 0,
 			usename,
@@ -475,8 +537,8 @@ local function UnitCooldown_OnUpdate(icon, time)
 		)
 
 	elseif unname then
-		icon:SetInfo("alpha; texture; start, duration; spell; unit, GUID",
-			icon.UnAlpha,
+		icon:SetInfo("state; texture; start, duration; spell; unit, GUID",
+			STATE_UNUSABLE,
 			GetSpellTexture(unname),
 			unstart, unduration,
 			unname,
@@ -484,22 +546,25 @@ local function UnitCooldown_OnUpdate(icon, time)
 		)
 
 	else
-		icon:SetInfo("alpha", 0)
+		icon:SetInfo("state", 0)
 	end
 end
 
 local function UnitCooldown_OnUpdate_Controller(icon, time)
 
 	-- Upvalue things that will be referenced a lot in our loops.
-	local Alpha, UnAlpha, NameArray, OnlySeen, Durations, Units =
-	icon.Alpha, icon.UnAlpha, icon.Spells.Array, icon.OnlySeen, icon.Spells.Durations, icon.Units
-		
+	local NameArray, OnlySeen, Durations, Units =
+	icon.Spells.Array, icon.OnlySeen, icon.Spells.Durations, icon.Units
+	
+	local usableAlpha = icon.States[STATE_USABLE].Alpha
+	local unusableAlpha = icon.States[STATE_UNUSABLE].Alpha
+
 	for u = 1, #Units do
 		local unit = Units[u]
 		local GUID = UnitGUID(unit)
 		local cooldowns = GUID and rawget(Cooldowns, GUID)
 
-		if u == 1 and GUID and not cooldowns and not OnlySeen then
+		if u == 1 and GUID and not cooldowns and OnlySeen ~= true then
 			-- If this is the first unit, use a blank cooldowns table for it if it doesn't exist
 			-- so that we can still find the first usable spell.
 			-- Such a dirty, dirty hack.
@@ -509,6 +574,8 @@ local function UnitCooldown_OnUpdate_Controller(icon, time)
 		if cooldowns then
 			for i = 1, #NameArray do
 				local iName = NameArray[i]
+				local baseName = iName
+
 				if not isNumber[iName] then
 					-- spell name keys have values that are the spellid of the name,
 					-- we need the spellid for the texture (thats why i did it like this)
@@ -516,10 +583,16 @@ local function UnitCooldown_OnUpdate_Controller(icon, time)
 				end
 
 				local start
-				if OnlySeen then
+				if OnlySeen == true then
 					-- If we only want cooldowns that have been seen,
 					-- don't default to 0 if it isn't in the table.
 					start = cooldowns[iName]
+				elseif OnlySeen == "class" then
+					local _, class = UnitClass(unit)
+
+					if classSpellNameCache[class][baseName] then
+						start = cooldowns[iName] or 0
+					end
 				else
 					start = cooldowns[iName] or 0
 				end
@@ -530,13 +603,13 @@ local function UnitCooldown_OnUpdate_Controller(icon, time)
 					if remaining < 0 then remaining = 0 end
 
 					if remaining ~= 0 then
-						if UnAlpha > 0 and not icon:YieldInfo(true, iName, start, duration, unit, GUID, UnAlpha) then
+						if unusableAlpha > 0 and not icon:YieldInfo(true, iName, start, duration, unit, GUID, STATE_UNUSABLE) then
 							-- YieldInfo returns true if we need to keep harvesting data. Otherwise, it returns false.
 							return
 						end
 
 					else
-						if Alpha > 0 and not icon:YieldInfo(true, iName, 0, 0, unit, GUID, Alpha) then
+						if usableAlpha > 0 and not icon:YieldInfo(true, iName, 0, 0, unit, GUID, STATE_USABLE) then
 							-- YieldInfo returns true if we need to keep harvesting data. Otherwise, it returns false.
 							return
 						end
@@ -549,17 +622,17 @@ local function UnitCooldown_OnUpdate_Controller(icon, time)
 	-- Signal the group controller that we are at the end of our data harvesting.
 	icon:YieldInfo(false)
 end
-function Type:HandleYieldedInfo(icon, iconToSet, name, start, duration, unit, GUID, alpha)
+function Type:HandleYieldedInfo(icon, iconToSet, name, start, duration, unit, GUID, state)
 	if name then
-		iconToSet:SetInfo("alpha; texture; start, duration; spell; unit, GUID",
-			alpha,
+		iconToSet:SetInfo("state; texture; start, duration; spell; unit, GUID",
+			state,
 			GetSpellTexture(name) or "Interface\\Icons\\INV_Misc_PocketWatch_01",
 			start, duration,
 			name,
 			unit, GUID
 		)
 	else
-		iconToSet:SetInfo("alpha", 0)
+		iconToSet:SetInfo("state", 0)
 	end
 
 end
@@ -579,16 +652,14 @@ function Type:Setup(icon)
 	Type:RegisterEvent("COMBAT_LOG_EVENT_UNFILTERED")
 	Type:RegisterEvent("UNIT_SPELLCAST_SUCCEEDED")
 
-
+	if icon.OnlySeen == "class" then
+		classSpellNameCache = TMW:GetModule("ClassSpellCache"):GetNameCache()
+	end
 
 	-- Setup icon events and update functions.
 	if icon.UnitSet.allUnitsChangeOnEvent then
 		icon:SetUpdateMethod("manual")
 		ManualIconsManager:UpdateTable_Register(icon)
-		
-		for event in pairs(icon.UnitSet.updateEvents) do
-			icon:RegisterSimpleUpdateEvent(event)
-		end
 		
 		TMW:RegisterCallback("TMW_UNITSET_UPDATED", UnitCooldown_OnEvent, icon)
 	end

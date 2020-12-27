@@ -1,5 +1,5 @@
 local Libra = LibStub("Libra")
-local Type, Version = "Dropdown", 12
+local Type, Version = "Dropdown", 13
 if Libra:GetModuleVersion(Type) >= Version then return end
 
 Libra.modules[Type] = Libra.modules[Type] or {}
@@ -329,10 +329,7 @@ function Dropdown:ToggleDropDownMenuHook(level, value, dropdownFrame, anchorName
 	end
 	local listFrameName = "DropDownList"..level
 	local listFrame = _G[listFrameName]
-	if not objects[dropdownFrame] then
-		listFrame:SetScript("OnMouseWheel", nil)
-		return
-	end
+	if not objects[dropdownFrame] then return end
 	if dropdownFrame and dropdownFrame._displayMode == "MENU" then
 		_G[listFrameName.."Backdrop"]:Hide()
 		_G[listFrameName.."MenuBackdrop"]:Show()
@@ -456,7 +453,7 @@ local function invisibleButtonOnLeave(self)
 	end
 end
 
-local function listOnHide(self)
+function Dropdown:HideListHook(self)
 	if not InCombatLockdown() then
 		for i = #Dropdown.secureButtons, 1, -1 do
 			-- hide secure buttons attached to this list frame
@@ -467,6 +464,13 @@ local function listOnHide(self)
 			end
 		end
 	end
+	if objects[UIDropDownMenu_GetCurrentDropDown()] then
+		self:SetScript("OnMouseWheel", nil)
+	end
+end
+
+local function listOnHide(self)
+	Dropdown:HideListHook(self)
 end
 
 function Dropdown:CreateFramesHook(numLevels, numButtons)
@@ -478,10 +482,11 @@ function Dropdown:CreateFramesHook(numLevels, numButtons)
 		self.hookedButtons[level] = self.hookedButtons[level] or {}
 		for i = 1, numButtons do
 			if not self.hookedButtons[level][i] then
-				_G["DropDownList"..level.."Button"..i]:HookScript("OnEnter", onEnter)
-				_G["DropDownList"..level.."Button"..i]:HookScript("OnLeave", onLeave)
-				_G["DropDownList"..level.."Button"..i.."InvisibleButton"]:HookScript("OnEnter", invisibleButtonOnEnter)
-				_G["DropDownList"..level.."Button"..i.."InvisibleButton"]:HookScript("OnLeave", invisibleButtonOnLeave)
+				local button = _G["DropDownList"..level.."Button"..i]
+				button:HookScript("OnEnter", onEnter)
+				button:HookScript("OnLeave", onLeave)
+				button.invisibleButton:HookScript("OnEnter", invisibleButtonOnEnter)
+				button.invisibleButton:HookScript("OnLeave", invisibleButtonOnLeave)
 				self.hookedButtons[level][i] = true
 			end
 		end

@@ -7,7 +7,7 @@
 --		Banjankri of Blackrock, Predeter of Proudmoore, Xenyr of Aszune
 
 -- Currently maintained by
--- Cybeloras of Aerie Peak/Detheroc/Mal'Ganis
+-- Cybeloras of Aerie Peak
 -- --------------------
 
 
@@ -21,6 +21,8 @@ local print = TMW.print
 	
 local IconDragger = TMW:NewModule("IconDragger", "AceTimer-3.0", "AceEvent-3.0")
 TMW.IconDragger = IconDragger
+
+
 
 function IconDragger:OnInitialize()
 	WorldFrame:HookScript("OnMouseDown", function() -- this contains other bug fix stuff too
@@ -72,6 +74,10 @@ function IconDragger:DropDownFunc()
 	TMW.DD:AddButton(info)
 end
 
+IconDragger.Dropdown = TMW.C.Config_DropDownMenu_NoFrame:New()
+IconDragger.Dropdown:SetFunction(IconDragger.DropDownFunc)
+local Dropdown = IconDragger.Dropdown
+
 function IconDragger:Start(icon)
 	IconDragger.srcicon = icon
 
@@ -113,18 +119,21 @@ function IconDragger:CompleteDrag(script, icon)
 				return
 			end
 
-			IconDragger.DraggerFrame.Dropdown:SetDropdownAnchor("TOPLEFT", icon, "BOTTOMLEFT", 0, 0)
+			Dropdown:SetDropdownAnchor("TOPLEFT", icon, "BOTTOMLEFT", 0, 0)
 
 		else
 			IconDragger.desticon = nil
 			IconDragger.destFrame = icon -- not actually an icon. just some frame.
 			local cursorX, cursorY = GetCursorPosition()
 			local UIScale = UIParent:GetScale()
-			IconDragger.DraggerFrame.Dropdown:SetDropdownAnchor(nil, UIParent, "BOTTOMLEFT", cursorX/UIScale, cursorY/UIScale)
+			-- We offset the position here by 1 so that the frame is always under the cursor.
+			-- Otherwise, it might not be under the cursor, causing the dropdown to never auto-hide if the user
+			-- never drags their cursor over it.
+			Dropdown:SetDropdownAnchor(nil, UIParent, "BOTTOMLEFT", cursorX/UIScale - 1, cursorY/UIScale + 1)
 		end
 
-		if not DropDownList1:IsShown() or TMW.DD.OPEN_MENU ~= IconDragger.DraggerFrame.Dropdown then
-			IconDragger.DraggerFrame.Dropdown:Toggle(1)
+		if not DropDownList1:IsShown() or TMW.DD.OPEN_MENU ~= Dropdown then
+			Dropdown:Toggle(1)
 		end
 	end
 end
@@ -249,6 +258,33 @@ IconDragger:RegisterIconDragHandler(3,	-- Swap
 		IconDragger.srcicon:SetInfo("texture", desttex)
 	end
 )
+IconDragger:RegisterIconDragHandler(4,	-- Insert
+	function(IconDragger, info)
+		if IconDragger.desticon then
+			info.text = L["ICONMENU_INSERTHERE"]
+			info.tooltipTitle = L["ICONMENU_INSERTHERE"]
+			info.tooltipText = L["ICONMENU_INSERTHERE_DESC"]:format(
+				IconDragger.srcicon:GetFullName(), 
+				IconDragger.desticon:GetFullName()
+			)
+			return true
+		end
+	end,
+	function(IconDragger)
+		-- move the actual settings
+		local srcgs = IconDragger.srcicon.group:GetSettings()
+		local srcics = IconDragger.srcicon:GetSettings()
+		
+		TMW:PrepareIconSettingsForCopying(srcics, srcgs)
+		
+		local targetId = IconDragger.desticon:GetID()
+		local ics = tremove(srcgs.Icons, IconDragger.srcicon:GetID())
+		tinsert(IconDragger.desticon.group:GetSettings().Icons, targetId, ics)
+		
+		-- preserve buff/debuff/other types textures
+		IconDragger.desticon:SetInfo("texture", IconDragger.srcicon.attributes.texture)
+	end
+)
 
 local function Split(IconDragger, domain)
 	if InCombatLockdown() then
@@ -268,7 +304,7 @@ local function Split(IconDragger, domain)
 		-- nullify it (we don't want to copy it)
 		IconDragger.srcicon.group:GetSettings().Icons = nil
 	
-		TMW:CopyTableInPlaceWithMeta(IconDragger.srcicon.group:GetSettings(), group:GetSettings())
+		TMW:CopyTableInPlaceUsingDestinationMeta(IconDragger.srcicon.group:GetSettings(), group:GetSettings())
 	end)
 
 	-- restore the icon data of the source group
@@ -292,7 +328,7 @@ local function Split(IconDragger, domain)
 
 	-- adjustments and positioning
 	local p = gs.Point
-	p.point, p.relativeTo, p.relativePoint, p.x, p.y = IconDragger.DraggerFrame.texture:GetPoint(2)
+	p.point, p.relativeTo, p.relativePoint, p.x, p.y = IconDragger.DraggerFrame.texture:GetPoint(1)
 	
 	p.relativeTo = "UIParent"
 	
@@ -361,14 +397,16 @@ function IconDragger:Handler(method)
 	TMW.IE:SaveSettings()
 
 	-- attempt to create a backup before doing anything
-	TMW.IE:AttemptBackup(IconDragger.srcicon)
-	TMW.IE:AttemptBackup(IconDragger.desticon)
+	IconDragger.srcicon:SaveBackup()
+	if IconDragger.desticon then
+		IconDragger.desticon:SaveBackup()
+	end
 
 	-- finally, invoke the method to handle the operation.
 	method(IconDragger)
 
 	-- then, update things
 	TMW:Update()
-	TMW.IE:Load(1)
+	TMW.IE:LoadIcon(1)
 end
 

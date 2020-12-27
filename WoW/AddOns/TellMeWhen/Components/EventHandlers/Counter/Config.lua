@@ -7,7 +7,7 @@
 --		Banjankri of Blackrock, Predeter of Proudmoore, Xenyr of Aszune
 
 -- Currently maintained by
--- Cybeloras of Aerie Peak/Detheroc/Mal'Ganis
+-- Cybeloras of Aerie Peak
 -- --------------------
 
 
@@ -56,7 +56,7 @@ function Counter:LoadSettingsForEventID(eventID)
 	self.ConfigContainer.Amt:SetText(eventSettings.CounterAmt)
 end
 
-function Counter:SetupEventDisplay(eventID)
+function Counter:GetEventDisplayText(eventID)
 	if not eventID then return end
 
 	local eventSettings = EVENTS:GetEventSettings(eventID)
@@ -73,30 +73,31 @@ function Counter:SetupEventDisplay(eventID)
 		str = str .. CounterOperation .. " " .. CounterAmt
 	end
 	
-	EVENTS.EventHandlerFrames[eventID].DataText:SetText("|cffcccccc" .. L["EVENTHANDLER_COUNTER_TAB"] .. ":|r " .. str)
+	return ("|cffcccccc" .. L["EVENTHANDLER_COUNTER_TAB"] .. ":|r " .. str)
 end
 
 
-function Counter:OperationMenu_DropDown()
+
+local function OperationMenu_DropDown_OnClick(button, dropdown)
+	dropdown:SetUIDropdownText(button.value, operations)
+	
+	local eventSettings = EVENTS:GetEventSettings()
+	eventSettings.CounterOperation = button.value
+
+	dropdown:OnSettingSaved()
+end
+function Counter.OperationMenu_DropDown(dropdown)
 	for k, v in pairs(operations) do
 		local info = TMW.DD:CreateInfo()
-		info.func = Counter.OperationMenu_DropDown_OnClick
+		info.func = OperationMenu_DropDown_OnClick
 		info.text = v.text
 		info.value = v.value
 		info.checked = v.value == EVENTS:GetEventSettings().CounterOperation
-		info.arg1 = self
+		info.arg1 = dropdown
 		TMW.DD:AddButton(info)
 	end
 end
 
-function Counter:OperationMenu_DropDown_OnClick(frame)
-	frame:SetUIDropdownText(self.value, operations)
-	
-	local eventSettings = EVENTS:GetEventSettings()
-	eventSettings.CounterOperation = self.value
-
-	TMW.EVENTS:LoadConfig()
-end
 
 
 
@@ -109,22 +110,14 @@ Module.showColorHelp = false
 Module.helpText = L["SUG_TOOLTIPTITLE_GENERIC"]
 
 function Module.Sorter_Counter(a, b)
-	--sort by name
-	
 	local special_a, special_b = strsub(a, 1, 1), strsub(b, 1, 1)
-	--local prefix_a, prefix_b = strsub(a, 1, 2), strsub(b, 1, 2)
 	
 	local haveA, haveB = special_a ~= "%", special_b ~= "%"
 	if (haveA ~= haveB) then
 		return haveA
 	end
 	
-	--[[local haveA, haveB = prefix_a == "%A", prefix_b == "%A"
-	if (haveA ~= haveB) then
-		return haveA
-	end]]
-	
-	--sort by index/alphabetical/whatever
+	--sort by alphabetical
 	return a < b
 end
 
@@ -142,7 +135,7 @@ function Module:Entry_AddToList_1(f, name)
 
 	f.insert = name
 end
-function Module:Table_GetNormalSuggestions(suggestions, tbl, ...)
+function Module:Table_GetNormalSuggestions(suggestions, tbl)
 	local lastName = SUG.lastName
 
 
@@ -157,7 +150,7 @@ function Module:Table_GetNormalSuggestions(suggestions, tbl, ...)
 	end
 end
 
-function Module:Table_GetSpecialSuggestions_1(suggestions, tbl, ...)
+function Module:Table_GetSpecialSuggestions_1(suggestions)
 	if #SUG.lastName > 0 then
 		suggestions[#suggestions + 1] = "%A"
 	end

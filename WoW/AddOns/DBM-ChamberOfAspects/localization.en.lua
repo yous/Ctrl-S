@@ -98,7 +98,7 @@ L:SetWarningLocalization({
 L:SetOptionLocalization({
 	WarningSplitSoon	= "Show pre-warning for Split",
 	RangeFrame			= "Show range frame (12 yards)",
-	SetIconOnBrand		= DBM_CORE_AUTO_ICONS_OPTION_TEXT:format(74505)
+	SetIconOnBrand		= DBM_CORE_L.AUTO_ICONS_OPTION_TEXT:format(74505)
 })
 
 -------------------------
@@ -112,7 +112,7 @@ L:SetGeneralLocalization({
 
 L:SetOptionLocalization({
 	RangeFrame				= "Show range frame (10 yards)",
-	BeaconIcon				= DBM_CORE_AUTO_ICONS_OPTION_TEXT:format(74453)
+	BeaconIcon				= DBM_CORE_L.AUTO_ICONS_OPTION_TEXT:format(74453)
 })
 
 --------------------------
@@ -136,7 +136,7 @@ L:SetTimerLocalization({
 L:SetOptionLocalization({
 	WarnAdds		= "Announce new adds",
 	TimerAdds		= "Show timer for new adds",
-	warnCleaveArmor	= DBM_CORE_AUTO_ANNOUNCE_OPTIONS.spell:format(74367)
+	warnCleaveArmor	= DBM_CORE_L.AUTO_ANNOUNCE_OPTIONS.spell:format(74367)
 })
 
 L:SetMiscLocalization({
@@ -159,8 +159,7 @@ L:SetWarningLocalization({
 L:SetOptionLocalization({
 	TwilightCutterCast		= "Show warning when $spell:74769 is being cast",
 	AnnounceAlternatePhase	= "Show warnings/timers for phase you aren't in as well",
-	SetIconOnConsumption	= "Set icons on $spell:74562 or $spell:74792 targets",--So we can use single functions for both versions of spell.
-	WhisperOnConsumption	= "Send whisper to $spell:74562 or $spell:74792<br/>targets (requires Raid Leader)"
+	SetIconOnConsumption	= "Set icons on $spell:74562 or $spell:74792 targets"--So we can use single functions for both versions of spell.
 })
 
 L:SetMiscLocalization({
@@ -169,7 +168,5 @@ L:SetMiscLocalization({
 	Phase2					= "You will find only suffering within the realm of twilight! Enter if you dare!",
 	Phase3					= "I am the light and the darkness! Cower, mortals, before the herald of Deathwing!",
 	twilightcutter			= "The orbiting spheres pulse with dark energy!",
-	WhisperCombustion		= "Combustion on you! Run to the wall!",
-	WhisperConsumption		= "Consumption on you! Run to the wall!",
 	Kill					= "Relish this victory, mortals, for it will be your last. This world will burn with the master's return!"
 })

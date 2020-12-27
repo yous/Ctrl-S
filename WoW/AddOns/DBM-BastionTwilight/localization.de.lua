@@ -70,8 +70,7 @@ L = DBM:GetModLocalization(167)
 L:SetOptionLocalization({
 	CorruptingCrashArrow	= "Zeige DBM-Pfeil, falls $spell:81685 nahe bei dir ist",
 	InfoFrame				= "Zeige Infofenster für $journal:3165",
-	RangeFrame				= "Zeige Abstandsfenster (5m) für $journal:3165",
-	SetIconOnCreature		= "Setze Zeichen auf Verfinsterte Geschöpfe"
+	RangeFrame				= "Zeige Abstandsfenster (5m) für $journal:3165"
 })
 
 ----------------
@@ -103,7 +102,6 @@ L:SetOptionLocalization({
 	TimerEggWeaken		= "Dauer der Erneuerung des $spell:87654 anzeigen",
 	TimerOrbs			= "Zeige Zeit bis nächste Schattenkugeln erscheinen<br/>(voraussichtlich, kann ungenau sein)",
 	SetIconOnOrbs		= "Setze Zeichen auf Spieler mit Aggro, wenn Schattenkugeln erscheinen<br/>(mögliches Ziel der Schattenkugeln)",
-	OrbsCountdown		= "Spiele akustischen Countdown für Schattenkugeln",
 	InfoFrame			= "Zeige Infofenster für Spieler mit Aggro"
 })
 

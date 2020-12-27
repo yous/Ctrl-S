@@ -13,7 +13,6 @@ local pinCache = {}
 -- last x,y of the player.
 -- total number of pins we have created
 local lastXY, lastYY, pinCount = 0, 0, 0
-local lastLevel, lastZone = 0, -1
 -- reference to the pin generating the UIDropDown
 local pinClickedOn
 -- our current zone
@@ -27,19 +26,18 @@ local minimapShape
 -- is the minimap indoors or outdoors
 local indoors = GetCVar("minimapZoom")+0 == Minimap:GetZoom() and "outdoor" or "indoor"
 -- diameter of the minimap
-local mapRadius, worldmapWidth, worldmapHeight, minimapWidth, minimapHeight, minimapScale, lastFacing, lastZoom
-local minimapStrata, worldmapStrata, minimapFrameLevel, worldmapFrameLevel
+local mapRadius, minimapWidth, minimapHeight, minimapScale, lastFacing, lastZoom
+local minimapStrata, minimapFrameLevel
 -- math function cache
 local math_sin, math_cos, abs, max = math.sin, math.cos, math.abs, math.max
 local sin, cos
 -- API function cache
-local GetRealZoneText, GetPlayerMapPosition, GetCurrentMapAreaID = GetRealZoneText, GetPlayerMapPosition, GetCurrentMapAreaID
-local GetProfessionInfo, GetCurrentMapDungeonLevel = GetProfessionInfo, GetCurrentMapDungeonLevel
+local GetRealZoneText = GetRealZoneText
+local GetProfessionInfo = GetProfessionInfo
 local strfind, format = string.find, string.format
 local trackingCircle, nodeTextures
 local db
 local Minimap = Minimap
-local WorldMapButton = WorldMapButton
 local inInstance
 local nodeRange = 2
 local forceNextUpdate
@@ -50,6 +48,18 @@ local have_prof_skill = {}
 
 local active_tracking = {}
 local tracking_spells = {}
+
+local continentZoneList = {
+	[12]  = true, -- Kalimdor
+	[13]  = true, -- Azeroth
+	[101] = true, -- Outlands
+	[113] = true, -- Northrend
+	[424] = true, -- Pandaria
+	[572] = true, -- Draenor
+	[619] = true, -- Broken Isles
+	[875] = true, -- Zandalar
+	[876] = true, -- Kul Tiras
+}
 
 --[[
 	recycle a pin
@@ -88,22 +98,18 @@ end
 local tooltip_template = "|c%02x%02x%02x%02x%s|r"
 local function showPin(self)
 	if (self.title) then
-		local tooltip, pinset
+		local pinset
 		if self.worldmap then
-			-- override default UI to hide the tooltip
-			WorldMapBlobFrame:SetScript("OnUpdate", nil)
-			tooltip = WorldMapTooltip
 			pinset = worldmapPins
 		else
-			tooltip = GameTooltip
 			pinset = minimapPins
 		end
 		local x, y = self:GetCenter()
 		local parentX, parentY = UIParent:GetCenter()
 		if ( x > parentX ) then
-			tooltip:SetOwner(self, "ANCHOR_LEFT")
+			GameTooltip:SetOwner(self, "ANCHOR_LEFT")
 		else
-			tooltip:SetOwner(self, "ANCHOR_RIGHT")
+			GameTooltip:SetOwner(self, "ANCHOR_RIGHT")
 		end
 
 		local t = db.trackColors
@@ -113,21 +119,15 @@ local function showPin(self)
 				text = text .. "\n" .. format(tooltip_template, t[pin.nodeType].Alpha*255, t[pin.nodeType].Red*255, t[pin.nodeType].Green*255, t[pin.nodeType].Blue*255, pin.title)
 			end
 		end
-		tooltip:SetText(text)
-		tooltip:Show()
+		GameTooltip:SetText(text)
+		GameTooltip:Show()
 	end
 end
 --[[
 	Pin OnLeave
 ]]
 local function hidePin(self)
-	if self.worldmap then
-		-- restore default UI
-		WorldMapBlobFrame:SetScript("OnUpdate", WorldMapBlobFrame_OnUpdate)
-		WorldMapTooltip:Hide()
-	else
-		GameTooltip:Hide()
-	end
+	GameTooltip:Hide()
 end
 --[[
 	Pin click handler
@@ -135,7 +135,7 @@ end
 local function pinClick(self, button)
 	if button == "RightButton" and self.worldmap then
 		pinClickedOn = self
-		ToggleDropDownMenu(1, nil, GatherMate2_GenericDropDownMenu, self:GetName(), 0, 0)
+		ToggleDropDownMenu(1, nil, GatherMate2_GenericDropDownMenu, self, 0, 0)
 	elseif self.worldmap == false then
 		-- This "simulates" clickthru on the minimap to ping the minimap, by roughknight
 		if Minimap:GetObjectType() == "Minimap" then -- This is for SexyMap's HudMap, which reparents to a hud frame that isn't a minimap
@@ -150,9 +150,8 @@ end
 ]]
 local function addTomTomWaypoint(button,pin)
 	if TomTom then
-		local mapId = GetCurrentMapAreaID()
-		local x, y, level = GatherMate:DecodeLoc(pin.coords)
-		TomTom:AddMFWaypoint(mapId, level, x, y, {
+		local x, y = GatherMate:DecodeLoc(pin.coords)
+		TomTom:AddWaypoint(pin.zone, x, y, {
 			title = pin.title,
 			persistent = nil,
 			minimap = true,
@@ -238,39 +237,38 @@ function Display:OnEnable()
 			end
 		end)
 	end
-	SetMapToCurrentZone()
+
+	WorldMapFrame:AddDataProvider(Display.WorldMapDataProvider)
+
 	self:RegisterMapEvents()
-	self:RegisterEvent("WORLD_MAP_UPDATE", "UpdateWorldMap")
-	self:RegisterEvent("ZONE_CHANGED_NEW_AREA")
 	self:RegisterEvent("SKILL_LINES_CHANGED")
 	self:RegisterEvent("MINIMAP_UPDATE_TRACKING")
 	self:RegisterEvent("PLAYER_ENTERING_WORLD","UpdateMaps")
+	GatherMate.HBD.RegisterCallback(self, "PlayerZoneChanged")
 	self:SKILL_LINES_CHANGED()
 	self:MINIMAP_UPDATE_TRACKING()
-	self:ZONE_CHANGED_NEW_AREA()
+	self:PlayerZoneChanged()
 	self:DigsitesChanged()
 	--self:UpdateMaps()  -- already in DigsitesChanged()
 	fullInit = true
 end
 
 function Display:RegisterMapEvents()
-	self:RegisterEvent("MINIMAP_ZONE_CHANGED", "MinimapChanged")
 	self:RegisterEvent("MINIMAP_UPDATE_ZOOM", "MinimapZoom")
 	self:RegisterEvent("CVAR_UPDATE", "ChangedVars")
 	self:RegisterMessage("GatherMate2ConfigChanged","ConfigChanged")
 	self:RegisterMessage("GatherMate2NodeAdded", "ScheduleUpdate")
 	self:RegisterMessage("GatherMate2DataImport", "DataUpdate")
 	self:RegisterMessage("GatherMate2Cleanup", "DataUpdate")
-	self:RegisterEvent("ARTIFACT_DIG_SITE_UPDATED","DigsitesChanged")
+	--self:RegisterEvent("ARTIFACT_DIG_SITE_UPDATED","DigsitesChanged")
 	self.updateFrame:Show()
 	listening = true
 end
 
 function Display:UnregisterMapEvents()
-	self:UnregisterEvent("MINIMAP_ZONE_CHANGED")
 	self:UnregisterEvent("MINIMAP_UPDATE_ZOOM")
 	self:UnregisterEvent("CVAR_UPDATE")
-	self:UnregisterEvent("ARTIFACT_DIG_SITE_UPDATED")
+	--self:UnregisterEvent("ARTIFACT_DIG_SITE_UPDATED")
 	self:UnregisterMessage("GatherMate2ConfigChanged")
 	self:UnregisterMessage("GatherMate2NodeAdded")
 	self:UnregisterMessage("GatherMate2DataImport")
@@ -284,30 +282,23 @@ end
 -- Disable the mod
 function Display:OnDisable()
 	self:UnregisterMapEvents()
-	self:UnregisterEvent("WORLD_MAP_UPDATE")
-	self:UnregisterEvent("ZONE_CHANGED_NEW_AREA")
 	self:UnregisterEvent("SKILL_LINES_CHANGED")
 	self:UnregisterEvent("MINIMAP_UPDATE_TRACKING")
-	self:UnregisterEvent("ARTIFACT_DIG_SITE_UPDATED")
+	self:UnregisterEvent("PLAYER_ENTERING_WORLD")
+	GatherMate.HBD.UnregisterCallback(self, "PlayerZoneChanged")
+	WorldMapFrame:RemoveDataProvider(Display.WorldMapDataProvider)
 end
 
-function Display:ZONE_CHANGED_NEW_AREA()
-	local areaID, dungeonLevel = GetCurrentMapAreaID(), GetCurrentMapDungeonLevel()
-	SetMapToCurrentZone()
-	zone = GetCurrentMapAreaID()
-	if GatherMate.phasing[zone] then zone = GatherMate.phasing[zone] end
-	if zone ~= areaID then
-		SetMapByID(areaID)
+function Display:PlayerZoneChanged()
+	local newZone = GatherMate.HBD:GetPlayerZone()
+	if GatherMate.phasing[newZone] then newZone = GatherMate.phasing[newZone] end
+	if newZone ~= zone then
+		zone = newZone
+		self:UpdateMiniMap(true)
 	end
-	if dungeonLevel and dungeonLevel > 0 then
-		SetDungeonMapLevel(dungeonLevel)
-	end
-
-	self:UpdateMaps()
 end
 
 function Display:SKILL_LINES_CHANGED()
-	local skillname, isHeader
 	for k,v in pairs(have_prof_skill) do
 		have_prof_skill[k] = nil
 	end
@@ -340,33 +331,22 @@ end
 local digSites = {}
 
 function Display:DigsitesChanged()
-	local activeMap = GetCurrentMapAreaID()
-	if GatherMate.phasing[activeMap] then activeMap = GatherMate.phasing[activeMap] end
 	table.wipe(digSites)
-	local continents = {GetMapContinents()}
-	for continent = 1, #continents / 2 do
-		SetMapZoom(continent)
-		local totalPOIs = GetNumMapLandmarks()
-		for index = 1,totalPOIs do
-			local name, description, textureIndex, px, py = GetMapLandmarkInfo(index)
-			if textureIndex == 177 then
-				local zoneName, mapFile, texPctX, texPctY, texX, texY, scrollX, scrollY = UpdateMapHighlight(px, py)
-				digSites[mapFile] = true
-				-- Hack for STV
-				if (mapFile == "StranglethornVale") then
-					digSites["StranglethornJungle"] = true
-					digSites["TheCapeOfStranglethorn"] = true
-				end
+	for continent in pairs(continentZoneList) do
+		local digSites = C_ResearchInfo.GetDigSitesForMap(continent)
+		for i, digSiteInfo in ipairs(digSites) do
+			local positionMapInfo = C_Map.GetMapInfoAtPosition(continent, digSiteInfo.position.x, digSiteInfo.position.y)
+			if positionMapInfo and positionMapInfo.mapID ~= continent then
+				digSites[positionMapInfo.mapID] = true
 			end
 		end
 	end
-	SetMapByID(activeMap)
 	self:UpdateMaps()
 end
 
 local function IsActiveDigSite()
 	local showDig = _G.GetCVarBool("digSites")
-	return digSites[(GetMapInfo())] and showDig
+	return digSites[zone] and showDig
 end
 
 function Display:UpdateVisibility()
@@ -403,7 +383,9 @@ function Display:UpdateVisibility()
 end
 
 function Display:SetTrackingSpell(skill,spell)
-	tracking_spells[(GetSpellInfo(spell))] = skill
+	local spellName, _, texture = GetSpellInfo(spell)
+	if not spellName then return end
+	tracking_spells[spellName] = skill
 	if fullInit then self:MINIMAP_UPDATE_TRACKING() end
 end
 
@@ -437,53 +419,24 @@ function Display:getMapPin()
 	end
 	-- create a new pin
 	pinCount = pinCount + 1
-	pin = CreateFrame("Button", "GatherMatePin"..pinCount, WorldMapButton)
+	pin = CreateFrame("Button", "GatherMatePin"..pinCount, Minimap)
 	pin:SetFrameLevel(5)
 	pin:EnableMouse(true)
 	pin:SetWidth(16)
 	pin:SetHeight(16)
-	pin:SetPoint("CENTER", WorldMapButton, "CENTER")
+	pin:SetPoint("CENTER", Minimap, "CENTER")
 	local texture = pin:CreateTexture(nil, "OVERLAY")
 	pin.texture = texture
 	texture:SetAllPoints(pin)
 	texture:SetTexture(trackingCircle)
 	texture:SetTexCoord(0, 1, 0, 1)
+	texture:SetTexelSnappingBias(0)
+	texture:SetSnapToPixelGrid(false)
 	pin:RegisterForClicks("LeftButtonUp", "RightButtonUp");
 	pin:SetScript("OnEnter", showPin)
 	pin:SetScript("OnLeave", hidePin)
 	pin:SetScript("OnClick", pinClick)
 	pin:Hide()
-	return pin
-end
---[[
-	Add a pin to the world map
-]]
-function Display:addWorldPin(coord, nodeID, nodeType, zone, index)
-	local pin = worldmapPins[index]
-	if not pin then
-		pin = self:getMapPin()
-		local x, y, level = GatherMate:DecodeLoc(coord)
-		pin.coords = coord
-		pin.title = GatherMate:GetNameForNode(nodeType, nodeID)
-		pin.zone = zone
-		pin.nodeID = nodeID
-		pin.nodeType = nodeType
-		pin.worldmap = true
-		pin:SetParent(WorldMapButton)
-		pin:SetFrameStrata(worldmapStrata)
-		pin:SetFrameLevel(worldmapFrameLevel)
-		pin:SetHeight(12 * db.scale)
-		pin:SetWidth(12 * db.scale)
-		pin:SetAlpha(db.alpha)
-		pin:EnableMouse(true)
-		pin.texture:SetTexture(nodeTextures[nodeType][nodeID])
-		pin.texture:SetTexCoord(0, 1, 0, 1)
-		pin.texture:SetVertexColor(1, 1, 1, 1)
-		pin:Show()
-		pin:ClearAllPoints()
-		pin:SetPoint("CENTER", WorldMapButton, "TOPLEFT", x *worldmapWidth, -y * worldmapHeight)
-		worldmapPins[index] = pin
-	end
 	return pin
 end
 --[[
@@ -510,15 +463,15 @@ function Display:getMiniPin(coord, nodeID, nodeType, zone, index)
 		pin.texture:SetTexture(nodeTextures[nodeType][nodeID])
 		pin.texture:SetTexCoord(0, 1, 0, 1)
 		pin.texture:SetVertexColor(1, 1, 1, 1)
-		pin.x, pin.y, pin.level = GatherMate:DecodeLoc(coord)
-		pin.x1, pin.y1 = GatherMate:PointToYards(pin.x,pin.y,zone,pin.level)
+		pin.x, pin.y = GatherMate:DecodeLoc(coord)
+		pin.x1, pin.y1 = GatherMate.HBD:GetWorldCoordinatesFromZone(pin.x,pin.y,zone)
 		minimapPins[index] = pin
 	end
 	return pin
 end
 
 function Display:addMiniPin(pin, refresh)
-	local xDist, yDist = pin.x1 - lastXY, pin.y1 - lastYY
+	local xDist, yDist = lastXY - pin.x1, lastYY - pin.y1
 	-- calculate relative position and distance to the player
 	local dist_2 = xDist*xDist + yDist*yDist
 	-- if distance <= db.trackDistance, convert to the circle texture
@@ -592,24 +545,9 @@ function Display:addMiniPin(pin, refresh)
 	end
 end
 --[[
-	Minimap changed
-]]
-function Display:MinimapChanged()
-	self:UpdateMiniMap(true)
-end
---[[
 	Minimap zoom changed
 ]]
-function Display:UpdateMiniMapZoom()
-	local zoom = Minimap:GetZoom()
-	if GetCVar("minimapZoom") == GetCVar("minimapInsideZoom") then
-		Minimap:SetZoom(zoom < 2 and zoom + 1 or zoom - 1)
-	end
-	indoors = GetCVar("minimapZoom")+0 == Minimap:GetZoom() and "outdoor" or "indoor"
-	Minimap:SetZoom(zoom)
-end
 function Display:MinimapZoom()
-	self:UpdateMiniMapZoom()
 	self:UpdateMiniMap()
 end
 --[[
@@ -624,11 +562,6 @@ end
 
 function Display:UpdateMaps()
 	clearpins(minimapPins)
-	if not WorldMapFrame:IsShown() then
-		SetMapToCurrentZone()
-	end
-	-- recheck zoom on map update, as it seems on load you dont get the map zoom changed event
-	self:UpdateMiniMapZoom()
 	-- Ask to update the visiblity for archaeology updates to blobs
 	self:UpdateVisibility()
 	self:UpdateMiniMap(true)
@@ -649,34 +582,21 @@ function Display:UpdateIconPositions()
 
 	-- we have no active minimap pins, just return early
 	if minimapPinCount == 0 then return end
-	-- microdungeon check
-	local mapName, textureWidth, textureHeight, isMicroDungeon, microDungeonName = GetMapInfo()
-	if isMicroDungeon then
-		if not WorldMapFrame:IsShown() then
-			-- return to the main map of this zone
-			ZoomOut()
-		else
-			-- can't do anything while in a micro dungeon and the main map is visible
-			return
-		end
-	end --end check
+
 	-- get current player position
-	local level = lastLevel
-	if GetCurrentMapAreaID() == zone then
-		level = GetCurrentMapDungeonLevel()
-	end
-	local x, y = GatherMate:PlayerPositionYards(zone, level)
+	local x, y = GatherMate.HBD:GetPlayerWorldPosition()
 
 	-- for rotating minimap support
 	local facing
 	if rotateMinimap then
-		if GetPlayerFacing then
-			facing = GetPlayerFacing()
-		else
-			facing = -MiniMapCompassRing:GetFacing()
-		end
+		facing = GetPlayerFacing()
 	else
 		facing = lastFacing
+	end
+
+	if not x or not y or (rotateMinimap and not facing) then
+		self:UpdateMiniMap()
+		return
 	end
 
 	local refresh
@@ -688,12 +608,11 @@ function Display:UpdateIconPositions()
 	end
 
 	-- if the player moved, or changed the facing (rotating map) - update nodes
-	if x ~= lastXY or y ~= lastYY or facing ~= lastFacing or level ~= lastLevel or refresh then
+	if x ~= lastXY or y ~= lastYY or facing ~= lastFacing or refresh then
 		-- update radius of the map
-		mapRadius = self.minimapSize[indoors][zoom] / 2
+		mapRadius = C_Minimap.GetViewRadius()
 		-- update upvalues for icon placement
 		lastXY, lastYY = x, y
-		lastLevel = level
 		lastFacing = facing
 
 		if rotateMinimap then
@@ -716,31 +635,13 @@ end
 function Display:UpdateMiniMap(force)
 	if not db.showMinimap or not Minimap:IsVisible() then return end
 
-	local level = GetCurrentMapDungeonLevel()
-	if not zone or zone == -1 then
+	if not zone or zone == 0 then
 		zone = nil
 		return
 	end
-	-- microduneon check
-	local mapName, textureWidth, textureHeight, isMicroDungeon, microDungeonName = GetMapInfo()
-	if isMicroDungeon then
-		if not WorldMapFrame:IsShown() then
-			-- return to the main map of this zone
-			ZoomOut()
-		else
-			-- can't do anything while in a micro dungeon and the main map is visible
-			clearpins(minimapPins)
-			zone = nil
-			return
-		end
-	end	--end check
+
 	-- get current player position
-	local x, y = GatherMate:PlayerPositionYards(zone, level)
-	if (x == 0 or y == 0 ) then
-		level = lastLevel
-		zone = lastZone
-		x, y = GatherMate:PlayerPositionYards(zone, level)
-	end
+	local x, y = GatherMate.HBD:GetPlayerWorldPosition()
 
 	-- get data from the API for calculations
 	local zoom = Minimap:GetZoom()
@@ -749,13 +650,19 @@ function Display:UpdateMiniMap(force)
 	-- for rotating minimap support
 	local facing
 	if rotateMinimap then
-		if GetPlayerFacing then
-			facing = GetPlayerFacing()
-		else
-			facing = -MiniMapCompassRing:GetFacing()
-		end
+		facing = GetPlayerFacing()
 	else
 		facing = lastFacing
+	end
+
+	--  disable all pins if no position is available
+	if not x or not y or (rotateMinimap and not facing) then
+		minimapPinCount = 0
+		for k,v in pairs(minimapPins) do
+			recyclePin(v)
+			minimapPins[k] = nil
+		end
+		return
 	end
 
 	local newScale = Minimap:GetScale()
@@ -765,31 +672,34 @@ function Display:UpdateMiniMap(force)
 	end
 
 	-- if the player moved, the zoom changed, or changed the facing (rotating map) - update nodes
-	if x ~= lastXY or y ~= lastYY or diffZoom or facing ~= lastFacing or level ~= lastLevel or force then
+	if x ~= lastXY or y ~= lastYY or diffZoom or facing ~= lastFacing or force then
 		-- set upvalues to new settings
 		minimapShape = GetMinimapShape and self.minimapShapes[GetMinimapShape() or "ROUND"]
-		mapRadius = self.minimapSize[indoors][zoom] / 2
 		minimapWidth = Minimap:GetWidth() / 2
 		minimapHeight = Minimap:GetHeight() / 2
 		minimapStrata = Minimap:GetFrameStrata()
 		minimapFrameLevel = Minimap:GetFrameLevel() + 5
+		mapRadius = C_Minimap.GetViewRadius()
+
+		local x1, y1 = GatherMate.HBD:GetZoneCoordinatesFromWorld(x,y,zone)
+		if not x1 then
+			x1, y1 = GatherMate.HBD:GetZoneCoordinatesFromWorld(x,y,zone)
+			if not x1 then return end
+		end
 
 		-- update upvalues for icon placement
 		lastZoom = zoom
 		lastFacing = facing
 		lastXY, lastYY = x, y
-		lastLevel = level
-		lastZone = zone
 
 		if rotateMinimap then
 			sin = math_sin(facing)
 			cos = math_cos(facing)
 		end
 		-- iterate the node databases and add the nodes
-		local x1, y1 = GatherMate:YardToPoints(x,y,zone,level)
 		for i,db_type in pairs(GatherMate.db_types) do
 			if GatherMate.Visible[db_type] then
-				for coord, nodeID in GatherMate:FindNearbyNode(zone, x1, y1, level, db_type, mapRadius*nodeRange) do
+				for coord, nodeID in GatherMate:FindNearbyNode(zone, x1, y1, db_type, mapRadius*nodeRange) do
 					local pin = self:getMiniPin(coord, nodeID, db_type, zone, (i * 1e14) + coord)
 					pin.keep = true
 					self:addMiniPin(pin, force)
@@ -810,66 +720,82 @@ function Display:UpdateMiniMap(force)
 	end
 end
 
---[[
-	Refresh the worldmap
-	we check profile preferences for what to display
-]]
-local lastDrawnWorldMap
-local rememberForce = false
-local lastScale, lastAlphaPref
-function Display:UpdateWorldMap(force)
-	if force then rememberForce = true end
-	if not WorldMapFrame:IsVisible() then return end
-	if not db.showWorldMap then clearpins(worldmapPins) return end
-	-- Ask to update the visiblity for archaeology updates to blobs
-	self:UpdateVisibility()
-	local zoneid = GetCurrentMapAreaID()
-	if GatherMate.phasing[zoneid] then zoneid = GatherMate.phasing[zoneid] end
-	local mapLevel = GetCurrentMapDungeonLevel()
-	local mapName, textureWidth, textureHeight, isMicroDungeon, microDungeonName = GetMapInfo()
-	if not zoneid or zoneid == -1 or isMicroDungeon then clearpins(worldmapPins) return end -- player is not viewing a zone map of a continent
-	if not rememberForce and (lastDrawnWorldMap == zoneid and mapLevel == lastLevel) then return end -- already drawn last time, and not forced
-	if lastDrawnWorldMap ~= zoneid or mapLevel ~= lastLevel then
-		clearpins(worldmapPins) -- viewing different zone or level, so clear all the pins, else don't clear and just do pin deltas
-	end
-	worldmapWidth = WorldMapButton:GetWidth()
-	worldmapHeight = WorldMapButton:GetHeight()
-	worldmapStrata = WorldMapButton:GetFrameStrata()
-	worldmapFrameLevel = WorldMapButton:GetFrameLevel() + 5
+---------------------------------------------------------
+-- World Map Data Provider
 
+Display.WorldMapDataProvider = CreateFromMixins(MapCanvasDataProviderMixin)
+
+function Display.WorldMapDataProvider:RemoveAllData()
+	self:GetMap():RemoveAllPinsByTemplate("GatherMate2WorldMapPinTemplate")
+	wipe(worldmapPins)
+end
+
+function Display.WorldMapDataProvider:RefreshAllData(fromOnShow)
+	self:RemoveAllData()
+
+	if not db.showWorldMap then return end
+
+	-- update visibility for archaeology blobs
+	Display:UpdateVisibility()
+
+	local uiMapID = self:GetMap():GetMapID()
+	if not uiMapID then return end
+
+	if GatherMate.phasing[uiMapID] then uiMapID = GatherMate.phasing[uiMapID] end
+
+	-- iterate databases and add nodes
 	for i,db_type in pairs(GatherMate.db_types) do
 		if GatherMate.Visible[db_type] then
-			for coord, nodeID in GatherMate:GetNodesForZone(zoneid, db_type) do
-				local nx,ny,nlevel = GatherMate:DecodeLoc(coord)
-				if nlevel == mapLevel then
-					self:addWorldPin(coord, nodeID, db_type, zoneid, (i * 1e14) + coord).keep = true
-				end
+			for coord, nodeID in GatherMate:GetNodesForZone(uiMapID, db_type) do
+				local pin = self:GetMap():AcquirePin("GatherMate2WorldMapPinTemplate", coord,  nodeID, db_type, uiMapID)
+				table.insert(worldmapPins, pin)
 			end
 		end
 	end
+end
 
-	for index, pin in pairs(worldmapPins) do
-		if pin.keep then
-			pin.keep = nil
-		else
-			recyclePin(pin)
-			worldmapPins[index] = nil
-		end
-	end
-	if lastScale ~= db.scale or lastAlphaPref ~= db.alpha then
-		local scale, alpha = db.scale, db.alpha
-		-- Make Worldmap scaling 0.25 bigger than the minimap.
-		scale = scale
-		for index, pin in pairs(worldmapPins) do
-			pin:SetHeight(12 * scale)
-			pin:SetWidth(12 * scale)
-			pin:SetAlpha(alpha)
-		end
-		lastScale, lastAlphaPref = scale, alpha
-	end
-	lastDrawnWorldMap = zoneid -- record last drawn zone name
-	lastLevel = mapLevel
-	rememberForce = false
+--[[ Handy Notes WorldMap Pin ]]--
+GatherMate2WorldMapPinMixin = CreateFromMixins(MapCanvasPinMixin)
+
+function GatherMate2WorldMapPinMixin:OnLoad()
+	self:UseFrameLevelType("PIN_FRAME_LEVEL_AREA_POI")
+	self:SetScalingLimits(1, 1.0, 1.2);
+end
+
+function GatherMate2WorldMapPinMixin:OnAcquired(coord, nodeID, nodeType, zone)
+	local x,y = GatherMate:DecodeLoc(coord)
+	self:SetPosition(x, y)
+
+	self.coords = coord
+	self.title = GatherMate:GetNameForNode(nodeType, nodeID)
+	self.zone = zone
+	self.nodeID = nodeID
+	self.nodeType = nodeType
+	self.worldmap = true
+
+	self:SetHeight(12 * db.scale)
+	self:SetWidth(12 * db.scale)
+	self:SetAlpha(db.alpha)
+	self.texture:SetTexture(nodeTextures[nodeType][nodeID])
+	self.texture:SetTexCoord(0, 1, 0, 1)
+	self.texture:SetVertexColor(1, 1, 1, 1)
+	self:EnableMouse(db.worldMapIconsInteractive)
+end
+
+function GatherMate2WorldMapPinMixin:OnMouseEnter()
+	return showPin(self)
+end
+
+function GatherMate2WorldMapPinMixin:OnMouseLeave()
+	return hidePin(self)
+end
+
+function GatherMate2WorldMapPinMixin:OnClick(button)
+	return pinClick(self, button)
+end
+
+function Display:UpdateWorldMap()
+	self.WorldMapDataProvider:RefreshAllData()
 end
 
 --[[

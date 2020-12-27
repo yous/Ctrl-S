@@ -1,3 +1,118 @@
+v3.4.9
+*Updated TOC version for patch 8.0.
+
+v3.4.8
+*Updated TOC version for patch 8.0.
+
+v3.4.7
+*Updated TOC version for patch 7.3.
+*Fixed bugs with changes to how sounds are played.
+
+v3.4.6
+*Updated TOC version for patch 7.2.
+
+v3.4.5
+*Reverted previous change.
+
+v3.4.4
+*Fixed bug detecting failed buyouts.
+
+v3.4.3
+*Fixed lag issue during crafting search mode item buyout.
+
+v3.4.2
+*Updated TOC version for patch 7.1.
+
+v3.4.1
+*Fixed bug with not being able to post auctions.
+
+v3.4
+*Shopping now takes advantage of some new scanning optimizations in more situations.
+*Fixed bug with Shopping trying to post soulbound items.
+
+v3.3.9
+*Fixed bug with displaying search results.
+
+v3.3.8
+*Increased max disenchant search iLvl to 905 to support Legion.
+
+v3.3.7
+*Fixed bug with notifying modules of no auction results found from a search (like crafting's gathering feature).
+*Fixed a bug with even stacks filter from crafting's gathering search.
+
+v3.3.6
+*Fixed bug with trying to post soulbound items.
+
+v3.3.5
+*Fixed bug with crafting mode searches not working in previous version.
+
+v3.3.4
+*Using new APIs added to core TSM addon to workaround Blizzard's item caching issues.
+*Fixed a bit of lag when selecting auction result rows.
+
+v3.3.3
+*Fixed bug with creating subclass filter searches
+
+v3.3.2
+*Fixed bug with "exact" filter always being set on searches.
+*Fixed issue with class / subclass dropdowns.
+*Temporarily disabled some code which was causing lag issues for some users due to Blizzard's item cache bugs.
+
+v3.3.1
+*Fixed bug affecting sniper searches which is caused by the last page of the AH missing items.
+
+v3.3
+*Updated for patch 7.0.3.
+
+v3.2.4
+*Fixed bug with extra filters not being included in recent / favorite searches for crafting mode.
+
+v3.2.3
+*Fixed bug with post duration being set to 48 hours on subsequent posts if you did not change the duration dropdown.
+* NB - due to the way blizzard internally stores auction time left, items posted at 24 hours will display as 48 in shopping results.
+
+v3.2.2
+*Fixed bug with crafting search disenchanting items.
+
+v3.2.1
+*Fixed bug with inline search filters.
+
+v3.2
+*Added support for filtering by equipment slot.
+
+v3.1.5
+*Fixed error when TSM_AuctionDB is not present.
+
+v3.1.4
+*Fixed bug with great deals button being grayed out even if data is available.
+
+v3.1.3
+*Fixed a bit more lag with large scans.
+
+v3.1.2
+*Fixed lag experienced during large group scans.
+
+v3.1.1
+*Fixed error which occurred when renaming a recent or favorite search.
+
+v3.1
+*You can now shift-click on the search button after running a favorite search to run the next favorite search in the list.
+*After stopping the sniper, you can now shift-click the search button to quickly restart it.
+*Fixed a visual issue with renaming recent / favorite searches.
+
+v3.0
+*Initial 3.0 version!
+\\
+
+v2.4.6
+*Updated for patch 6.2
+
+v2.4.5
+*Fixing interface version.
+
+v2.4.4
+*Updated for patch 6.1.
+
 v2.4.3
 *Increased Max DE iLvl to 640.
 *Added transformations to destroying search.

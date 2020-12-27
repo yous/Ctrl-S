@@ -10,7 +10,7 @@
 -- @name LibSpellRange-1.0.lua
 
 local major = "SpellRange-1.0"
-local minor = 7
+local minor = 15
 
 assert(LibStub, format("%s requires LibStub.", major))
 
@@ -76,7 +76,13 @@ local spellsByID_pet = Lib.spellsByID_pet
 
 -- Updates spellsByName and spellsByID
 local function UpdateBook(bookType)
-	local _, _, offs, numspells = GetSpellTabInfo(GetNumSpellTabs())
+	local max = 0
+	for i = 1, GetNumSpellTabs() do
+		local _, _, offs, numspells, _, specId = GetSpellTabInfo(i)
+		if specId == 0 then
+			max = offs + numspells
+		end
+	end
 
 	local spellsByName = Lib["spellsByName_" .. bookType]
 	local spellsByID = Lib["spellsByID_" .. bookType]
@@ -84,28 +90,41 @@ local function UpdateBook(bookType)
 	wipe(spellsByName)
 	wipe(spellsByID)
 	
-	for spellBookID = 1, offs + numspells do
+	for spellBookID = 1, max do
 		local type, baseSpellID = GetSpellBookItemInfo(spellBookID, bookType)
 		
-		if type == "SPELL" then
+		if type == "SPELL" or type == "PETACTION" then
 			local currentSpellName = GetSpellBookItemName(spellBookID, bookType)
 			local link = GetSpellLink(currentSpellName)
 			local currentSpellID = tonumber(link and link:gsub("|", "||"):match("spell:(%d+)"))
+
+			-- For each entry we add to a table,
+			-- only add it if there isn't anything there already.
+			-- This prevents weird passives from overwriting real, legit spells.
+			-- For example, in WoW 7.3.5 the ret paladin mastery 
+			-- was coming back with a base spell named "Judgement",
+			-- which was overwriting the real "Judgement".
+			-- Passives usually come last in the spellbook,
+			-- so this should work just fine as a workaround.
+			-- This issue with "Judgement" is gone in BFA because the mastery changed.
 			
-			local baseSpellName = GetSpellInfo(baseSpellID)
-			
-			if currentSpellName then
+			if currentSpellName and not spellsByName[strlower(currentSpellName)] then
 				spellsByName[strlower(currentSpellName)] = spellBookID
 			end
-			if baseSpellName then
-				spellsByName[strlower(baseSpellName)] = spellBookID
-			end
-			
-			if currentSpellID then
+			if currentSpellID and not spellsByID[currentSpellID] then
 				spellsByID[currentSpellID] = spellBookID
 			end
-			if baseSpellID then
-				spellsByID[baseSpellID] = spellBookID
+			
+			if type == "SPELL" then
+				-- PETACTION (pet abilities) don't return a spellID for baseSpellID,
+				-- so base spells only work for proper player spells.
+				local baseSpellName = GetSpellInfo(baseSpellID)
+				if baseSpellName and not spellsByName[strlower(baseSpellName)] then
+					spellsByName[strlower(baseSpellName)] = spellBookID
+				end
+				if baseSpellID and not spellsByID[baseSpellID] then
+					spellsByID[baseSpellID] = spellBookID
+				end
 			end
 		end
 	end

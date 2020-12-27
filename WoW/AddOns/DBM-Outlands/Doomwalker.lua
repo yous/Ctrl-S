@@ -1,26 +1,25 @@
 local mod	= DBM:NewMod("Doomwalker", "DBM-Outlands")
 local L		= mod:GetLocalizedStrings()
 
-mod:SetRevision(("$Revision: 183 $"):sub(12, -3))
+mod:SetRevision("20201103194435")
 mod:SetCreatureID(17711)
 mod:SetModelID(21435)
-mod:SetZone()
 
 mod:RegisterCombat("combat")
 
 mod:RegisterEventsInCombat(
-	"SPELL_CAST_START",
-	"SPELL_AURA_APPLIED"
+	"SPELL_CAST_START 32637",
+	"SPELL_AURA_APPLIED 32686"
 )
 
 local warnCharge			= mod:NewSpellAnnounce(32637, 3)
 local warnQuake				= mod:NewSpellAnnounce(32686, 3)
 
-local timerChargeCD			= mod:NewCDTimer(42, 32637)
-local timerQuakeCD			= mod:NewCDTimer(52, 32686)
-local timerQuake			= mod:NewBuffActiveTimer(8, 32686)
+local timerChargeCD			= mod:NewCDTimer(42, 32637, nil, nil, nil, 3)
+local timerQuakeCD			= mod:NewCDTimer(52, 32686, nil, nil, nil, 2)
+local timerQuake			= mod:NewBuffActiveTimer(8, 32686, nil, nil, nil, 2)
 
-mod:AddBoolOption("RangeFrame", true)
+mod:AddRangeFrameOption("10")
 
 function mod:OnCombatStart(delay)
 	if self.Options.RangeFrame then

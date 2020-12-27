@@ -1,9 +1,8 @@
 local mod	= DBM:NewMod("DSTrash", "DBM-DragonSoul")
 local L		= mod:GetLocalizedStrings()
 
-mod:SetRevision(("$Revision: 131 $"):sub(12, -3))
+mod:SetRevision("20200806141910")
 mod:SetModelID(39378)
-mod:SetZone()
 mod.isTrashMod = true
 
 mod:RegisterEvents(
@@ -21,18 +20,16 @@ local yellBoulder			= mod:NewYell(107597)
 local specWarnFlames		= mod:NewSpecialWarningMove(105579)
 
 local timerDrakes			= mod:NewTimer(253, "TimerDrakes", 61248)
-local timerRoleplay			= mod:NewTimer(45.5, "timerRoleplay", "Interface\\Icons\\Spell_Holy_BorrowedTime")
+local timerRoleplay			= mod:NewTimer(45.5, "timerRoleplay", "237538")
 --Leave this timer for now, I think this is the same.
 --it still seems timed, just ends earlier if you kill 15 drakes.
 --No one knew it ended at 24 drakes before hotfix because timer always expired before any raid hit 24, so we often just saw the hard capped event limit.
 --I suspect some shitty LFR group is still gonna hit timer limit before 15 drakes, so we'll see
 
-mod:RemoveOption("HealthFrame")
-mod:RemoveOption("SpeedKillTimer")
-
 local drakeRunning = false
 local drakesCount = 15
 local drakeguid = {}
+local drakeEscape = DBM:GetSpellInfo(109904)
 
 local function drakeDied(GUID)
 	if not drakeguid[GUID] then
@@ -49,7 +46,9 @@ end
 
 function mod:BoulderTarget(sGUID)
 	if not IsInGroup() then--you are ALWAYS target
-		specWarnBoulder:Show()
+		if self:AntiSpam(3, 1) then
+			specWarnBoulder:Show()
+		end
 		return
 	end
 	local targetname = nil
@@ -62,13 +61,15 @@ function mod:BoulderTarget(sGUID)
 	if targetname and self:AntiSpam(1, targetname) then--Anti spam using targetname as an identifier, will prevent same target being announced double/tripple but NOT prevent multiple targets being announced at once :)
 		warnBoulder:Show(targetname)
 		if targetname == UnitName("player") then
-			specWarnBoulder:Show()
-			yellBoulder:Yell()
+			if self:AntiSpam(3, 1) then
+				specWarnBoulder:Show()
+				yellBoulder:Yell()
+			end
 		else
 			local uId = DBM:GetRaidUnitId(targetname)
 			if uId then
 				local inRange = DBM.RangeCheck:GetDistance("player", uId)
-				if inRange and inRange < 6 then--Guessed, unknown, spelltip isn't informative.
+				if self:AntiSpam(3, 1) and inRange and inRange < 6 then--Guessed, unknown, spelltip isn't informative.
 					specWarnBoulderNear:Show(targetname)
 				end
 			end
@@ -83,7 +84,7 @@ function mod:SPELL_CAST_START(args)
 end
 
 function mod:SPELL_DAMAGE(_, _, _, _, destGUID, _, _, _, spellId, _, _, _, overkill)
-	if spellId == 105579 and destGUID == UnitGUID("player") and self:AntiSpam(3) then
+	if spellId == 105579 and destGUID == UnitGUID("player") and self:AntiSpam(3, 2) then
 		specWarnFlames:Show()
 	elseif (overkill or 0) > 0 then -- prevent to waste cpu. only pharse cid when event have overkill parameter.
 		local cid = self:GetCIDFromGUID(destGUID)
@@ -96,7 +97,7 @@ mod.SPELL_PERIODIC_DAMAGE = mod.SPELL_DAMAGE
 mod.RANGE_DAMAGE = mod.SPELL_DAMAGE
 
 function mod:SPELL_MISSED(_, _, _, _, destGUID, _, _, _, spellId)
-	if spellId == 105579 and destGUID == UnitGUID("player") and self:AntiSpam(3) then
+	if spellId == 105579 and destGUID == UnitGUID("player") and self:AntiSpam(3, 2) then
 		specWarnFlames:Show()
 	end
 end
@@ -130,7 +131,7 @@ function mod:CHAT_MSG_MONSTER_YELL(msg)
 	end
 end
 
-function mod:UNIT_SPELLCAST_SUCCEEDED_UNFILTERED(uId, _, _, _, spellId)
+function mod:UNIT_SPELLCAST_SUCCEEDED_UNFILTERED(uId, _, spellId)
 	if spellId == 108161 then--Thrall starting drake event, comes later then yell but is only event that triggers after a wipe to this trash.
 		self:SendSync("Skyrim")
 	elseif spellId == 109904 then
@@ -158,7 +159,7 @@ function mod:OnSync(msg, GUID)
 		end
 		table.wipe(drakeguid)
 		drakesCount = 15--Reset drakes here too soo they stay accurate after wipes.
-		timerDrakes:Start(231, GetSpellInfo(109904))
+		timerDrakes:Start(231, drakeEscape)
 	elseif msg == "SkyrimEnded" then
 		drakeRunning = false
 		self:UnregisterShortTermEvents()
@@ -180,7 +181,7 @@ function mod:OnSync(msg, GUID)
 		end
 		table.wipe(drakeguid)
 		drakesCount = 15--Reset drakes here still in case no one running current dbm is targeting thrall
-		timerDrakes:Start(253, GetSpellInfo(109904))--^^
+		timerDrakes:Start(253, drakeEscape)--^^
 		--timer still remains even combat starts. so, cancels manually. (Probably for someone who wasn't present for first drake dying.
 	end
 end

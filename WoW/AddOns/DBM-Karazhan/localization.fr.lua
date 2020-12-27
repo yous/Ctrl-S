@@ -9,15 +9,8 @@ L:SetGeneralLocalization{
 	name = "Attumen le Veneur"
 }
 
-L:SetWarningLocalization{
-}
-
-L:SetOptionLocalization{
-}
-
 L:SetMiscLocalization{
-	DBM_ATH_YELL_1		= "Viens, Minuit, allons disperser cette insignifiante racaille !",
-	KillAttumen			= "Always knew... someday I would become... the hunted."
+	DBM_ATH_YELL_1		= "Viens, Minuit, allons disperser cette insignifiante racaille !"
 }
 
 
@@ -36,10 +29,6 @@ L:SetOptionLocalization{
 	DBM_MOROES_VANISH_FADED	= "Show vanish fade warning"
 }
 
-L:SetMiscLocalization{
-	DBM_MOROES_YELL_START	= "Hum. Des visiteurs imprévus. Il va falloir se préparer."
-}
-
 
 -- Maiden of Virtue
 L = DBM:GetModLocalization("Maiden")
@@ -48,28 +37,12 @@ L:SetGeneralLocalization{
 	name = "Damoiselle de vertu"
 }
 
-L:SetWarningLocalization{
-}
-
-L:SetOptionLocalization{
-	RangeFrame			= "Show range frame (10)"
-}
-
-L:SetMiscLocalization{
-}
-
 
 -- Romulo and Julianne
 L = DBM:GetModLocalization("RomuloAndJulianne")
 
 L:SetGeneralLocalization{
 	name = "Romulo et Julianne"
-}
-
-L:SetWarningLocalization{
-}
-
-L:SetOptionLocalization{
 }
 
 L:SetMiscLocalization{
@@ -86,13 +59,6 @@ L:SetGeneralLocalization{
 	name = "Le grand méchant Loup"
 }
 
-L:SetWarningLocalization{
-}
-
-L:SetOptionLocalization{
-	RRHIcon		= DBM_CORE_AUTO_ICONS_OPTION_TEXT:format(30753)
-}
-
 L:SetMiscLocalization{
 	DBM_BBW_YELL_1			= "The better to own you with!"
 }
@@ -105,21 +71,6 @@ L:SetGeneralLocalization{
 	name = "Le conservateur"
 }
 
-L:SetWarningLocalization{
-}
-
-L:SetTimerLocalization{
-}
-
-L:SetOptionLocalization{
-	RangeFrame			= "Show range frame (10)"
-}
-
-L:SetMiscLocalization{
-	DBM_CURA_YELL_PULL		= "L'accès à la Ménagerie est réservé aux invités.",
-	DBM_CURA_YELL_OOM		= "Impossible de traiter votre requête."
-}
-
 
 -- Terestian Illhoof
 L = DBM:GetModLocalization("TerestianIllhoof")
@@ -128,17 +79,7 @@ L:SetGeneralLocalization{
 	name = "Terestian Malsabot"
 }
 
-L:SetWarningLocalization{
-}
-
-L:SetTimerLocalization{
-}
-
-L:SetOptionLocalization{
-}
-
 L:SetMiscLocalization{
-	DBM_TI_YELL_PULL		= "Ah, vous arrivez juste \195\160 temps. Les rituels vont commencer.",
 	Kilrek					= "Kil'rek",
 	DChains					= "Demon Chains"
 }
@@ -155,14 +96,8 @@ L:SetWarningLocalization{
 	DBM_ARAN_DO_NOT_MOVE	= "Ne bougez plus!"
 }
 
-L:SetTimerLocalization{
-}
-
 L:SetOptionLocalization{
 	DBM_ARAN_DO_NOT_MOVE	= "Show special warning for $spell:30004"
-}
-
-L:SetMiscLocalization{
 }
 
 
@@ -207,17 +142,7 @@ L:SetGeneralLocalization{
 	name = "Prince Malchezaar"
 }
 
-L:SetWarningLocalization{
-}
-
-L:SetTimerLocalization{
-}
-
-L:SetOptionLocalization{
-}
-
 L:SetMiscLocalization{
-	DBM_PRINCE_YELL_PULL	= "La folie vous a fait venir ici, devant moi. Et je serai votre perte !",
 	DBM_PRINCE_YELL_P2		= "Imb\195\169ciles heureux ! Le temps est le brasier dans lequel vous br\195\187lerez !",
 	DBM_PRINCE_YELL_P3		= "Comment pouvez-vous esp\195\169rer r\195\169sister devant un tel pouvoir ?",
 	DBM_PRINCE_YELL_INF1	= "Toutes les r\195\169alit\195\169s, toutes les dimensions me sont ouvertes !",
@@ -226,7 +151,7 @@ L:SetMiscLocalization{
 
 
 -- Nightbane
-L = DBM:GetModLocalization("Nightbane")
+L = DBM:GetModLocalization("NightbaneRaid")
 
 L:SetGeneralLocalization{
 	name = "Plaie-de-nuit"
@@ -252,7 +177,6 @@ L:SetOptionLocalization{
 
 L:SetMiscLocalization{
 	DBM_NB_EMOTE_PULL		= "Dans le lointain, un \195\170tre ancien s'\195\169veille...",
-	DBM_NB_YELL_PULL		= "Fous ! Je vais mettre un terme \195\160 vos souffrances !",
 	DBM_NB_YELL_AIR			= "Mis\195\169rable vermine. Je vais vous exterminer des airs !",
 	DBM_NB_YELL_GROUND		= "Assez ! Je vais atterir et vous !",
 	DBM_NB_YELL_GROUND2		= "Insectes ! Je vais vous montrer de quel bois je me chauffe !"
@@ -266,16 +190,9 @@ L:SetGeneralLocalization{
 	name = "Le magicien d'Oz"
 }
 
-L:SetWarningLocalization{
-}
-
-L:SetTimerLocalization{
-}
-
 L:SetOptionLocalization{
 	AnnounceBosses			= "Show warnings for boss spawns",
-	ShowBossTimers			= "Show timers for boss spawns",
-	DBM_OZ_OPTION_1			= "Show range check frame in phase 2"
+	ShowBossTimers			= "Show timers for boss spawns"
 }
 
 L:SetMiscLocalization{

@@ -9,49 +9,103 @@
 local TSM = select(2, ...)
 local Groups = TSM:NewModule("Groups", "AceEvent-3.0")
 local L = LibStub("AceLocale-3.0"):GetLocale("TradeSkillMaster_Mailing") -- loads the localization table
+local private = {dryRun=nil, frame=nil}
 
-local private = {}
 
+function Groups:OnEnable()
+	Groups:RegisterEvent("MAIL_CLOSED", function()
+		if private.frame then
+			private.frame.button:SetText(L["Mail Selected Groups"])
+			private.frame.button:Enable()
+		end
+	end)
+end
 
 function Groups:CreateTab(parent)
-	local frame = CreateFrame("Frame", nil, parent)
-	frame:Hide()
-	frame:SetAllPoints()
-	frame:SetScript("OnHide", function()
-		TSMAPI:CancelFrame("mailingGroupsRepeat")
-	end)
-
-	local stContainer = CreateFrame("Frame", nil, frame)
-	stContainer:SetPoint("TOPLEFT", 5, -5)
-	stContainer:SetPoint("BOTTOMRIGHT", -5, 35)
-	TSMAPI.Design:SetFrameColor(stContainer)
-	frame.groupTree = TSMAPI:CreateGroupTree(stContainer, "Mailing", "Mailing_Send")
-
-	local function OnButtonClick(self)
-		if IsShiftKeyDown() then
-			TSMAPI:CreateTimeDelay("mailingResendDelay", 0.1, private.StartSending, TSM.db.global.resendDelay * 60)
-		else
-			private:StartSending()
-		end
-	end
-
-	Groups:RegisterEvent("MAIL_CLOSED", function() TSMAPI:CancelFrame("mailingResendDelay") end)
-
-	local button = TSMAPI.GUI:CreateButton(frame, 15)
-	button:SetPoint("BOTTOMLEFT", 5, 5)
-	button:SetPoint("BOTTOMRIGHT", -5, 5)
-	button:SetHeight(25)
-	button:SetText(L["Mail Selected Groups"])
-	button:SetScript("OnClick", OnButtonClick)
-	button.tooltip = L["Shift-Click to automatically re-send after the amount of time specified in the TSM_Mailing options."]
-	frame.button = button
-
-	private.frame = frame
-	return frame
+	Groups:RegisterEvent("MAIL_CLOSED", function() TSMAPI.Delay:Cancel("mailingResendDelay") end)
+	
+	local BFC = TSMAPI.GUI:GetBuildFrameConstants()
+	local frameInfo = {
+		type = "Frame",
+		key = "groupsTab",
+		hidden = true,
+		points = "ALL",
+		scripts = {"OnShow", "OnHide"},
+		children = {
+			{
+				type = "GroupTreeFrame",
+				key = "groupTree",
+				groupTreeInfo = {"Mailing", "Mailing_Send"},
+				points = {{"TOPLEFT", 5, -5}, {"BOTTOMRIGHT", -5, 35}},
+			},
+			{
+				type = "Button",
+				key = "button",
+				text = L["Mail Selected Groups"],
+				textHeight = 15,
+				tooltip = L["|cff99ffffShift-Click|r to automatically re-send after the amount of time specified in the TSM_Mailing options.\n|cff99ffffCtrl-Click|r to perform a dry-run where Mailing doesn't send anything, but prints out what it would send (useful for testing your operations)."],
+				size = {0, 25},
+				points = {{"BOTTOMLEFT", 5, 5}, {"BOTTOMRIGHT", -5, 5}},
+				scripts = {"OnClick"},
+			},
+		},
+		handlers = {
+			OnShow = function(self)
+				private.frame = self
+				if not self.helpBtn then
+					local TOTAL_WIDTH = private.frame:GetParent():GetWidth()
+					local helpPlateInfo = {
+						FramePos = {x = 0, y = 70},
+						FrameSize = {width = TOTAL_WIDTH, height = private.frame:GetHeight()},
+						{
+							ButtonPos = {x = 100, y = -20},
+							HighLightBox = {x = 70, y = -35, width = TOTAL_WIDTH-70, height = 30},
+							ToolTipDir = "DOWN",
+							ToolTipText = L["These buttons change what is shown in the mailbox frame. You can view your inbox, automatically mail items in groups, quickly send items to other characters, and more in the various tabs."],
+						},
+						{
+							ButtonPos = {x = 200, y = -200},
+							HighLightBox = {x = 0, y = -65, width = TOTAL_WIDTH, height = 325},
+							ToolTipDir = "RIGHT",
+							ToolTipText = L["Here you can select groups with TSM_Mailing operations to be automatically mailed to other characters."],
+						},
+						{
+							ButtonPos = {x = 300, y = -380},
+							HighLightBox = {x = 0, y = -390, width = TOTAL_WIDTH, height = 35},
+							ToolTipDir = "RIGHT",
+							ToolTipText = L["Click this button to automatically mail items in the groups which you have selected."],
+						},
+					}
+					
+					self.helpBtn = CreateFrame("Button", nil, private.frame, "MainHelpPlateButton")
+					self.helpBtn:SetPoint("TOPLEFT", 50, 100)
+					self.helpBtn:SetScript("OnClick", function() TSM.MailTab:ToggleHelpPlate(private.frame, helpPlateInfo, self.helpBtn, true) end)
+					self.helpBtn:SetScript("OnHide", function() if HelpPlate_IsShowing(helpPlateInfo) then TSM.MailTab:ToggleHelpPlate(private.frame, helpPlateInfo, self.helpBtn, false) end end)
+					if not TSM.db.global.helpPlatesShown.groups then
+						TSM.db.global.helpPlatesShown.groups = true
+						TSM.MailTab:ToggleHelpPlate(private.frame, helpPlateInfo, self.helpBtn, false)
+					end
+				end
+			end,
+			OnHide = function() TSMAPI.Delay:Cancel("mailingGroupsRepeat") end,
+			button = {
+				OnClick = function(self)
+					if IsControlKeyDown() then
+						private:StartSending(true)
+					elseif IsShiftKeyDown() then
+						TSMAPI.Delay:AfterTime("mailingResendDelay", 0.1, private.StartSending, TSM.db.global.resendDelay * 60)
+					else
+						private:StartSending()
+					end
+				end,
+			},
+		},
+	}
+	return frameInfo
 end
 
 local badOperations = {}
-function private:ValidateOperation(operation, operationName)
+function Groups:ValidateOperation(operation, operationName)
 	if not operation then return end
 	if operation.target == "" then
 		-- operation is invalid (no target)
@@ -64,12 +118,13 @@ function private:ValidateOperation(operation, operationName)
 	return true
 end
 
-function private:StartSending()
+function private:StartSending(dryRun)
 	if private.isSending then return end
+	private.dryRun = dryRun
 
 	-- get a table of how many of each item we have in our bags
 	local inventoryItems = {}
-	for bag, slot, itemString, quantity, locked in TSMAPI:GetBagIterator(true) do
+	for bag, slot, itemString, quantity, locked in TSMAPI.Inventory:BagIterator(true, false, true) do
 		inventoryItems[itemString] = (inventoryItems[itemString] or 0) + quantity
 	end
 
@@ -77,9 +132,9 @@ function private:StartSending()
 	local targets = {}
 	for _, data in pairs(private.frame.groupTree:GetSelectedGroupInfo()) do
 		for _, operationName in ipairs(data.operations) do
-			TSMAPI:UpdateOperation("Mailing", operationName)
+			TSMAPI.Operations:Update("Mailing", operationName)
 			local operation = TSM.operations[operationName]
-			if private:ValidateOperation(operation, operationName) then
+			if Groups:ValidateOperation(operation, operationName) then
 				-- operation is valid
 				for itemString in pairs(data.items) do
 					local numAvailable = (inventoryItems[itemString] or 0) - operation.keepQty
@@ -89,13 +144,13 @@ function private:StartSending()
 							if not operation.restock then
 								quantity = min(numAvailable, operation.maxQty)
 							else
-								local targetQty = private:GetTargetQuantity(operation.target, itemString, operation.restockGBank)
-								if TSMAPI:IsPlayer(operation.target) and targetQty <= operation.maxQty then
+								local targetQty = Groups:GetTargetQuantity(operation.target, itemString, operation.restockSources)
+								if TSMAPI.Player:IsPlayer(operation.target) and targetQty <= operation.maxQty then
 									quantity = numAvailable
 								else
 									quantity = min(numAvailable, operation.maxQty - targetQty)
 								end
-								if TSMAPI:IsPlayer(operation.target) then
+								if TSMAPI.Player:IsPlayer(operation.target) then
 									-- if using restock and target == player ensure that subsequent operations don't take reserved bag inventory
 									reserveQty = numAvailable - (targetQty - operation.maxQty)
 								end
@@ -119,7 +174,7 @@ function private:StartSending()
 	end
 
 	for target in pairs(targets) do
-		if TSMAPI:IsPlayer(target) then
+		if TSMAPI.Player:IsPlayer(target) then
 			targets[target] = nil
 		end
 	end
@@ -128,15 +183,18 @@ function private:StartSending()
 	private:SendNextTarget()
 end
 
-function private:GetTargetQuantity(player, itemString, includeGBank)
-	local num = 0
-	num = num + ((TSMAPI:ModuleAPI("ItemTracker", "playerbags", player, true) or {})[itemString] or 0)
-	num = num + ((TSMAPI:ModuleAPI("ItemTracker", "playerbank", player, true) or {})[itemString] or 0)
-	num = num + ((TSMAPI:ModuleAPI("ItemTracker", "playermail", player, true) or {})[itemString] or 0)
-	num = num + ((TSMAPI:ModuleAPI("ItemTracker", "playerreagentbank", player, true) or {})[itemString] or 0)
-	num = num + ((TSMAPI:ModuleAPI("ItemTracker", "playerauctions", player, true) or {})[itemString] or 0)
-	if includeGBank then
-		num = num + (TSMAPI:ModuleAPI("ItemTracker", "playerguildtotal", itemString, player) or 0)
+function Groups:GetTargetQuantity(player, itemString, sources)
+	if player then
+		player = strmatch(player, "^[^-]+"):trim()
+	end
+	local num = TSMAPI.Inventory:GetBagQuantity(itemString, player) + TSMAPI.Inventory:GetMailQuantity(itemString, player) + TSMAPI.Inventory:GetAuctionQuantity(itemString, player)
+	if sources then
+		if sources.guild then
+			num = num + TSMAPI.Inventory:GetGuildQuantity(itemString, TSMAPI.Player:GetPlayerGuild(player))
+		end
+		if sources.bank then
+			num = num + TSMAPI.Inventory:GetBankQuantity(itemString, player) + TSMAPI.Inventory:GetReagentBankQuantity(itemString, player)
+		end
 	end
 	return num
 end
@@ -147,15 +205,17 @@ function private:SendNextTarget()
 		private.frame.button:SetText(L["Mail Selected Groups"])
 		private.frame.button:Enable()
 		private.isSending = nil
+		private.dryRun = nil
 		TSM:Print(L["Done sending mail."])
 		return
 	end
 
+	TSM:LOG_INFO("Sending items to %s", tostring(target))
 	private.isSending = true
 	private.targets[target] = nil
 	private.frame.button:SetText(L["Sending..."])
 	private.frame.button:Disable()
-	if not TSM.AutoMail:SendItems(items, target, private.SendNextTarget) then
+	if not TSM.AutoMail:SendItems(items, target, private.SendNextTarget, nil, private.dryRun) then
 		private:SendNextTarget()
 	end
 end

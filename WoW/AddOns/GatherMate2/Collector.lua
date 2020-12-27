@@ -11,8 +11,9 @@ local prevSpell, curSpell, foundTarget, gatherEvents, ga
 Convert for 2.4 spell IDs
 ]]
 local miningSpell = (GetSpellInfo(2575))
+local miningSpell2 = (GetSpellInfo(195122))
 local herbSpell = (GetSpellInfo(2366))
-local herbSkill = (string.gsub((GetSpellInfo(9134)),"%A",""))
+local herbSkill = ((GetSpellInfo(170691)) or (string.gsub((GetSpellInfo(9134)),"%A","")))
 local fishSpell = (GetSpellInfo(7620)) or (GetSpellInfo(131476))
 local gasSpell = (GetSpellInfo(30427))
 --local gasSpell = (GetSpellInfo(48929))  --other gasspell
@@ -23,8 +24,10 @@ local archSpell = (GetSpellInfo(73979)) -- Searching for Artifacts spell
 local sandStormSpell = (GetSpellInfo(93473)) -- Sandstorm spell cast by the camel
 local loggingSpell = (GetSpellInfo(167895))
 
-local spells = { -- spellname to "database name"
+local spells =
+{ -- spellname to "database name"
 	[miningSpell] = "Mining",
+	[miningSpell2] = "Mining",
 	[herbSpell] = "Herb Gathering",
 	[fishSpell] = "Fishing",
 	[gasSpell] = "Extract Gas",
@@ -34,6 +37,7 @@ local spells = { -- spellname to "database name"
 	[archSpell] = "Archaeology",
 	[sandStormSpell] = "Treasure",
 	[loggingSpell] = "Logging",
+	[205243] = "Treasure", -- skinning ground warts
 }
 local tooltipLeftText1 = _G["GameTooltipTextLeft1"]
 local strfind, stringmatch = string.find, string.match
@@ -49,19 +53,6 @@ local strtrim = strtrim
 -- local buffSearchString
 --local sub_string = GetLocale() == "deDE" and "%%%d$s" or "%%s"
 --buffSearchString = string.gsub(AURAADDEDOTHERHELPFUL, sub_string, "(.+)")
-
-local function getArrowDirection(...)
-	if GetPlayerFacing then
-		return GetPlayerFacing()
-	else
-		if(GetCVar("rotateMinimap") == "1") then return -MiniMapCompassRing:GetFacing()	end
-		for i=select("#",...),1,-1 do
-			local model=select(i,...)
-			if model:IsObjectType("Model") and not model:GetName() then	return model and model:GetFacing() end
-		end
-		return nil
-	end
-end
 
 --[[
 	Enable the collector
@@ -128,8 +119,9 @@ end
 	or get a better event instead of cha msg parsing
 	UNIT_DISSIPATES,0x0000000000000000,nil,0x80000000,0xF1307F0A00002E94,"Cinder Cloud",0xa28 now fires in cataclysm so hack not needed any more
 ]]
-function Collector:GasBuffDetector(b,timestamp, eventType, hideCaster, srcGUID, srcName, srcFlags, srcRaidFlags, dstGUID, dstName, dstFlags, dstRaidFlags, spellId,spellName,spellSchool,auraType)
+function Collector:GasBuffDetector(b)
 	if foundTarget or (prevSpell and prevSpell ~= gasSpell) then return end
+	local timestamp, eventType, hideCaster, srcGUID, srcName, srcFlags, srcRaidFlags, dstGUID, dstName, dstFlags, dstRaidFlags, spellId,spellName = CombatLogGetCurrentEventInfo()
 
 	if eventType == "SPELL_CAST_SUCCESS" and  spellName == gasSpell then
 		ga = gasSpell
@@ -188,10 +180,10 @@ end
 --[[
 	UI Error from gathering when you dont have the required skill
 ]]
-function Collector:UIError(event,msg)
+function Collector:UIError(event,token,msg)
 	local what = tooltipLeftText1:GetText();
 	if not what then return end
-	if strfind(msg, miningSpell) then
+	if strfind(msg, miningSpell) or (miningSpell2 and strfind(msg, miningSpell2)) then
 		self:addItem(miningSpell,what)
 	elseif strfind(msg, herbSkill) then
 		self:addItem(herbSpell,what)
@@ -205,13 +197,19 @@ end
 --[[
 	spell cast started
 ]]
-function Collector:SpellStarted(event,unit,spellcast,rank,target)
+function Collector:SpellStarted(event,unit,target,guid,spellcast)
 	if unit ~= "player" then return end
 	foundTarget = false
 	ga ="No"
-	if spells[spellcast] then
-		curSpell = spellcast
-		prevSpell = spellcast
+	local spellname = GetSpellInfo(spellcast)
+	if spellname and (spells[spellname] or spells[spellcast]) then
+		if spells[spellname] then
+			curSpell = spellname
+			prevSpell = spellname
+		else
+			curSpell = spellcast
+			prevSpell = spellcast
+		end
 		local nodeID = GatherMate:GetIDForNode(spells[prevSpell], target)
 		if nodeID then -- seem 2.4 has the node name now as the target
 			self:addItem(prevSpell,target)
@@ -231,71 +229,32 @@ local lastNode = ""
 local lastNodeCoords = 0
 
 function Collector:addItem(skill,what)
-	-- check for microdungeon
-	local mapName, textureWidth, textureHeight, isMicroDungeon, microDungeonName = GetMapInfo()
-	if isMicroDungeon then
-		-- we wont do any collection events inside of a micro dungeon
-		--SetMapByID(GetCurrentMapAreaID())
-		return
-	end
-	-- end check
-	local x, y = GetPlayerMapPosition("player")
-	if x == 0 and y == 0 then return end
-	-- Temporary fix, the map "ScarletEnclave" and "EasternPlaguelands"
-	-- both have the same English display name as "Eastern Plaguelands"
-	-- so we ignore the new Death Knight starting zone for now.
-	if GetMapInfo() == "ScarletEnclave" then return end
-	--self:GatherCompleted()
-	local zone = GetCurrentMapAreaID()
+	local x, y, zone = GatherMate.HBD:GetPlayerZonePosition()
+	if not x or not y then return end -- no valid data
+
+	-- don't collect any data in the garrison, its always the same location and spams the map
+	-- TODO: garrison ids
+	if GatherMate.mapBlacklist[zone] then return end
 	if GatherMate.phasing[zone] then zone = GatherMate.phasing[zone] end
 
-	local level = GetCurrentMapDungeonLevel()
 	local node_type = spells[skill]
 	if not node_type or not what then return end
 	-- db lock check
 	if GatherMate.db.profile.dbLocks[node_type] then return	end
 
-	local range = GatherMate.db.profile.cleanupRange[node_type]
 	-- special case for fishing and gas extraction guage the pointing direction
 	if node_type == fishSpell or node_type == gasSpell then
-		local yw, yh = GatherMate:GetZoneSize(zone,level)
+		local yw, yh = GatherMate.HBD:GetZoneSize(zone)
 		if yw == 0 or yh == 0 then return end -- No zone size data
 		x,y = self:GetFloatingNodeLocation(x, y, yw, yh)
 	end
-	local nid = GatherMate:GetIDForNode(node_type, what)
-	-- if we couldnt find the node id for what was found, exit the add
-	if not nid then return end
-	local rares = self.rareNodes
-	-- run through the nearby's
-	local skip = false
-	local foundCoord = GatherMate:EncodeLoc(x, y, level)
-	local specialNode = false
-	local specialWhat = what
+	-- avoid duplicate readds
+	local foundCoord = GatherMate:EncodeLoc(x, y)
 	if foundCoord == lastNodeCoords and what == lastNode then return end
-	--[[ DISABLE SPECIAL NODE PROCESSING FOR HERBS
-	if self.specials[zone] and self.specials[zone][node_type] ~= nil then
-		specialWhat = GatherMate:GetNameForNode(node_type,self.specials[zone][node_type])
-		specialNode = true
-	end
-	--]]
-	for coord, nodeID in GatherMate:FindNearbyNode(zone, x, y, level, node_type, range, true) do
-		if (nodeID == nid or rares[nodeID] and rares[nodeID][nid]) then
-			GatherMate:RemoveNodeByID(zone, node_type, coord)
-		-- we're trying to add a rare node, but there is already a normal node present, skip the adding
-		elseif rares[nid] and rares[nid][nodeID] then
-			skip = true
-		elseif specialNode then -- handle special case zone mappings
-			skip = false
-			GatherMate:RemoveNodeByID(zone, node_type, coord)
-		end
-	end
 
-	if not skip then
-		if specialNode then
-			GatherMate:AddNode(zone, x, y, level, node_type, specialWhat)
-		else
-			GatherMate:AddNode(zone, x, y, level, node_type, what)
-		end
+	-- tell the core to add it
+	local added = GatherMate:AddNodeChecked(zone, x, y, node_type, what)
+	if added then
 		lastNode = what
 		lastNodeCoords = foundCoord
 	end
@@ -306,7 +265,7 @@ end
 	move the node 20 yards in the direction the player is looking at
 ]]
 function Collector:GetFloatingNodeLocation(x,y,yardWidth,yardHeight)
-	local facing = getArrowDirection(Minimap:GetChildren())
+	local facing = GetPlayerFacing()
 	if not facing then	-- happens when minimap rotation is on
 		return x,y
 	else

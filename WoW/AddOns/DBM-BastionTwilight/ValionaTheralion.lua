@@ -1,13 +1,11 @@
 local mod	= DBM:NewMod(157, "DBM-BastionTwilight", nil, 72)
 local L		= mod:GetLocalizedStrings()
 
-mod:SetRevision(("$Revision: 142 $"):sub(12, -3))
+mod:SetRevision("20200806141910")
 mod:SetCreatureID(45992, 45993)
 mod:SetEncounterID(1032)
-mod:DisableEEKillDetection()
-mod:SetZone()
 mod:SetUsedIcons(6, 7, 8)
-mod:SetModelSound("Sound\\Creature\\Chogall\\VO_BT_Chogall_BotEvent10.wav", "Sound\\Creature\\Valiona\\VO_BT_Valiona_Event06.wav")
+--mod:SetModelSound("Sound\\Creature\\Chogall\\VO_BT_Chogall_BotEvent10.ogg", "Sound\\Creature\\Valiona\\VO_BT_Valiona_Event06.ogg")
 --Long: Valiona, Theralion put them in their place!
 --Short: Enter twilight!
 
@@ -60,19 +58,19 @@ local yellEngulfingMagic			= mod:NewYell(86622)
 local specWarnTwilightZone			= mod:NewSpecialWarningStack(86214, nil, 20)
 
 --Valiona Ground Phase
-local timerBlackout					= mod:NewTargetTimer(15, 86788)
-local timerBlackoutCD				= mod:NewCDTimer(45.5, 86788)
-local timerDevouringFlamesCD		= mod:NewCDTimer(40, 86840)
-local timerNextDazzlingDestruction	= mod:NewNextTimer(132, 86408)
+local timerBlackout					= mod:NewTargetTimer(15, 86788, nil, nil, nil, 5, nil, DBM_CORE_L.MAGIC_ICON..DBM_CORE_L.HEALER_ICON)
+local timerBlackoutCD				= mod:NewCDTimer(45.5, 86788, nil, nil, nil, 3, nil, DBM_CORE_L.MAGIC_ICON..DBM_CORE_L.DEADLY_ICON)
+local timerDevouringFlamesCD		= mod:NewCDTimer(40, 86840, nil, nil, nil, 3)
+local timerNextDazzlingDestruction	= mod:NewNextTimer(132, 86408, nil, nil, nil, 3)
 --Theralion Ground Phase
-local timerTwilightMeteorite		= mod:NewCastTimer(6, 86013)		
+local timerTwilightMeteorite		= mod:NewCastTimer(6, 86013)
 local timerEngulfingMagic			= mod:NewBuffFadesTimer(20, 86622)
-local timerEngulfingMagicNext		= mod:NewCDTimer(35, 86622)--30-40 second variations.
-local timerNextFabFlames			= mod:NewNextTimer(15, 86505)
-local timerNextDeepBreath			= mod:NewNextTimer(98, 86059)
+local timerEngulfingMagicNext		= mod:NewCDTimer(35, 86622, nil, nil, nil, 3)--30-40 second variations.
+local timerNextFabFlames			= mod:NewNextTimer(15, 86505, nil, nil, nil, 3)
+local timerNextDeepBreath			= mod:NewNextTimer(98, 86059, nil, nil, nil, 3)
 
-local timerTwilightShift			= mod:NewTargetTimer(100, 93051)
-local timerTwilightShiftCD			= mod:NewCDTimer(20, 93051)
+local timerTwilightShift			= mod:NewTargetTimer(100, 93051, nil, "Tank", 2, 5, nil, DBM_CORE_L.TANK_ICON)
+local timerTwilightShiftCD			= mod:NewCDTimer(20, 93051, nil, "Tank", 2, 5, nil, DBM_CORE_L.TANK_ICON)
 
 local berserkTimer					= mod:NewBerserkTimer(600)
 
@@ -80,25 +78,17 @@ mod:AddBoolOption("TwilightBlastArrow", false)
 mod:AddBoolOption("BlackoutIcon")
 mod:AddBoolOption("EngulfingIcon")
 mod:AddBoolOption("RangeFrame")
-mod:AddBoolOption("BlackoutShieldFrame", true, "misc")
+mod:AddInfoFrameOption(86788, true)
 
+mod.vb.blackoutCount = 0
 local engulfingMagicTargets = {}
 local engulfingMagicIcon = 7
 local dazzlingCast = 0
 local breathCast = 0
 local lastFab = 0--Leave this custom one, we use reset gettime on it in extra places and that cannot be done with prototype
 local markWarned = false
-local blackoutActive = false
 local ValionaLanded = false
-local meteorTarget = GetSpellInfo(88518)
-local fabFlames = GetSpellInfo(86497)
-
-local absorbHealth = {
-	["heroic25"] = 65000,
-	["heroic10"] = 40000,
-	["normal25"] = 50000,
-	["normal10"] = 50000
-}
+local meteorTarget, fabFlames = DBM:GetSpellInfo(88518), DBM:GetSpellInfo(86497)
 
 local function showEngulfingMagicWarning()
 	warnEngulfingMagic:Show(table.concat(engulfingMagicTargets, "<, >"))
@@ -157,7 +147,7 @@ end
 function mod:TwilightBlastTarget()
 	local targetname = self:GetBossTarget(45993)
 	if not targetname then return end
-	if self.Options.TBwarnWhileBlackout or not blackoutActive then
+	if self.Options.TBwarnWhileBlackout or self.vb.blackoutCount == 0 then
 		if targetname == UnitName("player") then
 			specWarnTwilightBlast:Show()
 			yellTwilightBlast:Yell()
@@ -182,18 +172,14 @@ function mod:OnCombatStart(delay)
 	timerBlackoutCD:Start(10-delay)
 	timerDevouringFlamesCD:Start(25.5-delay)
 	timerNextDazzlingDestruction:Start(85-delay)
+	self.vb.blackoutCount = 0
 	dazzlingCast = 0
 	breathCast = 0
 	lastFab = 0
 	markWarned = false
-	blackoutActive = false
 	ValionaLanded = true
 	if self.Options.RangeFrame then
 		DBM.RangeCheck:Show(8)
-	end
-	if DBM.BossHealth:IsShown() then
-		DBM.BossHealth:Show(L.name)
-		DBM.BossHealth:AddBoss(45992, 45993, L.name)
 	end
 end
 
@@ -201,11 +187,14 @@ function mod:OnCombatEnd()
 	if self.Options.RangeFrame then
 		DBM.RangeCheck:Hide()
 	end
+	if self.Options.InfoFrame then
+		DBM.InfoFrame:Hide()
+	end
 end
 
 function mod:SPELL_AURA_APPLIED(args)
 	if args.spellId == 86788 then
-		blackoutActive = true
+		self.vb.blackoutCount = self.vb.blackoutCount + 1
 		warnBlackout:Show(args.destName)
 		timerBlackout:Start(args.destName)
 		timerBlackoutCD:Start()
@@ -215,9 +204,9 @@ function mod:SPELL_AURA_APPLIED(args)
 		if args:IsPlayer() then
 			specWarnBlackout:Show()
 		end
-		if self.Options.BlackoutShieldFrame and DBM.BossHealth:IsShown() then
-			self:ShowAbsorbedHealHealthBar(args.destGUID, L.BlackoutTarget:format(args.destName), absorbHealth[(DBM:GetCurrentInstanceDifficulty())])
-			self:ScheduleMethod(15, "RemoveAbsorbedHealHealthBar", args.destGUID)
+		if self.Options.InfoFrame and not DBM.InfoFrame:IsShown() then
+			DBM.InfoFrame:SetHeader(args.spellName)
+			DBM.InfoFrame:Show(6, "playerabsorb", args.spellName, select(16, DBM:UnitDebuff(args.destName, args.spellName)))
 		end
 	elseif args.spellId == 86622 then
 		engulfingMagicTargets[#engulfingMagicTargets + 1] = args.destName
@@ -260,14 +249,13 @@ mod.SPELL_AURA_APPLIED_DOSE = mod.SPELL_AURA_APPLIED
 
 function mod:SPELL_AURA_REMOVED(args)
 	if args.spellId == 86788 then
+		self.vb.blackoutCount = self.vb.blackoutCount - 1
+		if self.Options.InfoFrame and self.vb.blackoutCount == 0 then
+			DBM.InfoFrame:Hide()
+		end
 		timerBlackout:Cancel(args.destName)
 		if self.Options.BlackoutIcon then
 			self:SetIcon(args.destName, 0)
-		end
-		blackoutActive = false
-		if self.Options.BlackoutShieldFrame and DBM.BossHealth:IsShown() then
-			self:UnscheduleMethod("RemoveAbsorbedHealHealthBar", args.destGUID)
-			self:RemoveAbsorbedHealHealthBar(args.destGUID)
 		end
 	elseif args.spellId == 86622 then
 		if self.Options.EngulfingIcon then
@@ -280,7 +268,7 @@ function mod:SPELL_AURA_REMOVED(args)
 		timerTwilightShift:Cancel(args.destName.." (4)")
 		timerTwilightShift:Cancel(args.destName.." (5)")
 	end
-end	
+end
 
 function mod:SPELL_CAST_START(args)
 	if args:IsSpellID(86840, 90950) then--Strange to have 2 cast ids instead of either 1 or 4
@@ -329,7 +317,7 @@ function mod:RAID_BOSS_EMOTE(msg)
 end
 
 function mod:UNIT_AURA(uId)
-	if UnitDebuff("player", meteorTarget) and not markWarned then
+	if DBM:UnitDebuff("player", meteorTarget) and not markWarned then
 		specWarnTwilightMeteorite:Show()
 		timerTwilightMeteorite:Start()
 		yellTwilightMeteorite:Yell()
@@ -338,7 +326,8 @@ function mod:UNIT_AURA(uId)
 	end
 end
 
-function mod:UNIT_SPELLCAST_SUCCEEDED(uId, spellName)
+function mod:UNIT_SPELLCAST_SUCCEEDED(uId, _, spellId)
+	local spellName = DBM:GetSpellInfo(spellId)--Shit workaround, fix
 	if spellName == fabFlames and not ValionaLanded and self:AntiSpam(2, 2) then
 		self:ScheduleMethod(0.1, "FabFlamesTarget")
 		timerNextFabFlames:Start()

@@ -1,3 +1,75 @@
+v3.0.19
+*Updated TOC version for patch 8.0.
+
+v3.0.18
+*Fixed bug with inbox display.
+
+v3.0.17
+*no change, version fix
+
+v3.0.16
+*Fixed bug with displaying total gold to collect in inbox.
+
+v3.0.15
+*Updated TOC version for patch 7.3.
+*Fixed bugs due to changes on how sounds are played.
+
+v3.0.14
+*Updated TOC version for patch 7.2.
+
+v3.0.13
+*Updated TOC version for patch 7.1.
+
+v3.0.12
+*Fixed bug with quick sending COD mail.
+
+v3.0.11
+*Fixed bug with opening mail.
+*Fixed error from opening inbox.
+
+v3.0.10
+*Using new APIs added to core TSM addon to workaround Blizzard's item caching issues.
+
+v3.0.9
+*Fixed bug with getting the quantity of a mail attachment.
+
+v3.0.8
+*Fixed bug with chat messages after sending mail.
+
+v3.0.7
+*Fixed bug when opening mail with above 1M gold.
+
+v3.0.6
+*Fixed bug with mail inbox.
+
+v3.0.5
+*Fixed 7.0.x bug causing errors and preventing opening of mail.
+
+v3.0.4
+*Bumped TOC version for patch 7.0.x.
+
+v3.0.3
+*Fixed bug with sending getting stuck if the recipient was invalid.
+
+v3.0.2
+*Fixed error if you did not press enter after keying in gold limit for send excess gold to banker.
+
+v3.0.1
+*Fixed error when attempting to loot mail past gold cap.
+
+v3.0
+*Initial 3.0 version!
+\\
+
+v2.2.13
+*Updated for patch 6.2
+
+v2.2.12
+*Fixing interface version.
+
+v2.2.11
+*Updated for patch 6.1.
+
 v2.2.10
 *Fixed an issue with mailing groups where bag inventory was incorrectly being reserved when target not the current player.
 

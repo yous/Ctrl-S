@@ -1,5 +1,4 @@
 if GetLocale() ~= "esES" and GetLocale() ~= "esMX" then return end
-
 local L
 
 ------------------------
@@ -53,30 +52,28 @@ L:SetGeneralLocalization{
 L = DBM:GetModLocalization("HyjalWaveTimers")
 
 L:SetGeneralLocalization{
-	name 		= "Avisos de trash"
+	name 		= "Oleadas"
 }
 L:SetWarningLocalization{
 	WarnWave	= "%s",
-	WarnWaveSoon= "Nueva oleada pronto"
 }
 L:SetTimerLocalization{
 	TimerWave	= "Siguiente oleada"
 }
 L:SetOptionLocalization{
-	WarnWave		= "Avisar cuando salga una nueva oleada",
-	WarnWaveSoon	= "Avisar cuando falte poco para nueva oleada",
-	DetailedWave	= "Aviso detallado cuando venga una nueva oleada (Que monstruos)",
-	TimerWave		= "Mostrar tiempo para siguiente oleada"
+	WarnWave		= "Mostrar aviso cuando se aproxime una oleada",
+	DetailedWave	= "Mostrar aviso detallado con los tipos y número de enemigos cuando se aproxime una oleada",
+	TimerWave		= "Mostrar temporizador para la siguiente oleada"
 }
 L:SetMiscLocalization{
 	HyjalZoneName	= "La Cima Hyjal",
 	Thrall			= "Thrall",
 	Jaina			= "Lady Jaina Valiente",
-	RageWinterchill	= "Ira Fríoinvierno",
-	Anetheron		= "Anetheron",
-	Kazrogal		= "Kazrogal",
-	Azgalor			= "Azgalor",
-	WaveCheck		= "Oleada actual = (%d+) de 8",
+	GeneralBoss		= "Se aproxima un jefe",
+	RageWinterchill	= "Se aproxima Ira Fríoinvierno",
+	Anetheron		= "Se aproxima Anetheron",
+	Kazrogal		= "Se aproxima Kazrogal",
+	Azgalor			= "Se aproxima Azgalor",
 	WarnWave_0		= "Oleada %s/8",
 	WarnWave_1		= "Oleada %s/8 - %s %s",
 	WarnWave_2		= "Oleada %s/8 - %s %s y %s %s",
@@ -92,7 +89,7 @@ L:SetMiscLocalization{
 	Necromancer		= "Nigromantes",
 	Banshee			= "Almas en pena",
 	Fiend			= "Malignos de cripta",
-	Gargoyle		= "Gargolas",
+	Gargoyle		= "Gárgolas",
 	Wyrm			= "Vermis de escarcha",
 	Stalker			= "Acechadores viles",
 	Infernal		= "Infernales"

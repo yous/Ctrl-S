@@ -1,5 +1,5 @@
-## Interface: 60000
-## X-Min-Interface: 50001
+## Interface: 90002
+## X-Min-Interface: 80000
 ## Title:|cffffe00a<|r|cffff7d0aDBM|r|cffffe00a>|r |cff69ccf0Ulduar|r
 ## Title-ruRU:|cffffe00a<|r|cffff7d0aDBM|r|cffffe00a>|r |cff69ccf0Ульдуар|r
 ## Title-koKR:|cffffe00a<|r|cffff7d0aDBM|r|cffffe00a>|r |cff69ccf0울두아르|r
@@ -13,10 +13,15 @@
 ## X-DBM-Mod: 1
 ## X-DBM-Mod-Type: RAID
 ## X-DBM-Mod-Category: WotLK
-## X-DBM-Mod-No-Heroic: 1
+## X-DBM-StatTypes: normal,timewalker
 ## X-DBM-Mod-MapID: 603
-## X-DBM-Mod-Sort: 404
-## X-DBM-Mod-MinCoreRevision: 12473
+## X-DBM-Mod-Sort: 903
+## X-DBM-Mod-MinCoreRevision: 20200524142133
+## X-DBM-Mod-MinExpansion: 2
+## X-Curse-Project-ID: 43970
+## X-WoWI-ID: 21522
+## Version: r297
+
 localization.en.lua
 localization.de.lua
 localization.fr.lua

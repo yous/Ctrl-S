@@ -1,103 +1,67 @@
 local mod	= DBM:NewMod("BrawlRank7", "DBM-Brawlers")
 local L		= mod:GetLocalizedStrings()
 
-mod:SetRevision(("$Revision: 12357 $"):sub(12, -3))
-mod:SetModelID(46798)
-mod:SetZone()
+mod:SetRevision("20201102223314")
+--mod:SetModelID(46798)
 
 mod:RegisterEvents(
-	"SPELL_CAST_START 133212 125212 133465 133017 138845 142621 142583",
-	"SPELL_AURA_APPLIED 133015 133018",
+	"SPELL_CAST_START 133308 229154",
+	"SPELL_CAST_SUCCESS 133227",
 	"SPELL_AURA_APPLIED_DOSE 138901",
 	"SPELL_AURA_REMOVED_DOSE 138901",
-	"SPELL_AURA_REMOVED 138901"
+	"SPELL_AURA_REMOVED 138901",
+	"UNIT_DIED"
 )
 
-local warnRockets				= mod:NewCastAnnounce(133212, 4)--Max Megablast
-local warnShadowbolt			= mod:NewSpellAnnounce(125212, 3)--Dark Summoner
-local warnGhost					= mod:NewSpellAnnounce(133465, 4)--Dark Summoner
-local warnMines					= mod:NewCountAnnounce(133018, 3)--Battletron
-local warnMinesSpawning			= mod:NewSpellAnnounce(133015, 4)--Battletron
-local warnBulwark				= mod:NewAddsLeftAnnounce(138901, 2)--Ahoo'ru
-local warnCharge				= mod:NewCastAnnounce(138845, 1)--Ahoo'ru
-local warnCompleteHeal			= mod:NewCastAnnounce(142621, 4)--Ahoo'ru
-local warnDivineCircle			= mod:NewSpellAnnounce(142585, 3)--Ahoo'ru
+local warnThrowNet					= mod:NewSpellAnnounce(133308, 3)--Fran and Riddoh
+local warnGoblinDevice				= mod:NewSpellAnnounce(133227, 4)--Fran and Riddoh
+local warnHighNoon					= mod:NewCastAnnounce(229154, 4)
 
-local specWarnShadowbolt		= mod:NewSpecialWarningSpell(125212, false)--Let you choose which one is important to warn for(Dark Summoner)
-local specWarnGhost				= mod:NewSpecialWarningSpell(133465, false)--Dark Summoner
-local specWarnMinesSpawning		= mod:NewSpecialWarningSpell(133015)--Battletron
-local specWarnCharge			= mod:NewSpecialWarningSpell(138845)--Ahoo'ru
-local specWarnCompleteHeal		= mod:NewSpecialWarningInterrupt(142621, nil, nil, nil, 3)--Ahoo'ru
-local specWarnDivineCircle		= mod:NewSpecialWarningDodge(142585)--Ahoo'ru
+local specWarnGoblinDevice			= mod:NewSpecialWarningSpell(133227)--Fran and Riddoh
 
-local timerRockets				= mod:NewBuffActiveTimer(9, 133212)--Max Megablast
-local timerShadowboltCD			= mod:NewCDTimer(12, 125212)--Dark Summoner
-local timerGhostCD				= mod:NewNextTimer(13, 133465)--Battletron
-local timerDivineCircleCD		= mod:NewCDTimer(35, 142585)--Insufficent data to say if accurate with certainty
+local timerThrowNetCD				= mod:NewCDTimer(20, 133308, nil, nil, nil, 3)--Fran and Riddoh
+local timerGoblinDeviceCD			= mod:NewCDTimer(21.8, 133227, nil, nil, nil, 3)--Fran and Riddoh
+local timerHighNoon					= mod:NewCastTimer(80, 229154, nil, nil, nil, 3)
 
-mod:RemoveOption("HealthFrame")
-mod:RemoveOption("SpeedKillTimer")
-
-local brawlersMod = DBM:GetModByName("Brawlers")
-local remainingMines = 8
+local brawlersMod = DBM:GetModByName("BrawlersGeneral")
 
 function mod:SPELL_CAST_START(args)
 	if not brawlersMod.Options.SpectatorMode and not brawlersMod:PlayerFighting() then return end--Spectator mode is disabled, do nothing.
-	if args.spellId == 133212 then
-		warnRockets:Show()
-		timerRockets:Schedule(4)
-	elseif args.spellId == 125212 then
-		warnShadowbolt:Show()
-		timerShadowboltCD:Start()
-		if brawlersMod:PlayerFighting() then
-			specWarnShadowbolt:Show()
+	if args.spellId == 133308 then
+		warnThrowNet:Show()
+		timerThrowNetCD:Start()
+		if not brawlersMod:PlayerFighting() then
+			timerThrowNetCD:SetSTFade(true)
 		end
-	elseif args.spellId == 133465 then
-		warnGhost:Show()
-		timerGhostCD:Start()
-		if brawlersMod:PlayerFighting() then
-			specWarnGhost:Show()
-		end
-	elseif args.spellId == 133017 then
-		remainingMines = remainingMines - 1
-		warnMines:Show(remainingMines)
-	elseif args.spellId == 138845 then
-		warnCharge:Show()
-		if brawlersMod:PlayerFighting() then
-			specWarnCharge:Show()
-		end
-	elseif args.spellId == 142621 then
-		warnCompleteHeal:Show()
-		if brawlersMod:PlayerFighting() then
-			specWarnCompleteHeal:Show(args.sourceName)
-		end
-	elseif args.spellId == 142583 then
-		warnDivineCircle:Show()
-		timerDivineCircleCD:Start()
-		if args:IsPlayer() then
-			specWarnDivineCircle:Show()
+	elseif args.spellId == 229154 then
+		warnHighNoon:Show()
+		timerHighNoon:Start()
+		if not brawlersMod:PlayerFighting() then
+			timerHighNoon:SetSTFade(true)
 		end
 	end
 end
 
-function mod:SPELL_AURA_APPLIED(args)
-	if not brawlersMod.Options.SpectatorMode and not brawlersMod:PlayerFighting() then return end
-	if args.spellId == 133015 then
---		remainingMines = 8
-		warnMinesSpawning:Show()
-		if brawlersMod:PlayerFighting() then
-			specWarnMinesSpawning:Show()
+function mod:SPELL_CAST_SUCCESS(args)
+	if not brawlersMod.Options.SpectatorMode and not brawlersMod:PlayerFighting() then return end--Spectator mode is disabled, do nothing.
+	if args.spellId == 133227 then
+		timerGoblinDeviceCD:Start()--6 seconds after combat start, if i do that kind of detection later
+		if brawlersMod:PlayerFighting() then--Only give special warnings if you're in arena though.
+			specWarnGoblinDevice:Show()
+		else
+			warnGoblinDevice:Show()
+			timerGoblinDeviceCD:SetSTFade(true)
 		end
-	elseif args.spellId == 133018 then
-		remainingMines = 8
 	end
 end
 
-function mod:SPELL_AURA_APPLIED_DOSE(args)
-	if not brawlersMod.Options.SpectatorMode and not brawlersMod:PlayerFighting() then return end
-	if args.spellId == 138901 then
-		warnBulwark:Show(args.amount or 0)
+function mod:UNIT_DIED(args)
+	local cid = self:GetCIDFromGUID(args.destGUID)
+	if cid == 67524 then--These 2 have a 1 min 50 second berserk
+		timerThrowNetCD:Stop()
+	elseif cid == 67525 then--These 2 have a 1 min 50 second berserk
+		timerGoblinDeviceCD:Stop()
+	elseif cid == 229154 then--Dupree
+		timerHighNoon:Stop()
 	end
 end
-mod.SPELL_AURA_REMOVED = mod.SPELL_AURA_APPLIED_DOSE
-mod.SPELL_AURA_REMOVED_DOSE = mod.SPELL_AURA_APPLIED_DOSE

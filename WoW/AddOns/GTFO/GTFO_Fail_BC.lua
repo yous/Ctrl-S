@@ -3,8 +3,9 @@
 --------------------------------------------------------------------------
 --[[
 GTFO Fail List - Burning Crusade
-Author: Zensunim of Malygos
 ]]--
+
+if (not GTFO.ClassicMode) then
 
 -- *****************
 -- * Blood Furnace *
@@ -224,14 +225,12 @@ GTFO.SpellID["40599"] = {
 	--desc = "Arcing Smash (Gurtogg Bloodboil - Black Temple)";
 	sound = 3;
 	tankSound = 0;
-	trivialLevel = 80;
 };
 
 GTFO.SpellID["40599"] = {
 	--desc = "Saber Lash (Mother Shahraz - Black Temple)";
 	sound = 3;
 	tankSound = 0;
-	trivialLevel = 80;
 };
 
 GTFO.SpellID["37433"] = {
@@ -281,3 +280,16 @@ GTFO.SpellID["39174"] = {
 	trivialLevel = 80;
 };
 
+GTFO.SpellID["40631"] = {
+  --desc = "Flame Blast (Flame of Azzinoth)";
+  sound = 3;
+  tankSound = 0;
+};
+
+GTFO.SpellID["40904"] = {
+  --desc = "Draw Soul (Illidan Stormrage)";
+  sound = 3;
+  tankSound = 0;
+};
+
+end

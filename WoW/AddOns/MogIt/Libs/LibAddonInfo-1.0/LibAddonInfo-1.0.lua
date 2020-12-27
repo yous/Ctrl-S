@@ -1,4 +1,4 @@
-﻿local lib,old = LibStub:NewLibrary("LibAddonInfo-1.0",1);
+local lib,old = LibStub:NewLibrary("LibAddonInfo-1.0",1);
 if not lib then return end
 
 local L = {};

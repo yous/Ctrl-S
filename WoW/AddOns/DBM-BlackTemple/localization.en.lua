@@ -9,12 +9,6 @@ L:SetGeneralLocalization{
 	name = "High Warlord Naj'entus"
 }
 
-L:SetOptionLocalization{
-	InfoFrame	= "Show info frame for health (<8.8k hp)",
-	RangeFrame	= DBM_CORE_AUTO_RANGE_OPTION_TEXT_SHORT:format(8),
-	SpineIcon	= DBM_CORE_AUTO_ICONS_OPTION_TEXT:format(39837)
-}
-
 L:SetMiscLocalization{
 	HealthInfo	= "Health Info"
 }
@@ -29,8 +23,7 @@ L:SetGeneralLocalization{
 }
 
 L:SetWarningLocalization{
-	WarnPhase		= "%s Phase",
-	WarnKite		= "Gaze on >%s<"
+	WarnPhase		= "%s Phase"
 }
 
 L:SetTimerLocalization{
@@ -39,14 +32,13 @@ L:SetTimerLocalization{
 
 L:SetOptionLocalization{
 	WarnPhase		= "Show warning for next phase",
-	WarnKite		= "Announce Kite targets",
 	TimerPhase		= "Show time for next phase",
 	KiteIcon		= "Set icon on Kite target"
 }
 
 L:SetMiscLocalization{
-	PhaseKite		= "punches the ground in anger!",
-	PhaseTank		= "The ground begins to crack open!",
+	PhaseTank		= "punches the ground in anger!",
+	PhaseKite		= "The ground begins to crack open!",
 	ChangeTarget	= "acquires a new target",
 	Kite			= "Kite",
 	Tank			= "Tank"
@@ -75,8 +67,7 @@ L:SetTimerLocalization{
 }
 
 L:SetOptionLocalization{
-	TimerVengefulSpirit		= "Show timer for Ghost durations",
-	CrushIcon				= DBM_CORE_AUTO_ICONS_OPTION_TEXT:format(40243)
+	TimerVengefulSpirit		= "Show timer for Ghost durations"
 }
 
 ----------------------------
@@ -107,16 +98,15 @@ L:SetTimerLocalization{
 
 L:SetOptionLocalization{
 	WarnMana		= "Show warning from zero mana in Phase 2",
-	TimerMana		= "Show timer for zero mana in Phase 2",
-	DrainIcon		= DBM_CORE_AUTO_ICONS_OPTION_TEXT:format(41303),
-	SpiteIcon		= DBM_CORE_AUTO_ICONS_OPTION_TEXT:format(41376)
+	TimerMana		= "Show timer for zero mana in Phase 2"
 }
 
 L:SetMiscLocalization{
-	Pull			= "Pain and suffering are all that await you!",
 	Suffering		= "Essence of Suffering",
 	Desire			= "Essence of Desire",
-	Anger			= "Essence of Anger"
+	Anger			= "Essence of Anger",
+	Phase1End		= "I don't want to go back!",
+	Phase2End		= "I won't be far!"
 }
 
 -----------------------
@@ -133,8 +123,7 @@ L:SetTimerLocalization{
 }
 
 L:SetOptionLocalization{
-	timerAura	= "Show timer for Prismatic Aura",
-	FAIcons		= DBM_CORE_AUTO_ICONS_OPTION_TEXT:format(41001)
+	timerAura	= "Show timer for Prismatic Aura"
 }
 
 ----------------------
@@ -151,8 +140,7 @@ L:SetWarningLocalization{
 }
 
 L:SetOptionLocalization{
-	Immune			= "Show warning when Manalde becomes spell or melee immune",
-	PoisonIcon		= DBM_CORE_AUTO_ICONS_OPTION_TEXT:format(41485)
+	Immune			= "Show warning when Manalde becomes spell or melee immune"
 }
 
 L:SetMiscLocalization{
@@ -180,8 +168,7 @@ L:SetWarningLocalization{
 
 L:SetTimerLocalization{
 	TimerNextHuman		= "Next Human Phase",
-	TimerNextDemon		= "Next Demon Phase",
-	TimerPhase4			= "Phase transition"
+	TimerNextDemon		= "Next Demon Phase"
 }
 
 L:SetOptionLocalization{
@@ -189,9 +176,7 @@ L:SetOptionLocalization{
 	WarnDemon		= "Show warning for Demon Phase",
 	TimerNextHuman	= "Show time for Next Human Phase",
 	TimerNextDemon	= "Show time for Demon Human Phase",
-	TimerPhase4		= "Show time for Phase 4 transition",
-	RangeFrame		= "Show range frame (10 yards) in Phase 3 and 4",
-	ParasiteIcon	= DBM_CORE_AUTO_ICONS_OPTION_TEXT:format(41917)
+	RangeFrame		= "Show range frame (10 yards) in Phase 3 and 4"
 }
 
 L:SetMiscLocalization{

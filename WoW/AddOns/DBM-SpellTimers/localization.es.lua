@@ -1,23 +1,19 @@
-if GetLocale() ~= "esES" then return end
+if GetLocale() ~= "esES" and GetLocale() ~= "esMX" then
+	return
+end
 local L = DBM_SpellsUsed_Translations
 
-
-
-L.TabCategory_SpellsUsed	= "Cd de Echizo/Habilidad"
-L.AreaGeneral 			= "Opciones Generales"
-L.Enable 			= "Habilitar cdsEnable cooldown timers"
-L.Show_LocalMessage 		= "Mostrar mensaje local cuando casteas"
-L.Enable_inRaid			= "Mostrar cds solo de miembros de la raid"
-L.Enable_inBattleground		= "Mostrar cds en batallas"
-L.Enable_Portals		= "Mostrar duracion de portales"
-L.Reset				= "Reinciar de fabrica"
-L.Local_CastMessage 		= "Cast detectado: %s"
-L.AreaAuras 			= "Configurar hechizos/habilidades"
-L.SpellID 			= "ID de Hechizo"
-L.BarText 			= "Texto de barra (defecto: %spell: %player)"
-L.Cooldown 			= "Cooldown"
-L.Error_FillUp			= "Por favor, rellena los campos antes de a馻dir otro"
-
-
-
-
+L.TabCategory_SpellsUsed	= "Tiempos de reutilizaci贸n"
+L.AreaGeneral 				= "Opciones generales"
+L.Enabled 					= "Habilitar temporizadores"
+L.ShowLocalMessage	 		= "Enviar mensaje con el lanzamiento"
+L.OnlyFromRaid				= "Mostrar solo tiempos de reutilizaci贸n de los miembros de banda"
+L.EnableInPVP				= "Mostrar tiempos de reutilizaci贸n en campos de batalla"
+L.EnablePortals				= "Mostrar duraci贸n de portales"
+L.Reset						= "Restaurar"
+L.Local_CastMessage 		= "Lanzamiento detectado: %s"
+L.AreaAuras 				= "Configuraci贸n de hechizos y facultades"
+L.SpellID 					= "ID"
+L.BarText 					= "Texto"
+L.Cooldown 					= "Tiempo de reutilizaci贸n"
+L.Error_FillUp				= "Por favor, rellena todos los campos antes de a帽adir otro hechizo o facultad."

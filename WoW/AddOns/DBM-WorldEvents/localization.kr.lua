@@ -1,4 +1,4 @@
-﻿if GetLocale() ~= "koKR" then return end
+if GetLocale() ~= "koKR" then return end
 local L
 
 ------------
@@ -22,7 +22,7 @@ L:SetTimerLocalization{
 }
 
 L:SetOptionLocalization({
-	TrioActiveTimer		= "각 우두머리 활성화 바 보기"
+	TrioActiveTimer		= "각 보스 활성화 타이머 바 보기"
 })
 
 L:SetMiscLocalization({
@@ -40,15 +40,15 @@ L:SetWarningLocalization({
 })
 
 L:SetTimerLocalization{
-	SubmergTimer	= "잠수",
+	SubmergTimer	= "잠복",
 	EmergeTimer		= "등장"
 }
 
 L:SetOptionLocalization({
-	Emerged			= "등장 알림 보기",
-	specWarnAttack	= "아훈 약화 특수 경고 보기",
-	SubmergTimer	= "잠수 바 보기",
-	EmergeTimer		= "등장 바 보기"
+	Emerged			= "등장 경고 보기",
+	specWarnAttack	= "아훈 약화 특별 경고 보기",
+	SubmergTimer	= "잠복 타이머 바 보기",
+	EmergeTimer		= "등장 타이머 바 보기"
 })
 
 L:SetMiscLocalization({
@@ -61,19 +61,31 @@ L:SetMiscLocalization({
 L = DBM:GetModLocalization("d287")
 
 L:SetWarningLocalization({
-	specWarnBrew		= "가방에 있는 맥주 사용!",
-	specWarnBrewStun	= "맥주를 미리 사용하셔야 기절하지 않습니다!"
+	specWarnBrew		= "다른 맥주가 넘어오기 전에 가방에 있는 맥주를 사용하세요!",
+	specWarnBrewStun	= "힌트: 기절했습니다. 다음엔 맥주를 꼭 마시세요!"
 })
 
 L:SetOptionLocalization({
-	specWarnBrew		= "$spell:47376 특수 경고 보기",
-	specWarnBrewStun	= "$spell:47340 특수 경고 보기",
-	YellOnBarrel		= "$spell:51413 대상이 된 경우 대화로 알리기"
+	specWarnBrew		= "$spell:47376 특별 경고 보기",
+	specWarnBrewStun	= "$spell:47340 특별 경고 보기"
 })
 
 L:SetMiscLocalization{
-	YellBarrel			= "저에게 맥주통!"
+	YellBarrel			= "나에게 맥주통!"
 }
+
+----------------
+--  Brewfest  --
+----------------
+L = DBM:GetModLocalization("Brew")
+
+L:SetGeneralLocalization({
+	name = "가을 축제"
+})
+
+L:SetOptionLocalization({
+	NormalizeVolume			= "가을 축제 지역에선 자동으로 대화 음량이 배경음 음량에 맞게 평준화되어 소음을 해소합니다. (배경음이 설정되지 않았을 경우 대화 음량은 음소거 됩니다.)"
+})
 
 -----------------------------
 --  The Headless Horseman  --
@@ -81,15 +93,15 @@ L:SetMiscLocalization{
 L = DBM:GetModLocalization("d285")
 
 L:SetWarningLocalization({
-	WarnPhase				= "%d 단계",
+	WarnPhase				= "%d단계",
 	warnHorsemanSoldiers	= "고동치는 호박 생성",
-	warnHorsemanHead		= "저주받은 기사의 머리 생성"
+	warnHorsemanHead		= "저주받은 기사의 머리 등장"
 })
 
 L:SetOptionLocalization({
-	WarnPhase				= "단계 전환 알림 보기",
-	warnHorsemanSoldiers	= "고동치는 호박 생성 알림 보기",
-	warnHorsemanHead		= "저주받은 기사 머리 생성 알림 보기"
+	WarnPhase				= "단계 전환 경고 보기",
+	warnHorsemanSoldiers	= "고동치는 호박 등장 경고 보기",
+	warnHorsemanHead		= "저주받은 기사 머리 등장 경고 보기"
 })
 
 L:SetMiscLocalization({
@@ -116,7 +128,7 @@ L:SetGeneralLocalization({
 })
 
 L:SetWarningLocalization({
-	warnTotalAdds	= "총공격 전까지 생성된 적 수 : %d",
+	warnTotalAdds	= "총공격 전까지 생성된 적 수: %d",
 	specWarnWave	= "총공격!"
 })
 
@@ -126,8 +138,8 @@ L:SetTimerLocalization{
 
 L:SetOptionLocalization({
 	warnTotalAdds	= "각 총공격마다 이전 단계에 생성된 적 수 보기",
-	specWarnWave	= "총공격 특수 경고 보기",
-	timerWave		= "다음 총공격 바 보기"
+	specWarnWave	= "총공격 특별 경고 보기",
+	timerWave		= "다음 총공격 타이머 바 보기"
 })
 
 L:SetMiscLocalization({
@@ -135,39 +147,152 @@ L:SetMiscLocalization({
 })
 
 --------------------------
---  Garrison Invasions  --
+--  Demonic Invasions  --
 --------------------------
-L = DBM:GetModLocalization("GarrisonInvasions")
+L = DBM:GetModLocalization("DemonInvasions")
 
 L:SetGeneralLocalization({
-	name = "주둔지 방어"
+	name = "악마 침공"
+})
+
+--------------------------
+--  Memories of Azeroth: Burning Crusade  --
+--------------------------
+L = DBM:GetModLocalization("BCEvent")
+
+L:SetGeneralLocalization({
+	name = "추억: 불타는 성전"
+})
+
+--------------------------
+--  Memories of Azeroth: Wrath of the Lich King  --
+--------------------------
+L = DBM:GetModLocalization("WrathEvent")
+
+L:SetGeneralLocalization({
+	name = "추억: 리치 왕의 분노"
+})
+
+L:SetWarningLocalization{
+	WarnEmerge				= "아눕아락 등장",
+	WarnEmergeSoon			= "10초 후 등장",
+	WarnSubmerge			= "아눕아락 잠복",
+	WarnSubmergeSoon		= "10초 후 잠복",
+	WarningTeleportNow		= "순간이동",
+	WarningTeleportSoon		= "10초 후 순간이동"
+}
+
+L:SetTimerLocalization{
+	TimerEmerge				= "등장",
+	TimerSubmerge			= "잠복",
+	TimerTeleport			= "순간이동"
+}
+
+L:SetMiscLocalization{
+	Emerge					= "땅속에서 모습을 드러냅니다!",
+	Burrow					= "땅속으로 숨어버립니다!"
+}
+
+L:SetOptionLocalization{
+	WarnEmerge				= "등장 경고 보기",
+	WarnEmergeSoon			= "등장 사전 경고 보기",
+	WarnSubmerge			= "잠복 경고 보기",
+	WarnSubmergeSoon		= "잠복 사전 경고 보기",
+	TimerEmerge				= "등장 타이머 바 보기",
+	TimerSubmerge			= "잠복 타이머 바 보기",
+	WarningTeleportNow		= "순간이동 경고 보기",
+	WarningTeleportSoon		= "순간이동 사전 경고 보기",
+	TimerTeleport			= "순간이동 타이머 바 보기"
+}
+
+--------------------------
+--  Memories of Azeroth: Cataclysm  --
+--------------------------
+L = DBM:GetModLocalization("CataEvent")
+
+L:SetGeneralLocalization({
+	name = "추억: 대격변"
 })
 
 L:SetWarningLocalization({
-	specWarnRylak	= "라일라크 등장!",
-	specWarnWorker	= "겁먹은 일꾼 등장!",
-	specWarnSpy		= "상대진영 침투요원 등장!",
-	specWarnBuilding= "건물이 공격받고 있습니다!"
+	warnSplittingBlow		= "%2$s에 %1$s",--Spellname in Location
+	warnEngulfingFlame		= "%2$s에 %1$s"--Spellname in Location
 })
 
 L:SetOptionLocalization({
-	specWarnRylak	= "라이라크 등장시 특수 경고 보기",
-	specWarnWorker	= "겁먹은 일꾼 등장시 특수 경고 보기",
-	specWarnSpy		= "상대진영 침투요원 등장시 특수 경고 보기",
-	specWarnBuilding= "건물이 공격 받을시 특수 경고 보기"
+	warnSplittingBlow			= "$spell:98951 위치 경고 보기",
+	warnEngulfingFlame			= "$spell:99171 위치 경고 보기"
 })
 
+----------------------------------
+--  Azeroth Event World Bosses  --
+----------------------------------
+
+-- Lord Kazzak (Badlands)
+L = DBM:GetModLocalization("KazzakClassic")
+
+L:SetGeneralLocalization{
+	name = "군주 카자크"
+}
+
 L:SetMiscLocalization({
-	--General
-	preCombat			= "To arms! To your posts!",--Common in all yells, rest varies based on invasion
-	preCombat2			= "The air has taken a turn for the foul...",--Shadow Council doesn't follow format of others :\
-	rylakSpawn			= "The commotion of the battle attracts a rylak!",--Source npc Darkwing Scavenger, target playername
-	terrifiedWorker		= "겁먹은 일꾼이 바깥에서 발이 묶였습니다!",
-	sneakySpy			= "혼란을 틈타",--Shortened to cut out "horde/alliance"
-	buildingAttack		= "Your %s is under attack!",--Your Salvage Yard is under attack!
-	--Ogre
-	GorianwarCaller		= "A Gorian Warcaller joins the battle to raise morale!",--Maybe combined "add" special warning most adds?
-	WildfireElemental	= "A Wildfire Elemental is being summoned at the front gates!",--Maybe combined "add" special warning most adds?
-	--Iron Horde
-	Assassin			= "An Assassin is hunting your guards!"--Maybe combined "add" special warning most adds?
+	Pull		= "불타는 군단과 킬제덴을 위하여!"
 })
+
+-- Azuregos (Azshara)
+L = DBM:GetModLocalization("Azuregos")
+
+L:SetGeneralLocalization{
+	name = "아주어고스"
+}
+
+L:SetMiscLocalization({
+	Pull		= "여기는 내가 지킨다. 어느 누구도 비전술의 신비를 건드리지 못할 것이다."
+})
+
+-- Taerar (Ashenvale)
+L = DBM:GetModLocalization("Taerar")
+
+L:SetGeneralLocalization{
+	name = "타에라"
+}
+
+L:SetMiscLocalization({
+	Pull		= "평화란 부질없는 꿈일 뿐! 이 세상은 악몽이 지배할 것이다!"
+})
+
+-- Ysondre (Feralas)
+L = DBM:GetModLocalization("Ysondre")
+
+L:SetGeneralLocalization{
+	name = "이손드레"
+}
+
+L:SetMiscLocalization({
+	Pull		= "생명의 끈이 끊어졌다! 꿈꾸는 자들이 복수하는 것이 틀림없다!"
+})
+
+-- Lethon (Hinterlands)
+L = DBM:GetModLocalization("Lethon")
+
+L:SetGeneralLocalization{
+	name = "레손"
+}
+
+-- Emeriss (Duskwood)
+L = DBM:GetModLocalization("Emeriss")
+
+L:SetGeneralLocalization{
+	name = "에메리스"
+}
+
+L:SetMiscLocalization({
+	Pull		= "희망은 영혼의 병! 이 땅은 말라 죽을 것이다!"
+})
+
+-- Doomwalker (Tanaris)
+L = DBM:GetModLocalization("DoomwalkerEvent")
+
+L:SetGeneralLocalization{
+	name = "파멸의 절단기 (이벤트)"
+}

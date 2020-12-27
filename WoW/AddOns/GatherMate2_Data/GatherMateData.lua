@@ -1,84 +1,132 @@
 -- nearby check yes/no? slowdown may be an isue if someone leaves the mod enabled and always replace node
 local GatherMateData = LibStub("AceAddon-3.0"):NewAddon("GatherMate2_Data")
 local GatherMate = LibStub("AceAddon-3.0"):GetAddon("GatherMate2")
-GatherMateData.generatedVersion = "403"
+GatherMateData.generatedVersion = "10"
 local bcZones = {
-	[464] = true,
-	[476] = true,
-	[471] = true,
-	[462] = true,
-	[463] = true,
-	[499] = true,
-	[480] = true,
-	[475] = true,
-	[465] = true,
-	[477] = true,
-	[479] = true,
-	[473] = true,
-	[481] = true,
-	[478] = true,
-	[467] = true,
+	[94] = true,
+	[95] = true,
+	[97] = true,
+	[100] = true,
+	[102] = true,
+	[103] = true,
+	[104] = true,
+	[105] = true,
+	[106] = true,
+	[107] = true,
+	[108] = true,
+	[109] = true,
+	[110] = true,
+	[111] = true,
+	[122] = true,
 }
--- FIX to new Zone numbers
+
 local wrathZones = {
-	[486] = true,
-	[510] = true,
-	[504] = true,
-	[488] = true,
-	[490] = true,
-	[491] = true,
-	[541] = true,
-	[492] = true,
-	[493] = true,
-	[495] = true,
-	[501] = true,
-	[496] = true,
+	[114] = true,
+	[115] = true,
+	[116] = true,
+	[117] = true,
+	[118] = true,
+	[119] = true,
+	[120] = true,
+	[121] = true,
+	[123] = true,
+	[125] = true,
+	[126] = true,
+	[127] = true,
+	[170] = true,
 }
 
 local cataZones = {
-	[606] = true,
-	[684] = true,
-	[685] = true,
-	[615] = true,
-	[708] = true,
-	[709] = true,
-	[700] = true,
-	[613] = true,
-	[614] = true,
-	[640] = true,
-	[605] = true,
-	[544] = true,
-	[737] = true,
+	[174] = true,
+	[175] = true,
+	[176] = true,
+	[177] = true,
+	[178] = true,
+	[194] = true,
+	[198] = true,
+	[201] = true,
+	[204] = true,
+	[205] = true,
+	[207] = true,
+	[208] = true,
+	[209] = true,
+	[217] = true,
+	[218] = true,
+	[241] = true,
+	[244] = true,
+	[245] = true,
+	[276] = true,
 }
 
 local mistsZones = {
-	[806] = true,
-	[807] = true,
-	[808] = true,
-	[809] = true,
-	[810] = true,
-	[811] = true,
-	[857] = true,
-	[858] = true,
-	[873] = true,
-	[903] = true,
-	[905] = true,	
+	[371] = true,
+	[376] = true,
+	[378] = true,
+	[379] = true,
+	[388] = true,
+	[390] = true,
+	[418] = true,
+	[422] = true,
+	[433] = true,
+	[504] = true,
+	[507] = true,
+	[516] = true,
+	[554] = true,
 }
 
 local wodZones = {
-	[962] = true,
-	[978] = true,
-	[941] = true,
-	[976] = true,
-	[971] = true,
-	[950] = true,
-	[947] = true,
-	[948] = true,
-	[1009] = true,
-	[946] = true,
-	[945] = true,
-	[907] = true,
-	[1011] = true,
+	[525] = true,
+	[534] = true,
+	[535] = true,
+	[539] = true,
+	[542] = true,
+	[543] = true,
+	[550] = true,
+	[572] = true,
+	[577] = true,
+	[582] = true,
+	[588] = true,
+	[589] = true,
+	[590] = true,
+	[622] = true,
+	[624] = true,
+}
+
+local legionZones = {
+	[627] = true,
+	[628] = true,
+	[630] = true,
+	[634] = true,
+	[641] = true,
+	[646] = true,
+	[650] = true,
+	[680] = true,
+	[790] = true,
+	[830] = true,
+	[882] = true,
+	[885] = true,
+}
+
+local bfaZones = {
+	[862] = true,
+	[863] = true,
+	[864] = true,
+	[895] = true,
+	[896] = true,
+	[942] = true,
+	[1161] = true,
+	[1165] = true,
+	[1355] = true,
+	[1462] = true,
+}
+
+local slZones = {
+	[1525] = true,
+	[1533] = true,
+	[1536] = true,
+	[1543] = true,
+	[1565] = true,
+	[1670] = true,
 }
 
 function GatherMateData:PerformMerge(dbs,style, zoneFilter)
@@ -94,6 +142,12 @@ function GatherMateData:PerformMerge(dbs,style, zoneFilter)
 			filter = mistsZones
 		elseif zoneFilter == "WOD" then
 			filter = wodZones
+		elseif zoneFilter == "LEGION" then
+			filter = legionZones
+		elseif zoneFilter == "BFA" then
+			filter = bfaZones
+		elseif zoneFilter == "SL" then
+			filter = slZones
 		end
 	end
 	if dbs["Mines"]    then self:MergeMines(style ~= "Merge",filter) end
@@ -110,14 +164,10 @@ end
 function GatherMateData:MergeMines(clear,zoneFilter)
 	if clear then GatherMate:ClearDB("Mining") end
 	for zoneID, node_table in pairs(GatherMateData2MineDB) do
-		if zoneFilter and zoneFilter[zoneID] or not zoneFilter then
+		if not zoneFilter or zoneFilter[zoneID] then
 			for coord, nodeID in pairs(node_table) do
-				GatherMate:InjectNode(zoneID,coord,"Mining", nodeID)
+				GatherMate:InjectNode2(zoneID,coord,"Mining", nodeID)
 			end
-		else
-			for coord, nodeID in pairs(node_table) do
-				GatherMate:InjectNode(zoneID,coord,"Mining", nodeID)
-			end			
 		end
 	end
 end
@@ -126,13 +176,9 @@ end
 function GatherMateData:MergeHerbs(clear,zoneFilter)
 	if clear then GatherMate:ClearDB("Herb Gathering") end
 	for zoneID, node_table in pairs(GatherMateData2HerbDB) do
-		if zoneFilter and zoneFilter[zoneID] or not zoneFilter then
+		if not zoneFilter or zoneFilter[zoneID] then
 			for coord, nodeID in pairs(node_table) do
-				GatherMate:InjectNode(zoneID,coord,"Herb Gathering", nodeID)
-			end
-		else
-			for coord, nodeID in pairs(node_table) do
-				GatherMate:InjectNode(zoneID,coord,"Herb Gathering", nodeID)
+				GatherMate:InjectNode2(zoneID,coord,"Herb Gathering", nodeID)
 			end
 		end
 	end
@@ -142,14 +188,10 @@ end
 function GatherMateData:MergeGases(clear,zoneFilter)
 	if clear then GatherMate:ClearDB("Extract Gas") end
 	for zoneID, node_table in pairs(GatherMateData2GasDB) do
-		if zoneFilter and zoneFilter[zoneID] or not zoneFilter then
+		if not zoneFilter or zoneFilter[zoneID] then
 			for coord, nodeID in pairs(node_table) do
-				GatherMate:InjectNode(zoneID,coord,"Extract Gas", nodeID)
+				GatherMate:InjectNode2(zoneID,coord,"Extract Gas", nodeID)
 			end
-		else
-			for coord, nodeID in pairs(node_table) do
-				GatherMate:InjectNode(zoneID,coord,"Extract Gas", nodeID)
-			end			
 		end
 	end
 end
@@ -158,42 +200,30 @@ end
 function GatherMateData:MergeFish(clear,zoneFilter)
 	if clear then GatherMate:ClearDB("Fishing") end
 	for zoneID, node_table in pairs(GatherMateData2FishDB) do
-		if zoneFilter and zoneFilter[zoneID] or not zoneFilter then
+		if not zoneFilter or zoneFilter[zoneID] then
 			for coord, nodeID in pairs(node_table) do
-				GatherMate:InjectNode(zoneID,coord,"Fishing", nodeID)
+				GatherMate:InjectNode2(zoneID,coord,"Fishing", nodeID)
 			end
-		else
-			for coord, nodeID in pairs(node_table) do
-				GatherMate:InjectNode(zoneID,coord,"Fishing", nodeID)
-			end			
 		end
 	end
 end
 function GatherMateData:MergeTreasure(clear,zoneFilter)
 	if clear then GatherMate:ClearDB("Treasure") end
 	for zoneID, node_table in pairs(GatherMateData2TreasureDB) do
-		if zoneFilter and zoneFilter[zoneID] or not zoneFilter then
+		if not zoneFilter or zoneFilter[zoneID] then
 			for coord, nodeID in pairs(node_table) do
-				GatherMate:InjectNode(zoneID,coord,"Treasure", nodeID)
+				GatherMate:InjectNode2(zoneID,coord,"Treasure", nodeID)
 			end
-		else
-			for coord, nodeID in pairs(node_table) do
-				GatherMate:InjectNode(zoneID,coord,"Treasure", nodeID)
-			end			
 		end
 	end
 end
 function GatherMateData:MergeArchaelogy(clear,zoneFilter)
 	if clear then GatherMate:ClearDB("Archaeology") end
 	for zoneID, node_table in pairs(GatherMateData2ArchaeologyDB) do
-		if zoneFilter and zoneFilter[zoneID] or not zoneFilter then
+		if not zoneFilter or zoneFilter[zoneID] then
 			for coord, nodeID in pairs(node_table) do
-				GatherMate:InjectNode(zoneID,coord,"Archaeology", nodeID)
+				GatherMate:InjectNode2(zoneID,coord,"Archaeology", nodeID)
 			end
-		else
-			for coord, nodeID in pairs(node_table) do
-				GatherMate:InjectNode(zoneID,coord,"Archaeology", nodeID)
-			end			
 		end
 	end
 end

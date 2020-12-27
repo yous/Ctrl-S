@@ -7,7 +7,7 @@
 --		Banjankri of Blackrock, Predeter of Proudmoore, Xenyr of Aszune
 
 -- Currently maintained by
--- Cybeloras of Aerie Peak/Detheroc/Mal'Ganis
+-- Cybeloras of Aerie Peak
 -- --------------------
 
 local TMW = TMW
@@ -29,13 +29,12 @@ local CL_CONTROL_PLAYER = COMBATLOG_OBJECT_CONTROL_PLAYER
 -- GLOBALS: TellMeWhen_ChooseName
 
 
-local DRData = LibStub("DRData-1.0")
+local DRList = LibStub("DRList-1.0")
 
-local DRSpells = DRData.spells
-local DRReset = 18
+local DRSpells = DRList:GetSpells()
 local PvEDRs = {}
 for spellID, category in pairs(DRSpells) do
-	if DRData.pveDR[category] then
+	if DRList:IsPvECategory(category) then
 		PvEDRs[spellID] = 1
 	end
 end
@@ -50,13 +49,15 @@ Type.usePocketWatch = 1
 Type.unitType = "unitid"
 Type.hasNoGCD = true
 
+local STATE_UNDIMINISHED = TMW.CONST.STATE.DEFAULT_SHOW
+local STATE_DIMINISHED = TMW.CONST.STATE.DEFAULT_HIDE
 
 -- AUTOMATICALLY GENERATED: UsesAttributes
+Type:UsesAttributes("state")
 Type:UsesAttributes("spell")
 Type:UsesAttributes("unit, GUID")
-Type:UsesAttributes("stack, stackText")
 Type:UsesAttributes("start, duration")
-Type:UsesAttributes("alpha")
+Type:UsesAttributes("stack, stackText")
 Type:UsesAttributes("texture")
 -- END AUTOMATICALLY GENERATED: UsesAttributes
 
@@ -64,15 +65,6 @@ Type:UsesAttributes("texture")
 Type:SetModuleAllowance("IconModule_PowerBar_Overlay", true)
 
 
-
-TMW:RegisterDatabaseDefaults{
-	global = {
-		-- The default length of diminishing returns.
-		-- Supposedly, the actual behavior is that the server "ticks" every 5 seconds to clear DRs.
-		-- This happens at a min of 15 seconds and a max of 20 seconds.
-		DRDuration = 17
-	},
-}
 
 Type:RegisterIconDefaults{
 	-- The unit(s) to check for DRs
@@ -86,7 +78,22 @@ Type:RegisterIconDefaults{
 
 	-- Show the icon even when no units have been known to have an effect put on them.
 	ShowWhenNone			= false,
+
+	-- Despite the fact that Blizzard says this is always 18 seconds, it really isn't.
+	-- My testing with stuns on a training dummy showed there is still significant variance.
+	-- So, we're bringing back the config setting on a per-icon basis.
+	DRDuration = 18,
 }
+
+
+TMW:RegisterUpgrade(72506, {
+	global = function(self, ics)
+		-- In patch 6.1, this changed from being a range of 15-20 seconds
+		-- to being always 18 seconds.
+		-- http://us.battle.net/wow/en/forum/topic/16529192789#1
+		TMW.db.global.DRDuration = nil
+	end,
+})
 
 TMW:RegisterUpgrade(71035, {
 	icon = function(self, ics)
@@ -122,33 +129,43 @@ Type:RegisterConfigPanel_XMLTemplate(105, "TellMeWhen_Unit", {
 	implementsConditions = true,
 })
 
-Type:RegisterConfigPanel_XMLTemplate(165, "TellMeWhen_WhenChecks", {
-	text = L["ICONMENU_SHOWWHEN"],
-	[0x2] = { text = "|cFF00FF00" .. L["ICONMENU_DRABSENT"], 	},
-	[0x1] = { text = "|cFFFF0000" .. L["ICONMENU_DRPRESENT"], 	},
+Type:RegisterConfigPanel_XMLTemplate(165, "TellMeWhen_IconStates", {
+	[STATE_UNDIMINISHED] = { text = "|cFF00FF00" .. L["ICONMENU_DRABSENT"],  },
+	[STATE_DIMINISHED]   = { text = "|cFFFF0000" .. L["ICONMENU_DRPRESENT"], },
 })
 
 Type:RegisterConfigPanel_ConstructorFunc(150, "TellMeWhen_DRSettings", function(self)
-	self.Header:SetText(Type.name)
-	TMW.IE:BuildSimpleCheckSettingFrame(self, {
-		{
-			setting = "CheckRefresh",
-			title = L["ICONMENU_CHECKREFRESH"],
-			tooltip = L["ICONMENU_CHECKREFRESH_DESC"],
-		},
-		{
-			setting = "ShowWhenNone",
-			title = L["ICONMENU_SHOWWHENNONE"],
-			tooltip = L["ICONMENU_SHOWWHENNONE_DESC"],
-		},
+	self:SetTitle(Type.name)
+	self:BuildSimpleCheckSettingFrame({
+		function(check)
+			check:SetTexts(L["ICONMENU_CHECKREFRESH"], L["ICONMENU_CHECKREFRESH_DESC"])
+			check:SetSetting("CheckRefresh")
+		end,
+		function(check)
+			check:SetTexts(L["ICONMENU_SHOWWHENNONE"], L["ICONMENU_SHOWWHENNONE_DESC"])
+			check:SetSetting("ShowWhenNone")
+		end,
 	})
+
+	local slider = TMW.C.Config_Slider:New("Slider", nil, self, "TellMeWhen_SliderTemplate")
+	self.DRDuration = slider
+	slider:SetTexts(L["UIPANEL_DRDURATION"], L["UIPANEL_DRDURATION_DESC"])
+	slider:SetPoint("TOP", self.checks[1], "BOTTOM", 0, -10)
+	slider:SetPoint("LEFT", 10, 0)
+	slider:SetPoint("RIGHT", -10, 0)
+	slider:SetSetting("DRDuration")
+	slider:SetMinMaxValues(15, 22)
+	slider:SetValueStep(1)
+	slider:SetTextFormatter(TMW.C.Formatter.S_SECONDS, TMW.C.Formatter.F_0)
+
+	self:AdjustHeight(5)
 end)
 
 
 TMW:RegisterCallback("TMW_EQUIVS_PROCESSING", function()
-	-- Create our own DR equivalencies in TMW using the data from DRData-1.0
+	-- Create our own DR equivalencies in TMW using the data from DRList-1.0
 
-	if DRData then
+	if DRList then
 		local myCategories = {
 			stun			= "DR-Stun",
 			silence			= "DR-Silence",
@@ -156,6 +173,7 @@ TMW:RegisterCallback("TMW_EQUIVS_PROCESSING", function()
 			root			= "DR-Root", 
 			incapacitate	= "DR-Incapacitate",
 			taunt 			= "DR-Taunt",
+			disarm 			= "DR-Disarm",
 		}
 
 		local ignored = {
@@ -172,11 +190,12 @@ TMW:RegisterCallback("TMW_EQUIVS_PROCESSING", function()
 		
 		TMW.BE.dr = {}
 		local dr = TMW.BE.dr
-		for spellID, category in pairs(DRData.spells) do
+		for spellID, category in pairs(DRList:GetSpells()) do
 			local k = myCategories[category]
 
 			if k then
-				dr[k] = (dr[k] and (dr[k] .. ";" .. spellID)) or tostring(spellID)
+				dr[k] = dr[k] or {}
+				tinsert(dr[k], spellID)
 			elseif TMW.debug and not ignored[category] then
 				TMW:Error("The DR category %q is undefined!", category)
 			end
@@ -184,8 +203,10 @@ TMW:RegisterCallback("TMW_EQUIVS_PROCESSING", function()
 	end
 end)
 
-local function DR_OnEvent(icon, event, arg1, cevent, _, _, _, _, _, destGUID, _, destFlags, _, spellID, spellName, _, auraType)
+local function DR_OnEvent(icon, event, arg1)
 	if event == "COMBAT_LOG_EVENT_UNFILTERED" then
+		local _, cevent, _, _, _, _, _, destGUID, _, destFlags, _, spellID, spellName, _, auraType = CombatLogGetCurrentEventInfo()
+		
 		if auraType == "DEBUFF" and (cevent == "SPELL_AURA_REMOVED" or cevent == "SPELL_AURA_APPLIED" or (icon.CheckRefresh and cevent == "SPELL_AURA_REFRESH")) then
 			local NameHash = icon.Spells.Hash
 			if NameHash[spellID] or NameHash[strlowerCache[spellName]] then
@@ -210,7 +231,7 @@ local function DR_OnEvent(icon, event, arg1, cevent, _, _, _, _, _, destGUID, _,
 							dr = {
 								amt = 50,
 								start = TMW.time,
-								duration = DRReset,
+								duration = icon.DRDuration,
 								tex = GetSpellTexture(spellID)
 							}
 							icon.DRInfo[destGUID] = dr
@@ -220,7 +241,7 @@ local function DR_OnEvent(icon, event, arg1, cevent, _, _, _, _, _, destGUID, _,
 							local amt = dr.amt
 							if amt and amt ~= 0 then
 								dr.amt = amt > 25 and amt/2 or 0
-								dr.duration = DRReset
+								dr.duration = icon.DRDuration
 								dr.start = TMW.time
 								dr.tex = GetSpellTexture(spellID)
 							end
@@ -240,7 +261,10 @@ end
 
 local function DR_OnUpdate(icon, time)
 	-- Upvalue things that will be referenced a lot in our loops.
-	local Alpha, UnAlpha, Units = icon.Alpha, icon.UnAlpha, icon.Units
+	local Units = icon.Units
+
+	local undimAlpha = icon.States[STATE_UNDIMINISHED].Alpha
+	local dimAlpha = icon.States[STATE_DIMINISHED].Alpha
 
 	for u = 1, #Units do
 		local unit = Units[u]
@@ -251,42 +275,42 @@ local function DR_OnUpdate(icon, time)
 			if dr.start + dr.duration <= time then
 				-- The timer is expired.
 
-				icon:SetInfo("alpha; texture; start, duration; stack, stackText; unit, GUID",
-					icon.Alpha,
+				icon:SetInfo("state; texture; start, duration; stack, stackText; unit, GUID",
+					STATE_UNDIMINISHED,
 					dr.tex,
 					0, 0,
 					nil, nil,
 					unit, GUID
 				)
 				
-				if Alpha > 0 then
+				if undimAlpha > 0 then
 					return
 				end
 			else
 				-- The timer is not expired.
 
 				local amt = dr.amt
-				icon:SetInfo("alpha; texture; start, duration; stack, stackText; unit, GUID",
-					icon.UnAlpha,
+				icon:SetInfo("state; texture; start, duration; stack, stackText; unit, GUID",
+					STATE_DIMINISHED,
 					dr.tex,
 					dr.start, dr.duration,
 					amt, amt .. "%",
 					unit, GUID
 				)
-				if UnAlpha > 0 then
+				if dimAlpha > 0 then
 					return
 				end
 			end
 		else
 			-- The unit doesn't have any DR.
-			icon:SetInfo("alpha; texture; start, duration; stack, stackText; unit, GUID",
-				icon.Alpha,
+			icon:SetInfo("state; texture; start, duration; stack, stackText; unit, GUID",
+				STATE_UNDIMINISHED,
 				icon.FirstTexture,
 				0, 0,
 				nil, nil,
 				unit, GUID
 			)
-			if Alpha > 0 then
+			if undimAlpha > 0 then
 				return
 			end
 		end
@@ -294,15 +318,15 @@ local function DR_OnUpdate(icon, time)
 	
 	if icon.ShowWhenNone then
 		-- Nothing found. Show default state of the icon.
-		icon:SetInfo("alpha; texture; start, duration; stack, stackText; unit, GUID",
-			icon.Alpha,
+		icon:SetInfo("state; texture; start, duration; stack, stackText; unit, GUID",
+			STATE_UNDIMINISHED,
 			icon.FirstTexture,
 			0, 0,
 			nil, nil,
 			Units[1], nil
 		)
 	else
-		icon:SetInfo("alpha", 0)
+		icon:SetInfo("state", 0)
 	end
 end
 
@@ -334,9 +358,9 @@ do	-- CheckCategories
 		local append = ""
 
 		for i, IDorName in ipairs(NameArray) do
-			for category, str in pairs(TMW.BE.dr) do
+			for category, tbl in pairs(TMW.BE.dr) do
 
-				local Names = TMW:GetSpells(str)
+				local Names = TMW:GetSpells(category)
 
 				-- Check if the spell being checked by the icon is in the DR category that we are looking at.
 				if Names.Hash[IDorName] or Names.StringHash[IDorName] then
@@ -405,8 +429,6 @@ function Type:Setup(icon)
 		wipe(icon.DRInfo)
 	end
 	
-	-- Update this local from the global setting.
-	DRReset = TMW.db.global.DRDuration
 	
 	icon.FirstTexture = GetSpellTexture(icon.Spells.First)
 
@@ -423,9 +445,6 @@ function Type:Setup(icon)
 	-- Setup events and update functions
 	if icon.UnitSet.allUnitsChangeOnEvent then
 		icon:SetUpdateMethod("manual")
-		for event in pairs(icon.UnitSet.updateEvents) do
-			icon:RegisterSimpleUpdateEvent(event)
-		end
 		
 		TMW:RegisterCallback("TMW_UNITSET_UPDATED", DR_OnEvent, icon)
 	end

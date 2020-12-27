@@ -1,19 +1,22 @@
-﻿--[[
+--[[
     This file is part of Decursive.
-    
-    Decursive (v 2.7.3.6) add-on for World of Warcraft UI
-    Copyright (C) 2006-2014 John Wellesz (archarodim AT
-    teaser.fr) ( http://www.2072productions.com/to/decursive.php )
 
-    Starting from 2009-10-31 and until said otherwise by its author, Decursive
-    is no longer free software, all rights are reserved to its author (John
-    Wellesz).
+    Decursive (v 2.7.8) add-on for World of Warcraft UI
+    Copyright (C) 2006-2019 John Wellesz (Decursive AT 2072productions.com) ( http://www.2072productions.com/to/decursive.php )
 
-    The only official and allowed distribution means are
-    www.2072productions.com, www.wowace.com and curse.com.
-    To distribute Decursive through other means a special authorization is
-    required.
-    
+    Decursive is free software: you can redistribute it and/or modify
+    it under the terms of the GNU General Public License as published by
+    the Free Software Foundation, either version 3 of the License, or
+    (at your option) any later version.
+
+    Decursive is distributed in the hope that it will be useful,
+    but WITHOUT ANY WARRANTY; without even the implied warranty of
+    MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+    GNU General Public License for more details.
+
+    You should have received a copy of the GNU General Public License
+    along with Decursive.  If not, see <https://www.gnu.org/licenses/>.
+
 
     Decursive is inspired from the original "Decursive v1.9.4" by Patrick Bohnet (Quu).
     The original "Decursive 1.9.4" is in public domain ( www.quutar.com )
@@ -21,7 +24,7 @@
     Decursive is distributed in the hope that it will be useful, but WITHOUT
     ANY WARRANTY.
 
-    This file was last updated on 2014-10-13T09:20:46Z
+    This file was last updated on 2019-11-18T13:42:00Z
 --]]
 -------------------------------------------------------------------------------
 
@@ -74,7 +77,7 @@ T._LoadedFiles["zhCN.lua"] = false;
 local L = LibStub("AceLocale-3.0"):NewLocale("Decursive", "zhCN");
 
 if not L then
-    T._LoadedFiles["zhCN.lua"] = "2.7.3.6";
+    T._LoadedFiles["zhCN.lua"] = "2.7.8";
     return;
 end;
 
@@ -115,10 +118,7 @@ L["COLORSTATUS"] = "设定“%s”时微单元框体的颜色。"
 L["CTRL"] = "Ctrl"
 L["CURE_PETS"] = "检测并净化宠物"
 L["CURSE"] = "诅咒"
-L["DEBUG_REPORT_HEADER"] = [=[|cFF11FF33请报告此窗口的内容给 Archarodim+DcrReport@teaser.fr|r
-|cFF009999（使用 Ctrl+A 选择所有 Ctrl+C 复制文本到剪切板）|r
-如果发现 Decursive 任何奇怪的行为也一并报告。
-]=]
+L["DEBUG_REPORT_HEADER"] = "|cFF11FF33请电邮此窗口的内容给 <%s>|r |cFF009999（使用 Ctrl+A 选择所有 Ctrl+C 复制文本到剪切板）|r 如果发现 %s 任何奇怪的行为也一并报告。"
 L["DECURSIVE_DEBUG_REPORT"] = "**** |cFFFF0000Decursive 除错报告|r ****"
 L["DECURSIVE_DEBUG_REPORT_BUT_NEW_VERSION"] = [=[|cFF11FF33Decursive 崩溃了但是别怕！新版本的 Decursive 已经被检测到了（%s）。只需简单更新。请到 curse.com 并查询“Decursive”'或使用 Curse 客户端，将自动更新全部插件。|r
 |cFFFF1133别浪费时间在汇报臭虫上了，因为可能已被修复了。只需更新 Decursive 来摆脱这些问题！|r
@@ -167,6 +167,8 @@ L["HLP_LEFTCLICK"] = "鼠标左键"
 L["HLP_LL_ONCLICK_TEXT"] = [=[实时列表不代表能被点击。请先阅读此文档来学习如何使用此插件。在 WoWAce.com 网站搜索“Decursive”
 （从 Decursive 计时条移除此列表，/dcrshow 命令并左Alt+点击移除）]=]
 L["HLP_MIDDLECLICK"] = "鼠标中键"
+L["HLP_MOUSE4"] = "鼠标按键4"
+L["HLP_MOUSE5"] = "鼠标按键5"
 L["HLP_NOTHINGTOCURE"] = "没有可处理的负面效果！"
 L["HLP_RIGHTCLICK"] = "鼠标右键"
 L["HLP_USEXBUTTONTOCURE"] = "用“%s”来净化这个负面效果！"
@@ -195,13 +197,13 @@ L["NORMAL"] = "一般"
 L["NOSPELL"] = "没有相关技能"
 L["OPT_ABOLISHCHECK_DESC"] = "设置是否显示和净化带有“驱毒术”增益效果的玩家"
 L["OPT_ABOUT"] = "关于"
-L["OPT_ADD_A_CUSTOM_SPELL"] = "添加一个自定义法术"
-L["OPT_ADD_A_CUSTOM_SPELL_DESC"] = "点击这里并 Shift+点击技能书上的一个法术。也可以直接写法术名称或数字 ID。"
+L["OPT_ADD_A_CUSTOM_SPELL"] = "添加一个自定义法术/物品"
+L["OPT_ADD_A_CUSTOM_SPELL_DESC"] = "拖动一个法术或可用物品到这里。也可以直接写它们的名称或数字 ID，或者使用Shift+点击。"
 L["OPT_ADDDEBUFF"] = "新增自定义减益"
 L["OPT_ADDDEBUFF_DESC"] = "向列表中新增一个减益。"
-L["OPT_ADDDEBUFFFHIST"] = "新增一个最近受到的减益"
-L["OPT_ADDDEBUFFFHIST_DESC"] = "从历史记录中新增一个减益"
-L["OPT_ADDDEBUFF_USAGE"] = "<减益名称>"
+L["OPT_ADDDEBUFF_USAGE"] = "<减益名称>（可以从 WoWHead.com 链接中找到法术 ID）"
+L["OPT_ADDDEBUFFFHIST"] = "新增一个最近祛除的减益"
+L["OPT_ADDDEBUFFFHIST_DESC"] = "从历史记录中新增一个最近祛除的减益"
 L["OPT_ADVDISP"] = "高级显示选项"
 L["OPT_ADVDISP_DESC"] = "允许分别设置面板和边框的透明度，以及微单元框体的间距。"
 L["OPT_AFFLICTEDBYSKIPPED"] = "%s受到%s的影响，但将被忽略。"
@@ -237,8 +239,8 @@ L["OPT_CMD_DISBLED"] = "已禁用"
 L["OPT_CMD_ENABLED"] = "已启用"
 L["OPT_CREATE_VIRTUAL_DEBUFF"] = "创建一个虚拟的测试用减益"
 L["OPT_CREATE_VIRTUAL_DEBUFF_DESC"] = "让你看看出现减益时的 Decursive 是什么样子。"
-L["OPT_CUREPETS_DESC"] = "宠物也会被检查和净化"
 L["OPT_CURE_PRIORITY_NUM"] = "优先级 #%d"
+L["OPT_CUREPETS_DESC"] = "宠物也会被检查和净化"
 L["OPT_CURINGOPTIONS"] = "净化选项"
 L["OPT_CURINGOPTIONS_DESC"] = "净化选项包含更改每个负面类型的的优先级"
 L["OPT_CURINGOPTIONS_EXPLANATION"] = [=[选择你想要治疗的伤害类型，未经检查的类型将被 Decursive 完全忽略。
@@ -281,12 +283,17 @@ L["OPT_CUSTOM_SPELL_PRIORITY_DESC"] = [=[当有多个法术可以治疗相同类
 请注意，Decursive 所管理的默认技能有优先级，取值范围从0到9。
 
 因此，如果您给您的自定义法术过低的优先级，它只会选择默认的技能。]=]
-L["OPT_CUSTOMSPELLS"] = "自定义法术"
+L["OPT_CUSTOM_SPELL_UNAVAILABLE"] = "不可用"
+L["OPT_CUSTOM_SPELL_UNIT_FILTER"] = "单位过滤中"
+L["OPT_CUSTOM_SPELL_UNIT_FILTER_DESC"] = "选择可受益于此法术的单位"
+L["OPT_CUSTOM_SPELL_UNIT_FILTER_NONE"] = "全部单位"
+L["OPT_CUSTOM_SPELL_UNIT_FILTER_NONPLAYER"] = "只限其它"
+L["OPT_CUSTOM_SPELL_UNIT_FILTER_PLAYER"] = "只限玩家"
+L["OPT_CUSTOMSPELLS"] = "自定义法术/物品"
 L["OPT_CUSTOMSPELLS_DESC"] = [=[这里添加法术扩展 Decursive 的自动配置。
 自定义法术永远拥有更高的优先级并覆盖和替换默认法术（当且仅当你的角色可以使用这些法术）。
 ]=]
 L["OPT_CUSTOMSPELLS_EFFECTIVE_ASSIGNMENTS"] = "有效法术分配："
-L["OPT_CUSTOM_SPELL_UNAVAILABLE"] = "不可用"
 L["OPT_DEBCHECKEDBYDEF"] = [=[
 
 默认被选中]=]
@@ -302,13 +309,14 @@ L["OPT_DISEASECHECK_DESC"] = "选中后你将可以查看和净化受到疾病�
 L["OPT_DISPLAYOPTIONS"] = "显示选项"
 L["OPT_DONOTBLPRIO_DESC"] = "优先列表中的玩家不会被加入黑名单"
 L["OPT_ENABLE_A_CUSTOM_SPELL"] = "启用"
-L["OPT_ENABLEDEBUG"] = "启用除错"
-L["OPT_ENABLEDEBUG_DESC"] = "启用除错输出"
-L["OPT_ENABLEDECURSIVE"] = "启用 Decursive"
 L["OPT_ENABLE_LIVELIST"] = "启用实时列表"
 L["OPT_ENABLE_LIVELIST_DESC"] = [=[显示受影响玩家的信息列表。
 
 可以通过 Decursive 条移动此列表Y（输入 /DCRSHOW 显示此条）。]=]
+L["OPT_ENABLEDEBUG"] = "启用除错"
+L["OPT_ENABLEDEBUG_DESC"] = "启用除错输出"
+L["OPT_ENABLEDECURSIVE"] = "启用 Decursive"
+L["OPT_FILTERED_DEBUFF_RENAMED"] = "已过滤减益“%s”自动更名为“%s”，法术 ID %d"
 L["OPT_FILTEROUTCLASSES_FOR_X"] = "在战斗中指定的职业%q将被忽略。"
 L["OPT_GENERAL"] = "一般选项"
 L["OPT_GROWDIRECTION"] = "反向显示微单元框体"
@@ -327,7 +335,7 @@ L["OPT_INPUT_SPELL_BAD_INPUT_ALREADY_HERE"] = "法术已在列表中！"
 L["OPT_INPUT_SPELL_BAD_INPUT_DEFAULT_SPELL"] = "Decursive 已经包含此法术。Shift+点击此法术或输入它的 ID 添加一个特殊等级。"
 L["OPT_INPUT_SPELL_BAD_INPUT_ID"] = "法术 ID 不可用！"
 L["OPT_INPUT_SPELL_BAD_INPUT_NOT_SPELL"] = "不能在技能书中找到法术！"
-L["OPTION_MENU"] = "Decursive 选项菜单"
+L["OPT_ISNOTVALID_SPELLID"] = "不是有效的法术 ID"
 L["OPT_LIVELIST"] = "实时列表"
 L["OPT_LIVELIST_DESC"] = [=[这是显示在 Decursive 条下面受影响目标的相关设置列表。
 
@@ -412,6 +420,9 @@ L["OPT_RESTPROFILECONF"] = [=[你确定要重置配置文件
 为默认选项？]=]
 L["OPT_REVERSE_LIVELIST_DESC"] = "实时列表将从下往上显示"
 L["OPT_SCANLENGTH_DESC"] = "设置实时检测的时间间隔"
+L["OPT_SETAFFTYPECOLOR_DESC"] = "设置“%s”影响类型颜色。（通常出现在微单元框体提示和实时列表中）"
+L["OPT_SHOW_STEALTH_STATUS"] = "显示潜行状态"
+L["OPT_SHOW_STEALTH_STATUS_DESC"] = "当玩家潜行时，他的微单位框体将有一个特殊的颜色"
 L["OPT_SHOWBORDER"] = "显示职业彩色边框"
 L["OPT_SHOWBORDER_DESC"] = "微单元框体边框将会显示出代表该单位职业的颜色"
 L["OPT_SHOWHELP"] = "显示帮助"
@@ -420,9 +431,10 @@ L["OPT_SHOWMFS"] = "在屏幕上显示微单元框体"
 L["OPT_SHOWMFS_DESC"] = "如果要点击净化必须启用此项"
 L["OPT_SHOWMINIMAPICON"] = "小地图图标"
 L["OPT_SHOWMINIMAPICON_DESC"] = "切换小地图图标"
-L["OPT_SHOW_STEALTH_STATUS"] = "显示潜行状态"
-L["OPT_SHOW_STEALTH_STATUS_DESC"] = "当玩家潜行时，他的微单位框体将有一个特殊的颜色"
 L["OPT_SHOWTOOLTIP_DESC"] = "在实时列表以及微单元框体上显示信息提示"
+L["OPT_SPELL_DESCRIPTION_LOADING"] = "加载描述中…稍后再来。"
+L["OPT_SPELL_DESCRIPTION_UNAVAILABLE"] = "描述不可用"
+L["OPT_SPELLID_MISSING_READD"] = "需要重新添加此减益使用它的法术 ID 来查看正确的描述，而不是此信息。"
 L["OPT_STICKTORIGHT"] = "将微单元框体向右对齐"
 L["OPT_STICKTORIGHT_DESC"] = "这个选项将会使微单元框体向右对齐。"
 L["OPT_TESTLAYOUT"] = "测试布局"
@@ -430,9 +442,9 @@ L["OPT_TESTLAYOUT_DESC"] = [=[新建测试单位以测试显示布局。
 （点击后稍等片刻）]=]
 L["OPT_TESTLAYOUTUNUM"] = "单位数字"
 L["OPT_TESTLAYOUTUNUM_DESC"] = "设置新建测试单位数字。"
+L["OPT_TIE_LIVELIST_DESC"] = "实时列表将和 Decursive 状态条一起显示。"
 L["OPT_TIECENTERANDBORDER"] = "绑定面板和边框的透明度"
 L["OPT_TIECENTERANDBORDER_OPT"] = "选中时边框的透明度为面板的一半"
-L["OPT_TIE_LIVELIST_DESC"] = "实时列表将和 Decursive 状态条一起显示。"
 L["OPT_TIEXYSPACING"] = "绑定水平和垂直间距"
 L["OPT_TIEXYSPACING_DESC"] = "微单元框体之间的水平和垂直间距相同。"
 L["OPT_UNITPERLINES"] = "每行单位数"
@@ -442,6 +454,7 @@ L["OPT_XSPACING"] = "水平间距"
 L["OPT_XSPACING_DESC"] = "设置微单元框体间的水平距离"
 L["OPT_YSPACING"] = "垂直间距"
 L["OPT_YSPACING_DESC"] = "设置微单元框体间的垂直距离"
+L["OPTION_MENU"] = "Decursive 选项菜单"
 L["PLAY_SOUND"] = "有玩家需要净化时播放音效"
 L["POISON"] = "中毒"
 L["POPULATE"] = "p"
@@ -478,12 +491,12 @@ L["TOC_VERSION_EXPIRED"] = [=[Decursive 版本已过期。此版本的 Decursive
 到 curse.com 搜寻“Decursive”或使用 Curse 客户端立刻更新你的全部插件。
 
 此消息2天内会重复显示。]=]
-L["TOOFAR"] = "太远"
 L["TOO_MANY_ERRORS_ALERT"] = [=[你的用户界面（%d）有太多的 Lua 错误。当前游戏体验被弱化。禁用或者更新失效的插件关闭信息并重新获得适当的帧数频率。
-如果想打开 Lua 错误报告（魔兽世界”下“帮助插件选项）来找出可能出问题的插件。]=]
+如果想打开 Lua 错误报告（/console scriptErrors 1）来找出可能出问题的插件。]=]
+L["TOOFAR"] = "太远"
 L["UNITSTATUS"] = "单位状态："
 L["UNSTABLERELEASE"] = "不稳定版本"
 
 
 
-T._LoadedFiles["zhCN.lua"] = "2.7.3.6";
+T._LoadedFiles["zhCN.lua"] = "2.7.8";

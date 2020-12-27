@@ -7,7 +7,7 @@
 --		Banjankri of Blackrock, Predeter of Proudmoore, Xenyr of Aszune
 
 -- Currently maintained by
--- Cybeloras of Aerie Peak/Detheroc/Mal'Ganis
+-- Cybeloras of Aerie Peak
 -- --------------------
 
 
@@ -20,16 +20,18 @@ local print = TMW.print
 
 TMW:NewClass("GroupModule_Resizer", "GroupModule", "Resizer_Generic"){
 	tooltipTitle = L["RESIZE"],
-	
+
 	METHOD_EXTENSIONS = {
 		OnImplementIntoGroup = function(self)
 			local group = self.group
 			
-			local GroupModule_GroupPosition = group:GetModuleOrModuleChild("GroupModule_GroupPosition")
+			local GroupPosition = group:GetModuleOrModuleChild("GroupModule_GroupPosition")
 			
-			if not GroupModule_GroupPosition then
+			if not GroupPosition then
 				error("Implementing GroupModule_Resizer (or a derivative) requies that GroupModule_GroupPosition (or a derivative) already be implemented.")
 			end
+
+			self:UpdateEnabledState()
 		
 			self.resizeButton:SetFrameLevel(group:GetFrameLevel() + 3)
 			
@@ -49,6 +51,23 @@ TMW:NewClass("GroupModule_Resizer", "GroupModule", "Resizer_Generic"){
 			end
 		end,
 	},
+
+	METHOD_EXTENSIONS_PRE = {
+		StartSizing = function(resizeButton)
+			local self = resizeButton.module
+			self:UpdateEnabledState()
+		end,
+	},
+
+	UpdateEnabledState = function(self) 
+		local group = self.group
+		local GroupPosition = group:GetModuleOrModuleChild("GroupModule_GroupPosition")
+		if TMW.Locked or not GroupPosition:CanMove() then
+			self:Disable()
+		else
+			self:Enable()
+		end
+	end,
 	
 	OnEnable = function(self)
 		self:Show()
@@ -74,8 +93,6 @@ TMW:NewClass("GroupModule_Resizer", "GroupModule", "Resizer_Generic"){
 		GroupModule_GroupPosition:UpdatePositionAfterMovement()
 		
 		group:Setup()
-		
-		TMW.ACEOPTIONS:NotifyChanges()
 	end,
 
 	SizeUpdate_RightButton = function(resizeButton)
@@ -114,7 +131,7 @@ TMW:NewClass("GroupModule_Resizer", "GroupModule", "Resizer_Generic"){
 			group:Setup()
 
 			if TMW.CI.ics ~= ics_old then
-				TMW.IE:Load(1, false)
+				TMW.IE:LoadIcon(1, false)
 			end
 		end
 	end,

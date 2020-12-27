@@ -39,7 +39,7 @@ L:SetOptionLocalization({
 })
 
 L:SetMiscLocalization({
-	voidYell	= "Gul'kafh an'qov N'Zoth."--Start translating the yell he does for Void of the Unmaking cast, the latest logs from DS indicate blizz removed the UNIT_SPELLCAST_SUCCESS event that detected casts. sigh.
+	voidYell	= "Gul'kafh an'qov N'Zoth."--Start translating the yell he does for Void of the Unmaking cast, the latest logs from DS indicate blizz removed the event that detected casts. sigh.
 })
 
 -----------------------------
@@ -89,9 +89,9 @@ L:SetOptionLocalization({
 	TimerSpecial			= "Exibir cronógrafo para lançamento da primeira habilidade",
     RangeFrame				= "Exibir medidor de distância: (3) para $spell:105269, (10) para $journal:4327",
 	AnnounceFrostTombIcons	= "Anunciar no chat da raide, ícones para alvos de $spell:104451<br/>(requer liderança)",
-	warnFrostTombCast		= DBM_CORE_AUTO_ANNOUNCE_OPTIONS.cast:format(104448),
-	SetIconOnFrostTomb		= DBM_CORE_AUTO_ICONS_OPTION_TEXT:format(104451),
-	SetIconOnFrostflake		= DBM_CORE_AUTO_ICONS_OPTION_TEXT:format(109325),
+	warnFrostTombCast		= DBM_CORE_L.AUTO_ANNOUNCE_OPTIONS.cast:format(104448),
+	SetIconOnFrostTomb		= DBM_CORE_L.AUTO_ICONS_OPTION_TEXT:format(104451),
+	SetIconOnFrostflake		= DBM_CORE_L.AUTO_ICONS_OPTION_TEXT:format(109325),
 	SpecialCount			= "Tocar som de contagem regressiva para $spell:105256 ou $spell:105465",
 	SetBubbles				= "Automaticamente desabilitar balões de voz quando $spell:104451 está disponível<br/>(Voltando ao normal ao fim do combate)"
 })
@@ -169,7 +169,7 @@ L:SetWarningLocalization({
 L:SetOptionLocalization({
 	SpecWarnTendril			= "Exibir aviso especial quando você não tem $spell:109454",
 	InfoFrame				= "Exibir quadro de informações para jogadores sem $spell:109454",
-	SetIconOnGrip			= DBM_CORE_AUTO_ICONS_OPTION_TEXT:format(109459),
+	SetIconOnGrip			= DBM_CORE_L.AUTO_ICONS_OPTION_TEXT:format(109459),
 	ShowShieldInfo			= "Exibir vida do chefe, com uma barra de vida para $spell:105479"
 })
 
@@ -182,13 +182,13 @@ L:SetMiscLocalization({
 })
 
 ---------------------------
--- Madness of Deathwing  -- 
+-- Madness of Deathwing  --
 ---------------------------
 L= DBM:GetModLocalization(333)
 
 L:SetOptionLocalization({
 	RangeFrame			= "Exibir medidor de distância dinâmico baseado nas penalidades do jogador para<br/>$spell:108649 na dificuldade heróica",
-	SetIconOnParasite	= DBM_CORE_AUTO_ICONS_OPTION_TEXT:format(108649)
+	SetIconOnParasite	= DBM_CORE_L.AUTO_ICONS_OPTION_TEXT:format(108649)
 })
 
 L:SetMiscLocalization({

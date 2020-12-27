@@ -1,0 +1,90 @@
+
+if not (LOCALE_esES or LOCALE_esMX) then return end
+local addon,ns=...;
+local L=FollowerLocationInfoData.Locale;
+
+--[=[ addon ]=]
+	L["Add waypoint to TomTom"] = "Establecer destino con TomTom"
+	L["Broker button text"] = "Texto de broker"
+	L["Chat commands"] = "Comandos de Chat"
+	L["Chat command usage"] = "Uso de comandos de chat"
+	L["Choose what you want to look on broker button"] = "Elige que quieres ver en broker"
+	L["Choose your favorite website for further informations"] = "Elija su sitio web favorito para obtener más informacion"
+	-- L["Collect group"] = ""
+	L["Collecting quest data... (%d entries)"] = "Recopilando de datos de misión (%d entradas)"
+	L["Collection vendor data..."] = "Recopilar datos del vendedor..." -- Needs review
+	L["<command>"] = "<comando>"
+	L["Commands:"] = "Comandos:"
+	L["Coordinations"] = "Coordenadas"
+	L["Couldn't load FollowerLocationInfo_Journal. Please check if FollowerLocationInfo_Data is enabled."] = "No se pudo cargar FollowerLocationInfo_Journal. Comprueba si esta activado FollowerLocationInfo_Data."
+	L["Counters"] = "Contadores"
+	L["Error: Could not get zone name."] = "Error: No se pudo obtener el nombre de zona."
+	L["Favorite website"] = "Sitio web favorito"
+	L["Follower count on broker"] = "Contador de seguidores en broker"
+	L["FollowerID"] = "ID de seguidor"
+	L["Garrison building"] = "Edificio de ciudadela"
+	L["Image"] = "Imagen"
+	L["Init description generator..."] = "Generador de descripción inicial..."
+	L["In your Questlog"] = "En tu registro de misiones"
+	L["is already your follower."] = "ya es tu seguidor."
+	L["Label"] = "Etiqueta"
+	L["Left-click"] = "Click-izq"
+	L["Link to"] = "Enlace a"
+	L["Minimap"] = "Minimapa"
+	L["More filters"] = "Mas filtros"
+	L["(mouse over to show image)"] = "(pasa el ratón sobre la imagen para mostrar)"
+	L["Not learned"] = "Desconocido"
+	L["NPC"] = "Personaje"
+	L["Obtainable by"] = "Obtenible por"
+	L["Open"] = "Abrir"
+	L["Opening a dialog popup with the Address"] = "Abriendo una ventana emergente con la Dirección"
+	L["Open option menu"] = "Abrir menú de opciones"
+	L["or"] = "o"
+	L["or higher"] = "o superior"
+	L["Other members"] = "Otros miembros"
+	L["Outpost building"] = "Edificio de avanzada"
+	L["Query data (npcID: %d)..."] = "datos de la consulta (ID personaje: %d)..."
+	L["Query data (questID: %d)..."] = "datos de la consulta (ID misión: %d)..."
+	L["Recruited"] = "Reclutado"
+	L["Reset addon settings |cffff6666and automatically reloading the UI!|r"] = "Restablecer la configuración del addon |cffff6666y recarga automáticamente la interfaz de usuario!|r"
+	L["Right-click"] = "Click-dcho"
+	L["Show amount of collected and available followers on broker button"] = "Mostrar seguidores reclutados y disponibles en broker"
+	L["Show collected followers on broker"] = "Mostrar seguidores reclutados en Broker"
+	L["Show coordinates on broker"] = "Mostrar coordenadas en Broker"
+	L["Show current target coordinates on broker button"] = "Mostrar las coordenadas de destino actual en broker"
+	L["Show FollowerID"] = "Mostrar ID del seguidor"
+	L["Show followerIDs in follower list"] = "Mostrar ID del seguidor en la lista"
+	L["Show/Hide followerID in journal"] = "Mostrar/Ocultar ID del seguidor en el diario"
+	L["Show/Hide journal frame"] = "Mostrar/Ocultar ventana de diario"
+	L["Show/Hide minimap button"] = "Mostar/Ocultar botón en el minimapa"
+	L["Show minimap button"] = "Mostrar botón en el minimapa"
+	L["Show your current coordinates on broker button"] = "Mostrar coordenadas actuales en broker"
+	L["Toggle FollowerLocationInfo Journal"] = "Alternar información de ubicación del seguidor en el diario"
+	L["Usage"] = "Uso"
+	L["Without description"] = "Sin descripción"
+	L["You can only obtain one follower from this group"] = "Sólo se puede obtener un seguidor de este grupo."
+	L["Your installed version of FollowerLocationInfo requires an additional addon to work.|nPlease install FollowerLocationInfo_Data."] = "Esta versión de FollowerLocationInfo requiere de un addon complementario para su funcionamiento.|nPor favor instale el addon FollowerLocationInfo_Data."
+	L["Your installed version of FollowerLocationInfo requires a newer version of FollowerLocationInfo_Data.|nPlease update it..."] = "Esta versión de FollowerLocationInfo requiere de un actualizar el addon complementario FollowerLocationInfo_Data.|nPor favor actualicelo..."
+
+--[=[ gameobjects ]=]
+	L["object_233229"] = "Escrito de las maldiciones del Consejo de la Sombra";
+
+--[=[ follower descriptions ]=]
+--	L["desc_32_neutral"] = "";
+--	L["desc_157_alliance"] = "";
+--	L["desc_170_neutral"] = "";
+--	L["desc_171_neutral"] = "";
+--	L["desc_179_alliance"] = "";
+--	L["desc_184_alliance"] = "";
+--	L["desc_184_horde"] = "";
+--	L["desc_190_neutral"] = "";
+--	L["desc_192_neutral"] = "";
+--	L["desc_193_neutral"] = "";
+--	L["desc_194_neutral"] = "";
+--	L["desc_195_neutral"] = "";
+--	L["desc_208_neutral"] = "";
+--	L["desc_209_neutral"] = "";
+--	L["desc_216_alliance"] = "";
+--	L["desc_219_neutral"] = "";
+--	L["desc_224_neutral"] = "";
+--	L["desc_467_neutral"] = "";

@@ -7,7 +7,7 @@
 --		Banjankri of Blackrock, Predeter of Proudmoore, Xenyr of Aszune
 
 -- Currently maintained by
--- Cybeloras of Aerie Peak/Detheroc/Mal'Ganis
+-- Cybeloras of Aerie Peak
 -- --------------------
 
 local TMW = TMW
@@ -35,16 +35,18 @@ local Type = TMW.Classes.IconType:New("wpnenchant")
 LibStub("AceTimer-3.0"):Embed(Type)
 Type.name = L["ICONMENU_WPNENCHANT"]
 Type.desc = L["ICONMENU_WPNENCHANT_DESC"]
-Type.menuIcon = "Interface\\Icons\\inv_fishingpole_02"
+Type.menuIcon = GetSpellTexture(8024)
 Type.AllowNoName = true
 Type.menuSpaceAfter = true
 
+local STATE_PRESENT = TMW.CONST.STATE.DEFAULT_SHOW
+local STATE_ABSENT = TMW.CONST.STATE.DEFAULT_HIDE
 
 -- AUTOMATICALLY GENERATED: UsesAttributes
+Type:UsesAttributes("state")
 Type:UsesAttributes("spell")
 Type:UsesAttributes("reverse")
 Type:UsesAttributes("start, duration")
-Type:UsesAttributes("alpha")
 Type:UsesAttributes("texture")
 -- END AUTOMATICALLY GENERATED: UsesAttributes
 
@@ -101,41 +103,37 @@ TMW:RegisterUpgrade(62008, {
 
 
 Type:RegisterConfigPanel_XMLTemplate(100, "TellMeWhen_ChooseName", {
-	title = L["ICONMENU_CHOOSENAME_WPNENCH"] .. " " .. L["ICONMENU_CHOOSENAME_ORBLANK"],
+	title = L["ICONMENU_CHOOSENAME3"] .. " " .. L["ICONMENU_CHOOSENAME_ORBLANK"],
 	text = L["ICONMENU_CHOOSENAME_WPNENCH_DESC"],
 	SUGType = "wpnenchant",
 })
 
-Type:RegisterConfigPanel_XMLTemplate(165, "TellMeWhen_WhenChecks", {
-	text = L["ICONMENU_SHOWWHEN"],
-	[0x2] = { text = "|cFF00FF00" .. L["ICONMENU_PRESENT"], 		 },
-	[0x1] = { text = "|cFFFF0000" .. L["ICONMENU_ABSENT"], 			 },
+Type:RegisterConfigPanel_XMLTemplate(165, "TellMeWhen_IconStates", {
+	[STATE_PRESENT] = { text = "|cFF00FF00" .. L["ICONMENU_PRESENT"], },
+	[STATE_ABSENT] =  { text = "|cFFFF0000" .. L["ICONMENU_ABSENT"],  },
 })
 
 Type:RegisterConfigPanel_ConstructorFunc(120, "TellMeWhen_WeaponSlot", function(self)
-	self.Header:SetText(TMW.L["ICONMENU_WPNENCHANTTYPE"])
-	TMW.IE:BuildSimpleCheckSettingFrame(self, {
-		{
-			setting = "WpnEnchantType",
-			value = "MainHandSlot",
-			title = INVTYPE_WEAPONMAINHAND,
-		},
-		{
-			setting = "WpnEnchantType",
-			value = "SecondaryHandSlot",
-			title = INVTYPE_WEAPONOFFHAND,
-		},
+	self:SetTitle(TMW.L["ICONMENU_WPNENCHANTTYPE"])
+	self:BuildSimpleCheckSettingFrame({
+		function(check)
+			check:SetTexts(INVTYPE_WEAPONMAINHAND, nil)
+			check:SetSetting("WpnEnchantType", "MainHandSlot")
+		end,
+		function(check)
+			check:SetTexts(INVTYPE_WEAPONOFFHAND, nil)
+			check:SetSetting("WpnEnchantType", "SecondaryHandSlot")
+		end,
 	})
 end)
 
 Type:RegisterConfigPanel_ConstructorFunc(150, "TellMeWhen_WpnEnchantSettings", function(self)
-	self.Header:SetText(Type.name)
-	TMW.IE:BuildSimpleCheckSettingFrame(self, {
-		{
-			setting = "HideUnequipped",
-			title = L["ICONMENU_HIDEUNEQUIPPED"],
-			tooltip = L["ICONMENU_HIDEUNEQUIPPED_DESC"],
-		},
+	self:SetTitle(Type.name)
+	self:BuildSimpleCheckSettingFrame({
+		function(check)
+			check:SetTexts(L["ICONMENU_HIDEUNEQUIPPED"], L["ICONMENU_HIDEUNEQUIPPED_DESC"])
+			check:SetSetting("HideUnequipped")
+		end,
 	})
 end)
 
@@ -204,14 +202,14 @@ local function WpnEnchant_OnUpdate(icon, time)
 
 		local start = floor(time - duration + expiration)
 
-		icon:SetInfo("alpha; start, duration; spell",
-			icon.Alpha,
+		icon:SetInfo("state; start, duration; spell",
+			STATE_PRESENT,
 			start, duration,
 			EnchantName
 		)
 	else
-		icon:SetInfo("alpha; start, duration; spell",
-			icon.UnAlpha,
+		icon:SetInfo("state; start, duration; spell",
+			STATE_ABSENT,
 			0, 0,
 			nil
 		)
@@ -260,7 +258,7 @@ local function WpnEnchant_OnEvent(icon, event, unit)
 			if not wpnTexture then
 				-- If we should hide when there's no weapon, and there's no weapon,
 				-- then hide the icon and remove the update function.
-				icon:SetInfo("alpha", 0)
+				icon:SetInfo("state", 0)
 				icon:SetUpdateFunction(nil)
 				return
 			end
@@ -271,7 +269,7 @@ local function WpnEnchant_OnEvent(icon, event, unit)
 				if invType == "INVTYPE_HOLDABLE" or invType == "INVTYPE_RELIC" or invType == "INVTYPE_SHIELD" then
 					-- These item types can't have weapon enchants (because they aren't weapons).
 					-- Hide the icon and remove the update function.
-					icon:SetInfo("alpha", 0)
+					icon:SetInfo("state", 0)
 					icon:SetUpdateFunction(nil)
 					return
 				end
@@ -289,7 +287,7 @@ function Type:Setup(icon)
 	icon.Spells = TMW:GetSpells(icon.Name, false)
 
 
-	icon.SelectIndex = icon.WpnEnchantType == "SecondaryHandSlot" and 4 or 1
+	icon.SelectIndex = icon.WpnEnchantType == "SecondaryHandSlot" and 5 or 1
 	icon.Slot = GetInventorySlotInfo(icon.WpnEnchantType)
 
 

@@ -1,5 +1,5 @@
 local Libra = LibStub("Libra")
-local Type, Version = "Addon", 3
+local Type, Version = "Addon", 4
 if Libra:GetModuleVersion(Type) >= Version then return end
 
 Libra.modules[Type] = Libra.modules[Type] or {}
@@ -60,13 +60,15 @@ local function onUpdate(self, elapsed)
 	end
 end
 
-setmetatable(object.events, {
+local mt = {
 	__index = function(table, key)
 		local newTable = {}
 		table[key] = newTable
 		return newTable
 	end
-})
+}
+
+setmetatable(object.events, mt)
 
 local AddonPrototype = {}
 local ObjectPrototype = {}
@@ -91,6 +93,7 @@ function Libra:NewAddon(name, addonObject)
 	local addon = addonObject or {}
 	addon.name = name
 	addon.modules = {}
+	addon.messages = setmetatable({}, mt)
 	AddonEmbed(addon)
 	ObjectEmbed(addon)
 	object.addons[name] = addon
@@ -109,6 +112,7 @@ function AddonPrototype:NewModule(name, table)
 	local module = table or {}
 	ObjectEmbed(module)
 	module.name = name
+	module.messages = setmetatable({}, mt)
 	tinsert(self.modules, module)
 	safecall(self, "OnModuleCreated", name, module)
 	return module, name
@@ -162,6 +166,23 @@ function ObjectPrototype:UnregisterEvent(event)
 	if not next(object.events[event]) then
 		object.frame:UnregisterEvent(event)
 	end
+end
+
+function ObjectPrototype:SendMessage(message, ...)
+	for module, messageHandler in pairs(self.messages[message]) do
+		messageHandler(module, ...)
+	end
+end
+
+function ObjectPrototype:RegisterMessage(module, message, handler)
+	if type(handler) ~= "function" then
+		handler = module[handler] or module[message]
+	end
+	self.messages[message][module] = handler
+end
+
+function ObjectPrototype:UnregisterMessage(module, message)
+	self.messages[message][module] = nil
 end
 
 function ObjectPrototype:SetOnUpdate(handler)

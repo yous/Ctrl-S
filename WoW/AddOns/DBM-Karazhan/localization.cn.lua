@@ -9,15 +9,8 @@ L:SetGeneralLocalization{
 	name = "猎手阿图门"
 }
 
-L:SetWarningLocalization{
-}
-
-L:SetOptionLocalization{
-}
-
 L:SetMiscLocalization{
-	DBM_ATH_YELL_1		= "来吧，午夜，让我们解决这群乌合之众！",
---	KillAttumen			= "Always knew... someday I would become... the hunted."
+	DBM_ATH_YELL_1		= "来吧，午夜，让我们解决这群乌合之众！"
 }
 
 
@@ -36,10 +29,6 @@ L:SetOptionLocalization{
 	DBM_MOROES_VANISH_FADED	= "Show vanish fade warning"
 }
 
-L:SetMiscLocalization{
-	DBM_MOROES_YELL_START	= "啊，不速之客。我得准备一下……"
-}
-
 
 -- Maiden of Virtue
 L = DBM:GetModLocalization("Maiden")
@@ -48,28 +37,12 @@ L:SetGeneralLocalization{
 	name = "贞节圣女"
 }
 
-L:SetWarningLocalization{
-}
-
-L:SetOptionLocalization{
-	RangeFrame			= "Show range frame (10)"
-}
-
-L:SetMiscLocalization{
-}
-
 
 -- Romulo and Julianne
 L = DBM:GetModLocalization("RomuloAndJulianne")
 
 L:SetGeneralLocalization{
 	name = "罗密欧与朱丽叶"
-}
-
-L:SetWarningLocalization{
-}
-
-L:SetOptionLocalization{
 }
 
 L:SetMiscLocalization{
@@ -86,13 +59,6 @@ L:SetGeneralLocalization{
 	name = "大灰狼"
 }
 
-L:SetWarningLocalization{
-}
-
-L:SetOptionLocalization{
-	RRHIcon		= DBM_CORE_AUTO_ICONS_OPTION_TEXT:format(30753)
-}
-
 L:SetMiscLocalization{
 	DBM_BBW_YELL_1			= "可以一口把你吃掉呀！"
 }
@@ -105,21 +71,6 @@ L:SetGeneralLocalization{
 	name = "馆长"
 }
 
-L:SetWarningLocalization{
-}
-
-L:SetTimerLocalization{
-}
-
-L:SetOptionLocalization{
-	RangeFrame			= "Show range frame (10)"
-}
-
-L:SetMiscLocalization{
-	DBM_CURA_YELL_PULL		= "展览厅只对访客开放。",
-	DBM_CURA_YELL_OOM		= "你的请求未能得到批准。"
-}
-
 
 -- Terestian Illhoof
 L = DBM:GetModLocalization("TerestianIllhoof")
@@ -128,17 +79,7 @@ L:SetGeneralLocalization{
 	name = "特雷斯坦·邪蹄"
 }
 
-L:SetWarningLocalization{
-}
-
-L:SetTimerLocalization{
-}
-
-L:SetOptionLocalization{
-}
-
 L:SetMiscLocalization{
-	DBM_TI_YELL_PULL		= "啊，你们来的正是时候。仪式就要开始了！",
 	Kilrek					= "Kil'rek",
 	DChains					= "Demon Chains"
 }
@@ -155,16 +96,9 @@ L:SetWarningLocalization{
 	DBM_ARAN_DO_NOT_MOVE	= "不要移动！"
 }
 
-L:SetTimerLocalization{
-}
-
 L:SetOptionLocalization{
 	DBM_ARAN_DO_NOT_MOVE	= "Show special warning for $spell:30004"
 }
-
-L:SetMiscLocalization{
-}
-
 
 --Netherspite
 L = DBM:GetModLocalization("Netherspite")
@@ -207,17 +141,7 @@ L:SetGeneralLocalization{
 	name = "玛克扎尔王子"
 }
 
-L:SetWarningLocalization{
-}
-
-L:SetTimerLocalization{
-}
-
-L:SetOptionLocalization{
-}
-
 L:SetMiscLocalization{
-	DBM_PRINCE_YELL_PULL	= "疯狂将你们带到我的面前，而我将以死亡终结你们！",
 	DBM_PRINCE_YELL_P2		= "愚蠢的家伙！时间就是吞噬你躯体的烈焰！",
 	DBM_PRINCE_YELL_P3		= "你如何抵挡这无坚不摧的力量？",
 	DBM_PRINCE_YELL_INF1	= "所有的世界都向我敞开大门！",
@@ -226,7 +150,7 @@ L:SetMiscLocalization{
 
 
 -- Nightbane
-L = DBM:GetModLocalization("Nightbane")
+L = DBM:GetModLocalization("NightbaneRaid")
 
 L:SetGeneralLocalization{
 	name = "夜之魇"
@@ -252,7 +176,6 @@ L:SetOptionLocalization{
 
 L:SetMiscLocalization{
 	DBM_NB_EMOTE_PULL	= "一个远古的生物在远处被唤醒了……",
-	DBM_NB_YELL_PULL	= "愚蠢的家伙！我会很快终结你们的痛苦！",
 	DBM_NB_YELL_AIR		= "可怜的渣滓。我要腾空而起，让你尝尝毁灭的滋味！",
 	DBM_NB_YELL_GROUND	= "够了！我要落下来把你们打得粉碎！",
 	DBM_NB_YELL_GROUND2	= "没用的虫子！让你们见识一下我的力量吧！"
@@ -266,16 +189,9 @@ L:SetGeneralLocalization{
 	name = "绿野仙踪"
 }
 
-L:SetWarningLocalization{
-}
-
-L:SetTimerLocalization{
-}
-
 L:SetOptionLocalization{
 	AnnounceBosses			= "Show warnings for boss spawns",
-	ShowBossTimers			= "Show timers for boss spawns",
-	DBM_OZ_OPTION_1			= "在第2阶段显示距离框体"
+	ShowBossTimers			= "Show timers for boss spawns"
 }
 
 L:SetMiscLocalization{

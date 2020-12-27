@@ -10,10 +10,6 @@ L:SetGeneralLocalization{
 	name = "Oberster Kriegsfürst Naj'entus"
 }
 
-L:SetOptionLocalization{
-	InfoFrame	= "Zeige Infofenster für Gesundheit (weniger als 8800 Lebenspunkte)"
-}
-
 L:SetMiscLocalization{
 	HealthInfo	= "Gesundheitsinfo"
 }
@@ -28,8 +24,7 @@ L:SetGeneralLocalization{
 }
 
 L:SetWarningLocalization{
-	WarnPhase		= "%sphase",
-	WarnKite		= "Blick auf >%s<"
+	WarnPhase		= "%sphase"
 }
 
 L:SetTimerLocalization{
@@ -38,14 +33,13 @@ L:SetTimerLocalization{
 
 L:SetOptionLocalization{
 	WarnPhase		= "Zeige Warnung für nächste Phase",
-	WarnKite		= "Verkünde verfolgte Ziele",
 	TimerPhase		= "Zeige Zeit bis nächste Phase",
 	KiteIcon		= "Setze Zeichen auf das verfolgte Ziel"
 }
 
 L:SetMiscLocalization{
-	PhaseKite		= "schlägt wütend auf den Boden!",
-	PhaseTank		= "Der Boden beginnt aufzubrechen!",
+	PhaseTank		= "schlägt wütend auf den Boden!",
+	PhaseKite		= "Der Boden beginnt aufzubrechen!",
 	ChangeTarget	= "wählt ein neues Ziel!",
 	Kite			= "Kite",
 	Tank			= "Tank"
@@ -109,10 +103,11 @@ L:SetOptionLocalization{
 }
 
 L:SetMiscLocalization{
-	Pull			= "Auf Euch warten nur Schmerz und Leid!",
 	Suffering		= "Essenz des Leidens",
 	Desire			= "Essenz der Begierde",
-	Anger			= "Essenz des Zorns"
+	Anger			= "Essenz des Zorns",
+	Phase1End		= "Ich will nicht zurück!",
+	Phase2End		= "I won't be far!"--translate (trigger)
 }
 
 -----------------------
@@ -174,8 +169,7 @@ L:SetWarningLocalization{
 
 L:SetTimerLocalization{
 	TimerNextHuman		= "Normalform",
-	TimerNextDemon		= "Dämonenform",
-	TimerPhase4			= "Phasenübergang"
+	TimerNextDemon		= "Dämonenform"
 }
 
 L:SetOptionLocalization{
@@ -183,7 +177,6 @@ L:SetOptionLocalization{
 	WarnDemon		= "Zeige Warnung für Dämonenform",
 	TimerNextHuman	= "Zeige Zeit bis nächste Normalform",
 	TimerNextDemon	= "Zeige Zeit bis nächste Dämonenform",
-	TimerPhase4		= "Dauer des Übergangs in Phase 4 anzeigen",
 	RangeFrame		= "Zeige Abstandsfenster (10m) in Phase 3 und 4"
 }
 

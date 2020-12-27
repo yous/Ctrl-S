@@ -10,71 +10,43 @@
 local TSM = select(2, ...)
 local Options = TSM:NewModule("Options", "AceEvent-3.0", "AceHook-3.0")
 local AceGUI = LibStub("AceGUI-3.0") -- load the AceGUI libraries
-
 local L = LibStub("AceLocale-3.0"):GetLocale("TradeSkillMaster_Crafting") -- loads the localization table
+local private = {filters={}}
 
--- scrolling tables
-local matST, craftST
-local ROW_HEIGHT = 16
-local filters = {}
 
-local function getIndex(t, value)
-	for i, v in pairs(t) do
-		if v == value then
-			return i
+
+-- ============================================================================
+-- Module Options
+-- ============================================================================
+
+function Options:Load(container)
+	local tg = AceGUI:Create("TSMTabGroup")
+	tg:SetLayout("Fill")
+	tg:SetFullHeight(true)
+	tg:SetFullWidth(true)
+	tg:SetTabs({{value=1, text=L["General"]}, {value=2, text=L["Gathering"]}})
+	tg:SetCallback("OnGroupSelected", function(self, _, value)
+		self:ReleaseChildren()
+		if value == 1 then
+			private:DrawGeneralSettings(self)
+		elseif value == 2 then
+			private:DrawGatheringSettings(self)
 		end
-	end
+	end)
+	container:AddChild(tg)
+	tg:SelectTab(1)
 end
 
-function Options:Load(parent, operation, group)
-	Options.treeGroup = AceGUI:Create("TSMTreeGroup")
-	Options.treeGroup:SetLayout("Fill")
-	Options.treeGroup:SetCallback("OnGroupSelected", function(...) Options:SelectTree(...) end)
-	Options.treeGroup:SetStatusTable(TSM.db.global.optionsTreeStatus)
-	parent:AddChild(Options.treeGroup)
-
-	Options:UpdateTree()
-	if operation then
-		if operation == "" then
-			Options.currentGroup = group
-			Options.treeGroup:SelectByPath(2)
-			Options.currentGroup = nil
-		else
-			Options.treeGroup:SelectByPath(2, operation)
-		end
-	else
-		Options.treeGroup:SelectByPath(1)
+function private:DrawGeneralSettings(container)
+	-- inventory tracking characters / guilds
+	local altCharacters, altGuilds = {}, {}
+	for name in pairs(TSMAPI.Player:GetCharacters()) do
+		altCharacters[name] = name
 	end
-end
-
-function Options:UpdateTree()
-	local operationTreeChildren = {}
-
-	for name in pairs(TSM.operations) do
-		tinsert(operationTreeChildren, { value = name, text = name })
+	for name in pairs(TSMAPI.Player:GetGuilds()) do
+		altGuilds[name] = name
 	end
-	
-	sort(operationTreeChildren, function(a, b) return a.value < b.value end)
 
-	Options.treeGroup:SetTree({ { value = 1, text = L["Options"] }, { value = 2, text = L["Operations"], children = operationTreeChildren } })
-end
-
-function Options:SelectTree(treeGroup, _, selection)
-	treeGroup:ReleaseChildren()
-
-	local major, minor = ("\001"):split(selection)
-	major = tonumber(major)
-	if major == 1 then
-		Options:LoadGeneralSettings(treeGroup)
-	elseif minor then
-		Options:DrawOperationSettings(treeGroup, minor)
-	else
-		Options:DrawNewOperation(treeGroup)
-	end
-end
-
-function Options:DrawNewOperation(container)
-	local currentGroup = Options.currentGroup
 	local page = {
 		{
 			-- scroll frame to contain everything
@@ -84,61 +56,328 @@ function Options:DrawNewOperation(container)
 				{
 					type = "InlineGroup",
 					layout = "flow",
-					title = L["New Operation"],
+					title = L["General Settings"],
 					children = {
 						{
-							type = "Label",
-							text = L["Crafting operations contain settings for restocking the items in a group. Type the name of the new operation into the box below and hit 'enter' to create a new Crafting operation."],
+							-- slider to set the scale of the professions frame
+							type = "Slider",
+							label = L["Profession Frame Scale"],
+							value = TSMCraftingTradeSkillFrame and TSMCraftingTradeSkillFrame:GetFrameScale() or 1,
+							isPercent = true,
+							relativeWidth = 0.5,
+							min = 0.1,
+							max = 2,
+							step = 0.05,
+							disabled = not TSMCraftingTradeSkillFrame,
+							callback = function(_, _, value)
+								if TSMCraftingTradeSkillFrame then
+									TSMCraftingTradeSkillFrame:SetFrameScale(value)
+								end
+							end,
+							tooltip = TSMCraftingTradeSkillFrame and L["Changes the scale of the profession frame."] or L["Changes the scale of the profession frame. \n\nOpen the profession window to enable."],
+						},
+						{
+							-- slider to set the % to deduct from profits
+							type = "Slider",
+							label = L["Profit Deduction"],
+							settingInfo = {TSM.db.global, "profitPercent"},
+							isPercent = true,
+							min = 0,
+							max = 0.25,
+							step = 0.01,
+							relativeWidth = 0.5,
+							tooltip = L["Percent to subtract from buyout when calculating profits (5% will compensate for AH cut)."],
+						},
+						{
+							type = "Dropdown",
 							relativeWidth = 1,
+							label = L["Queue Sorting Method"],
+							list = {L["Can Craft At Least One, Profit, Craftable Quantity"], L["Profit, Craftable Quantity"], L["Craftable Quantity, Profit"]},
+							settingInfo = {TSM.db.global, "queueSort"},
+							tooltip = L["The queue will be sorted based on this option, from left to right."],
+						},
+						{
+							type = "CheckBox",
+							label = L["Enable Smart Crafting for Quests"],
+							settingInfo = {TSM.db.global, "questSmartCrafting" },
+							relativeWidth = 1,
+							tooltip = L["Crafting can automatically prompt you to craft your quest required items when you open the profession with the necessary materials on-hand or automatically add them to your queue if you don't have the necessary materials on-hand."],
+						},
+					},
+				},
+				{
+					type = "Spacer"
+				},
+				{
+					type = "InlineGroup",
+					layout = "flow",
+					title = L["Inventory Settings"],
+					children = {
+						{
+							type = "Dropdown",
+							label = L["Characters (Bags/Bank/AH/Mail) to Ignore:"],
+							value = TSM.db.global.ignoreCharacters,
+							list = altCharacters,
+							relativeWidth = 0.49,
+							multiselect = true,
+							callback = function(self, _, key, value)
+								TSM.db.global.ignoreCharacters[key] = value
+							end,
+						},
+						{
+							type = "Dropdown",
+							label = L["Guilds (Guild Banks) to Ignore:"],
+							value = TSM.db.global.ignoreGuilds,
+							list = altGuilds,
+							relativeWidth = 0.49,
+							multiselect = true,
+							callback = function(_, _, key, value)
+								TSM.db.global.ignoreGuilds[key] = value
+							end,
+						},
+					},
+				},
+				{
+					type = "Spacer"
+				},
+				{
+					type = "InlineGroup",
+					layout = "flow",
+					title = L["Default Price Settings"],
+					children = {
+						{
+							type = "EditBox",
+							label = L["Default Material Cost Method"],
+							settingInfo = {TSM.db.global, "defaultMatCostMethod"},
+							relativeWidth = 1,
+							acceptCustom = "matprice",
+							tooltip = L["This is the default method Crafting will use for determining material cost."],
+						},
+						{
+							type = "Button",
+							text = L["Reset Material Cost Method to Default"],
+							relativeWidth = 1,
+							callback = function(self)
+								StaticPopupDialogs["TSM_CRAFTING_RESET_MAT_COST_METHOD"] = StaticPopupDialogs["TSM_CRAFTING_RESET_MAT_COST_METHOD"] or {
+									text = L["Are you sure you want to reset the 'Default Material Cost Method' back to the default value?"],
+									button1 = YES,
+									button2 = CANCEL,
+									timeout = 0,
+									hideOnEscape = true,
+									OnAccept = function(self)
+										TSM.db.global.defaultMatCostMethod = TSM.defaultMatCostMethod
+										if container.frame:IsVisible() then
+											container:Reload()
+										end
+									end,
+									preferredIndex = 3,
+								}
+								TSMAPI.Util:ShowStaticPopupDialog("TSM_CRAFTING_RESET_MAT_COST_METHOD")
+								container:Reload()
+							end,
+							tooltip = L["Reset the Material Cost Method to the default TSM value."],
+						},
+						{
+							type = "HeadingLine",
 						},
 						{
 							type = "EditBox",
-							label = L["Operation Name"],
-							relativeWidth = 0.8,
-							callback = function(self, _, name)
-								name = (name or ""):trim()
-								if name == "" then return end
-								if TSM.operations[name] then
-									self:SetText("")
-									return TSM:Printf(L["Error creating operation. Operation with name '%s' already exists."], name)
-								end
-								TSM.operations[name] = CopyTable(TSM.operationDefaults)
-								Options:UpdateTree()
-								Options.treeGroup:SelectByPath(2, name)
-								TSMAPI:NewOperationCallback("Crafting", currentGroup, name)
+							label = L["Default Craft Value Method"],
+							settingInfo = {TSM.db.global, "defaultCraftPriceMethod"},
+							relativeWidth = 1,
+							acceptCustom = "crafting",
+							tooltip = L["This is the default method Crafting will use for determining the value of crafted items."],
+						},
+						{
+							type = "Button",
+							text = L["Reset Craft Value Method to Default"],
+							relativeWidth = 1,
+							callback = function(self)
+								StaticPopupDialogs["TSM_CRAFTING_RESET_CRAFT_VALUE_METHOD"] = StaticPopupDialogs["TSM_CRAFTING_RESET_CRAFT_VALUE_METHOD"] or {
+									text = L["Are you sure you want to reset the 'Default Craft Value Method' back to the default value?"],
+									button1 = YES,
+									button2 = CANCEL,
+									timeout = 0,
+									hideOnEscape = true,
+									OnAccept = function(self)
+										TSM.db.global.defaultCraftPriceMethod = TSM.defaultCraftPriceMethod
+										if container.frame:IsVisible() then
+											container:Reload()
+										end
+									end,
+									preferredIndex = 3,
+								}
+								TSMAPI.Util:ShowStaticPopupDialog("TSM_CRAFTING_RESET_CRAFT_VALUE_METHOD")
+								container:Reload()
 							end,
-							tooltip = L["Give the new operation a name. A descriptive name will help you find this operation later."],
+							tooltip = L["Reset the Craft Value Method to the default TSM value."],
+						},
+						{
+							type = "HeadingLine",
+						},
+						{
+							type = "CheckBox",
+							label = L["Exclude Crafts with a Cooldown from Craft Cost"],
+							settingInfo = { TSM.db.global, "ignoreCDCraftCost" },
+							relativeWidth = 1,
+							tooltip = L["If checked, if there is more than one way to craft the item then the craft cost will exclude any craft with a daily cooldown when calculating the lowest craft cost."],
 						},
 					},
 				},
 			},
 		},
 	}
-	TSMAPI:BuildPage(container, page)
+
+	TSMAPI.GUI:BuildOptions(container, page)
 end
 
-function Options:DrawOperationSettings(container, operationName)
-	local tg = AceGUI:Create("TSMTabGroup")
-	tg:SetLayout("Fill")
-	tg:SetFullHeight(true)
-	tg:SetFullWidth(true)
-	tg:SetTabs({{value=1, text=L["General"]}, {value=2, text=L["Relationships"]}, {value=3, text=L["Management"]}})
-	tg:SetCallback("OnGroupSelected", function(self,_,value)
-			tg:ReleaseChildren()
-			TSMAPI:UpdateOperation("Crafting", operationName)
-			if value == 1 then
-				Options:DrawOperationGeneral(self, operationName)
-			elseif value == 2 then
-				Options:DrawOperationRelationships(self, operationName)
-			elseif value == 3 then
-				TSMAPI:DrawOperationManagement(TSM, self, operationName)
-			end
-		end)
-	container:AddChild(tg)
-	tg:SelectTab(1)
+function private:DrawGatheringSettings(container)
+	local professions = {}
+	for player, info in pairs(TSM.db.factionrealm.playerProfessions) do
+		for profession, data in pairs(info) do
+			professions[profession] = professions[profession] or {}
+			tinsert(professions[profession], player)
+		end
+	end
+
+	local page = {
+		{
+			type = "ScrollFrame",
+			layout = "List",
+			children = {
+				{
+					type = "SimpleGroup",
+					layout = "Flow",
+					children = {
+						{
+							type = "Label",
+							text = L["You can set the global default gathering options here, some of these can be overriden per gathering session."],
+							relativeWidth = 1,
+						},
+						{
+							type = "HeadingLine",
+						},
+					},
+				},
+				{
+					type = "InlineGroup",
+					layout = "flow",
+					title = L["Auction House"],
+					children = {
+						{
+							type = "CheckBox",
+							label = L["Disable Crafting AH Search"],
+							relativeWidth = 0.33,
+							tooltip = L["Toggle to switch between Crafting and Normal searches at the Auction House. A Crafting search will look for any disenchantable / prospectable / millable / craftable items that will provide the target item wheras a normal search will look just for the target item"],
+							settingInfo = { TSM.db.factionrealm, "disableCheckBox" },
+						},
+						{
+							type = "CheckBox",
+							label = L["Disable DE Search"],
+							relativeWidth = 0.33,
+							tooltip = L["If enabled the crafting search at the Auction House will ignore Disenchantable Items."],
+							settingInfo = { TSM.db.factionrealm, "ignoreDECheckBox" },
+						},
+						{
+							type = "CheckBox",
+							label = L["Even Stacks Only"],
+							relativeWidth = 0.34,
+							tooltip = L["If enabled the crafting search will only search for multiples of 5."],
+							settingInfo = { TSM.db.factionrealm, "evenStacks" },
+						},
+						{
+							type = "CheckBox",
+							label = L["Always Buy from AH"],
+							relativeWidth = 0.34,
+							tooltip = L["If enabled, buying from AH will always be suggested even if you have enough via other sources. If disabled only short items will be searched for at the AH"],
+							settingInfo = { TSM.db.factionrealm, "buyAH" },
+						},
+					},
+				},
+				{
+					type = "Spacer"
+				},
+				{
+					type = "InlineGroup",
+					layout = "flow",
+					title = L["Characters"],
+					children = {
+						{
+							type = "CheckBox",
+							label = L["Ignore Alts"],
+							relativeWidth = 1,
+							tooltip = L["Toggle to ignore gathering from Alts and only gather from the crafter."],
+							settingInfo = { TSM.db.factionrealm, "ignoreAlts" },
+						},
+					},
+				},
+				{
+					type = "Spacer"
+				},
+				{
+					type = "InlineGroup",
+					layout = "flow",
+					title = L["Intermediate Crafting"],
+					children = {
+						{
+							type = "CheckBox",
+							label = L["Ignore Intermediate Crafting"],
+							relativeWidth = 1,
+							tooltip = L["Toggle to ignore intermediate crafting."],
+							settingInfo = { TSM.db.factionrealm, "ignoreIntermediate" },
+						},
+					},
+				},
+				{
+					type = "Spacer"
+				},
+				{
+					type = "InlineGroup",
+					layout = "flow",
+					title = L["Ink Trader"],
+					children = {
+						{
+							type = "CheckBox",
+							label = L["Trade Inks at the vendor"],
+							relativeWidth = 1,
+							tooltip = L["Toggle to suggest trading inks at the vendor."],
+							settingInfo = { TSM.db.factionrealm, "inkTrade" },
+						},
+					},
+				},
+			},
+		},
+	}
+
+	TSMAPI.GUI:BuildOptions(container, page)
 end
 
-function Options:DrawOperationGeneral(container, operationName)
+
+-- ============================================================================
+-- Operation Options
+-- ============================================================================
+
+function Options:GetOperationOptionsInfo()
+	local description = L["Crafting operations contain settings for restocking the items in a group. Type the name of the new operation into the box below and hit 'enter' to create a new Crafting operation."]
+	local tabInfo = {
+		{ text = L["General"], callback = private.DrawOperationGeneral},
+	}
+	local relationshipInfo = {
+		{
+			label = L["Restock Settings"],
+			{key="maxRestock", label=L["Max Restock Quantity"]},
+			{key="minRestock", label=L["Min Restock Quantity"]},
+			{key="minProfit", label=L["Minimum Profit"]},
+		},
+		{
+			label = L["Price Settings"],
+			{key="craftPriceMethod", label=L["Craft Value Method"]},
+		},
+	}
+	return description, tabInfo, relationshipInfo
+end
+
+function private.DrawOperationGeneral(container, operationName)
 	local operationSettings = TSM.operations[operationName]
 
 	local page = {
@@ -202,7 +441,7 @@ function Options:DrawOperationGeneral(container, operationName)
 								else
 									operationSettings.minProfit = nil
 								end
-								container:ReloadTab()
+								container:Reload()
 							end,
 						},
 						{
@@ -212,6 +451,13 @@ function Options:DrawOperationGeneral(container, operationName)
 							settingInfo = {operationSettings, "minProfit"},
 							relativeWidth = 0.49,
 							acceptCustom = true,
+							callback = function(self, _, value)
+								if TSMAPI:MoneyFromString(value) == 0 then
+									TSM:Print(L["A minimum profit of 0g is not allowed."])
+									operationSettings.minProfit = TSM.operationDefaults.minProfit
+									container:Reload()
+								end
+							end,
 							tooltip = L["Crafting will not queue any items affected by this operation with a profit below this value. As an example, a min profit of 'max(10g, 10% crafting)' would ensure a profit of at least 10g or 10% of the craft cost, whichever is highest."],
 						},
 					},
@@ -236,7 +482,7 @@ function Options:DrawOperationGeneral(container, operationName)
 								else
 									operationSettings.craftPriceMethod = nil
 								end
-								container:ReloadTab()
+								container:Reload()
 							end,
 						},
 						{
@@ -253,184 +499,16 @@ function Options:DrawOperationGeneral(container, operationName)
 			},
 		},
 	}
-	TSMAPI:BuildPage(container, page)
-end
-
-function Options:DrawOperationRelationships(container, operationName)
-	local settingInfo = {
-		{
-			label = L["Restock Settings"],
-			{key="maxRestock", label=L["Max Restock Quantity"]},
-			{key="minRestock", label=L["Min Restock Quantity"]},
-			{key="minProfit", label=L["Minimum Profit"]},
-		},
-		{
-			label = L["Price Settings"],
-			{key="craftPriceMethod", label=L["Craft Value Method"]},
-		},
-	}
-	TSMAPI:ShowOperationRelationshipTab(TSM, container, TSM.operations[operationName], settingInfo)
+	TSMAPI.GUI:BuildOptions(container, page)
 end
 
 
-function Options:LoadGeneralSettings(container)
-	-- inventory tracking characters / guilds
-	local altCharacters, altGuilds = {}, {}
-	for _, name in ipairs(TSMAPI:ModuleAPI("ItemTracker", "playerlist") or {}) do
-		altCharacters[name] = name
-	end
-	for _, name in ipairs(TSMAPI:ModuleAPI("ItemTracker", "guildlist") or {}) do
-		altGuilds[name] = name
-	end
 
-	local oldScale = TSM.CraftingGUI.frame and TSM.CraftingGUI.frame.options.scale*UIParent:GetScale() or nil
-	local page = {
-		{
-			-- scroll frame to contain everything
-			type = "ScrollFrame",
-			layout = "List",
-			children = {
-				{
-					type = "InlineGroup",
-					layout = "flow",
-					title = L["General Settings"],
-					children = {
-						{
-							-- slider to set the % to deduct from profits
-							type = "Slider",
-							label = TSM.CraftingGUI.frame and L["Profession Frame Scale"] or "Open Profession to Enable",
-							value = TSM.CraftingGUI.frame and TSM.CraftingGUI.frame.options.scale or 1,
-							disabled = not TSM.CraftingGUI.frame,
-							min = 0.1,
-							max = 3,
-							step = 0.01,
-							relativeWidth = 0.49,
-							callback = function(_,_,value)
-								local options = TSM.CraftingGUI.frame.options
-								options.scale = value
-								local x = TSM.CraftingGUI.frame:GetLeft()
-								local y = TSM.CraftingGUI.frame:GetBottom()
-								local newScale = UIParent:GetScale()*options.scale
-								x = x * oldScale / newScale
-								y = y * oldScale / newScale
-								options.x = x
-								options.y = y
-								oldScale = options.scale*UIParent:GetScale()
-								TSM.CraftingGUI.frame:RefreshPosition()
-							end,
-							tooltip = L["The scale of the profession frame."],
-						},
-						{
-							-- slider to set the % to deduct from profits
-							type = "Slider",
-							label = L["Profit Deduction"],
-							settingInfo = {TSM.db.global, "profitPercent"},
-							isPercent = true,
-							min = 0,
-							max = 0.25,
-							step = 0.01,
-							relativeWidth = 0.49,
-							tooltip = L["Percent to subtract from buyout when calculating profits (5% will compensate for AH cut)."],
-						},
-						{
-							type = "CheckBox",
-							relativeWidth = 0.5,
-							label = L["Never Queue Inks as Sub-Craftings"],
-							settingInfo = { TSM.db.global, "neverCraftInks" },
-							tooltip = L["If checked, Crafting will never try and craft inks as intermediate crafts."],
-						},
-						{
-							type = "CheckBox",
-							relativeWidth = 0.5,
-							label = L["Disable Ink Vendor Trading"],
-							settingInfo = { TSM.db.global, "ignoreInkTrader" },
-							tooltip = L["If checked, Gathering will not suggest to trade inks at the vendor."],
-						},
-						{
-							type = "CheckBox",
-							label = L["Gather All Professions by Default if Only One Crafter"],
-							settingInfo = { TSM.db.factionrealm.gathering, "gatherAll" },
-							relativeWidth = 1,
-							tooltip = L["If checked, if there is only one crafter for the craft queue clicking gather will gather for all professions for that crafter"],
-						},
-					},
-				},
-				{
-					type = "Spacer"
-				},
-				{
-					type = "InlineGroup",
-					layout = "flow",
-					title = L["Inventory Settings"],
-					children = {
-						{
-							type = "Dropdown",
-							label = L["Characters (Bags/Bank/AH/Mail) to Ignore:"],
-							value = TSM.db.global.ignoreCharacters,
-							list = altCharacters,
-							relativeWidth = 0.49,
-							multiselect = true,
-							callback = function(self, _, key, value)
-								TSM.db.global.ignoreCharacters[key] = value
-							end,
-						},
-						{
-							type = "Dropdown",
-							label = L["Guilds (Guild Banks) to Ignore:"],
-							value = TSM.db.global.ignoreGuilds,
-							list = altGuilds,
-							relativeWidth = 0.49,
-							multiselect = true,
-							callback = function(_, _, key, value)
-								TSM.db.global.ignoreGuilds[key] = value
-							end,
-						},
-					},
-				},
-				{
-					type = "Spacer"
-				},
-				{
-					type = "InlineGroup",
-					layout = "flow",
-					title = L["Default Price Settings"],
-					children = {
-						{
-							type = "EditBox",
-							label = L["Default Material Cost Method"],
-							settingInfo = {TSM.db.global, "defaultMatCostMethod"},
-							relativeWidth = 1,
-							acceptCustom = true,
-							tooltip = L["This is the default method Crafting will use for determining material cost."],
-						},
-						{
-							type = "EditBox",
-							label = L["Default Craft Value Method"],
-							settingInfo = {TSM.db.global, "defaultCraftPriceMethod"},
-							relativeWidth = 1,
-							acceptCustom = "crafting",
-							tooltip = L["This is the default method Crafting will use for determining the value of crafted items."],
-						},
-						{
-							type = "Spacer"
-						},
-						{
-							type = "CheckBox",
-							label = L["Exclude Crafts with a Cooldown from Craft Cost"],
-							settingInfo = { TSM.db.global, "ignoreCDCraftCost" },
-							relativeWidth = 1,
-							tooltip = L["If checked, if there is more than one way to craft the item then the craft cost will exclude any craft with a daily cooldown when calculating the lowest craft cost."],
-						},
-					},
-				},
-			},
-		},
-	}
+-- ============================================================================
+-- Tooltip Options
+-- ============================================================================
 
-	TSMAPI:BuildPage(container, page)
-end
-
-function Options:LoadTooltipOptions(container)
+function Options:LoadTooltipOptions(container, options)
 	local page = {
 		{
 			type = "SimpleGroup",
@@ -440,54 +518,56 @@ function Options:LoadTooltipOptions(container)
 				{
 					type = "CheckBox",
 					label = L["Show Crafting Cost in Tooltip"],
-					settingInfo = { TSM.db.global, "tooltip" },
-					callback = function(_, _, value) container:ReloadTab() end,
+					settingInfo = { options, "craftingCost" },
 					tooltip = L["If checked, the crafting cost of items will be shown in the tooltip for the item."],
 				},
 				{
 					type = "CheckBox",
 					label = L["Show Material Cost in Tooltip"],
-					settingInfo = { TSM.db.global, "materialTooltip" },
-					callback = function(_, _, value) container:ReloadTab() end,
+					settingInfo = { options, "matPrice" },
 					tooltip = L["If checked, the material cost of items will be shown in the tooltip for the item."],
 				},
 				{
 					type = "CheckBox",
 					label = L["List Mats in Tooltip"],
-					settingInfo = { TSM.db.global, "matsInTooltip" },
-					callback = function(_, _, value) container:ReloadTab() end,
+					settingInfo = { options, "detailedMats" },
 					tooltip = L["If checked, the mats needed to craft an item and their prices will be shown in item tooltips."],
 				},
 			},
 		},
 	}
 
-	TSMAPI:BuildPage(container, page)
+	TSMAPI.GUI:BuildOptions(container, page)
 end
+
+
+
+-- ============================================================================
+-- Main Window Pgae
+-- ============================================================================
 
 function Options:LoadCrafting(parent)
 	local tg = AceGUI:Create("TSMTabGroup")
 	tg:SetLayout("Fill")
 	tg:SetFullHeight(true)
 	tg:SetFullWidth(true)
-	tg:SetTabs({ { value = 1, text = L["Crafts"] }, { value = 2, text = L["Materials"] } })
+	tg:SetTabs({ { value = 1, text = L["Crafts"] }, { value = 2, text = L["Materials"] } , { value = 3, text = L["Cooldowns"] }})
 	tg:SetCallback("OnGroupSelected", function(self, _, value)
 		tg:ReleaseChildren()
-		if matST then matST:Hide() end
-		if craftST then craftST:Hide() end
 		if Options.OpenWindow then Options.OpenWindow:Hide() end
+		if Options.OpenGatherWindow then Options.OpenGatherWindow:Hide() end
 		parent:DoLayout()
 
 		if value == 1 then
 			Options:LoadCraftsPage(tg)
 		elseif value == 2 then
 			Options:LoadMaterialsPage(tg)
+		elseif value == 3 then
+			Options:LoadCooldownPage(tg)
 		end
 		tg.children[1]:DoLayout()
 	end)
 	tg:SetCallback("OnRelease", function()
-			if matST then matST:Hide() end
-			if craftST then craftST:Hide() end
 			if Options.OpenWindow then Options.OpenWindow:Hide() end
 		end)
 	parent:AddChild(tg)
@@ -495,45 +575,78 @@ function Options:LoadCrafting(parent)
 end
 
 function Options:UpdateCraftST()
-	if not craftST then return end
+	if private.craftSTDisabled then return end
 	local stData = {}
-	local bagTotal, auctionTotal, otherTotal = TSM.Inventory:GetTotals()
+	local bagTotal, auctionTotal, otherTotal = TSM:GetInventoryTotals()
 	for spellID, data in pairs(TSM.db.factionrealm.crafts) do
 		local isFiltered
-		local name, link = TSMAPI:GetSafeItemInfo(data.itemID)
-	
-		if not name or not link or (filters.filter ~= "" and not strfind(strlower(name), strlower(filters.filter))) then
+		local name = TSMAPI.Item:GetName(data.itemString)
+		local link = TSMAPI.Item:GetLink(data.itemString)
+		local ilvl = TSMAPI.Item:GetItemLevel(data.itemString)
+		local lvl = TSMAPI.Item:GetMinLevel(data.itemString)
+
+		if not name or not link then
 			isFiltered = true
-		elseif filters.profession ~= "" and filters.profession ~= data.profession then
+		elseif private.filters.profession ~= "" and private.filters.profession ~= data.profession then
 			isFiltered = true
-		elseif filters.haveMats then
+		elseif private.filters.minLevel and lvl < private.filters.minLevel then
+			isFiltered = true
+		elseif private.filters.maxLevel and lvl > private.filters.maxLevel then
+			isFiltered = true
+		elseif private.filters.minILevel and ilvl < private.filters.minILevel then
+			isFiltered = true
+		elseif private.filters.maxILevel and ilvl > private.filters.maxILevel then
+			isFiltered = true
+		elseif private.filters.filter ~= "" and not strmatch(strlower(name), private.filters.filter) then
+			isFiltered = true
+		elseif private.filters.haveMats then
 			for itemString, quantity in pairs(data.mats) do
-				if (bagTotal[itemString] or 0) < quantity and not TSMAPI:GetVendorCost(itemString) then
+				if (bagTotal[itemString] or 0) < quantity and not TSMAPI.Item:GetVendorCost(itemString) then
 					isFiltered = true
 					break
 				end
 			end
 		end
-		
+
 		if not isFiltered then
-			local bags, auctions, other = bagTotal[data.itemID] or 0, auctionTotal[data.itemID] or 0, otherTotal[data.itemID] or 0
-			local cost, buyout, profit = TSM.Cost:GetCraftPrices(spellID)
-			local percent = profit and floor(100*profit/cost+0.5) or nil
-			local operations = TSMAPI:GetItemOperation(data.itemID, "Crafting")
-			local operation = operations and operations[1] and TSM.operations[operations[1]] and operations[1] or "---"
+			local itemString = TSMAPI.Item:ToBaseItemString(data.itemString)
+			local bags, auctions, other = bagTotal[itemString] or 0, auctionTotal[itemString] or 0, otherTotal[itemString] or 0
+			local cost, buyout, profit = TSM.Cost:GetSpellCraftPrices(spellID)
+			local operationName = TSMAPI.Operations:GetFirstByItem(data.itemString, "Crafting")
+			if not operationName or not TSM.operations[operationName] then
+				operationName = "---"
+			end
+			local percent = nil
+			local percentStr = nil
+			local profitStr = nil
+			if profit then
+				percent = TSMAPI.Util:Round(100*profit/cost)
+				if profit >= 0 then
+					profitStr = TSMAPI:MoneyToString(profit, "|cff00ff00")
+					percentStr = "|cff00ff00"..percent.."%|r"
+				else
+					profitStr = TSMAPI:MoneyToString(-profit, "|cffff0000")
+					percentStr = "|cff00ff00"..(-percent).."%|r"
+				end
+			else
+				profit = -math.huge
+				percent = -math.huge
+				profitStr = "---"
+				percentStr = "---"
+			end
 			local row = {
 				cols = {
 					{
-						value = data.queued,
-						sortArg = data.queued,
+						value = TSM.Queue:Get(spellID),
+						sortArg = TSM.Queue:Get(spellID),
 					},
 					{
 						value = link,
 						sortArg = strlower(name),
 					},
 					{
-						value = operation,
-						sortArg = operation,
+						value = operationName,
+						sortArg = operationName,
 					},
 					{
 						value = bags,
@@ -548,209 +661,224 @@ function Options:UpdateCraftST()
 						sortArg = other,
 					},
 					{
-						value = TSMAPI:FormatTextMoney(cost) or "---",
+						value = TSMAPI:MoneyToString(cost) or "---",
 						sortArg = cost or -math.huge,
 					},
 					{
-						value = TSMAPI:FormatTextMoney(buyout) or "---",
+						value = TSMAPI:MoneyToString(buyout) or "---",
 						sortArg = buyout or -math.huge,
 					},
 					{
-						value = profit and (profit > 0 and TSMAPI:FormatTextMoney(profit, "|cff00ff00") or TSMAPI:FormatTextMoney(-profit, "|cffff0000")) or "---",
-						sortArg = profit or -math.huge,
+						value = profitStr,
+						sortArg = profit,
 					},
 					{
-						value = percent and (percent > 0 and "|cff00ff00"..percent.."%|r" or "|cffff0000"..(-percent).."%|r") or "---",
-						sortArg = percent or -math.huge,
+						value = percentStr,
+						sortArg = percent,
 					},
 				},
 				name = data.name,
-				itemString = data.itemID,
+				itemString = data.itemString,
 				spellID = spellID,
 			}
 			tinsert(stData, row)
 		end
 	end
-	craftST:SetData(stData)
+
+	TSMAPI.GUI:UpdateTSMScrollingTableData("TSM_CRAFTING_CRAFTS", stData)
 end
 
 -- Crafts Page
 function Options:LoadCraftsPage(container)
-	filters = {filter="", profession="", dpSelection="all", haveMats=nil, queueIncr=1}
+	private.filters = {filter="", profession="", dpSelection="all", haveMats=nil, queueIncr=1, minLevel=nil, maxLevel=nil, minILevel=nil, maxILevel=nil}
 
 	local professionList = { [""] = L["<None>"] }
 	for _, data in pairs(TSM.db.factionrealm.crafts) do
 		professionList[data.profession] = data.profession
 	end
 
+	local stCols = {
+		{
+			name = L["Queue"],
+			width = 0.06,
+			align = "CENTER",
+			headAlign = "CENTER",
+		},
+		{
+			name = L["Craft Name"],
+			width = 0.25,
+			align = "LEFT",
+			headAlign = "CENTER",
+		},
+		{
+			name = L["Operation"],
+			width = 0.12,
+			align = "CENTER",
+			headAlign = "CENTER",
+		},
+		{
+			name = L["Bags"],
+			width = 0.05,
+			align = "CENTER",
+			headAlign = "CENTER",
+		},
+		{
+			name = L["AH"],
+			width = 0.05,
+			align = "CENTER",
+			headAlign = "CENTER",
+		},
+		{
+			name = OTHER,
+			width = 0.05,
+			align = "CENTER",
+			headAlign = "CENTER",
+		},
+		{
+			name = L["Crafting Cost"],
+			width = 0.12,
+			align = "LEFT",
+			headAlign = "CENTER",
+		},
+		{
+			name = L["Item Value"],
+			width = 0.12,
+			align = "LEFT",
+			headAlign = "CENTER",
+		},
+		{
+			name = L["Profit"],
+			width = 0.12,
+			align = "LEFT",
+			headAlign = "CENTER",
+		},
+		{
+			name = "%",
+			width = 0.06,
+			align = "LEFT",
+			headAlign = "CENTER",
+		},
+	}
+	local stHandlers = {
+		OnClick = function(st, data, self, button)
+			if not data then return end
+			if button == "LeftButton" then
+				TSM.Queue:Add(data.spellID, private.filters.queueIncr)
+			elseif button == "RightButton" then
+				TSM.Queue:Remove(data.spellID, private.filters.queueIncr)
+			end
+			data.cols[1].value = TSM.Queue:Get(data.spellID)
+			data.cols[1].sortArg = TSM.Queue:Get(data.spellID)
+			st:RefreshRows()
+			private.craftSTDisabled = true
+			TSM.TradeSkill.Queue:Update()
+			private.craftSTDisabled = nil
+		end,
+		OnEnter = function(_, data, self)
+			if not data then return end
+
+			GameTooltip:SetOwner(self, "ANCHOR_TOPLEFT")
+			TSMAPI.Util:SafeTooltipLink(data.itemString)
+			GameTooltip:Show()
+		end,
+		OnLeave = function()
+			GameTooltip:ClearLines()
+			GameTooltip:Hide()
+		end
+	}
+
 	local page = {
 		{
 			type = "SimpleGroup",
-			layout = "Flow",
+			layout = "TSMFillList",
 			children = {
 				{
-					type = "EditBox",
-					label = L["Search"],
-					relativeWidth = 0.3,
-					onTextChanged = true,
-					callback = function(_, _, value)
-						filters.filter = TSMAPI:StrEscape(strlower(value:trim()))
-						Options:UpdateCraftST()
-					end,
-				},
-				{
-					type = "Dropdown",
-					label = L["Profession Filter"],
-					relativeWidth = 0.2,
-					list = professionList,
-					settingInfo = {filters, "profession"},
-					callback = Options.UpdateCraftST,
-				},
-				{
-					type = "CheckBox",
-					label = L["Have Mats"],
-					relativeWidth = 0.19,
-					settingInfo = {filters, "haveMats"},
-					callback = Options.UpdateCraftST,
-					tooltip = L["If checked, only crafts which you can craft with items in your bags (ignoring vendor items) will be shown below."],
-				},
-				{
-					type = "Slider",
-					label = L["Queue Increment"],
-					relativeWidth = 0.29,
-					settingInfo = {filters, "queueIncr"},
-					min = 1,
-					max = 20,
-					step = 1,
-					tooltip = L["This slider sets the quantity to add/remove from the queue when left/right clicking on a row below."],
-				},
-				{
-					type = "Label",
-					text = L["You can left/right click on a row to add/remove a craft from the crafting queue."],
-					relativeWidth = 1,
+					type = "SimpleGroup",
+					layout = "Flow",
+					children = {
+						{
+							type = "EditBox",
+							label = L["Search"],
+							relativeWidth = 0.3,
+							onTextChanged = true,
+							callback = function(_, _, value)
+								local parts = {("/"):split(strlower(value:trim()))}
+								private.filters.minLevel = nil
+								private.filters.maxLevel = nil
+								private.filters.minILevel = nil
+								private.filters.maxILevel = nil
+								for i, part in ipairs(parts) do
+									local lvl = tonumber(part)
+									local ilvl = tonumber(strmatch(part, "^i([0-9]+)$"))
+									if i == 1 then
+										private.filters.filter = part
+									elseif lvl then
+										if private.filters.minLevel then
+											private.filters.maxLevel = lvl
+										else
+											private.filters.minLevel = lvl
+										end
+									elseif ilvl then
+										if private.filters.minILevel then
+											private.filters.maxILevel = ilvl
+										else
+											private.filters.minILevel = ilvl
+										end
+									end
+								end
+								Options:UpdateCraftST()
+							end,
+						},
+						{
+							type = "Dropdown",
+							label = L["Profession Filter"],
+							relativeWidth = 0.2,
+							list = professionList,
+							settingInfo = {private.filters, "profession"},
+							callback = Options.UpdateCraftST,
+						},
+						{
+							type = "CheckBox",
+							label = L["Have Mats"],
+							relativeWidth = 0.19,
+							settingInfo = {private.filters, "haveMats"},
+							callback = Options.UpdateCraftST,
+							tooltip = L["If checked, only crafts which you can craft with items in your bags (ignoring vendor items) will be shown below."],
+						},
+						{
+							type = "Slider",
+							label = L["Queue Increment"],
+							relativeWidth = 0.29,
+							settingInfo = {private.filters, "queueIncr"},
+							min = 1,
+							max = 20,
+							step = 1,
+							tooltip = L["This slider sets the quantity to add/remove from the queue when left/right clicking on a row below."],
+						},
+						{
+							type = "Label",
+							text = L["You can left/right click on a row to add/remove a craft from the crafting queue."],
+							relativeWidth = 1,
+						},
+					},
 				},
 				{
 					type = "HeadingLine",
 				},
 				{
-					type = "SimpleGroup",
-					fullHeight = true,
-					layout = "flow",
-					children = {},
+					type = "ScrollingTable",
+					tag = "TSM_CRAFTING_CRAFTS",
+					colInfo = stCols,
+					handlers = stHandlers,
+					selectionDisabled = true,
+					defaultSort = 2,
 				},
 			},
 		},
 	}
 
-	TSMAPI:BuildPage(container, page)
-
-	local stParent = container.children[1].children[#container.children[1].children].frame
-	if not craftST then
-		local cols = {
-			{
-				name = L["Queue"],
-				width = 0.06,
-				align = "CENTER",
-				headAlign = "CENTER",
-			},
-			{
-				name = L["Craft Name"],
-				width = 0.22,
-				align = "LEFT",
-				headAlign = "CENTER",
-			},
-			{
-				name = L["Operation Name"],
-				width = 0.15,
-				align = "CENTER",
-				headAlign = "CENTER",
-			},
-			{
-				name = L["Bags"],
-				width = 0.05,
-				align = "CENTER",
-				headAlign = "CENTER",
-			},
-			{
-				name = L["AH"],
-				width = 0.05,
-				align = "CENTER",
-				headAlign = "CENTER",
-			},
-			{
-				name = OTHER,
-				width = 0.05,
-				align = "CENTER",
-				headAlign = "CENTER",
-			},
-			{
-				name = L["Crafting Cost"],
-				width = 0.12,
-				align = "LEFT",
-				headAlign = "CENTER",
-			},
-			{
-				name = L["Item Value"],
-				width = 0.12,
-				align = "LEFT",
-				headAlign = "CENTER",
-			},
-			{
-				name = L["Profit"],
-				width = 0.12,
-				align = "LEFT",
-				headAlign = "CENTER",
-			},
-			{
-				name = "%",
-				width = 0.06,
-				align = "LEFT",
-				headAlign = "CENTER",
-			},
-		}
-		local handlers = {
-			OnClick = function(st, data, self, button)
-				if not data then return end
-				local craft = TSM.db.factionrealm.crafts[data.spellID]
-				if button == "LeftButton" then
-					craft.queued = craft.queued + filters.queueIncr
-				elseif button == "RightButton" then
-					craft.queued = max(craft.queued - filters.queueIncr, 0)
-				end
-				data.cols[1].value = craft.queued
-				data.cols[1].sortArg = craft.queued
-				--st.updateSort = true
-				st:RefreshRows()
-				craftST = nil
-				TSM.CraftingGUI:UpdateQueue()
-				craftST = st
-			end,
-			OnEnter = function(_, data, self)
-				if not data then return end
-
-				GameTooltip:SetOwner(self, "ANCHOR_TOPLEFT")
-				TSMAPI:SafeTooltipLink(data.itemString)
-				GameTooltip:Show()
-			end,
-			OnLeave = function()
-				GameTooltip:ClearLines()
-				GameTooltip:Hide()
-			end
-		}
-		TSMAPI:CreateTimeDelay(0, function()
-				craftST = TSMAPI:CreateScrollingTable(stParent, cols, handlers)
-				craftST:EnableSorting(true, 2)
-				craftST:Show()
-				craftST:SetParent(stParent)
-				craftST:SetAllPoints()
-				Options:UpdateCraftST()
-			end)
-	else
-		craftST:Show()
-		craftST:SetParent(stParent)
-		craftST:SetAllPoints()
-		Options:UpdateCraftST()
-	end
+	TSMAPI.GUI:BuildOptions(container, page)
+	Options:UpdateCraftST()
 end
 
 function Options:ResetDefaultPrice()
@@ -765,9 +893,9 @@ end
 function Options:UpdateMatST()
 	local items = {}
 	for _, data in pairs(TSM.db.factionrealm.crafts) do
-		if filters.ddSelection == "none" or data.profession == filters.ddSelection then
+		if private.filters.ddSelection == "none" or data.profession == private.filters.ddSelection then
 			for itemString in pairs(data.mats) do
-				if filters.dpSelection == "all" or (filters.dpSelection == "default" and not TSM.db.factionrealm.mats[itemString].customValue) or (filters.dpSelection == "custom" and TSM.db.factionrealm.mats[itemString].customValue) then
+				if private.filters.dpSelection == "all" or (private.filters.dpSelection == "default" and not TSM.db.factionrealm.mats[itemString].customValue) or (private.filters.dpSelection == "custom" and TSM.db.factionrealm.mats[itemString].customValue) then
 					if TSM.db.factionrealm.mats[itemString] and TSM.db.factionrealm.mats[itemString].name then -- sanity check
 						items[itemString] = TSM.db.factionrealm.mats[itemString].name
 					end
@@ -776,11 +904,9 @@ function Options:UpdateMatST()
 		end
 	end
 
-
 	local stData = {}
-	local inventoryTotals = select(4, TSM.Inventory:GetTotals())
 	for itemString, name in pairs(items) do
-		if strfind(strlower(name), filters.filter) then
+		if strfind(strlower(name), private.filters.filter) then
 			local professions = {}
 			local professionList = {}
 			for _, data in pairs(TSM.db.factionrealm.crafts) do
@@ -795,16 +921,16 @@ function Options:UpdateMatST()
 			local professionsUsed = table.concat(professionList, ",")
 
 			local mat = TSM.db.factionrealm.mats[itemString]
-			local cost = TSM:GetCustomPrice(mat.customValue or TSM.db.global.defaultMatCostMethod, itemString) or 0
-			local quantity = inventoryTotals[itemString] or 0
+			local cost = TSMAPI:GetCustomPriceValue(mat.customValue or TSM.db.global.defaultMatCostMethod, itemString) or 0
+			local quantity = TSMAPI.Inventory:GetTotalQuantity(itemString)
 			tinsert(stData, {
 				cols = {
 					{
-						value = select(2, TSMAPI:GetSafeItemInfo(itemString)) or name,
+						value = TSMAPI.Item:GetLink(itemString) or name,
 						sortArg = name,
 					},
 					{
-						value = cost > 0 and TSMAPI:FormatTextMoney(cost) or "---",
+						value = cost > 0 and TSMAPI:MoneyToString(cost) or "---",
 						sortArg = cost,
 					},
 					{
@@ -822,13 +948,12 @@ function Options:UpdateMatST()
 		end
 	end
 
-	sort(stData, function(a, b) return a.name < b.name end) -- sort rows by the item name
-	matST:SetData(stData)
+	TSMAPI.GUI:UpdateTSMScrollingTableData("TSM_CRAFTING_MATS", stData)
 end
 
 -- Materials Page
 function Options:LoadMaterialsPage(container)
-	filters = {filter="", ddSelection="none", dpSelection="all"}
+	private.filters = {filter="", ddSelection="none", dpSelection="all"}
 
 	local ddList = { ["none"] = L["<None>"] }
 	for _, data in pairs(TSM.db.factionrealm.crafts) do
@@ -837,133 +962,133 @@ function Options:LoadMaterialsPage(container)
 
 	local dpList = { ["all"] = L["All"], ["default"] = L["Default Price"], ["custom"] = L["Custom Price"] }
 
+	local stCols = {
+		{
+			name = L["Item Name"],
+			width = 0.3,
+			align = "LEFT",
+			headAlign = "LEFT",
+		},
+		{
+			name = L["Mat Price"],
+			width = 0.12,
+			align = "LEFT",
+			headAlign = "LEFT",
+		},
+		{
+			name = L["Professions Used In"],
+			width = 0.48,
+			align = "LEFT",
+			headAlign = "LEFT",
+		},
+		{
+			name = L["Num Owned"],
+			width = 0.10,
+			align = "RIGHT",
+			headAlign = "RIGHT",
+		},
+	}
+	local stHandlers = {
+		OnClick = function(_, data, self)
+			if not data then return end
+			Options:ShowMatOptionsWindow(self, data.itemString)
+		end,
+		OnEnter = function(_, data, self)
+			if not data then return end
+
+			GameTooltip:SetOwner(self, "ANCHOR_TOPLEFT")
+			TSMAPI.Util:SafeTooltipLink(data.itemString)
+			GameTooltip:Show()
+		end,
+		OnLeave = function()
+			GameTooltip:ClearLines()
+			GameTooltip:Hide()
+		end
+	}
+
 	local page = {
 		{
 			type = "SimpleGroup",
-			layout = "Flow",
+			layout = "TSMFillList",
 			children = {
 				{
-					type = "EditBox",
-					label = L["Search"],
-					relativeWidth = 0.41,
-					onTextChanged = true,
-					callback = function(_, _, value)
-						filters.filter = TSMAPI:StrEscape(strlower(value:trim()))
-						Options:UpdateMatST()
-					end,
-				},
-				{
-					type = "Dropdown",
-					label = L["Profession Filter"],
-					relativeWidth = 0.29,
-					list = ddList,
-					value = "none",
-					callback = function(_, _, value)
-						filters.ddSelection = value
-						Options:UpdateMatST()
-					end,
-				},
-				{
-					type = "Dropdown",
-					label = L["Price Source Filter"],
-					relativeWidth = 0.29,
-					list = dpList,
-					value = "all",
-					callback = function(_, _, value)
-						filters.dpSelection = value
-						Options:UpdateMatST()
-					end,
-				},
-				{
-					type = "Button",
-					text = L["Reset All Custom Prices to Default"],
-					relativeWidth = .5,
-					callback = function(self)
-						StaticPopupDialogs["TSM_CRAFTING_RESET_MAT_PRICES"] = StaticPopupDialogs["TSM_CRAFTING_RESET_MAT_PRICES"] or {
-							text = L["Are you sure you want to reset all material prices to the default value?"],
-							button1 = YES,
-							button2 = CANCEL,
-							timeout = 0,
-							hideOnEscape = true,
-							OnAccept = Options.ResetDefaultPrice,
-							preferredIndex = 3,
-						}
-						TSMAPI:ShowStaticPopupDialog("TSM_CRAFTING_RESET_MAT_PRICES")
-					end,
-					tooltip = L["Reset all Custom Prices to Default Price Source."],
-				},
-				{
-					type = "Label",
-					text = L["You can click on one of the rows of the scrolling table below to view or adjust how the price of a material is calculated."],
-					relativeWidth = 1,
+					type = "SimpleGroup",
+					layout = "Flow",
+					children = {
+						{
+							type = "EditBox",
+							label = L["Search"],
+							relativeWidth = 0.41,
+							onTextChanged = true,
+							callback = function(_, _, value)
+								private.filters.filter = TSMAPI.Util:StrEscape(strlower(value:trim()))
+								Options:UpdateMatST()
+							end,
+						},
+						{
+							type = "Dropdown",
+							label = L["Profession Filter"],
+							relativeWidth = 0.29,
+							list = ddList,
+							value = "none",
+							callback = function(_, _, value)
+								private.filters.ddSelection = value
+								Options:UpdateMatST()
+							end,
+						},
+						{
+							type = "Dropdown",
+							label = L["Price Source Filter"],
+							relativeWidth = 0.29,
+							list = dpList,
+							value = "all",
+							callback = function(_, _, value)
+								private.filters.dpSelection = value
+								Options:UpdateMatST()
+							end,
+						},
+						{
+							type = "Button",
+							text = L["Reset All Custom Prices to Default"],
+							relativeWidth = .5,
+							callback = function(self)
+								StaticPopupDialogs["TSM_CRAFTING_RESET_MAT_PRICES"] = StaticPopupDialogs["TSM_CRAFTING_RESET_MAT_PRICES"] or {
+									text = L["Are you sure you want to reset all material prices to the default value?"],
+									button1 = YES,
+									button2 = CANCEL,
+									timeout = 0,
+									hideOnEscape = true,
+									OnAccept = Options.ResetDefaultPrice,
+									preferredIndex = 3,
+								}
+								TSMAPI.Util:ShowStaticPopupDialog("TSM_CRAFTING_RESET_MAT_PRICES")
+							end,
+							tooltip = L["Reset all Custom Prices to Default Price Source."],
+						},
+						{
+							type = "Label",
+							text = L["You can click on one of the rows of the scrolling table below to view or adjust how the price of a material is calculated."],
+							relativeWidth = 1,
+						},
+					},
 				},
 				{
 					type = "HeadingLine",
 				},
 				{
-					type = "SimpleGroup",
-					fullHeight = true,
-					layout = "flow",
-					children = {},
+					type = "ScrollingTable",
+					tag = "TSM_CRAFTING_MATS",
+					colInfo = stCols,
+					handlers = stHandlers,
+					selectionDisabled = true,
+					defaultSort = 1,
 				},
 			},
 		},
 	}
 
-	TSMAPI:BuildPage(container, page)
-
-	local stParent = container.children[1].children[#container.children[1].children].frame
-	if not matST then
-		local matCols = {
-			{
-				name = L["Item Name"],
-				width = 0.3,
-				align = "LEFT",
-				headAlign = "LEFT",
-			},
-			{
-				name = L["Mat Price"],
-				width = 0.12,
-				align = "LEFT",
-				headAlign = "LEFT",
-			},
-			{
-				name = L["Professions Used In"],
-				width = 0.45,
-				align = "LEFT",
-				headAlign = "LEFT",
-			},
-			{
-				name = L["Number Owned"],
-				width = 0.12,
-				align = "LEFT",
-				headAlign = "LEFT",
-			},
-		}
-		local handlers = {
-			OnClick = function(_, data, self)
-				if not data then return end
-				Options:ShowMatOptionsWindow(self, data.itemString)
-			end,
-			OnEnter = function(_, data, self)
-				if not data then return end
-
-				GameTooltip:SetOwner(self, "ANCHOR_TOPLEFT")
-				TSMAPI:SafeTooltipLink(data.itemString)
-				GameTooltip:Show()
-			end,
-			OnLeave = function()
-				GameTooltip:ClearLines()
-				GameTooltip:Hide()
-			end
-		}
-		matST = TSMAPI:CreateScrollingTable(stParent, matCols, handlers)
-		matST:EnableSorting(true)
-	end
+	TSMAPI.GUI:BuildOptions(container, page)
 	Options:UpdateMatST()
-	matST:Show()
-	matST:SetParent(stParent)
-	matST:SetAllPoints()
 end
 
 -- Material Options Window
@@ -971,8 +1096,8 @@ function Options:ShowMatOptionsWindow(parent, itemString)
 	if Options.OpenWindow then Options.OpenWindow:Hide() end
 	local mat = TSM.db.factionrealm.mats[itemString]
 	if not mat then return end
-	local link = select(2, TSMAPI:GetSafeItemInfo(itemString)) or mat.name
-	local cost = TSM:GetCustomPrice(mat.customValue or TSM.db.global.defaultMatCostMethod, itemString) or 0
+	local link = TSMAPI.Item:GetLink(itemString)
+	local cost = TSMAPI:GetCustomPriceValue(mat.customValue or TSM.db.global.defaultMatCostMethod, itemString) or 0
 
 	local window = AceGUI:Create("TSMWindow")
 	window.frame:SetParent(parent)
@@ -998,12 +1123,12 @@ function Options:ShowMatOptionsWindow(parent, itemString)
 			text = link,
 			fontObject = GameFontHighlight,
 			relativeWidth = 0.6,
-			callback = function() SetItemRef(itemString, itemString) end,
+			callback = function() TSMAPI.Util:SafeItemRef(link) end,
 			tooltip = itemString,
 		},
 		{
 			type = "Label",
-			text = TSMAPI.Design:GetInlineColor("link") .. L["Price:"] .. " |r" .. (TSMAPI:FormatTextMoneyIcon(cost) or "---"),
+			text = TSMAPI.Design:GetInlineColor("link") .. L["Price:"] .. " |r" .. (TSMAPI:MoneyToString(cost, "OPT_ICON") or "---"),
 			relativeWidth = 0.39,
 		},
 		{
@@ -1017,16 +1142,7 @@ function Options:ShowMatOptionsWindow(parent, itemString)
 		},
 	}
 
-	TSMAPI:BuildPage(window, page)
-
-	local function GetMoneyText(copperValue, additionalRequirement)
-		if additionalRequirement ~= false then
-			return TSMAPI:FormatTextMoney(copperValue) or "---"
-		else
-			return TSMAPI:FormatTextMoney(copperValue, "|cff777777", nil, nil, true) or "---"
-		end
-	end
-
+	TSMAPI.GUI:BuildOptions(window, page)
 
 	local sPage = {
 		{
@@ -1043,7 +1159,7 @@ function Options:ShowMatOptionsWindow(parent, itemString)
 				},
 				{
 					type = "EditBox",
-					value = TSMAPI:FormatTextMoney(mat.customValue) or mat.customValue or TSM.db.global.defaultMatCostMethod,
+					value = TSMAPI:MoneyToString(mat.customValue) or mat.customValue or TSM.db.global.defaultMatCostMethod,
 					label = L["Custom Price per Item"],
 					relativeWidth = 1,
 					acceptCustom = true,
@@ -1073,5 +1189,144 @@ function Options:ShowMatOptionsWindow(parent, itemString)
 	if window.children[4] then
 		window.children[4]:ReleaseChildren()
 	end
-	TSMAPI:BuildPage(window.children[4], sPage)
+	TSMAPI.GUI:BuildOptions(window.children[4], sPage)
+end
+
+function Options:UpdateCooldownST()
+	local stData = {}
+	for spellID, craft in pairs(TSM.db.factionrealm.crafts) do
+		if craft.hasCD then
+			for player in pairs(craft.players) do
+				local timeLeftText = nil
+				local cooldownData = craft.cooldownTimes and craft.cooldownTimes[player]
+				if cooldownData then
+					local remaining = cooldownData.endTime - time()
+					if remaining <= 0 then
+						timeLeftText = "|cff00ff00"..L["Ready"].."|r"
+					elseif remaining > 60 * 60 * 24 then -- remaining cooldown is greater than 1 day
+						timeLeftText = "|cffff0000"..SecondsToTime(remaining, true, false, 1, true).."|r"
+					else
+						timeLeftText = "|cffff0000"..SecondsToTime(remaining).."|r"
+					end
+					tinsert(stData, {
+						cols = {
+							{
+								value = player,
+								sortArg = player,
+							},
+							{
+								value = craft.profession,
+								sortArg = craft.profession,
+							},
+							{
+								value = craft.name,
+								sortArg = craft.name,
+							},
+							{
+								value = timeLeftText,
+								sortArg = timeLeftText,
+							},
+							{
+								value = cooldownData.prompt and ("|cff00ff00"..YES.."|r") or ("|cffff0000"..NO.."|r"),
+								sortArg = cooldownData.prompt and 1 or 2,
+							},
+						},
+						spellID = spellID,
+						craft = craft,
+						player = player,
+					})
+				end
+			end
+		end
+	end
+
+	TSMAPI.GUI:UpdateTSMScrollingTableData("TSM_CRAFTING_COOLDOWNS", stData)
+end
+
+-- Cooldowns Page
+function Options:LoadCooldownPage(container)
+	local stCols = {
+		{
+			name = L["Player"],
+			width = 0.2,
+			align = "LEFT",
+			headAlign = "LEFT",
+		},
+		{
+			name = L["Profession"],
+			width = 0.2,
+			align = "LEFT",
+			headAlign = "LEFT",
+		},
+		{
+			name = L["Name"],
+			width = 0.3,
+			align = "LEFT",
+			headAlign = "LEFT",
+		},
+		{
+			name = L["Status"],
+			width = 0.15,
+			align = "LEFT",
+			headAlign = "LEFT",
+		},
+		{
+			name = L["Smart"],
+			width = 0.15,
+			align = "LEFT",
+			headAlign = "LEFT",
+		},
+	}
+	local stHandlers = {
+		OnEnter = function(_, data, self)
+			if not data then return end
+			GameTooltip:SetOwner(self, "ANCHOR_TOPLEFT")
+			GameTooltip:SetSpellByID(data.spellID)
+			GameTooltip:Show()
+		end,
+		OnLeave = function()
+			GameTooltip:ClearLines()
+			GameTooltip:Hide()
+		end,
+		OnClick = function(_, data)
+			if not data then return end
+			data.craft[data.player] = nil
+			data.craft.cooldownTimes[data.player].prompt = not data.craft.cooldownTimes[data.player].prompt
+			Options:UpdateCooldownST()
+		end,
+	}
+
+	local page = {
+		{
+			type = "SimpleGroup",
+			layout = "TSMFillList",
+			children = {
+				{
+					type = "SimpleGroup",
+					layout = "Flow",
+					children = {
+						{
+							type = "Label",
+							text = L["Crafting can automatically prompt you to craft your cooldowns when you open the profession with the necessary materials on-hand or automatically add them to your queue if you don't have the necessary materials on-hand. Click on rows below to toggle this smart behavior on/off for your cooldowns."],
+							relativeWidth = 1,
+						},
+					},
+				},
+				{
+					type = "HeadingLine",
+				},
+				{
+					type = "ScrollingTable",
+					tag = "TSM_CRAFTING_COOLDOWNS",
+					colInfo = stCols,
+					handlers = stHandlers,
+					selectionDisabled = true,
+					defaultSort = 1,
+				},
+			},
+		},
+	}
+
+	TSMAPI.GUI:BuildOptions(container, page)
+	Options:UpdateCooldownST()
 end

@@ -1,62 +1,94 @@
 local mod	= DBM:NewMod("BrawlRank6", "DBM-Brawlers")
 local L		= mod:GetLocalizedStrings()
 
-mod:SetRevision(("$Revision: 11898 $"):sub(12, -3))
-mod:SetModelID(39166)
-mod:SetZone()
+mod:SetRevision("20201102223314")
+--mod:SetModelID(39166)
 
 mod:RegisterEvents(
-	"SPELL_CAST_START 141104 124860 124935",
-	"SPELL_AURA_APPLIED 134789",
-	"SPELL_AURA_APPLIED_DOSE 134789"
+	"SPELL_CAST_START 142788 142795 142769 282081",
+	"SPELL_CAST_SUCCESS 141013",
+	"SPELL_AURA_APPLIED 236155",
+	"SPELL_AURA_APPLIED_DOSE 236155"
 )
 
-local warnFallenKin				= mod:NewStackAnnounce(134789, 3)--Yikkan Izu
-local warnHammerFist			= mod:NewCastAnnounce(141104, 4)--Doctor FIST
-local warnRainDance				= mod:NewSpellAnnounce(124860, 4)--Proboskus
-local warnTorrent				= mod:NewSpellAnnounce(124935, 4)--Proboskus
+--Get real dino dash timer, and add Ogrewatch when better idea of mechanics
 
-local specWarnHammerFist		= mod:NewSpecialWarningRun(141104, nil, nil, nil, 3)--Doctor FIST
-local specWarnRainDance			= mod:NewSpecialWarningSpell(124860, nil, nil, nil, true)--Proboskus
-local specWarnTorrent			= mod:NewSpecialWarningInterrupt(124935)--Proboskus
+local warnSpitAcid					= mod:NewSpellAnnounce(141013, 4)--Nibbleh
+local warnEightChomps				= mod:NewSpellAnnounce(142788, 4, nil, false, 2)--Mecha-Bruce
+local warnBetterStrongerFaster		= mod:NewSpellAnnounce(142795, 2)--Mecha-Bruce
+local warnStasisBeam				= mod:NewSpellAnnounce(142769, 3)--Mecha-Bruce
 
-local timerFallenKin			= mod:NewBuffActiveTimer(2, 134789)--Yikkan Izu
-local timerRainDanceCD			= mod:NewCDTimer(18, 124860)--Proboskus
-local timerTorrentCD			= mod:NewCDTimer(18, 124935)--Proboskus
+local specWarnSpitAcid				= mod:NewSpecialWarningSpell(141013, nil, nil, nil, 1, 2)--Nibbleh
+local specWarnAuraofRot				= mod:NewSpecialWarningStack(236155, nil, 7, nil, nil, 1, 6)--Stiches
+local specWarnEightChomps			= mod:NewSpecialWarningDodge(142788, nil, nil, nil, 1, 2)--Mecha-Bruce
+local specWarnDisrobingStrike		= mod:NewSpecialWarningInterrupt(282081, nil, nil, nil, 1, 2)--Robe-Robber Robert
 
-mod:RemoveOption("HealthFrame")
-mod:RemoveOption("SpeedKillTimer")
+local timerSpitAcidCD				= mod:NewNextTimer(20, 141013)--Nibbleh
+local timerEightChompsCD			= mod:NewCDTimer(8.5, 142788, nil, nil, nil, 3)--Mecha-Bruce
+local timerBetterStrongerFasterCD	= mod:NewCDTimer(20, 142795)--Mecha-Bruce
+local timerStasisBeamCD				= mod:NewCDTimer(19.4, 142769, nil, nil, nil, 3)--Mecha-Bruce
+local timerDisrobingStrikeCD		= mod:NewCDTimer(8.4, 282081, nil, nil, nil, 4, nil, DBM_CORE_L.INTERRUPT_ICON)--Robe-Robber Robert
 
-local brawlersMod = DBM:GetModByName("Brawlers")
+local brawlersMod = DBM:GetModByName("BrawlersGeneral")
 
 function mod:SPELL_CAST_START(args)
 	if not brawlersMod.Options.SpectatorMode and not brawlersMod:PlayerFighting() then return end--Spectator mode is disabled, do nothing.
-	if args.spellId == 141104 then
-		warnHammerFist:Show()
+	if args.spellId == 142788 then
+		timerEightChompsCD:Start()
 		if brawlersMod:PlayerFighting() then
-			specWarnHammerFist:Show()
+			specWarnEightChomps:Show()
+			specWarnEightChomps:Play("shockwave")
+		else
+			warnEightChomps:Show()
+			timerEightChompsCD:SetSTFade(true)
 		end
-	elseif args.spellId == 124860 then
-		warnRainDance:Show()
-		timerRainDanceCD:Start()
-		if brawlersMod:PlayerFighting() then
-			specWarnRainDance:Show()
+	elseif args.spellId == 142795 then
+		warnBetterStrongerFaster:Show()
+		timerBetterStrongerFasterCD:Start()
+		if not brawlersMod:PlayerFighting() then
+			timerBetterStrongerFasterCD:SetSTFade(true)
 		end
-	elseif args.spellId == 124935 then
-		warnTorrent:Show()
-		timerTorrentCD:Start()
+	elseif args.spellId == 142769 then
+		warnStasisBeam:Show()
+		timerStasisBeamCD:Start()
+		if not brawlersMod:PlayerFighting() then
+			timerStasisBeamCD:SetSTFade(true)
+		end
+	elseif args.spellId == 282081 then
+		timerDisrobingStrikeCD:Start()
 		if brawlersMod:PlayerFighting() then
-			specWarnTorrent:Show(args.sourceName)
+			if self:CheckInterruptFilter(args.sourceGUID, false, true) then
+				specWarnDisrobingStrike:Show(args.sourceName)
+				specWarnDisrobingStrike:Play("kickcast")
+			end
+		else
+			timerDisrobingStrikeCD:SetSTFade(true)
+		end
+	end
+end
+
+function mod:SPELL_CAST_SUCCESS(args)
+	if not brawlersMod.Options.SpectatorMode and not brawlersMod:PlayerFighting() then return end--Spectator mode is disabled, do nothing.
+	if args.spellId == 141013 then
+		timerSpitAcidCD:Start()
+		if brawlersMod:PlayerFighting() then
+			specWarnSpitAcid:Show()
+			specWarnSpitAcid:Play("watchstep")
+		else
+			warnSpitAcid:Show()
+			timerSpitAcidCD:SetSTFade(true)
 		end
 	end
 end
 
 function mod:SPELL_AURA_APPLIED(args)
 	if not brawlersMod.Options.SpectatorMode and not brawlersMod:PlayerFighting() then return end--Spectator mode is disabled, do nothing.
-	if args.spellId == 134789 then
-		warnFallenKin:Cancel()
-		warnFallenKin:Schedule(0.5, args.destName, args.amount or 1)
-		timerFallenKin:Start()
+	if args.spellId == 236155 and args:IsPlayer() then
+		local amount = args.amount or 1
+		if amount >= 7 then
+			specWarnAuraofRot:Show(amount)
+			specWarnAuraofRot:Play("stackhigh")
+		end
 	end
 end
 mod.SPELL_AURA_APPLIED_DOSE = mod.SPELL_AURA_APPLIED

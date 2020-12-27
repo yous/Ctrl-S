@@ -8,8 +8,7 @@ L:SetGeneralLocalization{
 }
 
 L:SetMiscLocalization{
-	DBM_ATH_YELL_1		= "Come Midnight, let's disperse this petty rabble!",
-	KillAttumen			= "Always knew... someday I would become... the hunted."
+	DBM_ATH_YELL_1		= "Come Midnight, let's disperse this petty rabble!"
 }
 
 
@@ -28,20 +27,12 @@ L:SetOptionLocalization{
 	DBM_MOROES_VANISH_FADED	= "Show vanish fade warning"
 }
 
-L:SetMiscLocalization{
-	DBM_MOROES_YELL_START	= "Hm, unannounced visitors. Preparations must be made..."
-}
-
 
 -- Maiden of Virtue
 L = DBM:GetModLocalization("Maiden")
 
 L:SetGeneralLocalization{
 	name = "Maiden of Virtue"
-}
-
-L:SetOptionLocalization{
-	RangeFrame			= DBM_CORE_AUTO_RANGE_OPTION_TEXT:format(10, 29522)
 }
 
 -- Romulo and Julianne
@@ -68,10 +59,6 @@ L:SetGeneralLocalization{
 }
 
 L:SetWarningLocalization{
-}
-
-L:SetOptionLocalization{
-	RRHIcon		= DBM_CORE_AUTO_ICONS_OPTION_TEXT:format(30753)
 }
 
 L:SetMiscLocalization{
@@ -103,8 +90,7 @@ L:SetTimerLocalization{
 
 L:SetOptionLocalization{
 	AnnounceBosses			= "Show warnings for boss spawns",
-	ShowBossTimers			= "Show timers for boss spawns",
-	DBM_OZ_OPTION_1			= DBM_CORE_AUTO_RANGE_OPTION_TEXT:format(10, 32337)
+	ShowBossTimers			= "Show timers for boss spawns"
 }
 
 L:SetMiscLocalization{
@@ -131,14 +117,6 @@ L:SetOptionLocalization{
 	warnAdd		= "Show warning when add spawned"
 }
 
-L:SetOptionLocalization{
-	RangeFrame			= "Show range frame (10)"
-}
-
-L:SetMiscLocalization{
-	DBM_CURA_YELL_PULL		= "The Menagerie is for guests only."
-}
-
 
 -- Terestian Illhoof
 L = DBM:GetModLocalization("TerestianIllhoof")
@@ -148,7 +126,6 @@ L:SetGeneralLocalization{
 }
 
 L:SetMiscLocalization{
-	DBM_TI_YELL_PULL		= "Ah, you're just in time. The rituals are about to begin!",
 	Kilrek					= "Kil'rek",
 	DChains					= "Demon Chains"
 }
@@ -171,9 +148,7 @@ L:SetTimerLocalization{
 
 L:SetOptionLocalization{
 	timerSpecial			= "Show timer for special ability cooldown",
-	DBM_ARAN_DO_NOT_MOVE	= "Show special warning for $spell:30004",
-	ElementalIcons			= "Set icons on $spell:37053",
-	WreathIcons				= DBM_CORE_AUTO_ICONS_OPTION_TEXT:format(29946)
+	DBM_ARAN_DO_NOT_MOVE	= "Show special warning for $spell:30004"
 }
 
 --Netherspite
@@ -232,7 +207,6 @@ L:SetGeneralLocalization{
 }
 
 L:SetMiscLocalization{
-	DBM_PRINCE_YELL_PULL	= "Madness has brought you here to me. I shall be your undoing!",
 	DBM_PRINCE_YELL_P2		= "Simple fools! Time is the fire in which you'll burn!",
 	DBM_PRINCE_YELL_P3		= "How can you hope to stand against such overwhelming power?",
 	DBM_PRINCE_YELL_INF1	= "All realities, all dimensions are open to me!",
@@ -241,10 +215,10 @@ L:SetMiscLocalization{
 
 
 -- Nightbane
-L = DBM:GetModLocalization("Nightbane")
+L = DBM:GetModLocalization("NightbaneRaid")
 
 L:SetGeneralLocalization{
-	name = "Nightbane"
+	name = "Nightbane (Raid)"
 }
 
 L:SetWarningLocalization{
@@ -262,7 +236,6 @@ L:SetOptionLocalization{
 
 L:SetMiscLocalization{
 	DBM_NB_EMOTE_PULL		= "An ancient being awakens in the distance...",
-	DBM_NB_YELL_PULL		= "What fools! I shall bring a quick end to your suffering!",
 	DBM_NB_YELL_AIR			= "Miserable vermin. I shall exterminate you from the air!",
 	DBM_NB_YELL_GROUND		= "Enough! I shall land and crush you myself!",
 	DBM_NB_YELL_GROUND2		= "Insects! Let me show you my strength up close!"

@@ -7,7 +7,7 @@
 --		Banjankri of Blackrock, Predeter of Proudmoore, Xenyr of Aszune
 
 -- Currently maintained by
--- Cybeloras of Aerie Peak/Detheroc/Mal'Ganis
+-- Cybeloras of Aerie Peak
 -- --------------------
 
 
@@ -43,6 +43,8 @@ local rawget, date, tinsert, ipairs, error, ceil
 
 local IconView = TMW:NewClass("IconView", "GroupComponent", "IconComponent")
 IconView.ModuleImplementors = {}
+
+IconView.DefaultPanelSet = "group"
 
 
 
@@ -177,11 +179,11 @@ function IconView:SetTypeAllowance(typeName, allow)
 		IconType:SetViewAllowance(self.view, allow)
 		
 	elseif not IconType then
-		TMW:RegisterCallback("TMW_CLASS_IconType_INTANCE_NEW", function(event, instance)
+		TMW:RegisterSelfDestructingCallback("TMW_CLASS_IconType_INTANCE_NEW", function(event, instance)
 			if instance.type == typeName and instance.SetViewAllowance then
 				instance:SetViewAllowance(self.view, allow)
 
-				TMW:UnregisterThisCallback()
+				return true -- Signal callback destruction
 			end
 		end)
 	end
@@ -265,7 +267,7 @@ function IconView:OnImplementIntoIcon(icon)
 			local Module = icon.Modules[moduleName]
 			
 			-- Don't create the module if it is disallowed for the default icon type and the icon uses the default icon type.
-			if not Module and not (icon.typeData.type == "" and not ModuleClass:IsAllowedByType("")) then
+			if not Module and not (icon:GetSettings().Type == "" and not ModuleClass:IsAllowedByType("")) then
 				Module = ModuleClass:New(icon)
 			end
 
@@ -345,6 +347,7 @@ end
 
 
 -- Default modules
+IconView:ImplementsModule("GroupModule_BaseConfig", 0.5, true)
 IconView:ImplementsModule("GroupModule_GroupPosition", 1, true)
 IconView:ImplementsModule("GroupModule_Alpha", 1.5, true)
 

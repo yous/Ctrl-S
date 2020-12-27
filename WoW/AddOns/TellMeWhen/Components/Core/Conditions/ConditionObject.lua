@@ -7,7 +7,7 @@
 --		Banjankri of Blackrock, Predeter of Proudmoore, Xenyr of Aszune
 
 -- Currently maintained by
--- Cybeloras of Aerie Peak/Detheroc/Mal'Ganis
+-- Cybeloras of Aerie Peak
 -- --------------------
 
 
@@ -157,9 +157,6 @@ function ConditionObject:CompileUpdateFunction(Conditions)
 	end
 
 	self.UpdateMethod = "OnEvent"
-	if TMW.db.profile.DEBUG_ForceAutoUpdate then
-		self.UpdateMethod = "OnUpdate"
-	end
 	
 	-- Begin creating the final string that will be used to make the function.
 	local funcstr = "if (not event or \r\n"
@@ -291,6 +288,8 @@ end
 function ConditionObject:RequestAutoUpdates(requester, doRequest)
 	if doRequest then
 	
+		-- self.doesAutoUpdate must be true before calling RegisterForUpdating().
+		-- :RegisterForUpdating() will update the current state of the condition.
 		self.doesAutoUpdate = true
 		self:RegisterForUpdating()
 		

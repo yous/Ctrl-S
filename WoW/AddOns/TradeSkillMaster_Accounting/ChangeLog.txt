@@ -1,3 +1,83 @@
+v3.0.22
+*Fixed missing ptBR localization file.
+
+v3.0.21
+*Updated TOC version for patch 8.0.
+
+v3.0.20
+*Updated TOC version for patch 7.3.
+
+v3.0.19
+*Updated for patch 7.2.
+*Fixed issue with recording of repair expenses.
+
+v3.0.18
+*Updated TOC version for patch 7.1.
+
+v3.0.17
+*Fixed issue with recording trades.
+*Fixed issue with recording bonus gold from class hall missions.
+
+v3.0.16
+*Made scanning of listed auctions less aggressive.
+
+v3.0.15
+*Fixed error while opening mail.
+
+v3.0.14
+*Using new APIs added to core TSM addon to workaround Blizzard's item caching issues.
+
+v3.0.13
+*Fixed error hit while opening mail.
+
+v3.0.12
+*Fixed bug with tracking of sent mail.
+
+v3.0.11
+*Fixed bug when opening mail with above 1M gold.
+
+v3.0.10
+*Fixed bug in last version.
+
+v3.0.8
+*Fixed bug caused by 7.0.x changes.
+
+v3.0.7
+*Bumped TOC version for patch 7.0.x.
+
+v3.0.6
+*Fixed error seen in some situations after clearing old data.
+*Fixed error from gold tracking.
+
+v3.0.5
+*Fixed another issue with Accounting taking a long time to load.
+
+v3.0.4
+*Fixed issue with Accounting taking a long time to load.
+
+v3.0.3
+*Changed how Accounting data is stored.
+
+v3.0.2
+*Various changes to prepare for r303 of the TSM Desktop Application.
+*Removed a bunch of dead code.
+
+v3.0.1
+*Fixed error when attempting to loot mail past gold cap.
+
+v3.0
+*Initial 3.0 version!
+\\
+
+v2.4.5
+*Updated for patch 6.2
+
+v2.4.4
+*Fixing interface version.
+
+v2.4.3
+*Updated for patch 6.1
+
 v2.4.2
 *Fixed issue with display of avgBuy info.
 

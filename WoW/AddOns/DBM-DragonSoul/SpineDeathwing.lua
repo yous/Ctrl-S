@@ -1,12 +1,11 @@
 local mod	= DBM:NewMod(318, "DBM-DragonSoul", nil, 187)
 local L		= mod:GetLocalizedStrings()
 
-mod:SetRevision(("$Revision: 145 $"):sub(12, -3))
+mod:SetRevision("20200806141910")
 mod:SetCreatureID(53879)
 mod:SetEncounterID(1291)
-mod:SetZone()
 mod:SetUsedIcons(6, 5, 4, 3, 2, 1)
-mod:SetModelSound("sound\\CREATURE\\Deathwing\\VO_DS_DEATHWING_BACKEVENT_01.OGG", "sound\\CREATURE\\Deathwing\\VO_DS_DEATHWING_BACKSLAY_01.OGG")
+--mod:SetModelSound("sound\\CREATURE\\Deathwing\\VO_DS_DEATHWING_BACKEVENT_01.OGG", "sound\\CREATURE\\Deathwing\\VO_DS_DEATHWING_BACKSLAY_01.OGG")
 
 mod:RegisterCombat("combat")
 
@@ -16,8 +15,6 @@ mod:RegisterEventsInCombat(
 	"SPELL_AURA_APPLIED 105248 105490 105479",
 	"SPELL_AURA_APPLIED_DOSE 105248",
 	"SPELL_AURA_REMOVED 105490 105479",
-	"SPELL_HEAL",
-	"SPELL_PERIODIC_HEAL",
 	"SPELL_DAMAGE",
 	"SPELL_MISSED",
 	"SWING_DAMAGE",
@@ -40,28 +37,26 @@ local specWarnNuclearBlast	= mod:NewSpecialWarningRun(105845, "Melee", nil, nil,
 local specWarnSealArmor		= mod:NewSpecialWarningSpell(105847, "Dps")
 local specWarnAmalgamation	= mod:NewSpecialWarningSpell("ej4054", false)
 
-local timerSealArmor		= mod:NewCastTimer(23, 105847)
-local timerBarrelRoll		= mod:NewCastTimer(5, "ej4050")
-local timerGripCD			= mod:NewNextTimer(32, 105490)
-local timerDeathCD			= mod:NewCDTimer(8.5, 106199)--8.5-10sec variation.
-
-local countdownRoll			= mod:NewCountdown(5, "ej4050")
-local countdownGrip			= mod:NewCountdown("Alt32", 105490, "-Tank")--Can get confusing if used with roll countdown. This is off by default but can be turned on by someone willing to sort out the confusion on their own.
+local timerSealArmor		= mod:NewCastTimer(23, 105847, nil, nil, nil, 6)
+local timerBarrelRoll		= mod:NewCastTimer(5, "ej4050", nil, nil, nil, 2, nil, DBM_CORE_L.DEADLY_ICON, nil, 1, 3)
+local timerGripCD			= mod:NewNextTimer(32, 105490, nil, nil, nil, 3)
+local timerDeathCD			= mod:NewCDTimer(8.5, 106199, nil, nil, nil, 5)--8.5-10sec variation.
 
 mod:AddBoolOption("InfoFrame", true)
 mod:AddBoolOption("SetIconOnGrip", true)
-mod:AddBoolOption("ShowShieldInfo", false)--on 25 man this is quite frankly a spammy nightmare, especially on heroic. off by default since it's really only sensible in 10 man. Besides I may be adding an alternate frame option for "grip damage needed"
 
-local sealArmorText = DBM_CORE_AUTO_ANNOUNCE_TEXTS.cast:format(GetSpellInfo(105847), 23)
+mod.vb.shieldCount = 0
+local sealArmorText = DBM_CORE_L.AUTO_ANNOUNCE_TEXTS.cast:format(DBM:GetSpellInfo(105847), 23)
 local gripTargets = {}
 local gripIcon = 6
 local corruptionActive = {}
 local residueNum = 0
 local diedOozeGUIDS = {}
 local numberOfPlayers = 1
+local tendrilDebuff = DBM:GetSpellInfo(105563)
 
 local function checkTendrils()
-	if not UnitDebuff("player", GetSpellInfo(105563)) and not UnitIsDeadOrGhost("player") then
+	if not DBM:UnitDebuff("player", tendrilDebuff) and not UnitIsDeadOrGhost("player") then
 		specWarnTendril:Show()
 	end
 end
@@ -102,66 +97,17 @@ local function countCorruptionActive()
 	return count
 end
 
-local clearPlasmaTarget, setPlasmaTarget, clearPlasmaVariables
-do
-	local plasmaTargets = {}
-	local healed = {}
-	
-	function mod:SPELL_HEAL(_, _, _, _, destGUID, _, _, _, _, _, _, _, _, absorbed)
-		if plasmaTargets[destGUID] then
-			healed[destGUID] = healed[destGUID] + (absorbed or 0)
-			DBM.BossHealth:Update()
-		end
-	end
-	mod.SPELL_PERIODIC_HEAL = mod.SPELL_HEAL
-
-	local function updatePlasmaTargets()
-		if not mod.Options.ShowShieldInfo then return end
-		local maxAbsorb =	mod:IsDifficulty("heroic25") and 420000 or
-							mod:IsDifficulty("heroic10") and 280000 or
-							mod:IsDifficulty("normal25") and 300000 or
-							mod:IsDifficulty("normal10") and 200000 or 1
-		DBM.BossHealth:Clear()
-		if not DBM.BossHealth:IsShown() then
-			DBM.BossHealth:Show(L.name)
-		end
-		for i,v in pairs(plasmaTargets) do
-			DBM.BossHealth:AddBoss(function() return math.max(1, math.floor((healed[i] or 0) / maxAbsorb * 100))	end, L.PlasmaTarget:format(v))
-		end
-	end
-
-	function setPlasmaTarget(guid, name)
-		plasmaTargets[guid] = name
-		healed[guid] = 0
-		updatePlasmaTargets()
-	end
-
-	function clearPlasmaTarget(guid, name)
-		plasmaTargets[guid] = nil
-		healed[guid] = nil
-		updatePlasmaTargets()
-	end
-
-	function clearPlasmaVariables()
-		table.wipe(plasmaTargets)
-		table.wipe(healed)
-		updatePlasmaTargets()
-	end
-end
-
 function mod:OnCombatStart(delay)
+	self.vb.shieldCount = 0
 	numberOfPlayers = DBM:GetNumRealGroupMembers()
 	if self:IsDifficulty("lfr25") then
-		sealArmorText = DBM_CORE_AUTO_ANNOUNCE_TEXTS.cast:format(GetSpellInfo(105847), 34.5)
+		sealArmorText = DBM_CORE_L.AUTO_ANNOUNCE_TEXTS.cast:format(DBM:GetSpellInfo(105847), 34.5)
 	else
-		sealArmorText = DBM_CORE_AUTO_ANNOUNCE_TEXTS.cast:format(GetSpellInfo(105847), 23)
+		sealArmorText = DBM_CORE_L.AUTO_ANNOUNCE_TEXTS.cast:format(DBM:GetSpellInfo(105847), 23)
 	end
 	table.wipe(gripTargets)
 	table.wipe(corruptionActive)
 	table.wipe(diedOozeGUIDS)
-	if self.Options.ShowShieldInfo then
-		clearPlasmaVariables()
-	end
 	gripIcon = 6
 	residueNum = 0
 end
@@ -190,14 +136,8 @@ function mod:SPELL_CAST_START(args)
 			corruptionActive[args.sourceGUID] = 0
 			if self:IsDifficulty("normal25", "heroic25") then
 				timerGripCD:Start(16, args.sourceGUID)
-				if countCorruptionActive() < 2 then--because using countdowns with more then 1 will be noisy not informative.
-					countdownGrip:Start(16, nil, args.sourceGUID)
-				end
 			else
 				timerGripCD:Start(nil, args.sourceGUID)
-				if countCorruptionActive() < 2 then--because using countdowns with more then 1 will be noisy not informative.
-					countdownGrip:Start(32, nil, args.sourceGUID)
-				end
 			end
 		end
 		corruptionActive[args.sourceGUID] = corruptionActive[args.sourceGUID] + 1
@@ -212,7 +152,7 @@ end
 -- not needed guid check. This is residue creation step.
 function mod:SPELL_CAST_SUCCESS(args)
 	local spellId = args.spellId
-	if spellId == 105219 then 
+	if spellId == 105219 then
 		residueNum = residueNum + 1
 		diedOozeGUIDS[args.sourceGUID] = GetTime()
 		self:Unschedule(warningResidue)
@@ -233,7 +173,6 @@ function mod:SPELL_AURA_APPLIED(args)
 	elseif spellId == 105490 then
 		gripTargets[#gripTargets + 1] = args.destName
 		timerGripCD:Cancel(args.sourceGUID)
-		countdownGrip:Cancel(args.sourceGUID)
 		if corruptionActive[args.sourceGUID] then
 			corruptionActive[args.sourceGUID] = nil
 		end
@@ -247,11 +186,13 @@ function mod:SPELL_AURA_APPLIED(args)
 		self:Unschedule(showGripWarning)
 		self:Schedule(0.3, showGripWarning)
 	elseif spellId == 105479 then
-		if self.Options.ShowShieldInfo then
-			setPlasmaTarget(args.destGUID, args.destName)
+		self.vb.shieldCount = self.vb.shieldCount + 1
+		if self.Options.InfoFrame and not DBM.InfoFrame:IsShown() then
+			DBM.InfoFrame:SetHeader(args.spellName)
+			DBM.InfoFrame:Show(6, "playerabsorb", args.spellName, select(16, DBM:UnitDebuff(args.destName, args.spellName)))
 		end
 	end
-end		
+end
 
 function mod:SPELL_AURA_APPLIED_DOSE(args)
 	local spellId = args.spellId
@@ -272,11 +213,12 @@ function mod:SPELL_AURA_REMOVED(args)
 			self:SetIcon(args.destName, 0)
 		end
 	elseif spellId == 105479 then
-		if self.Options.ShowShieldInfo then
-			clearPlasmaTarget(args.destGUID, args.destName)
+		self.vb.shieldCount = self.vb.shieldCount - 1
+		if self.Options.InfoFrame and self.vb.shieldCount == 0 then
+			DBM.InfoFrame:Hide()
 		end
 	end
-end	
+end
 
 --Damage event that indicates an ooze is taking damage
 --we check its GUID to see if it's a resurrected ooze and if so remove it from table.
@@ -297,26 +239,26 @@ function mod:RAID_BOSS_EMOTE(msg)
 	if msg == L.DRoll or msg:find(L.DRoll) then
 		self:Unschedule(checkTendrils)--In case you manage to spam spin him, we don't want to get a bunch of extra stuff scheduled.
 		self:Unschedule(clearTendrils)--^
-		countdownRoll:Cancel()--^
-		specWarnRoll:Show()--Warn you right away.
+		if self:AntiSpam(3, 1) then
+			specWarnRoll:Show()--Warn you right away.
+		end
 		self:Schedule(3, checkTendrils)--After 3 seconds of roll starting, check tendrals, you should have leveled him out by now if this wasn't on purpose.
-		self:Schedule(12, clearTendrils)--Clearing 3 seconds after the roll should be sufficent
+		timerBarrelRoll:Cancel()
 		if numberOfPlayers > 1 then
 			timerBarrelRoll:Start(5)
-			countdownRoll:Start(5)
+			self:Schedule(8, clearTendrils)--Clearing 3 seconds after the roll should be sufficent
 		else
 			timerBarrelRoll:Start(10)
-			countdownRoll:Start(10)
+			self:Schedule(13, clearTendrils)--Clearing 3 seconds after the roll should be sufficent
 		end
 		if self.Options.InfoFrame and not DBM.InfoFrame:IsShown() then
-			DBM.InfoFrame:SetHeader(L.NoDebuff:format(GetSpellInfo(105563)))
-			DBM.InfoFrame:Show(5, "playergooddebuff", 105563)
+			DBM.InfoFrame:SetHeader(L.NoDebuff:format(tendrilDebuff))
+			DBM.InfoFrame:Show(5, "playergooddebuff", tendrilDebuff)
 		end
 	elseif msg == L.DLevels or msg:find(L.DLevels) then
 		self:Unschedule(checkTendrils)
 		self:Unschedule(clearTendrils)
 		clearTendrils()
-		countdownRoll:Cancel()
 		timerBarrelRoll:Cancel()
 	end
 end
@@ -325,7 +267,6 @@ function mod:UNIT_DIED(args)
 	local cid = self:GetCIDFromGUID(args.destGUID)
 	if cid == 53891 or cid == 56162 or cid == 56161 then
 		timerGripCD:Cancel(args.sourceGUID)
-		countdownGrip:Cancel(args.sourceGUID)
 		warnAmalgamation:Schedule(4.5)--4.5-5 seconds after corruption dies.
 		specWarnAmalgamation:Schedule(4.5)
 		if self:IsDifficulty("heroic10", "heroic25") then

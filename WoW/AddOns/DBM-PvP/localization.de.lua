@@ -4,160 +4,39 @@ local L
 --------------------------
 --  General BG Options  --
 --------------------------
-L = DBM:GetModLocalization("Battlegrounds")
+L = DBM:GetModLocalization("PvPGeneral")
 
 L:SetGeneralLocalization({
-	name = "Allgemeine Einstellungen"
-})
-
-
-L:SetTimerLocalization({
-	TimerInvite = "%s"
-})
-
-L:SetOptionLocalization({
-	ColorByClass	= "Einfärbung der Spielernamen nach Klasse in der Schlachtfeld-Punktetafel",
-	ShowInviteTimer	= "Zeige Zeit für Schlachtfeld-Beitrittsmöglichkeit",
-	AutoSpirit		= "Automatisch Geist freilassen",
-	HideBossEmoteFrame	= "Verberge das Schlachtzugsboss-Emote-Fenster ('RaidBossEmoteFrame')"
-})
-
-L:SetMiscLocalization({
-	ArenaInvite	= "Arena-Einladung"
-})
-
---------------
---  Arenas  --
---------------
-L = DBM:GetModLocalization("Arenas")
-
-L:SetGeneralLocalization({
-	name = "Arenas"
+	name	= "Allgemeine Einstellungen"
 })
 
 L:SetTimerLocalization({
-	TimerShadow	= "Schattensicht"
+	TimerInvite	= "%s"
 })
 
 L:SetOptionLocalization({
-	TimerShadow = "Zeige Zeit bis $spell:34709 verfügbar"
+	ColorByClass		= "Einfärbung der Spielernamen nach Klasse in der Schlachtfeld-Punktetafel",
+	TimerInvite			= "Zeige Zeit für Schlachtfeld-Beitrittsmöglichkeit",
+	AutoSpirit			= "Automatisch Geist freilassen",
+	HideBossEmoteFrame	= "Verberge das Fenster \"RaidBossEmoteFrame\" und Garnisons-/Gildenerfolgsmeldungen während Schlachtfeldern"
 })
 
 L:SetMiscLocalization({
-	Start15 = "Noch fünfzehn Sekunden bis der Arenakampf beginnt!"
+	BgStart60			= "Die Schlacht beginnt in 1 Minute.",
+	BgStart30			= "Die Schlacht beginnt in 30 Sekunden. Macht Euch bereit!",
+	ExprFlagPickUp		= "(.+) hat die Flagge der (%w+) aufgenommen!",
+	ExprFlagCaptured	= "(.+) hat die Flagge der (%w+) errungen!",
+	ExprFlagReturn		= "Die Flagge der (%w+) wurde von (.+) zu ihrem Stützpunkt zurückgebracht!",
+	Vulnerable1			= "Eure Angriffe verursachen nun schwerere Verletzungen bei Flaggenträgern!",
+	Vulnerable2			= "Eure Angriffe verursachen nun sehr schwere Verletzungen bei Flaggenträgern!"
 })
-
 ----------------------
 --  Alterac Valley  --
 ----------------------
 L = DBM:GetModLocalization("z30")
 
-L:SetTimerLocalization({
-	TimerTower	= "%s",
-	TimerGY		= "%s"
-})
-
 L:SetOptionLocalization({
-	TimerTower	= "Zeige Zerstörungsdauer für Türme",
-	TimerGY		= "Zeige Eroberungsdauer für Friedhofe",
 	AutoTurnIn	= "Automatisches Abgeben der Quests im Alteractal"
-})
-
---------------------
---  Arathi Basin  --
---------------------
-L = DBM:GetModLocalization("z529")
-
-L:SetTimerLocalization({
-	TimerCap	= "%s"
-})
-
-L:SetOptionLocalization({
-	TimerWin				= "Zeige Zeit bis eine Fraktion gewinnt",
-	TimerCap				= "Zeige Eroberungsdauer für Basen",
-	ShowAbEstimatedPoints	= "Zeige geschätzten Endpunktestand",
-	ShowAbBasesToWin		= "Zeige benötigte Anzahl von Basen zum Sieg"
-})
-
-L:SetMiscLocalization({
-	ScoreExpr	= "(%d+)/1500",
-	WinBarText	= "%s gewinnt",
-	BasesToWin	= "benötigte Basen für Sieg: %d"
-})
-
----------------------
---  Deepwind Gorge --
----------------------
-L = DBM:GetModLocalization("z1105")
-
-L:SetTimerLocalization({
-       TimerCap        = "%s"
-})
-
-L:SetOptionLocalization({
-       TimerCap        = "Zeige Eroberungsdauer für Basen",
-       TimerWin        = "Zeige Zeit bis eine Fraktion gewinnt"
-})
-
-L:SetMiscLocalization({
-       ScoreExpr       = "(%d+)/1500",
-       WinBarText      = "%s gewinnt"
-})
-
-------------------------
---  Eye of the Storm  --
-------------------------
-L = DBM:GetModLocalization("z566")
-
-L:SetTimerLocalization({
-	TimerFlag	= "Flaggen-Respawn"
-})
-
-L:SetOptionLocalization({
-	TimerWin 		= "Zeige Zeit bis eine Fraktion gewinnt",
-	TimerFlag 		= "Zeige Zeit bis zum Respawn der Flagge",
-	ShowPointFrame	= "Zeige Flaggenträger und geschätzten Endpunktestand"
-})
-
-L:SetMiscLocalization({
-	ScoreExpr		= "(%d+)/1500",
-	WinBarText 		= "%s gewinnt",
-	Flag			= "Flagge",
-	FlagReset 		= "Die Flagge wurde zurückgesetzt.",
-	FlagTaken 		= "(.+) hat die Flagge aufgenommen.",
-	FlagCaptured	= "Die %w+ hat die Flagge erobert!",
-	FlagDropped		= "Die Flagge wurde fallengelassen."
-})
-
----------------------
---  Warsong Gulch  --
----------------------
-L = DBM:GetModLocalization("z489")
-
-L:SetTimerLocalization({
-	TimerStart	= "Kampfbeginn",
-	TimerFlag	= "Flaggen-Respawn"
-})
-
-L:SetOptionLocalization({
-	TimerStart					= "Zeige Zeit bis Kampfbeginn",
-	TimerFlag					= "Zeige Zeit bis zum Respawn der Flaggen",
-	ShowFlagCarrier				= "Zeige Flaggenträger",
-	ShowFlagCarrierErrorNote	= "Zeige Fehlermeldung, wenn Flaggenträger-Zielauswahl nicht gesetzt werden kann"
-})
-
-L:SetMiscLocalization({
-	BgStart60 			= "Die Schlacht beginnt in 1 Minute.",
-	BgStart30 			= "Die Schlacht beginnt in 30 Sekunden. Macht Euch bereit!",
-	InfoErrorText		= "Die Zielauswahlfunktion für den Flaggenträger wird bei Kampfende wiederhergestellt.",
-	ExprFlagPickUp		= "(.+) hat die Flagge der (%w+) aufgenommen!", -- code is aware of the switched match groups for deDE
-	ExprFlagCaptured	= "(.+) hat die Flagge der (%w+) errungen!",
-	ExprFlagReturn		= "Die Flagge der (%w+) wurde von (.+) zu ihrem Stützpunkt zurückgebracht!",
-	FlagAlliance		= "Allianz-Flagge: ",
-	FlagHorde			= "Horde-Flagge: ",
-	FlagBase			= "Basis",
-	Vulnerable1			= "Eure Angriffe verursachen nun schwerere Verletzungen bei Flaggenträgern!",
-	Vulnerable2			= "Eure Angriffe verursachen nun sehr schwere Verletzungen bei Flaggenträgern!"
 })
 
 ------------------------
@@ -171,12 +50,10 @@ L:SetWarningLocalization({
 })
 
 L:SetTimerLocalization({
-	TimerPOI			= "%s",
 	TimerSiegeEngine	= "Belagerungsmaschine"
 })
 
 L:SetOptionLocalization({
-	TimerPOI			= "Zeige Eroberungsdauer",
 	TimerSiegeEngine	= "Zeige Zeit bis Belagerungsmaschine bereit ist",
 	WarnSiegeEngine		= "Zeige Warnung, wenn Belagerungsmaschine bereit ist",
 	WarnSiegeEngineSoon	= "Zeige Warnung, wenn Belagerungsmaschine fast bereit ist",
@@ -196,74 +73,24 @@ L:SetMiscLocalization({
 	GoblinBrokenHorde		= "Schon wieder kaputt?! Ich werde es richten... Ihr solltet allerdings nicht davon ausgehen, dass das noch unter die Garantie fällt."
 })
 
-------------------
---  Twin Peaks  --
-------------------
-L = DBM:GetModLocalization("z726")
-
-L:SetTimerLocalization({
-	TimerStart	= "Kampfbeginn",
-	TimerFlag	= "Flaggen-Respawn"
-})
-
-L:SetOptionLocalization({
-	TimerStart					= "Zeige Zeit bis Kampfbeginn",
-	TimerFlag					= "Zeige Zeit bis zum Respawn der Flaggen",
-	ShowFlagCarrier				= "Zeige Flaggenträger",
-	ShowFlagCarrierErrorNote	= "Zeige Fehlermeldung, wenn Flaggenträger-Zielauswahl nicht gesetzt werden kann"
-})
-
-L:SetMiscLocalization({
-	BgStart60 			= "Die Schlacht beginnt in 1 Minute.",
-	BgStart30 			= "Die Schlacht beginnt in 30 Sekunden. Macht Euch bereit!",
-	InfoErrorText		= "Die Zielauswahlfunktion für den Flaggenträger wird bei Kampfende wiederhergestellt.",
-	ExprFlagPickUp		= "(.+) hat die Flagge der (%w+) aufgenommen!", -- code is aware of the switched match groups for deDE
-	ExprFlagCaptured	= "(.+) hat die Flagge der (%w+) errungen!",
-	ExprFlagReturn		= "Die Flagge der (%w+) wurde von (.+) zu ihrem Stützpunkt zurückgebracht!",
-	FlagAlliance		= "Allianz-Flagge: ",
-	FlagHorde			= "Horde-Flagge: ",
-	FlagBase			= "Basis",
-	Vulnerable1			= "Eure Angriffe verursachen nun schwerere Verletzungen bei Flaggenträgern!",
-	Vulnerable2			= "Eure Angriffe verursachen nun sehr schwere Verletzungen bei Flaggenträgern!"
-})
-
-------------------------------
---  The Battle for Gilneas  --
-------------------------------
-L = DBM:GetModLocalization("z761")
-
-L:SetTimerLocalization({
-	TimerCap	= "%s"
-})
-
-L:SetOptionLocalization({
-	TimerWin				= "Zeige Zeit bis eine Fraktion gewinnt",
-	TimerCap				= "Zeige Eroberungsdauer für Basen",
-	ShowGilneasEstimatedPoints		= "Zeige geschätzten Endpunktestand",
-	ShowGilneasBasesToWin			= "Zeige benötigte Anzahl von Basen zum Sieg"
-})
-
-L:SetMiscLocalization({
-	ScoreExpr	= "(%d+)/1500",
-	WinBarText	= "%s gewinnt",
-	BasesToWin	= "benötigte Basen für Sieg: %d"
-})
-
 -------------------------
 --  Silvershard Mines  --
 -------------------------
 L = DBM:GetModLocalization("z727")
 
 L:SetTimerLocalization({
-	TimerCart	= "Wagen-Respawn"
+	TimerRespawn	= "Wagen-Respawn"
 })
 
 L:SetOptionLocalization({
-	TimerCart	= "Zeige Zeit bis zum Respawn der Wagen"
+	TimerResapwn	= "Zeige Zeit bis zum Respawn der Wagen",
+	TimerCart		= "Show cart cap timer"
 })
 
 L:SetMiscLocalization({
-	Capture = "hat eine Minenlore erobert"
+	Capture	= "hat eine Minenlore erobert",
+	Arrived	= "has arived",
+	Begun	= "has begun"
 })
 
 -------------------------
@@ -271,16 +98,7 @@ L:SetMiscLocalization({
 -------------------------
 L = DBM:GetModLocalization("z998")
 
-L:SetOptionLocalization({
-	TimerWin			= "Zeige Zeit bis eine Fraktion gewinnt",
-	ShowKotmoguEstimatedPoints	= "Zeige geschätzten Endpunktestand",
-	ShowKotmoguOrbsToWin		= "Zeige benötigte Anzahl von Kugeln der Macht zum Sieg"
-})
-
 L:SetMiscLocalization({
-	OrbTaken 	= "(%S+) hat die (%S+) Kugel genommen!",
-	OrbReturn 	= "Die (%S+) Kugel wurde zurückgebracht!",
-	ScoreExpr	= "(%d+)/1500",
-	WinBarText	= "%s gewinnt (geschätzt)",
-	OrbsToWin	= "benötigte Kugeln für Sieg: %d"
+	OrbTaken	= "(%S+) hat die (%S+) Kugel genommen!",
+	OrbReturn	= "Die (%S+) Kugel wurde zurückgebracht!"
 })

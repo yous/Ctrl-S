@@ -36,8 +36,8 @@ L:SetOptionLocalization({
 	TwilightBlastArrow		= "Показывать стрелку DBM, когда $spell:92898 около вас",
 	RangeFrame				= "Показывать окно проверки дистанции (10м)",
 	BlackoutShieldFrame		= "Показывать полоску здоровья для $spell:92878",
-	BlackoutIcon			= DBM_CORE_AUTO_ICONS_OPTION_TEXT:format(92878),
-	EngulfingIcon			= DBM_CORE_AUTO_ICONS_OPTION_TEXT:format(86622)
+	BlackoutIcon			= DBM_CORE_L.AUTO_ICONS_OPTION_TEXT:format(92878),
+	EngulfingIcon			= DBM_CORE_L.AUTO_ICONS_OPTION_TEXT:format(86622)
 })
 
 L:SetMiscLocalization({
@@ -66,15 +66,15 @@ L:SetOptionLocalization({
 	SpecWarnSearingWinds	= "Спец-предупреждение, когда у вас не хватает ауры $spell:83500<br/>(~10сек перед началом применения)",
 	timerTransition			= "Показывать таймер перехода в другую фазу",
 	RangeFrame				= "Автоматически показывать окно проверки дистанции при надобности",
-	yellScrewed				= "Кричать, когда на вас одновременно $spell:83099 и $spell:92307",	
+	yellScrewed				= "Кричать, когда на вас одновременно $spell:83099 и $spell:92307",
 	InfoFrame				= "Показывать игроков без $spell:83581 или $spell:83500",
-	HeartIceIcon			= DBM_CORE_AUTO_ICONS_OPTION_TEXT:format(82665),
-	BurningBloodIcon		= DBM_CORE_AUTO_ICONS_OPTION_TEXT:format(82660),
-	LightningRodIcon		= DBM_CORE_AUTO_ICONS_OPTION_TEXT:format(83099),
-	GravityCrushIcon		= DBM_CORE_AUTO_ICONS_OPTION_TEXT:format(84948),
-	FrostBeaconIcon			= DBM_CORE_AUTO_ICONS_OPTION_TEXT:format(92307),
-	StaticOverloadIcon		= DBM_CORE_AUTO_ICONS_OPTION_TEXT:format(92067),
-	GravityCoreIcon			= DBM_CORE_AUTO_ICONS_OPTION_TEXT:format(92075)
+	HeartIceIcon			= DBM_CORE_L.AUTO_ICONS_OPTION_TEXT:format(82665),
+	BurningBloodIcon		= DBM_CORE_L.AUTO_ICONS_OPTION_TEXT:format(82660),
+	LightningRodIcon		= DBM_CORE_L.AUTO_ICONS_OPTION_TEXT:format(83099),
+	GravityCrushIcon		= DBM_CORE_L.AUTO_ICONS_OPTION_TEXT:format(84948),
+	FrostBeaconIcon			= DBM_CORE_L.AUTO_ICONS_OPTION_TEXT:format(92307),
+	StaticOverloadIcon		= DBM_CORE_L.AUTO_ICONS_OPTION_TEXT:format(92067),
+	GravityCoreIcon			= DBM_CORE_L.AUTO_ICONS_OPTION_TEXT:format(92075)
 })
 
 L:SetMiscLocalization({
@@ -102,8 +102,7 @@ L:SetOptionLocalization({
 	CorruptingCrashArrow	= "Показывать стрелку DBM, когда $spell:93178 около вас",
 	InfoFrame				= "Показывать информационное окно для $journal:3165",
 	RangeFrame				= "Показывать окно проверки дистанции (5м) для $spell:82235",
-	SetIconOnWorship		= DBM_CORE_AUTO_ICONS_OPTION_TEXT:format(91317),
-	SetIconOnCreature		= "Устанавливать метки на Смутные творения"
+	SetIconOnWorship		= DBM_CORE_L.AUTO_ICONS_OPTION_TEXT:format(91317)
 })
 
 ----------------
@@ -135,7 +134,6 @@ L:SetOptionLocalization({
 	TimerEggWeaken		= "Отсчет времени восстановления $spell:87654",
 	TimerOrbs			= "Отсчет времени до следующих сфер (таймер может быть неточным)",
 	SetIconOnOrbs		= "Устанавливать метки на игроков, имеющих агро от сфер<br/>(Предполагаемые цели сфер)",
-	OrbsCountdown		= "Звуковой отсчет перед появлением сфер",
 	InfoFrame			= "Показывать список игроков, имеющих агро"
 })
 

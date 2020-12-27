@@ -17,6 +17,9 @@ L:SetOptionLocalization{
 }
 L:SetMiscLocalization{
 	Phase2Emote	= "失去能量，停止运作!",
+	YellEgg1	= "你要为强迫我这么做而付出代价！",
+	YellEgg2	= "蠢货！这些蛋比你认为的要珍贵的多！", -- needs localized resource
+	YellEgg3	= "不！住手！我要你的头颅来弥补你的罪行！",
 	YellPull 	= "入侵者闯入孵化室了!警报!不惜一切代价保护蛋!"
 }
 -------------------
@@ -115,7 +118,6 @@ L:SetOptionLocalization{
 	WarnPhase			= "提示转换阶段"
 }
 L:SetMiscLocalization{
-	YellPull	= "让赛事开始吧!",
 	YellP2		= "干得好，我的手下。凡人的勇气开始消退!现在，现在让我们看看他们如何应对黑石之王的力量!!!",
 	YellP3		= "不可能!出现吧，我的仆人!再次为我的主人服务!",
 	YellShaman	= "萨满，让我看看",

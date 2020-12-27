@@ -10,7 +10,7 @@ L = DBM:GetModLocalization("FlameLeviathan")
 L:SetGeneralLocalization{
 	name = "Огненный Левиафан"
 }
-	
+
 L:SetMiscLocalization{
 	YellPull	= "Обнаружены противники. Запуск протокола оценки угрозы. Главная цель выявлена. Повторный анализ через 30 секунд.",
 	Emote		= "%%s наводится на (%S+)%."
@@ -48,7 +48,7 @@ L:SetGeneralLocalization{
 	name = "Острокрылая"
 }
 
-L:SetWarningLocalization{	
+L:SetWarningLocalization{
 	warnTurretsReadySoon		= "Гарпунные пушки будут собраны через 20 секунд",
 	warnTurretsReady			= "Гарпунные пушки собраны"
 }
@@ -211,10 +211,6 @@ L:SetGeneralLocalization{
 	name = "Ходир"
 }
 
-L:SetOptionLocalization{
-	SetIconOnStormCloud		= "Устанавливать метки на цели заклинания $spell:65133"
-}
-
 L:SetMiscLocalization{
 	YellKill	= "Наконец-то я... свободен от его оков…"
 }
@@ -234,7 +230,6 @@ L:SetTimerLocalization{
 
 L:SetOptionLocalization{
 	TimerHardmode	= "Отсчет времени для сложного режима",
-	RangeFrame		= "Показывать окно проверки дистанции",
 	AnnounceFails	= "Объявлять игроков, попавших под $spell:62017, в рейд-чат<br/>(требуются права лидера или помощника)"
 }
 
@@ -243,7 +238,7 @@ L:SetMiscLocalization{
 	YellPhase2	= "Бесстыжие выскочки, вы решили бросить вызов мне лично? Я сокрушу вас всех!",
 	YellKill	= "Придержите мечи! Я сдаюсь.",
 	ChargeOn	= "Разряд молнии: %s",
-	Charge		= "Попали под Разряд молнии (в этом бою): %s" 
+	Charge		= "Попали под Разряд молнии (в этом бою): %s"
 }
 
 -------------
@@ -312,13 +307,10 @@ L:SetOptionLocalization{
 	TimeToPhase3			= "Отсчет времени для фазы 3",
 	TimeToPhase4			= "Отсчет времени для фазы 4",
 	MagneticCore			= "Объявлять подобравших Магнитное ядро",
-	HealthFramePhase4		= "Отображать индикатор здоровья в фазе 4",
-	AutoChangeLootToFFA		= "Смена режима добычи на Каждый за себя в фазе 3",
 	WarnBombSpawn			= "Предупреждение о Бомботах",
 	TimerHardmode			= "Отсчет времени для сложного режима",
 	ShockBlastWarningInP1	= "Спец-предупреждение для $spell:63631 в фазе 1",
-	ShockBlastWarningInP4	= "Спец-предупреждение для $spell:63631 в фазе 4",
-	RangeFrame				= "Показывать окно проверки дистанции в фазе 1 (6 м)"
+	ShockBlastWarningInP4	= "Спец-предупреждение для $spell:63631 в фазе 4"
 }
 
 L:SetMiscLocalization{
@@ -327,9 +319,6 @@ L:SetMiscLocalization{
 	MobPhase3		= "Воздушное судно",
 	YellPull		= "У нас мало времени, друзья! Вы поможете испытать новейшее и величайшее из моих изобретений. И учтите: после того, что вы натворили с XT-002, отказываться просто некрасиво.",
 	YellHardPull	= "Так, зачем вы это сделали? Разве вы не видели надпись \"НЕ НАЖИМАЙТЕ ЭТУ КНОПКУ!\"? Ну как мы сумеем завершить испытания при включенном механизме самоликвидации, а?",
-	YellPhase2		= "ПРЕВОСХОДНО! Просто восхитительный результат! Целостность обшивки – 98,9 процента! Почти что ни царапинки! Продолжаем!",
-	YellPhase3		= "Спасибо, друзья! Благодаря вам я получил ценнейшие сведения! Так, а куда же я дел... – ах, вот куда.",
-	YellPhase4		= "Фаза предварительной проверки завершена. Пора начать главный тест!",
 	LootMsg			= "([^%s]+).*Hitem:(%d+)"
 }
 
@@ -353,8 +342,6 @@ L:SetWarningLocalization{
 }
 
 L:SetOptionLocalization{
-	SetIconOnShadowCrash			= "Устанавливать метки на цели заклинания $spell:62660 (череп)",
-	SetIconOnLifeLeach				= "Устанавливать метки на цели заклинания $spell:63276 (крест)",
 	SpecialWarningShadowCrash		= "Спец-предупреждение для $spell:62660<br/>(должен быть в цели или фокусе хотя бы у одного члена рейда)",
 	SpecialWarningShadowCrashNear	= "Спец-предупреждение о $spell:62660 около вас",
 	SpecialWarningLLNear			= "Спец-предупреждение о $spell:63276 около вас",
@@ -378,8 +365,7 @@ L:SetGeneralLocalization{
 L:SetMiscLocalization{
 	YellPull 			= "Скоро мы сразимся с главарем этих извергов! Обратите гнев и ненависть против его прислужников!",
 	YellPhase2	 		= "Я – это сон наяву.",
-	Sara 				= "Сара",
-	WarningYellSqueeze	= "Выдавливание на мне! Помогите!"
+	Sara 				= "Сара"
 }
 
 L:SetWarningLocalization{
@@ -389,7 +375,7 @@ L:SetWarningLocalization{
 	SpecWarnSanity 					= "Осталось %d Здравомыслия",
 	SpecWarnGuardianLow				= "Прекратите атаковать этого Стража",
 	SpecWarnMadnessOutNow			= "Доведение до помешательства заканчивается - выбегайте",
-	WarnBrainPortalSoon				= "Провал Безумия через 3 секунды",	
+	WarnBrainPortalSoon				= "Провал Безумия через 3 секунды",
 	SpecWarnFervor					= "Рвение Сары на вас",
 	SpecWarnFervorCast				= "Рвение Сары накладывается на вас",
 	specWarnBrainPortalSoon			= "Скоро Провал Безумия"
@@ -407,13 +393,8 @@ L:SetOptionLocalization{
 	SpecWarnGuardianLow				= "Спец-предупреждение, когда у Стража (в фазе 1) мало здоровья (для бойцов)",
 	WarnBrainPortalSoon				= "Предупреждать заранее о Провале Безумия",
 	SpecWarnMadnessOutNow			= "Спец-предупреждение незадолго до окончания $spell:64059",
-	SetIconOnFearTarget				= "Устанавливать метки на цели заклинания $spell:63881",
 	SpecWarnFervorCast				= "Спец-предупреждение, когда на вас накладывается $spell:63138<br/>(должна быть в цели или фокусе хотя бы у одного члена рейда)",
 	specWarnBrainPortalSoon			= "Спец-предупреждение о следующем Провале Безумия",
-	WarningSqueeze					= "Кричать, когда на вас Выдавливание",
 	NextPortal						= "Отсчет времени до следующего Провала Безумия",
-	SetIconOnFervorTarget			= "Устанавливать метки на цели заклинания $spell:63138",
-	ShowSaraHealth					= "Показывать здоровье Сары в фазе 1 (должна быть в цели или фокусе хотя бы у одного члена рейда)",
-	SetIconOnBrainLinkTarget		= "Устанавливать метки на цели заклинания $spell:63802",
 	MaladyArrow						= "Показывать стрелку, когда $spell:63881 около вас"
 }

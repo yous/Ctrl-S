@@ -1,0 +1,10 @@
+## Interface: 90002
+## Title: FollowerLocationInfo Journal
+## Version: 1.6.2-release
+## Title-zhTW: 追隨者位置資訊 Journal
+## Notes-zhTW: 追隨者位置資訊 Journal
+## Author: Hizuro
+## LoadOnDemand: 1
+## Dependencies: FollowerLocationInfo
+
+Journal.xml

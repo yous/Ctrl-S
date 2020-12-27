@@ -3,6 +3,8 @@ local L = mog.L;
 
 local LBI = LibStub("LibBabble-Inventory-3.0"):GetUnstrictLookupTable();
 
+local TITANS_GRIP_SPELLID = 46917
+
 
 mog.view = CreateFrame("Frame","MogItPreview",UIParent);
 mog.view:SetAllPoints();
@@ -34,7 +36,7 @@ function mog:ActivatePreview(preview)
 		end
 	end
 	if mog.db.profile.gridDress == "preview" then
-		mog.scroll:update();
+		mog:UpdateScroll();
 	end
 end
 
@@ -95,31 +97,69 @@ end
 
 local function slotOnEnter(self)
 	if self.item then
-		mog.ShowItemTooltip(self, self.item);
+		mog.ShowItemTooltip(self, self.item, self.item);
 	else
 		GameTooltip:SetOwner(self,"ANCHOR_RIGHT");
 		GameTooltip:SetText(_G[strupper(self.slot)]);
 	end
 end
 
-local function slotOnClick(self,btn)
-	if btn == "RightButton" and IsControlKeyDown() then
+local function historyOnClick(self, item, data)
+	mog.view.AddItem(item, data:GetParent(), data.slot)
+end
+
+local function previewSlotHistory(self, level, data)
+	data = self.data
+	if not data.isPreview then return end
+	if #data.history == 0 then return end
+	local info = UIDropDownMenu_CreateInfo()
+	info.text = L["Previous items"]
+	info.isTitle = true
+	info.notCheckable = true
+	self:AddButton(info)
+	for i, item in ipairs(data.history) do
+		local info = UIDropDownMenu_CreateInfo()
+		info.text = mog:GetItemLabel(item)
+		info.func = historyOnClick
+		info.arg1 = item
+		info.arg2 = data
+		info.notCheckable = true
+		self:AddButton(info)
+	end
+end
+
+mog:AddItemOption(previewSlotHistory)
+
+local function slotOnClick(self, button)
+	if button == "RightButton" and IsControlKeyDown() then
 		local preview = self:GetParent();
 		mog.view.DelItem(self.slot, preview);
+		mog.Item_Menu:Close()
 		if mog.db.profile.gridDress == "preview" and mog.activePreview == preview then
-			mog.scroll:update();
+			mog:UpdateScroll();
 		end
 		self:OnEnter();
 	else
-		mog.Item_OnClick(self, btn, self);
+		mog.Item_OnClick(self, button, self, nil, true);
+		-- dropdown is normally not shown for empty slots
+		if button == "RightButton" and not self.item then
+			if mog.Item_Menu.data ~= self then
+				mog.Item_Menu:Hide(1)
+			end
+			self.isPreview = true
+			mog.Item_Menu.data = self
+			mog.Item_Menu:Toggle(nil, "cursor", nil, nil, previewSlotHistory)
+		end
 	end
 end
 
 local function previewOnClose(self)
 	if mog.db.profile.singlePreview then
 		mog.view:Hide();
-	else
+	elseif mog.db.profile.previewConfirmClose then
 		StaticPopup_Show("MOGIT_PREVIEW_CLOSE", nil, nil, self:GetParent());
+	else
+		mog:DeletePreview(self:GetParent());
 	end
 end
 
@@ -144,7 +184,7 @@ end
 local function setWeaponEnchant(self, preview, enchant)
 	preview.data.weaponEnchant = enchant;
 	self.owner:Rebuild(2);
-	mog.scroll:update();
+	mog:UpdateScroll();
 	local mainHandItem = preview.slots["MainHandSlot"].item;
 	local offHandItem = preview.slots["SecondaryHandSlot"].item;
 	if mainHandItem then
@@ -173,6 +213,18 @@ local previewMenu = {
 		value = "weaponEnchant",
 		notCheckable = true,
 		hasArrow = true,
+	},
+	{
+		text = L["Sheathe weapons"],
+		isNotRadio = true,
+		checked = function(self)
+			return currentPreview.data.sheathe
+		end,
+		func = function(self, arg1, arg2, checked)
+			checked = not checked
+			currentPreview.data.sheathe = checked
+			currentPreview.model.model:SetSheathed(checked)
+		end,
 	},
 	{
 		text = L["Add Item"],
@@ -209,13 +261,26 @@ local previewMenu = {
 			for k, v in pairs(currentPreview.slots) do
 				mog.view.DelItem(k, currentPreview);
 				local slotID = GetInventorySlotInfo(k);
-				local item = mog.mogSlots[slotID] and select(6, GetTransmogrifySlotInfo(slotID)) or GetInventoryItemID("player", slotID)
-				if (k ~= "HeadSlot" or ShowingHelm()) and (k ~= "BackSlot" or ShowingCloak()) then
+				local item = GetInventoryItemLink("player", slotID);
+				if item then
+					local transmogLocation = TransmogUtil.GetTransmogLocation(slotID, Enum.TransmogType.Appearance, Enum.TransmogModification.None);
+					local isTransmogrified, _, _, _, _, _, isHideVisual, texture = C_Transmog.GetSlotInfo(transmogLocation);
+					local baseSourceID, baseVisualID, appliedSourceID, appliedVisualID = C_Transmog.GetSlotVisualInfo(transmogLocation);
+					if isTransmogrified then
+						if isHideVisual then
+							item = nil;
+						else
+							local categoryID, appearanceVisualID, canEnchant, icon, isCollected, link = C_TransmogCollection.GetAppearanceSourceInfo(appliedSourceID);
+							item = link;
+						end
+					end
+				end
+				if item then
 					mog.view.AddItem(item, currentPreview);
 				end
 			end
 			if mog.activePreview == currentPreview and mog.db.profile.gridDress == "preview" then
-				mog.scroll:update();
+				mog:UpdateScroll();
 			end
 		end,
 	},
@@ -225,7 +290,7 @@ local previewMenu = {
 		func = function(self)
 			mog.view:Undress(currentPreview);
 			if mog.activePreview == currentPreview and mog.db.profile.gridDress == "preview" then
-				mog.scroll:update();
+				mog:UpdateScroll();
 			end
 		end,
 	},
@@ -294,7 +359,7 @@ end
 
 local function newSetOnClick(self)
 	wipe(newSet.items)
-	newSet.name = "Set "..(#mog.wishlist:GetSets() + 1)
+	newSet.name = currentPreview.data.title or ("Set "..(#mog.wishlist:GetSets() + 1))
 	newSet.previewFrame = currentPreview
 	for slot, v in pairs(currentPreview.slots) do
 		newSet.items[slot] = v.item
@@ -331,16 +396,50 @@ local function loadInitialize(self, level)
 		
 		local info = UIDropDownMenu_CreateInfo()
 		info.text = L["Other profiles"]
+		info.value = "profiles"
+		info.hasArrow = true
+		info.notCheckable = true
+		self:AddButton(info, level)
+		
+		local info = UIDropDownMenu_CreateInfo()
+		info.text = "Wardrobe outfits"
+		info.value = "outfits"
 		info.hasArrow = true
 		info.notCheckable = true
 		self:AddButton(info, level)
 	elseif level == 2 then
-		local curProfile = mog.wishlist:GetCurrentProfile()
-		for i, profile in ipairs(mog.wishlist:GetProfiles()) do
-			if profile ~= curProfile and mog.wishlist:GetSets(profile) then
+		if UIDROPDOWNMENU_MENU_VALUE == "profiles" then
+			local curProfile = mog.wishlist:GetCurrentProfile()
+			for i, profile in ipairs(mog.wishlist:GetProfiles()) do
+				if profile ~= curProfile and mog.wishlist:GetSets(profile) then
+					local info = UIDropDownMenu_CreateInfo()
+					info.text = profile
+					info.hasArrow = true
+					info.notCheckable = true
+					self:AddButton(info, level)
+				end
+			end
+		end
+		if UIDROPDOWNMENU_MENU_VALUE == "outfits" then
+			if #C_TransmogCollection.GetOutfits() > 0 then
+				for i, outfit in ipairs(C_TransmogCollection.GetOutfits()) do
+					local info = UIDropDownMenu_CreateInfo()
+					info.text = outfit.name
+					info.notCheckable = true
+					info.func = function(self, outfitID)
+						mog:PreviewFromOutfit(currentPreview, C_TransmogCollection.GetOutfitSources(outfitID))
+						local title = C_TransmogCollection.GetOutfitName(outfitID)
+						currentPreview.TitleText:SetText(title)
+						currentPreview.data.title = title
+						CloseDropDownMenus()
+					end
+					info.arg1 = outfit.outfitID
+					self:AddButton(info, level)
+				end
+			else
 				local info = UIDropDownMenu_CreateInfo()
-				info.text = profile
-				info.hasArrow = true
+				info.text = "No outfits"
+				info.disabled = true
 				info.notCheckable = true
 				self:AddButton(info, level)
 			end
@@ -354,7 +453,7 @@ end;
 
 --// Toolbar
 local function helpOnEnter(self)
-	self.nt:SetTexture(1,0.82,0,1);
+	self.nt:SetColorTexture(1,0.82,0,1);
 	GameTooltip:SetOwner(self, "ANCHOR_BOTTOMRIGHT");
 	GameTooltip:AddLine(L["How to use"]);
 	GameTooltip:AddLine(" ");
@@ -376,7 +475,7 @@ end
 
 local function helpOnLeave(self)
 	GameTooltip:Hide();
-	self.nt:SetTexture(0,0,0,0);
+	self.nt:SetColorTexture(0,0,0,0);
 end
 
 local function createMenuBar(parent)
@@ -464,7 +563,7 @@ function mog:CreatePreview()
 	
 	f.slots = {};
 	for i, slotIndex in ipairs(mog.slots) do
-		local slot = CreateFrame("Button", nil, f, "ItemButtonTemplate");
+		local slot = CreateFrame("ItemButton", nil, f);
 		slot.slot = slotIndex;
 		if i == 1 then
 			slot:SetPoint("TOPLEFT", f.Inset, "TOPLEFT", 8, -8);
@@ -480,6 +579,7 @@ function mog:CreatePreview()
 		slot:SetScript("OnEnter", slotOnEnter);
 		slot:SetScript("OnLeave", GameTooltip_Hide);
 		slot.OnEnter = slotOnEnter;
+		slot.history = {};
 		f.slots[slotIndex] = slot;
 		slotTexture(f, slotIndex);
 	end
@@ -517,6 +617,9 @@ function mog:DeletePreview(f)
 	f:SetPoint("CENTER",mog.view,"CENTER");
 	mog.view:Undress(f);
 	wipe(f.data);
+	for k, slot in pairs(f.slots) do
+		slot.history = {};
+	end
 	tinsert(mog.previewBin,f);
 	for k,v in ipairs(mog.previews) do
 		if v == f then
@@ -527,7 +630,7 @@ function mog:DeletePreview(f)
 	if mog.activePreview == f then
 		mog.activePreview = nil;
 		if mog.db.profile.gridDress == "preview" then
-			mog.scroll:update();
+			mog:UpdateScroll();
 		end
 	end
 	if #mog.previews == 0 then
@@ -604,14 +707,21 @@ function mog:SetPreviewFixedSize(isFixedSize)
 	UpdateUIPanelPositions(MogItPreview1);
 end
 
+local cachedPreviews;
 local doCache = {};
 mog:AddItemCacheCallback("PreviewAddItem", function()
+	cachedPreviews = {};
 	for i = #doCache, 1, -1 do
 		local item = doCache[i];
 		if mog:GetItemInfo(item.id) then
+			cachedPreviews[item.frame] = true;
 			mog.view.AddItem(item.id, item.frame, item.slot, item.set);
 			tremove(doCache, i);
 		end
+	end
+	-- update the grid if using preview grid dress, and an item was cached on the active preview
+	if mog.db.profile.gridDress == "preview" and cachedPreviews[mog.activePreview] then
+		mog:UpdateScroll();
 	end
 end)
 
@@ -620,11 +730,7 @@ local playerClass = select(2, UnitClass("player"));
 function mog.view.AddItem(item, preview, forceSlot, setItem)
 	if not (item and preview) then return end;
 	
-	local itemID, bonusID = item
-	if type(item) == "string" then
-		itemID, bonusID = mog:ToNumberItem(item);
-	end
-	item = mog:ToStringItem(itemID, bonusID);
+	item = mog:NormaliseItemString(item);
 	
 	local itemInfo = mog:GetItemInfo(item, "PreviewAddItem");
 	if not itemInfo then
@@ -645,7 +751,7 @@ function mog.view.AddItem(item, preview, forceSlot, setItem)
 	if slot then
 		if slot == "MainHandSlot" or slot == "SecondaryHandSlot" then
 			if invType == "INVTYPE_2HWEAPON" then
-				if playerClass == "WARRIOR" and IsSpellKnown(23588) then
+				if playerClass == "WARRIOR" and IsSpellKnown(TITANS_GRIP_SPELLID) then
 					-- Titan's Grip exists in the spellbook, so we can treat this weapon as one handed
 					invType = "INVTYPE_WEAPON";
 				end
@@ -673,6 +779,20 @@ function mog.view.AddItem(item, preview, forceSlot, setItem)
 			end
 		end
 		
+		if item ~= preview.slots[slot].item then
+			local history = preview.slots[slot].history
+			for i, v in ipairs(history) do
+				if v == item then
+					tremove(history, i);
+					break;
+				end
+			end
+			if preview.slots[slot].item then
+				tinsert(history, 1, preview.slots[slot].item);
+				-- make sure there's never more than five items
+				history[6] = nil;
+			end
+		end
 		preview.slots[slot].item = item;
 		slotTexture(preview, slot, GetItemIcon(item));
 		if preview:IsVisible() then
@@ -693,6 +813,10 @@ end
 function mog.view.DelItem(slot, preview)
 	if not (preview and slot) or not preview.slots[slot].item then return end;
 	local invType = mog:GetItemInfo(preview.slots[slot].item).invType;
+	local history = preview.slots[slot].history
+	tinsert(history, 1, preview.slots[slot].item);
+	-- make sure there's never more than five items
+	history[6] = nil;
 	preview.slots[slot].item = nil;
 	slotTexture(preview,slot);
 	if preview.data.title then
@@ -713,7 +837,7 @@ function mog:AddToPreview(item, preview, title)
 	ShowUIPanel(mog.view);
 	if type(item) == "table" then
 		mog.view:Undress(preview);
-		for k,v in pairs(item) do
+		for k, v in pairs(item) do
 			mog.view.AddItem(v, preview, k, true);
 		end
 		if title then
@@ -725,17 +849,7 @@ function mog:AddToPreview(item, preview, title)
 	end
 	
 	if mog.db.profile.gridDress == "preview" and mog.activePreview == preview then
-		for i, frame in ipairs(mog.models) do
-			local data = frame.data;
-			local value = data.value;
-			local cycle = data.cycle;
-			local item = data.item;
-			if value and frame:IsShown() then
-				mog:ModelUpdate(frame, value);
-				data.cycle = cycle;
-				data.item = item;
-			end
-		end
+		mog:UpdateScroll();
 	end
 	
 	return preview;
@@ -745,6 +859,25 @@ function mog.view:Undress(preview)
 	for k, v in pairs(preview.slots) do
 		mog.view.DelItem(k, preview);
 	end
+end
+
+function mog:PreviewFromOutfit(preview, appearanceSources, mainHandEnchant, offHandEnchant)
+	local mainHandSlotID = GetInventorySlotInfo("MAINHANDSLOT");
+	local secondaryHandSlotID = GetInventorySlotInfo("SECONDARYHANDSLOT");
+	for i, source in pairs(appearanceSources) do
+		if source ~= NO_TRANSMOG_SOURCE_ID and i ~= mainHandSlotID and i ~= secondaryHandSlotID then
+			local _, _, _, _, _, link = C_TransmogCollection.GetAppearanceSourceInfo(source);
+			appearanceSources[i] = link;
+		end
+	end
+
+	-- remap handheld items into string IDs instead as numerical IDs are not supported
+	appearanceSources["MainHandSlot"] = select(6, C_TransmogCollection.GetAppearanceSourceInfo(appearanceSources[mainHandSlotID]));
+	appearanceSources["SecondaryHandSlot"] = select(6, C_TransmogCollection.GetAppearanceSourceInfo(appearanceSources[secondaryHandSlotID]));
+	appearanceSources[mainHandSlotID] = nil;
+	appearanceSources[secondaryHandSlotID] = nil;
+	
+	mog:AddToPreview(appearanceSources, preview);
 end
 --//
 
@@ -828,15 +961,51 @@ local function hookInspectUI()
 		_G["Inspect"..v]:RegisterForClicks("AnyUp");
 		_G["Inspect"..v]:SetScript("OnClick", onClick);
 	end
+	
+	InspectPaperDollFrame.ViewButton:RegisterForClicks("LeftButtonUp", "RightButtonUp");
+	InspectPaperDollFrame.ViewButton:SetScript("OnClick", function(self, button)
+		if IsControlKeyDown() and button == "RightButton" then
+			mog:PreviewFromOutfit(mog:GetPreview(), C_TransmogCollection.GetInspectSources());
+		else
+			InspectPaperDollViewButton_OnClick(self);
+		end
+	end);
+	
 	hookInspectUI = nil;
 end
 
 if InspectFrame then
 	hookInspectUI();
 else
-	mog.view:SetScript("OnEvent",function(self,event,addon)
+	mog.view:SetScript("OnEvent",function(self, event, addon)
+		if addon == "Blizzard_AuctionUI" then
+			for i = 1, NUM_BROWSE_TO_DISPLAY do
+				local frame = _G["BrowseButton"..i];
+				if frame then
+					frame:RegisterForClicks("LeftButtonUp", "RightButtonUp");
+				end
+				local iconFrame = _G["BrowseButton"..i.."Item"];
+				if iconFrame then
+					iconFrame:RegisterForClicks("LeftButtonUp", "RightButtonUp");
+				end
+			end
+		end
+		if addon == "Blizzard_EncounterJournal" then
+			for i, button in ipairs(EncounterJournal.encounter.info.lootScroll.buttons) do
+				button:RegisterForClicks("LeftButtonUp", "RightButtonUp")
+			end
+			
+			-- removed in BFA, to return??
+			-- local LegendariesFrame = EncounterJournal.LootJournal.LegendariesFrame
+			-- for i, button in ipairs(LegendariesFrame.buttons) do
+				-- button:RegisterForClicks("LeftButtonUp", "RightButtonUp")
+				-- LegendariesFrame.rightSideButtons[i]:RegisterForClicks("LeftButtonUp", "RightButtonUp")
+			-- end
+		end
 		if addon == "Blizzard_InspectUI" then
 			hookInspectUI();
+		end
+		if IsAddOnLoaded("Blizzard_AuctionUI") and IsAddOnLoaded("Blizzard_InspectUI") and IsAddOnLoaded("Blizzard_EncounterJournal") then
 			self:UnregisterEvent(event);
 			self:SetScript("OnEvent", nil);
 		end
@@ -885,10 +1054,10 @@ local function onAccept(self, preview)
 	items = items and items:match("compare%?items=([^#]+)");
 	if items then
 		local tbl = {};
-		for item in items:gmatch("([^;]+)") do
-			local id,bonus = item:match("^(%d+)%.%d+%.%d+%.%d+%.%d+%.%d+%.%d+%.%d+%.%d+%.%d+%.(%d+)");
+		for item in items:gmatch("([^:;]+)") do
+			local id, bonus = item:match("^(%d+)%.%d+%.%d+%.%d+%.%d+%.%d+%.%d+%.%d+%.%d+%.%d+%.(%d+)");
 			id = id or item:match("^(%d+)");
-			table.insert(tbl, mog:ToStringItem(tonumber(id),tonumber(bonus)));
+			table.insert(tbl, mog:ToStringItem(tonumber(id), tonumber(bonus)));
 		end
 		mog:AddToPreview(tbl, preview);
 	end

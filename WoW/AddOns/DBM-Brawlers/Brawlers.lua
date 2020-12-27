@@ -1,7 +1,7 @@
-local mod	= DBM:NewMod("Brawlers", "DBM-Brawlers")
+local mod	= DBM:NewMod("BrawlersGeneral", "DBM-Brawlers")
 local L		= mod:GetLocalizedStrings()
 
-mod:SetRevision(("$Revision: 12605 $"):sub(12, -3))
+mod:SetRevision("20201102223314")
 --mod:SetCreatureID(60491)
 --mod:SetModelID(41448)
 mod:SetZone(DBM_DISABLE_ZONE_DETECTION)
@@ -11,30 +11,47 @@ mod:RegisterEvents(
 	"CHAT_MSG_MONSTER_YELL"
 )
 
-local warnQueuePosition		= mod:NewAnnounce("warnQueuePosition", 2, 132639, false)
+local warnQueuePosition		= mod:NewAnnounce("warnQueuePosition2", 2, 132639, true)
 local warnOrgPortal			= mod:NewCastAnnounce(135385, 1)--These are rare casts and linked to achievement.
 local warnStormPortal		= mod:NewCastAnnounce(135386, 1)--So warn for them being cast
 
-local specWarnOrgPortal		= mod:NewSpecialWarningSpell(135385)
-local specWarnStormPortal	= mod:NewSpecialWarningSpell(135386)
+local specWarnOrgPortal		= mod:NewSpecialWarningSpell(135385, nil, nil, nil, 1, 7)
+local specWarnStormPortal	= mod:NewSpecialWarningSpell(135386, nil, nil, nil, 1, 7)
 local specWarnYourNext		= mod:NewSpecialWarning("specWarnYourNext")
 local specWarnYourTurn		= mod:NewSpecialWarning("specWarnYourTurn")
+local specWarnRumble		= mod:NewSpecialWarning("specWarnRumble")
 
-local berserkTimer			= mod:NewBerserkTimer(120)--all fights have a 2 min enrage to 134545. some fights have an earlier berserk though.
+local berserkTimer			= mod:NewBerserkTimer(123)--all fights have a 2 min enrage to 134545. some fights have an earlier berserk though.
 
 mod:AddBoolOption("SpectatorMode", true)
 mod:AddBoolOption("SpeakOutQueue", true)
-mod:RemoveOption("HealthFrame")
-mod:RemoveOption("SpeedKillTimer")
+mod:AddBoolOption("NormalizeVolume", true, "misc")
 
 local playerIsFighting = false
 local currentFighter = nil
-local currentRank = 0--Used to stop bars for the right sub mod based on dynamic rank detection from pulls
 local currentZoneID = select(8, GetInstanceInfo())
 local modsStopped = false
 local eventsRegistered = false
 local lastRank = 0
-local QueuedBuff = GetSpellInfo(132639)
+local QueuedBuff = DBM:GetSpellInfo(132639)
+
+local function setDialog(self, set)
+	if not self.Options.NormalizeVolume then return end
+	if set then
+		local soundVolume = tonumber(GetCVar("Sound_SFXVolume"))
+		self.Options.SoundOption = tonumber(GetCVar("Sound_DialogVolume")) or 1
+		DBM:Debug("Setting normalized volume to SFX volume of: "..soundVolume)
+		SetCVar("Sound_DialogVolume", soundVolume)
+	else
+		DBM:Debug("Exiting Brawlers Area, checking Sound")
+		if self.Options.SoundOption then
+			DBM:Debug("Restoring Dialog volume to saved value of: "..self.Options.SoundOption)
+			SetCVar("Sound_DialogVolume", self.Options.SoundOption)
+			self.Options.SoundOption = nil
+		end
+	end
+end
+
 --Fix for not registering events on reloadui or login while already inside brawlers guild.
 if currentZoneID == 369 or currentZoneID == 1043 then
 	eventsRegistered = true
@@ -44,6 +61,8 @@ if currentZoneID == 369 or currentZoneID == 1043 then
 		"UNIT_DIED",
 		"UNIT_AURA player"
 	)
+	mod:Unschedule(setDialog)
+	mod:Schedule(1, setDialog, mod, true)
 end
 
 function mod:PlayerFighting() -- for external mods
@@ -52,51 +71,37 @@ end
 
 function mod:SPELL_CAST_START(args)
 	if args.spellId == 135385 then
-		warnOrgPortal:Show()
 		if not playerIsFighting then--Do not distract player in arena with special warning
 			specWarnOrgPortal:Show()
+			specWarnOrgPortal:Play("newportal")
+		else
+			warnOrgPortal:Show()
 		end
 	elseif args.spellId == 135386 then
-		warnStormPortal:Show()
 		if not playerIsFighting then--Do not distract player in arena with special warning
 			specWarnStormPortal:Show()
+			specWarnStormPortal:Play("newportal")
+		else
+			warnStormPortal:Show()
 		end
 	end
 end
 
 function mod:CHAT_MSG_MONSTER_YELL(msg, npc, _, _, target)
+	if npc ~= L.Bizmo and npc ~= L.Bazzelflange then return end
 	local isMatchBegin = true
-	if msg:find(L.Rank1, 1, true) then -- fix for ruRU clients.
+	--Search is for Rank <n> to avoid lines like "x has risen through the ranks" or something else along those lines.
+	if msg:find(L.Rank1, 1, true) or msg:find(L.Rank2, 1, true) or msg:find(L.Rank3, 1, true) or msg:find(L.Rank4, 1, true) or msg:find(L.Rank5, 1, true) or msg:find(L.Rank6, 1, true) or msg:find(L.Rank7, 1, true) or msg:find(L.Rank8, 1, true) then -- fix for ruRU clients.
 		currentFighter = target
-		currentRank = 1
-	elseif msg:find(L.Rank2, 1, true) then
-		currentFighter = target
-		currentRank = 2
-	elseif msg:find(L.Rank3, 1, true) then
-		currentFighter = target
-		currentRank = 3
-	elseif msg:find(L.Rank4, 1, true) then
-		currentFighter = target
-		currentRank = 4
-	elseif msg:find(L.Rank5, 1, true) then
-		currentFighter = target
-		currentRank = 5
-	elseif msg:find(L.Rank6, 1, true) then
-		currentFighter = target
-		currentRank = 6
-	elseif msg:find(L.Rank7, 1, true) then
-		currentFighter = target
-		currentRank = 7
-	elseif msg:find(L.Rank8, 1, true) then
-		currentFighter = target
-		currentRank = 8
-	elseif msg:find(L.Rank9, 1, true) then
-		currentFighter = target
-		currentRank = 9
-	elseif msg:find(L.Rank10, 1, true) then
-		currentFighter = target
-		currentRank = 10
-	elseif currentFighter and target == currentFighter and (npc == L.Bizmo or npc == L.Bazzelflange) then--He's targeting current fighter but it's not a match begin yell, the only other time this happens is on match end.
+	elseif msg:find(L.Rumbler) then
+		--self:SendSync("MatchEnd")--End any other matches in progress
+		--isMatchBegin = false--And start a new match instead?
+		specWarnRumble:Show()
+	--He's targeting current fighter but it's not a match begin yell, the only other times this happens is on match end and 10 second pre berserk warning.
+	--This tries to filter pre berserk warnings then pass match end in a way that will definitely catch them all
+	--but might also incorrectly cancel berserk timer at 10 second pre berserk warning if a message filter isn't localized yet
+	--But it's still better to cancel berserk 10 seconds early, than to fail to end a match at all.
+	elseif currentFighter and (target == currentFighter) and not (msg:find(L.BizmoIgnored) or msg == L.BizmoIgnored or msg:find(L.BizmoIgnored2) or msg == L.BizmoIgnored2 or msg:find(L.BizmoIgnored3) or msg == L.BizmoIgnored3 or msg:find(L.BizmoIgnored4) or msg == L.BizmoIgnored4 or msg:find(L.BizmoIgnored5) or msg == L.BizmoIgnored5 or msg:find(L.BizmoIgnored6) or msg == L.BizmoIgnored6 or msg:find(L.BizmoIgnored7) or msg == L.BizmoIgnored7 or msg:find(L.BazzelIgnored) or msg == L.BazzelIgnored or msg:find(L.BazzelIgnored2) or msg == L.BazzelIgnored2 or msg:find(L.BazzelIgnored3) or msg == L.BazzelIgnored3 or msg:find(L.BazzelIgnored4) or msg == L.BazzelIgnored4 or msg:find(L.BazzelIgnored5) or msg == L.BazzelIgnored5 or msg:find(L.BazzelIgnored6) or msg == L.BazzelIgnored6 or msg:find(L.BazzelIgnored7) or msg == L.BazzelIgnored7) then
 		self:SendSync("MatchEnd")
 		isMatchBegin = false
 	else
@@ -112,6 +117,7 @@ function mod:CHAT_MSG_MONSTER_YELL(msg, npc, _, _, target)
 		end
 	end
 	--Only boss with a custom berserk timer. His is 1 minute, but starts at different yell than 2 min berserk, so it's not actually 60 sec shorter but more like 50-55 sec shorter
+	--Need the yells for meatball too i guess? he has a 1 minute berserk as well?
 	if msg == L.Proboskus or msg:find(L.Proboskus) or msg == L.Proboskus2 or msg:find(L.Proboskus2) then
 		self:Schedule(2, function()
 			berserkTimer:Cancel()
@@ -132,7 +138,7 @@ end
 function mod:UNIT_DIED(args)
 	if not args.destName then return end
 	--Another backup for when npc doesn't yell. This is a way to detect a wipe at least.
-	if currentFighter and args.destName == currentFighter and args:IsDestTypePlayer() then--They wiped. Fix match ends when mage's mirror image died. 
+	if currentFighter and args.destName == currentFighter and args:IsDestTypePlayer() then--They wiped.
 		self:SendSync("MatchEnd")
 	end
 end
@@ -142,16 +148,17 @@ function mod:ZONE_CHANGED_NEW_AREA()
 	if currentZoneID == 369 or currentZoneID == 1043 then
 		playerIsFighting = false
 		currentFighter = nil
-		currentRank = 0
 		lastRank = 0
 		modsStopped = false
 		eventsRegistered = true
 		self:RegisterShortTermEvents(
-			"SPELL_CAST_START",
+			"SPELL_CAST_START 135385 135386",
 			"PLAYER_REGEN_ENABLED",
 			"UNIT_DIED",
 			"UNIT_AURA player"
 		)
+		self:Unschedule(setDialog)
+		self:Schedule(1, setDialog, mod, true)
 		return
 	end--We returned to arena, reset variable
 	if modsStopped then return end--Don't need this to fire every time you change zones after the first.
@@ -164,12 +171,19 @@ function mod:ZONE_CHANGED_NEW_AREA()
 			mod2:Stop()--Stop all timers and warnings
 		end
 	end
-	for i = 1, 2 do
-		local mod2 = DBM:GetModByName("BrawlRare" .. i)
-		if mod2 then
-			mod2:Stop()--Stop all timers and warnings
-		end
+	local mod3 = DBM:GetModByName("BrawlChallenges")
+	if mod3 then
+		mod3:Stop()--Stop all timers and warnings
 	end
+	local mod4 = DBM:GetModByName("BrawlLegacy")
+	if mod4 then
+		mod4:Stop()--Stop all timers and warnings
+	end
+	local mod5 = DBM:GetModByName("BrawlRumble")
+	if mod5 then
+		mod5:Stop()--Stop all timers and warnings
+	end
+	setDialog(self)
 	modsStopped = true
 end
 
@@ -186,19 +200,19 @@ end
 --Most group up for this so they can buff eachother for matches. Syncing should greatly improve reliability, especially for match end since the person fighting definitely should detect that (probably missing yells still)
 function mod:OnSync(msg)
 	if msg == "MatchBegin" then
+		if not (currentZoneID == 369 or currentZoneID == 1043) then return end
 		if not eventsRegistered then
 			eventsRegistered = true
 			self:RegisterShortTermEvents(
-				"SPELL_CAST_START",
+				"SPELL_CAST_START 135385 135386",
 				"PLAYER_REGEN_ENABLED",
 				"UNIT_DIED",
 				"UNIT_AURA player"
 			)
 		end
-		if not (currentZoneID == 369 or currentZoneID == 1043) then return end
 		self:Stop()--Sometimes NPC doesn't yell when a match ends too early, if a new match begins we stop on begin before starting new stuff
 		berserkTimer:Start()
-		for i, v in ipairs(startCallbacks) do
+		for _, v in ipairs(startCallbacks) do
 			v()
 		end
 	elseif msg == "MatchEnd" then
@@ -206,7 +220,7 @@ function mod:OnSync(msg)
 		currentFighter = nil
 		self:Stop()
 		--Boss from any rank can be fought by any rank now, so we just need to always cancel them all
-		for i, v in ipairs(endCallbacks) do
+		for _, v in ipairs(endCallbacks) do
 			v()
 		end
 		for i = 1, 7 do
@@ -215,26 +229,36 @@ function mod:OnSync(msg)
 				mod2:Stop()--Stop all timers and warnings
 			end
 		end
-		for i = 1, 2 do
-			local mod2 = DBM:GetModByName("BrawlRare" .. i)
-			if mod2 then
-				mod2:Stop()--Stop all timers and warnings
+		local mod2 = DBM:GetModByName("BrawlChallenges")
+		if mod2 then
+			mod2:Stop()--Stop all timers and warnings
+		end
+		mod2 = DBM:GetModByName("BrawlLegacy")
+		if mod2 then
+			mod2:Stop()--Stop all timers and warnings
+		end
+		mod2 = DBM:GetModByName("BrawlRumble")
+		if mod2 then
+			mod2:Stop()--Stop all timers and warnings
+		end
+	end
+end
+
+do
+	function mod:UNIT_AURA()
+		local currentQueueRank = select(16, DBM:UnitBuff("player", QueuedBuff))
+		if currentQueueRank and currentQueueRank ~= lastRank then
+			lastRank = currentQueueRank
+			if currentQueueRank ~= 0 then
+				if currentQueueRank == 1 then
+					specWarnYourNext:Show()
+				else
+					warnQueuePosition:Show(currentQueueRank)
+				end
+			end
+			if self.Options.SpeakOutQueue then
+				DBM:PlayCountSound(currentQueueRank)
 			end
 		end
 	end
 end
-
-function mod:UNIT_AURA(uId)
-	local currentQueueRank = select(15, UnitBuff("player", QueuedBuff))
-	if currentQueueRank and currentQueueRank ~= lastRank then
-		lastRank = currentQueueRank
-		warnQueuePosition:Show(currentQueueRank)
-		if currentQueueRank == 1 then
-			specWarnYourNext:Show()
-		end
-		if self.Options.SpeakOutQueue then
-			DBM:PlayCountSound(currentQueueRank)
-		end
-	end
-end
-

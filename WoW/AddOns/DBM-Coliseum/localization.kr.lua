@@ -23,7 +23,6 @@ L:SetTimerLocalization{
 L:SetOptionLocalization{
 	WarningSnobold				= "스노볼트 부하 생성 알림 보기",
 	ClearIconsOnIceHowl			= "사나운 돌진 전에 모든 전술 목표 아이콘 지움",
-	PingCharge					= "사나운 돌진 대상이 있는 위치를 미니맵에 보기",
 	TimerNextBoss				= "다음 우두머리 등장 바 보기",
 	TimerEmerge					= "출현 바 보기",
 	TimerSubmerge				= "숨기 바 보기",
@@ -88,7 +87,7 @@ L:SetWarningLocalization{
 	SpecWarnSwitchTarget		= "대상 전환!",
 	SpecWarnKickNow				= "지금 차단!",
 	WarningTouchDebuff			= "손길 : >%s<",
-	WarningPoweroftheTwins		= "쌍둥이의 힘 : %s",
+	WarningPoweroftheTwins2		= "쌍둥이의 힘 : %s",
 	SpecWarnPoweroftheTwins		= "쌍둥이의 힘!"
 }
 
@@ -105,7 +104,7 @@ L:SetOptionLocalization{
 	SpecialWarnOnDebuff			= "빛/어둠의 손길 대상이 된 경우 특수 경고 보기",
 	SetIconOnDebuffTarget		= "빛/어둠의 손길 대상에게 전술 목표 아이콘 설정(영웅 난이도)",
 	WarningTouchDebuff			= "빛/어둠의 손길 대상 알림 보기",
-	WarningPoweroftheTwins		= "쌍둥이의 힘 대상 알림 보기",
+	WarningPoweroftheTwins2		= "쌍둥이의 힘 대상 알림 보기",
 	SpecWarnPoweroftheTwins		= "쌍둥이의 힘 특수 경고 보기"
 }
 

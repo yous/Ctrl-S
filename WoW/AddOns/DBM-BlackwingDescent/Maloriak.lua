@@ -1,12 +1,11 @@
 local mod	= DBM:NewMod(173, "DBM-BlackwingDescent", nil, 73)
 local L		= mod:GetLocalizedStrings()
 
-mod:SetRevision(("$Revision: 146 $"):sub(12, -3))
+mod:SetRevision("20200806141910")
 mod:SetCreatureID(41378)
 mod:SetEncounterID(1025)
-mod:SetZone()
 mod:SetUsedIcons(1, 2, 3, 4, 6, 7, 8)
-mod:SetModelSound("Sound\\Creature\\Nefarian\\VO_BD_Nefarian_MaloriakIntro01.wav", "Sound\\Creature\\Maloriak\\VO_BD_Maloriak_Event05.wav")
+--mod:SetModelSound("Sound\\Creature\\Nefarian\\VO_BD_Nefarian_MaloriakIntro01.ogg", "Sound\\Creature\\Maloriak\\VO_BD_Maloriak_Event05.ogg")
 --Long: Maloriak, try not to lose to these mortals. Semicompetent help is SO hard to create.
 --Short: Mix and stir, apply heat...
 
@@ -36,7 +35,7 @@ local warnMagmaJets				= mod:NewSpellAnnounce(78194, 4, nil, "Tank")
 local warnEngulfingDarkness		= mod:NewSpellAnnounce(92754, 4, nil, "Tank|Healer")--Heroic Ability
 local warnPhase2Soon			= mod:NewPrePhaseAnnounce(2, 3)
 local warnPhase2				= mod:NewPhaseAnnounce(2, 4)
- 
+
 local timerPhase				= mod:NewTimer(49, "TimerPhase", 89250)--Just some random cauldron icon not actual spellid
 local timerBitingChill			= mod:NewBuffFadesTimer(10, 77760)
 local timerFlashFreeze			= mod:NewCDTimer(14, 77699)--Varies on other abilities CDs
@@ -74,10 +73,10 @@ local bitingChillIcon = 6
 local flashFreezeIcon = 8
 local prewarnedPhase2 = false
 local CVAR = false
-local Red = EJ_GetSectionInfo(2935)
-local Green = EJ_GetSectionInfo(2941)
-local Blue = EJ_GetSectionInfo(2938)
-local Dark = EJ_GetSectionInfo(2943)
+local Red = DBM:EJ_GetSectionInfo(2935)
+local Green = DBM:EJ_GetSectionInfo(2941)
+local Blue = DBM:EJ_GetSectionInfo(2938)
+local Dark = DBM:EJ_GetSectionInfo(2943)
 
 local function showBitingChillWarning()
 	warnBitingChill:Show(table.concat(bitingChillTargets, "<, >"))

@@ -1,15 +1,22 @@
 --[[
     This file is part of Decursive.
-    
-    Decursive (v 2.7.3.6) add-on for World of Warcraft UI
-    Copyright (C) 2006-2014 John Wellesz (archarodim AT teaser.fr) ( http://www.2072productions.com/to/decursive.php )
 
-    Starting from 2009-10-31 and until said otherwise by its author, Decursive
-    is no longer free software, all rights are reserved to its author (John Wellesz).
+    Decursive (v 2.7.8) add-on for World of Warcraft UI
+    Copyright (C) 2006-2019 John Wellesz (Decursive AT 2072productions.com) ( http://www.2072productions.com/to/decursive.php )
 
-    The only official and allowed distribution means are www.2072productions.com, www.wowace.com and curse.com.
-    To distribute Decursive through other means a special authorization is required.
-    
+    Decursive is free software: you can redistribute it and/or modify
+    it under the terms of the GNU General Public License as published by
+    the Free Software Foundation, either version 3 of the License, or
+    (at your option) any later version.
+
+    Decursive is distributed in the hope that it will be useful,
+    but WITHOUT ANY WARRANTY; without even the implied warranty of
+    MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+    GNU General Public License for more details.
+
+    You should have received a copy of the GNU General Public License
+    along with Decursive.  If not, see <https://www.gnu.org/licenses/>.
+
 
     Decursive is inspired from the original "Decursive v1.9.4" by Patrick Bohnet (Quu).
     The original "Decursive 1.9.4" is in public domain ( www.quutar.com )
@@ -17,7 +24,7 @@
     Decursive is distributed in the hope that it will be useful,
     but WITHOUT ANY WARRANTY.
 
-    This file was last updated on 2014-10-15T00:25:50Z
+    This file was last updated on 2020-11-21T16:50:01Z
 --]]
 -------------------------------------------------------------------------------
 
@@ -34,6 +41,11 @@ local strjoin           = _G.strjoin;
 local GetCVarBool       = _G.GetCVarBool;
 local IsAddOnLoaded     = _G.IsAddOnLoaded;
 local GetAddOnMetadata  = _G.GetAddOnMetadata;
+local time              = _G.time;
+local pcall             = _G.pcall;
+local pairs             = _G.pairs;
+local ipairs            = _G.ipairs;
+local InCombatLockdown  = _G.InCombatLockdown;
 
 local addonName, T = ...;
 DecursiveRootTable = T; -- needed until we get rid of the xml based UI. -- Also used by HHTD from 2013-04-05
@@ -84,7 +96,7 @@ local DebugTextTable    = T._DebugTextTable;
 local Reported          = {};
 
 local UNPACKAGED = "@pro" .. "ject-version@";
-local VERSION = "2.7.3.6";
+local VERSION = "2.7.8";
 
 T._LoadedFiles = {};
 T._LoadedFiles["Dcr_DIAG.lua"] = false; -- here for consistency but useless in this particular file
@@ -119,7 +131,7 @@ T._LoadOrderedFiles = { -- {{{
     "zhTW.lua",
     "ptBR.lua",
     "itIT.lua",
-    
+
     "DCR_init.lua",
     "Dcr_LDB.lua",
     "Dcr_utils.lua",
@@ -128,7 +140,7 @@ T._LoadOrderedFiles = { -- {{{
     "Dcr_Events.lua",
 
     "Dcr_Raid.lua",
-    
+
     "Decursive.lua",
     "Decursive.xml",
 
@@ -178,7 +190,7 @@ end
 -- }}}
 
  -- DEBUG REPORTING {{{
- 
+
 function T._AddDebugText(a1, ...) -- {{{
 
     _Debug("Error processed");
@@ -194,7 +206,17 @@ function T._AddDebugText(a1, ...) -- {{{
     local zone = GetRealZoneText() or "none";
 
     if not Reported[text] then
-        table.insert (DebugTextTable,  ("\n\n|cffff0000*****************|r\n\n%.4f (tr:'%s' ca:'%s' h%d_w%d-%dfps-%s): %s -|count: "):format(NiceTime(), tostring(T._DebugTimerRefName), tostring(T._CatchAllErrors), select(3, GetNetStats()), select(4, GetNetStats()), GetFramerate(), zone, text) );
+        table.insert (DebugTextTable,  ("\n\n|cffff0000*****************|r\n\n%.4f (tr:'%s' ca:'%s' icl:'%s' h%d_w%d-%dfps-%s): %s -|count: "):format(
+        NiceTime(), -- %.4f
+        tostring(T._DebugTimerRefName), -- tr:'%s'
+        tostring(T._CatchAllErrors), -- ca:'%s'
+        tostring(InCombatLockdown()), -- icl:'%s'
+        select(3, GetNetStats()), -- h%d
+        select(4, GetNetStats()), -- w%d
+        GetFramerate(), -- %dfps
+        zone, -- -%s
+        text -- %s
+        ));
         table.insert (DebugTextTable, 1);
         Reported[text] = #DebugTextTable;
     else
@@ -224,21 +246,29 @@ end -- }}}
 
 do
     local DebugHeader = false;
-    local HeaderFailOver = "|cFF11FF33Please report the content of this window to archarodim+DcrReport@teaser.fr|r\n|cFF009999(Use CTRL+A to select all and then CTRL+C to put the text in your clip-board)|r\n\n";
+    local ReportEmail = GetAddOnMetadata("Decursive", "X-eMail") or "Decursive@2072productions.com";
+    local HeaderFailOver = ("|cFF11FF33Please email the content of this window to <%s>|r\n|cFF009999(Use CTRL+A to select all and then CTRL+C to put the text in your clip-board)|r\nAlso tell in your report if you noticed any strange behavior of Decursive.\n"):format(ReportEmail:gsub('@','+ReportFH@'));
     local LoadedAddonNum = 0;
+    local TotalAddonMemoryUsage = 0;
 
     local function GetAddonListAsString ()
         local addonCount = GetNumAddOns();
         local loadedAddonList = {};
-        local name, security, _;
+        local version, memoryUsage, name, security, _;
+
+        TotalAddonMemoryUsage = 0;
+        UpdateAddOnMemoryUsage();
 
         for addonID=1, addonCount do
             name, _, _, _, _, security, _ = GetAddOnInfo(addonID)
 
             if security == 'INSECURE' and IsAddOnLoaded(addonID) then
-                local version = GetAddOnMetadata(addonID, "Version");
+                version = GetAddOnMetadata(addonID, "Version");
+                memoryUsage = GetAddOnMemoryUsage(addonID);
 
-                table.insert(loadedAddonList, ("%s (%s)[%d]"):format(name, version or 'N/A', addonID));
+                TotalAddonMemoryUsage = TotalAddonMemoryUsage + memoryUsage;
+
+                table.insert(loadedAddonList, ("%s (%s)[%d]{MU: %d}"):format(name, version or 'N/A', addonID, memoryUsage));
 
             end
         end
@@ -254,15 +284,22 @@ do
         local instructionsHeader;
 
         if fromDiag or not T.Dcr.db or not T.Dcr.db.global.NewerVersionName or T._HHTDErrors ~= 0 then
-            instructionsHeader = T.Dcr.L and T.Dcr.L["DEBUG_REPORT_HEADER"] or HeaderFailOver;
+            if T.Dcr.L and T.Dcr.L["DEBUG_REPORT_HEADER"] then
+                -- Create the header insterting the email address and
+                -- influencing the content if this is an HHTD error.
+                instructionsHeader = (T.Dcr.L["DEBUG_REPORT_HEADER"]):format(
+
+                    ReportEmail:gsub('@', T._HHTDErrors ~= 0 and '+HHTDReport@' or '+Report@'),
+                    T._HHTDErrors ~= 0 and 'Decursive / H.H.T.D.' or 'Decursive'
+
+                );
+            else
+                instructionsHeader = HeaderFailOver
+            end
         else
             instructionsHeader = T.Dcr.L and ((T.Dcr.L["DECURSIVE_DEBUG_REPORT_BUT_NEW_VERSION"]):format(T.Dcr.db.global.NewerVersionName)) or HeaderFailOver;
             -- disable bug me not since the user _clearly_ took the wrong decision
             T.Dcr.db.global.NewVersionsBugMeNot = false;
-        end
-
-        if T._HHTDErrors ~= 0 then
-            instructionsHeader = instructionsHeader:gsub('ecursive', 'ecursive / Healers Have To Die');
         end
 
         local TIandBI = T.Dcr.GetTimersInfo and {T.Dcr:GetTimersInfo()} or {-1,-1,-1,-1,-1,0};
@@ -270,7 +307,7 @@ do
         _Debug(unpack(TIandBI));
 
 
-        DebugHeader = ("%s\n2.7.3.6  %s(%s)  CT: %0.4f D: %s %s %s BDTHFAd: %s nDrE: %d Embeded: %s W: %d LA: %d TA: %d NDRTA: %d BUIE: %d TI: [dc:%d, lc:%d, y:%d, LEBY:%d, LB:%d, TTE:%u] (%s, %s, %s, %s)"):format(instructionsHeader, -- "%s\n
+        DebugHeader = ("%s\n2.7.8  %s(%s)  CT: %0.4f D: %s %s %s BDTHFAd: %s nDrE: %d Embeded: %s W: %d (LA: %d TAMU: %d) TA: %d NDRTA: %d BUIE: %d TI: [dc:%d, lc:%d, y:%d, LEBY:%d, LB:%d, TTE:%u] (%s, %s, %s, %s)"):format(instructionsHeader, -- "%s\n
         tostring(DC.MyClass), tostring(UnitLevel("player") or "??"), NiceTime(), date(), GetLocale(), -- %s(%s)  CT: %0.4f D: %s %s
         BugGrabber and "BG" .. (T.BugGrabber and "e" or "") or "NBG", -- %s
         tostring(T._BDT_HotFix1_applyed), -- BDTHFAd: %s
@@ -278,11 +315,12 @@ do
         tostring(T._EmbeddedMode), -- Embeded: %s
         IsWindowsClient() and 1 or 0, -- W: %d
         LoadedAddonNum, -- LA: %d
+        TotalAddonMemoryUsage, -- TAMU: %d
         T._TaintingAccusations, -- TA: %d
         T._NDRTaintingAccusations, -- NDRTA: %d
         T._BlizzardUIErrors, -- BUIE: %d
         unpack(TIandBI));
-       -- T.Dcr:GetTimersInfo(), -- TI: [dc:%d, lc:%d, y:%d, LEBY:%d, LB:%d, TTE:%u] 
+       -- T.Dcr:GetTimersInfo(), -- TI: [dc:%d, lc:%d, y:%d, LEBY:%d, LB:%d, TTE:%u]
        -- GetBuildInfo()); --  (%s, %s, %s, %s)
     end
 
@@ -300,8 +338,15 @@ do
         end
 
         -- get running add-ons list
-        local success, errorm, loadedAddonList;
-        success, errorm, loadedAddonList = pcall(GetAddonListAsString);
+        local ALASsuccess, loadedAddonList = pcall(GetAddonListAsString);
+
+        local ACsuccess, actionsConfiguration = pcall(T._ExportActionsConfiguration);
+
+        local CSCsuccess, customSpellConfiguration = pcall(T._ExportCustomSpellConfiguration);
+        local STPsuccess, spellTable = pcall(T._PrintSpellTable);
+
+        local SRTOLEsuccess, SRTOLErrors =
+            pcall(function() return "Script ran too long errors:\n" .. T.Dcr:tAsString(T.Dcr.db.global.SRTLerrors) end);
 
         local headerSucess, headerGenErrorm;
         if not DebugHeader then
@@ -311,7 +356,13 @@ do
         end
 
 
-        T._DebugText = (headerSucess and DebugHeader or (HeaderFailOver .. 'Report header gen failed: ' .. (headerGenErrorm and headerGenErrorm or ""))) .. table.concat(T._DebugTextTable, "") .. "\n\nLoaded Addons:\n\n" .. (success and loadedAddonList or errorm) .. "\n-- --";
+        T._DebugText = (headerSucess and DebugHeader or (HeaderFailOver .. 'Report header gen failed: ' .. (headerGenErrorm and headerGenErrorm or "")))
+        .. table.concat(T._DebugTextTable, "")
+        .. "\n\n-- --\n" .. actionsConfiguration .. "\n-- --" -- (Spells assignments:)
+        .. customSpellConfiguration .. "\n-- --"
+        .. spellTable .. "\n-- --" -- (Decursive known spells:)
+        .. SRTOLErrors .. "\n-- --"
+        .. "\n\nLoaded Addons:\n\n" .. loadedAddonList .. "\n-- --";
 
         if _G.DecursiveDebuggingFrameText then
             _G.DecursiveDebuggingFrameText:SetText(T._DebugText);
@@ -319,7 +370,7 @@ do
             local title = T.Dcr.L and T.Dcr.L["DECURSIVE_DEBUG_REPORT"] or "**** |cFFFF0000Decursive Debug Report|r ****";
 
             if T._HHTDErrors ~= 0 then
-                title = title:gsub('ecursive', 'ecursive/HHTD');
+                title = title:gsub('ecursive', 'ecursive / H.H.T.D.');
             end
 
             _G.DecursiveDEBUGtext:SetText(title);
@@ -342,18 +393,14 @@ local function PlaySoundFile_RanTooLongheck(message)
         _Print("|cffff0000*DING!*|r (Decursive failed to play a sound)");
         return true;
     end
-    
+
     return false;
 end
 
 local function CheckHHTD_Error(errorm, errorml)
-    if errorml:find("healers%-have%-to%-die") and -- first, make a general test to see if it's worth looking further
-        (
-        not errorml:find("\\libs\\")
-        --or ( errorm:find("[\"']healers%-have%-to%-die[\"']") ) -- events
-        --or ( errorm:find("healers%-have%-to%-die:") ) -- libraries error (AceLocal)
-        --or ( errorml:find("healers%-have%-to%-die%.")) -- Aceconfig
-        ) then
+    if (errorml:find("hhtd") and not errorml:find("\\libs\\"))
+        or
+        (errorml:find("\\libnameplateregistry") and not errorml:find("couldn't open") and not errorml:find("error loading")) then
         _Debug("CheckHHTD_Error()", true);
         return true;
     end
@@ -376,7 +423,61 @@ T._BlizzardUIErrors = 0;
 T._ErrorLimitStripped = false;
 T._HHTDErrors = 0;
 
-local InCombatLockdown  = _G.InCombatLockdown;
+local LastErrorMessage = "!NotSet!";
+
+-- a special handler for these random "Script ran too long" error
+-- returns true when a resport should be shown, false otherwise
+local function continueErrorReporting (lowerCaseErrorMsg)
+    local isSRTLE = lowerCaseErrorMsg:find("script ran too long")
+
+    if not isSRTLE then
+        -- continue as usual when this error is not a SRTL one
+        return true;
+    elseif T._CatchAllErrors or not T.Dcr.DcrFullyInitialized then
+        -- However we do want to catch SRTL errors when these flags are active as it
+        -- explains why subsequent "impossible" errors are happening...
+        -- (several reports were received where DCR init did not complete for no apparent reason)
+        return true;
+    end
+
+    -- these tests appear to be redundant but this function must never crash...
+    if not T.Dcr.db or not T.Dcr.db.global or not T.Dcr.db.global.SRTLerrors then
+        return false;
+    end
+
+    local fname_line = lowerCaseErrorMsg:match('(%w+%.[xl][mu][la]:%d+)');
+
+    if not fname_line then
+        return false;
+    end
+
+    local SRTLerrors = T.Dcr.db.global.SRTLerrors;
+
+    SRTLerrors["total"] = SRTLerrors["total"] + 1;
+
+    if not SRTLerrors[fname_line] then
+        SRTLerrors[fname_line] = {};
+    end
+
+    local ctime = time();
+
+    while(SRTLerrors[fname_line][1] and ctime - SRTLerrors[fname_line][1] > 86400 * 30) do
+        table.remove(SRTLerrors[fname_line], 1);
+    end
+
+    table.insert(SRTLerrors[fname_line], ctime);
+
+    if lowerCaseErrorMsg:find("dcr_diag.lua") then
+        return false;
+    end
+
+    if #SRTLerrors[fname_line] > 1 then
+        return true;
+    else
+        return false;
+    end
+end
+
 function T._onError(event, errorObject)
     local errorm = errorObject.message;
     local mine = false;
@@ -393,15 +494,14 @@ function T._onError(event, errorObject)
         and ( T._CatchAllErrors or (
         errorml:find("decursive") and -- first, make a general test to see if it's worth looking further
         (
-           ( not errorml:find("\\libs\\") ) -- errors happpening in something located below Decursive's path but not inside \Libs 
+           ( not errorml:find("\\libs\\") ) -- errors happpening in something located below Decursive's path but not inside \Libs
         or ( errorm:find("[\"']Decursive[\"']") ) -- events involving Decursive
         or ( errorm:find("Decursive:") ) -- libraries error involving Decursive (AceLocal)
         or ( errorml:find("decursive%.")) -- for Aceconfig
         )
         )) then
 
-        if errorml:find("dcr_diag.lua") and errorml:find("script ran too long") then
-            -- don't create report for these 'errors'...
+        if not continueErrorReporting(errorml) then
             return;
         end
 
@@ -434,6 +534,11 @@ function T._onError(event, errorObject)
             T._NonDecursiveErrors = T._NonDecursiveErrors + 1;
 
             if CheckHHTD_Error(errorm, errorml) then
+
+                if not continueErrorReporting(errorml) then
+                    return;
+                end
+
                 IsReporting = true;
                 AddDebugText(errorObject.message, "\n|cff00aa00STACK:|r\n", errorObject.stack, "\n|cff00aa00LOCALS:|r\n", errorObject.locals);
                 IsReporting = false;
@@ -441,46 +546,35 @@ function T._onError(event, errorObject)
                 mine = true;
             elseif errorm:find("ADDON_ACTION_") then
                 T._NDRTaintingAccusations = T._NDRTaintingAccusations + 1;
-            elseif errorm:find("FrameXML") then
+            elseif errorm:find("FrameXML") or errorm:find("SharedXML") then
                 T._BlizzardUIErrors = T._BlizzardUIErrors + 1;
             end
 
         end
     end
 
-    if not mine and not T._BugSackLoaded and GetCVarBool("scriptErrors") then
-        if not _G.DEBUGLOCALS_LEVEL then
-            if not InCombatLockdown() then
-                _G.LoadAddOn("Blizzard_DebugTools");
-            else
-                if T.Dcr.AddDelayedFunctionCall then
-                    T.Dcr:AddDelayedFunctionCall('Load_Blizzard_DebugTools', _G.LoadAddOn, 'Blizzard_DebugTools');
+    LastErrorMessage = errorm;
 
-                    _Debug("Blizzard_DebugTools load has been delayed because InCombatLockdown");
-                else
-                    _Debug("Blizzard_DebugTools load has been cancelled because InCombatLockdown");
-                end
-                return;
+    if not mine and not T._BugSackLoaded then
+
+        --/console scriptErrors 1 to check it
+        if _G.DEBUGLOCALS_LEVEL then
+
+            -- Fix Blizzard's own code... (2017-09-04: it's set to 5 while it should be 4)
+            if _G.DEBUGLOCALS_LEVEL == 5 then
+                _G.DEBUGLOCALS_LEVEL = 4
             end
+
+            _G.DEBUGLOCALS_LEVEL = _G.DEBUGLOCALS_LEVEL + 9
         end
-        _G.DEBUGLOCALS_LEVEL = 12; -- XXX must be set to the right value to get the correct stack and locals. This is why we need to load Blizzard_DebugTools ourselves... That sucks... 
 
         -- forward the error to the default Blizzad error displayer
-        if _G._ERRORMESSAGE then
+        if _G.HandleLuaError then
             local errorm = errorObject.message;
 
-            -- if the error happened inside blizzard_debugtools, use Blizzards's BasicScriptErrorsText
-            if (errorm:lower()):find("blizzard_debugtools") then
-                --[===[@alpha@
-                _G.BasicScriptErrorsText:SetText(errorm);
-                _G.BasicScriptErrors:Show();
-                --@end-alpha@]===]
-                return;
-            end
-           
             _Debug("Lua error forwarded");
 
-            _G._ERRORMESSAGE( errorm );
+            return _G.HandleLuaError( errorm );
         end
     else
         _Debug("Lua error NOT forwarded, mine=", mine);
@@ -495,6 +589,9 @@ local _, _, _, tocversion = GetBuildInfo();
 T._CatchAllErrors = false;
 T._tocversion = tocversion;
 
+DC.WOWC = WOW_PROJECT_ID == WOW_PROJECT_CLASSIC
+DC.WOW8 = (tocversion >= 80000) or DC.WOWC
+
 
 
 function T._DecursiveErrorHandler(err, ...)
@@ -504,17 +601,7 @@ function T._DecursiveErrorHandler(err, ...)
     end
 
     err = tostring(err);
-    errl = err:lower();
-
-    --A check to see if the error is happening inside the Blizzard 'debug' tool himself...
-    if errl:find("blizzard_debugtools") then
-        --[===[@alpha@
-        if ( GetCVarBool("scriptErrors") ) then
-            print (("|cFFFF0000%s|r"):format(err));
-        end
-        --@end-alpha@]===]
-        return;
-    end
+    local errl = err:lower();
 
     if PlaySoundFile_RanTooLongheck(err) then
         return;
@@ -523,8 +610,7 @@ function T._DecursiveErrorHandler(err, ...)
     local mine = false;
     if not IsReporting and (T._CatchAllErrors or errl:find("decursive") and not errl:find("\\libs\\")) then
 
-        if errl:find("dcr_diag.lua") and errl:find("script ran too long") then
-            -- don't create report for these 'errors'...
+        if not continueErrorReporting(errl) then
             return;
         end
 
@@ -535,38 +621,53 @@ function T._DecursiveErrorHandler(err, ...)
 
 
         IsReporting = true;
-        AddDebugText(err, "\n|cff00aa00STACK:|r\n", debugstack(4), "\n|cff00aa00LOCALS:|r\n", debuglocals(4), ...);
+        AddDebugText(err, "\n|cff00aa00STACK:|r\n", debugstack(3), "\n|cff00aa00LOCALS:|r\n", debuglocals(3), ...);
         IsReporting = false;
-	T._CatchAllErrors = false; -- Errors are unacceptable so one is enough, no need to get all subsequent errors.
+        T._CatchAllErrors = false; -- Errors are unacceptable so one is enough, no need to get all subsequent errors.
         mine = true;
         _Debug("Error recorded");
     else
-
-        if IsReporting then -- then it means there is a bug insiede AddDebugText...
+        if IsReporting then -- then it means there is a bug inside AddDebugText...
             IsReporting = false;
         else
             T._NonDecursiveErrors = T._NonDecursiveErrors + 1;
 
             if CheckHHTD_Error(err, errl) then
+
+                if not continueErrorReporting(errl) then
+                    return;
+                end
+
                 IsReporting = true;
-                AddDebugText(err, "\n|cff00aa00STACK:|r\n", debugstack(4), "\n|cff00aa00LOCALS:|r\n", debuglocals(4), ...);
+                AddDebugText(err, "\n|cff00aa00STACK:|r\n", debugstack(3), "\n|cff00aa00LOCALS:|r\n", debuglocals(3), ...);
                 IsReporting = false;
                 T._HHTDErrors = T._HHTDErrors + 1;
                 mine = true;
             elseif err:find("ADDON_ACTION_") then
                 T._NDRTaintingAccusations = T._NDRTaintingAccusations + 1;
-            elseif err:find("FrameXML") then
+            elseif err:find("FrameXML") or err:find("SharedXML") then
                 T._BlizzardUIErrors = T._BlizzardUIErrors + 1;
             end
 
             if (T._NonDecursiveErrors - T._NDRTaintingAccusations - T._BlizzardUIErrors) > 999 then
-                T._ErrorLimitStripped = true;
+                T._ErrorLimitStripped = NiceTime() > 10; -- allow a graceful period of 10s after startup
                 T._TooManyErrors();
             end
         end
     end
 
+    LastErrorMessage = err;
+
     if ProperErrorHandler and not mine then
+        if _G.DEBUGLOCALS_LEVEL then
+
+            -- Fix Blizzard's own code... (2017-09-04: it's set to 5 while it should be 4)
+            if _G.DEBUGLOCALS_LEVEL == 5 then
+                _G.DEBUGLOCALS_LEVEL = 4
+            end
+
+            _G.DEBUGLOCALS_LEVEL = _G.DEBUGLOCALS_LEVEL + 3;
+        end
         return ProperErrorHandler( err, ... ); -- returning this way prevents this function from appearing in the stack
     end
 end
@@ -576,15 +677,24 @@ function T._TooManyErrors()
 
     -- T._NDRTaintingAccusations
 
-    -- if tainting accusation and Blizzard's UI errors represent more than 90% of errors then yield and don't display anything
-    if not ((T._NDRTaintingAccusations + T._BlizzardUIErrors) > T._NonDecursiveErrors * 0.9) then
-        if not WarningDisplayed and T.Dcr and T.Dcr.L and not (#DebugTextTable > 0 or T._TaintingAccusations > 10) then -- if we can and should display the alert
-            _Print(T.Dcr:ColorText((T.Dcr.L["TOO_MANY_ERRORS_ALERT"]):format(T._NonDecursiveErrors), "FFFF0000"));
-            _Print(T.Dcr:ColorText(T.Dcr.L["DONT_SHOOT_THE_MESSENGER"], "FFFF9955"));
-            WarningDisplayed = true;
+    -- If the game just started (or Decursive), we ignore error burst as the
+    -- new LUA_WARNING feature reveals many loading issues in other add-ons
+    -- without gameplay consequences
+    if (NiceTime() > 10) then
+
+        -- if tainting accusation and Blizzard's UI errors represent more than 90% of errors then yield and don't display anything
+        if not ((T._NDRTaintingAccusations + T._BlizzardUIErrors) > T._NonDecursiveErrors * 0.9) then
+            if not WarningDisplayed and T.Dcr and T.Dcr.L and not (#DebugTextTable > 0 or T._TaintingAccusations > 10) then -- if we can and should display the alert
+                _Print(T.Dcr:ColorText((T.Dcr.L["TOO_MANY_ERRORS_ALERT"]):format(T._NonDecursiveErrors), "FFFF0000"));
+                _Print(T.Dcr:ColorText(T.Dcr.L["DONT_SHOOT_THE_MESSENGER"], "FFFF9955"));
+                _Print('|cFF47C2A1Last UI error:|r', LastErrorMessage);
+                WarningDisplayed = true;
+            end
+        else
+            _Debug("_TooManyErrors()'s message not displayed NDR-TA being predominent...");
         end
     else
-        _Debug("_TooManyErrors()'s message not displayed NDR-TA being predominent...");
+            _Debug("_TooManyErrors()'s message not displayed Decursive was just started...");
     end
 
     _Debug("Error handler disabled");
@@ -629,7 +739,7 @@ function T._HookErrorHandler()
         BUGGRABBER_SUPPRESS_THROTTLE_CHAT = true; -- for people using an older version of BugGrabber. There is no way to know...
 
 
-        -- force BG to load callbackhandler since it relies on other add-ons to embeded it.
+        -- force BG to load callbackhandler since it relies on other add-ons that embeded it.
         if not BugGrabber.RegisterCallback and BugGrabber.setupCallbacks then
             BugGrabber.setupCallbacks();
         end
@@ -665,6 +775,10 @@ T._ShowNotice = function (notice)
             showAlert = 1,
             preferredIndex = 3,
         }; -- }}}
+
+        if T.Dcr.L and T.Dcr.L["NOTICE_FRAME_TEMPLATE"] and T.Dcr.L["NOTICE_FRAME_TEMPLATE"]:find("%s") then
+            StaticPopupDialogs["DECURSIVE_NOTICE_FRAME"].text = T.Dcr.L["NOTICE_FRAME_TEMPLATE"];
+        end
     end
 
     StaticPopup_Show ("DECURSIVE_NOTICE_FRAME", notice);
@@ -678,6 +792,54 @@ do
     local PrintMessage = function (message, ...) if T._DiagStatus ~= 2 then _Print("|cFFFFAA55Self diagnostic:|r ", format(message, ...)); end end;
 
 
+    function T._ExportCustomSpellConfiguration () -- (use pcall with this) -- {{{
+
+        local errorPrefix = function (message)
+            return "_ExportCustomSpellConfiguration: " .. message;
+        end
+
+        local customSpellConfText = {};
+        local D = T.Dcr;
+
+        if not D.classprofile or not D.classprofile.UserSpells then
+            return errorPrefix("D.classprofile.UserSpells not available");
+        end
+
+        customSpellConfText[1] = "\nCustom spells configuration:\n";
+
+        for spellID, spellData in pairs(D.classprofile.UserSpells) do
+            if not spellData.IsDefault then
+                 customSpellConfText[#customSpellConfText + 1] = ("    %s (id: %s) - %s - %s - %s - B: %d - Ts: %s - UF: %s - Macro: %s\n"):format(
+                 --                                                                  3    4    5       6        7        8           9
+                 select (2, pcall(function () return tostring(spellData.IsItem and (GetItemInfo(spellID * -1)) or (GetSpellInfo(spellID))) end)), tostring(spellID),
+                 spellData.Disabled and "OFF" or "ON", -- 3
+                 spellData.Pet and "PET" or "PLAYER", -- 4
+                 spellData.IsItem and "ITEM" or "SPELL", -- 5
+                 spellData.Better, -- 6
+                 D:tAsString(spellData.Types), -- 7
+                 D:tAsString(spellData.UnitFiltering), -- 8
+                 spellData.MacroText and spellData.MacroText or "false" -- 9
+                 );
+            end
+        end
+
+        return table.concat(customSpellConfText, "\n");
+    end
+    function T._PrintSpellTable() -- (use pcall with this) -- {{{
+
+        local errorPrefix = function (message)
+            return "_PrintSpellTable: " .. message;
+        end
+
+        local customSpellConfText = {};
+        local D = T.Dcr;
+
+        if not T._C or not T._C.DSI then
+            return errorPrefix("T._C.DSI not available");
+        end
+
+        return "\nDecursive known spells:\n(left and right side should be 'matching')\n" .. D:tAsString(D:tMap(T._C.DSI, GetSpellInfo));
+    end
     function T._ExportActionsConfiguration () -- (use pcall with this) -- {{{
 
         local errorPrefix = function (message)
@@ -685,7 +847,6 @@ do
         end
 
         local SpellAssignmentsTexts = {};
-        local result = "";
         local D = T.Dcr;
 
         if not D.Status then
@@ -693,7 +854,7 @@ do
         end
 
         local sucess, MouseButtons = pcall(function ()return D.db.global.MouseButtons end);
-        
+
         if not sucess then
             return errorPrefix("couldn't get MouseButtons: " .. MouseButtons);
         end
@@ -736,26 +897,26 @@ do
 
         --LibStub:GetLibrary
         local UseLibStub = {
-            ["AceAddon-3.0"] = 12,
-            ["AceComm-3.0"] = 9,
+            ["AceAddon-3.0"] = 13,
+            ["AceComm-3.0"] = 12,
             ["AceConsole-3.0"] = 7,
-            ["AceDB-3.0"] = 25,
-            ["AceDBOptions-3.0"] = 14,
-            ["AceEvent-3.0"] = 3,
+            ["AceDB-3.0"] = 27,
+            ["AceDBOptions-3.0"] = 15,
+            ["AceEvent-3.0"] = 4,
             ["AceHook-3.0"] = 8,
             ["AceLocale-3.0"] = 6,
             ["AceTimer-3.0"] = 17,
 
-            ["AceGUI-3.0"] = 34,
-            ["AceConfig-3.0"] = 2,
-            ["AceConfigCmd-3.0"] = 13,
-            ["AceConfigDialog-3.0"] = 59,
-            ["AceConfigRegistry-3.0"] = 15,
+            ["AceGUI-3.0"] = 41,
+            ["AceConfig-3.0"] = 3,
+            ["AceConfigCmd-3.0"] = 14,
+            ["AceConfigDialog-3.0"] = 79,
+            ["AceConfigRegistry-3.0"] = 20,
 
             ["LibDataBroker-1.1"] = 4,
-            ["LibDBIcon-1.0"] = 34,
-            ["LibQTip-1.0"] = 42,
-            ["CallbackHandler-1.0"] = 6,
+            ["LibDBIcon-1.0"] = 43,
+            ["LibQTip-1.0"] = 48,
+            ["CallbackHandler-1.0"] = 7,
         };
 
         local GenericErrorMessage1 = "Decursive could not initialize properly because one or several of the required shared libraries (at least |cFF00FF00LibStub|r) could not be found.\n";
@@ -786,7 +947,7 @@ do
         end
 
         local DcrMinTOC = tonumber(GetAddOnMetadata("Decursive", "X-Min-Interface") or 60000); -- once GetAddOnMetadata() was bugged and returned nil...
-        
+
         -- test if Decursive is backward compatible with the client's version
         if tocversion < DcrMinTOC then
             table.insert(Errors, ("Your World of Warcraft client version (%d) is too old to run this version of Decursive.\n"):format(tocversion));
@@ -857,8 +1018,12 @@ do
             T._DiagStatus = FatalOccured and 2 or 1;
         end
 
-        -- if the diagnostic was requested by the user, we also test AceEvent functionalities {{{ -
+        -- if the diagnostic was requested by the user, we also test AceEvent functionalities among a few other things {{{ -
         if force and FromCommand and T._DiagStatus == 0 then
+
+            if not _G.HandleLuaError then
+                AddDebugText("|cFFFF0000WARNING Blizzard default error handler is no longer available...|r");
+            end
 
             PrintMessage("|cFF00FF00No problem found in shared libraries or Decursive files!|r");
 
@@ -902,8 +1067,6 @@ do
                     PrintMessage("|cFF00FF00Event library functionning properly!|r");
                     PrintMessage("|cFF00FF00Everything seems to be OK.|r");
                     AddDebugText("Event library functionning properly, Everything seems to be OK");
-                    -- get a list of current actions assignments
-                    AddDebugText(pcall(T._ExportActionsConfiguration));
                     -- open the diagnostic window
                     T._ShowDebugReport(true);
                     return;
@@ -950,4 +1113,4 @@ do
     end
 end
 
-T._LoadedFiles["Dcr_DIAG.lua"] = "2.7.3.6";
+T._LoadedFiles["Dcr_DIAG.lua"] = "2.7.8";

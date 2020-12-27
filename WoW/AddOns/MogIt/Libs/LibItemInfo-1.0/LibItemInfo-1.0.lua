@@ -1,4 +1,4 @@
-local MAJOR, MINOR = "LibItemInfo-1.0", 4
+local MAJOR, MINOR = "LibItemInfo-1.0", 6
 local lib = LibStub:NewLibrary(MAJOR, MINOR)
 
 if not lib then return end
@@ -25,8 +25,9 @@ local function onUpdate(self)
 	lib.callbacks:Fire("OnItemInfoReceivedBatch")
 	if not next(lib.queue) then
 		self:UnregisterEvent("GET_ITEM_INFO_RECEIVED")
-		self:Hide()
 	end
+	-- always hide after an update to prevent endless reattempting of items that for whatever reason never returns data
+	self:Hide()
 end
 
 lib.frame = lib.frame or CreateFrame("Frame")
@@ -42,7 +43,7 @@ setmetatable(lib.cache, {
 			if not itemID then return end
 			itemID = tonumber(itemID)
 		end
-		local name, link, quality, itemLevel, reqLevel, class, subClass, maxStack, equipSlot = GetItemInfo(item)
+		local name, link, quality, itemLevel, reqLevel, class, subClass, maxStack, equipSlot, icon, sellPrice, classID, subClassID, bindType, expansion, itemSetID, isReagent = GetItemInfo(item)
 		if not name then
 			lib.queue[itemID] = true
 			lib.frame:RegisterEvent("GET_ITEM_INFO_RECEIVED")
@@ -50,6 +51,8 @@ setmetatable(lib.cache, {
 		end
 		if type(item) == "string" then
 			local baseItem = self[itemID]
+			-- apparently cases exist where a query using the item ID won't return any results even though a query with full link did immediately before
+			if not baseItem then return end
 			-- if the properties are equal to that of the base item, just point this entry at that
 			if quality == baseItem.quality and itemLevel == baseItem.itemLevel then
 				self[item] = baseItem
@@ -65,8 +68,10 @@ setmetatable(lib.cache, {
 			subType = subClass,
 			invType = equipSlot,
 			stackSize = maxStack,
+			bindType = bindType,
 		}
 		self[item] = itemInfo
 		return itemInfo
 	end,
 })
+

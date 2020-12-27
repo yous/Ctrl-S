@@ -11,170 +11,128 @@
 local TSM = select(2, ...)
 local Manage = TSM:NewModule("Manage", "AceEvent-3.0")
 local L = LibStub("AceLocale-3.0"):GetLocale("TradeSkillMaster_Auctioning") -- loads the localization table
+local private = {mode=nil, scanStatus={}, currentItem=nil}
 
-local scanStatus = {}
-local GUI, Util, mode
-
-function Manage:StartScan(GUIRef, options)
-	GUI = GUIRef
-	mode = GUI.mode
-	Util = TSM[mode]
-	GUI.OnAction = Manage.OnGUIEvent
-	wipe(scanStatus)
-	TSM.Log:Clear()
+function Manage:StartScan(options, mode, isGroup)
+	private.mode = mode
+	private.currentItem = nil
+	wipe(private.scanStatus)
 	
-	local scanList = Util:GetScanListAndSetup(GUI, options)
-	GUI:UpdateSTData()
-	if #scanList == 0 then
-		GUI:Stopped()
-		return
+	local scanStarted = false
+	if mode == "Post" then
+		scanStarted = TSM.Post:StartScan(isGroup, options)
+	elseif mode == "Cancel" then
+		scanStarted = TSM.Cancel:StartScan(isGroup, options)
+	elseif mode == "Reset" then
+		scanStarted = TSM.Reset:StartScan(options)
 	end
-	
-	if options and options.noScan then -- no scanning required
-		Manage:StartNoScanScan(GUIRef, scanList)
-		return
-	end
-	
-	GUI.statusBar:SetStatusText(L["Starting Scan..."])
-	GUI.statusBar:UpdateStatus(0, 0)
-	GUI.infoText:SetInfo(L["Running Scan..."])
-	TSM.Scan:StartItemScan(scanList)
-end
-
-function Manage:StartNoScanScan(GUIRef, scanList)
-	GUI.infoText:SetInfo(L["Processing Items..."])
-	GUI.statusBar:UpdateStatus(0, 0)
-	TSMAPI:CancelFrame("auctioningNoScanProcessing")
-	scanStatus.query = {1, 1}
-	
-	local totalToScan = #scanList
-	local function ProcessNoScanItems()
-		local numLeft = #scanList
-		for i=1, min(numLeft, 10) do
-			Manage:ProcessScannedItem(tremove(scanList, 1), (i ~= endNum and i ~= 1))
-			Manage:UpdateStatus("scan", totalToScan-#scanList, totalToScan)
-		end
-		
-		if #scanList == 0 then
-			TSMAPI:CancelFrame("auctioningNoScanProcessing")
-			Manage:ScanComplete()
-		end
-	end
-	TSMAPI:CreateTimeDelay("auctioningNoScanProcessing", 0, ProcessNoScanItems, 0.1)
-end
-
-function Manage:OnGUIEvent(event)
-	if event == "action" then
-		Util:DoAction()
-	elseif event == "skip" then
-		Util:SkipItem()
-	elseif event == "stop" then
-		TSMAPI:CancelFrame("auctioningNoScanProcessing")
-		TSMAPI.AuctionScan:StopScan()
-		Util:Stop()
-	end
-	TSMAPI:CreateTimeDelay("aucManageSTUpdate", 0.01, GUI.UpdateAuctionsSTData)
-end
-
-function Manage:ProcessScannedItem(itemString, noUpdate)
-	Util:ProcessItem(itemString)
-	if not noUpdate then
-		GUI:UpdateSTData()
-	end
-end
-
-function Manage:ScanComplete(interrupted)
-	if interrupted then
-		TSM.Scan:KillEventThread()
-		Util:Stop(true)
+	if scanStarted then
+		TSM.GUI:SetStatusBar(L["Starting Scan..."], 0, 0)
+		TSM.GUI:SetInfo(L["Running Scan..."])
 	else
-		local numToManage = Util:DoneScanning()
-		TSMAPI:FireEvent("AUCTIONING:SCANDONE", {num=numToManage})
-		if numToManage == 0 then
-			Util:Stop()
-		elseif TSM.db.global.scanCompleteSound ~= 1 then
-			PlaySound(TSM.Options:GetScanCompleteSound(TSM.db.global.scanCompleteSound), "Master")
-		end
+		TSM.GUI:Stopped()
 	end
 end
 
 -- these functions help display the status text which goes inside the statusbar
 local function IsStepStarted(step)
-	return scanStatus[step] and scanStatus[step][1] and scanStatus[step][2]
+	return private.scanStatus[step] and private.scanStatus[step][1] and private.scanStatus[step][2]
 end
 local function IsStepDone(step)
-	return IsStepStarted(step) and scanStatus[step][1] == scanStatus[step][2]
+	return IsStepStarted(step) and private.scanStatus[step][1] == private.scanStatus[step][2]
 end
--- update the statusbar
 function Manage:UpdateStatus(statusType, current, total)
-	scanStatus[statusType] = {current, total}
+	private.scanStatus[statusType] = {current, total}
 	if statusType == "query" then
 		if total >= 0 then
-			GUI.statusBar:SetStatusText(format(L["Preparing Filter %d / %d"], current, total))
+			TSM.GUI:SetStatusBar(format(L["Preparing Filter %d / %d"], current, total))
 		else
-			GUI.statusBar:SetStatusText(format(L["Preparing Filters..."], current, total))
+			TSM.GUI:SetStatusBar(L["Preparing Filters..."])
 		end
 	elseif IsStepDone("scan") and IsStepDone("manage") and IsStepDone("confirm") then -- scan complete
-		GUI.statusBar:SetStatusText(L["Scan Complete!"])
+		TSM.GUI:SetStatusBar(L["Scan Complete!"])
 	else
 		local parts = {}
 		if IsStepDone("scan") then
-			tinsert(parts, L["Done Scanning"])
+			if IsStepDone("manage") then
+				if private.mode == "Post" then
+					tinsert(parts, L["Done Posting"])
+				elseif private.mode == "Cancel" then
+					tinsert(parts, L["Done Canceling"])
+				elseif private.mode == "Reset" then
+					tinsert(parts, L["Done Resetting"])
+				end
+				if private.mode ~= "Reset" then
+					if IsStepStarted("confirm") then
+						tinsert(parts, format(L["Confirming %d / %d"], private.scanStatus.confirm[1]+1, private.scanStatus.confirm[2]))
+					else
+						tinsert(parts, format(L["Confirming %d / %d"], 1, private.scanStatus.manage[2]))
+					end
+				end
+			elseif IsStepStarted("manage") then
+				if private.mode == "Post" then
+					tinsert(parts, format(L["Posting %d / %d"], private.scanStatus.manage[1]+1, private.scanStatus.manage[2]))
+				elseif private.mode == "Cancel" then
+					tinsert(parts, format(L["Canceling %d / %d"], private.scanStatus.manage[1]+1, private.scanStatus.manage[2]))
+				elseif private.mode == "Reset" then
+					tinsert(parts, format(L["Resetting %d / %d"], private.scanStatus.manage[1]+1, private.scanStatus.manage[2]))
+				end
+				if private.mode ~= "Reset" then
+					if IsStepStarted("confirm") then
+						tinsert(parts, format(L["Confirming %d / %d"], private.scanStatus.confirm[1]+1, private.scanStatus.confirm[2]))
+					else
+						tinsert(parts, format(L["Confirming %d / %d"], 1, private.scanStatus.manage[2]))
+					end
+				end
+			end
 		elseif IsStepStarted("scan") then
 			if IsStepStarted("page") then
-				tinsert(parts, format(L["Scanning %d / %d (Page %d / %d)"], scanStatus.scan[1], scanStatus.scan[2], scanStatus.page[1], scanStatus.page[2]))
+				tinsert(parts, format(L["Scanning %d / %d (Page %d / %d)"], private.scanStatus.scan[1]+1, private.scanStatus.scan[2], private.scanStatus.page[1]+1, private.scanStatus.page[2]))
 			else
-				tinsert(parts, format(L["Scanning %d / %d"], scanStatus.scan[1], scanStatus.scan[2]))
+				tinsert(parts, format(L["Scanning %d / %d"], private.scanStatus.scan[1]+1, private.scanStatus.scan[2]))
 			end
 		end
-		if IsStepDone("manage") then
-			if mode == "Post" then
-				tinsert(parts, L["Done Posting"])
-			elseif mode == "Cancel" then
-				tinsert(parts, L["Done Canceling"])
-			end
-			if IsStepStarted("confirm") then
-				tinsert(parts, format(L["Confirming %d / %d"], scanStatus.confirm[1]+1, scanStatus.confirm[2]))
-			else
-				tinsert(parts, format(L["Confirming %d / %d"], 1, scanStatus.manage[2]))
-			end
-		elseif IsStepDone("scan") and IsStepStarted("manage") then
-			if mode == "Post" then
-				tinsert(parts, format(L["Posting %d / %d"], scanStatus.manage[1]+1, scanStatus.manage[2]))
-			elseif mode == "Cancel" then
-				tinsert(parts, format(L["Canceling %d / %d"], scanStatus.manage[1]+1, scanStatus.manage[2]))
-			end
-			if IsStepStarted("confirm") then
-				tinsert(parts, format(L["Confirming %d / %d"], scanStatus.confirm[1]+1, scanStatus.confirm[2]))
-			else
-				tinsert(parts, format(L["Confirming %d / %d"], 1, scanStatus.manage[2]))
-			end
-		end
-		GUI.statusBar:SetStatusText(table.concat(parts, "  -  "))
+		TSM.GUI:SetStatusBar(table.concat(parts, "  -  "))
 	end
 	
 	if IsStepDone("query") then
-		local scanCurrent = scanStatus.scan and scanStatus.scan[1] or 0
-		local scanTotal = scanStatus.scan and scanStatus.scan[2] or 1
-		local confirmCurrent = scanStatus.confirm and scanStatus.confirm[1] or 0
-		local confirmTotal = scanStatus.confirm and scanStatus.confirm[2] or 1
-		GUI.statusBar:UpdateStatus(100*confirmCurrent/confirmTotal, 100*scanCurrent/scanTotal)
+		local scanCurrent = private.scanStatus.scan and private.scanStatus.scan[1] or 0
+		local scanTotal = private.scanStatus.scan and private.scanStatus.scan[2] or 1
+		local confirmCurrent = private.scanStatus.confirm and private.scanStatus.confirm[1] or 0
+		local confirmTotal = private.scanStatus.confirm and private.scanStatus.confirm[2] or 1
+		TSM.GUI:SetStatusBar(nil, 100*confirmCurrent/confirmTotal, 100*scanCurrent/scanTotal)
 	end
 end
 
 function Manage:SetCurrentItem(currentItem)
+	private.currentItem = currentItem
 	if currentItem and currentItem.itemString then
-		GUI.infoText:SetInfo(currentItem)
+		TSM.GUI:SetInfo(currentItem)
 	end
 end
 
-function Manage:GetCurrentItem()
-	return currentItem
+function Manage:GetCurrentItem()	
+	return private.currentItem
 end
 
 function Manage:SetInfoText(text)
-	if type(text) ~= "table" then
-		GUI:UpdateLogSTHighlight()
+	TSM.GUI:SetInfo(text)
+end
+
+function Manage:StopScan()
+	TSM.GUI:Stopped()
+	if private.mode == "Post" then
+		TSM.Post:StopPosting()
+	elseif private.mode == "Cancel" then
+		TSM.Cancel:StopCanceling()
+	elseif private.mode == "Reset" then
+		TSM.Reset:StopResetting()
 	end
-	GUI.infoText:SetInfo(text)
+	TSM.Scan:StopScanning()
+	TSMAPI.Auction:StopScan("Auctioning")
+	
+	-- clean up local variables
+	private.currentItem = nil
+	private.mode = nil
+	wipe(private.scanStatus)
 end

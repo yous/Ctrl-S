@@ -8,7 +8,9 @@ function TC:TargetChanged()
 
 	local class = UnitIsPlayer("target") and select(2, UnitClass("target")) or UnitClassification("target")
 	if class then
-		local coordinates = CLASS_BUTTONS[class]
+		--local CLASS_BUTTONS = CLASS_BUTTONS
+		local coordinates = CLASS_ICON_TCOORDS[class];
+		--local coordinates = CLASS_BUTTONS[class]
 		if coordinates then
 			frame.Texture:SetTexCoord(coordinates[1], coordinates[2], coordinates[3], coordinates[4])
 			frame:Show()

@@ -7,7 +7,7 @@
 --		Banjankri of Blackrock, Predeter of Proudmoore, Xenyr of Aszune
 
 -- Currently maintained by
--- Cybeloras of Aerie Peak/Detheroc/Mal'Ganis
+-- Cybeloras of Aerie Peak
 -- --------------------
 
 
@@ -55,6 +55,7 @@ UNITS.Units = {
 	{ value = "mouseover",			text = L["ICONMENU_MOUSEOVER"]										},
 	{ value = "mouseovertarget",	text = L["ICONMENU_MOUSEOVERTARGET"]								},
 	{ value = "vehicle",			text = L["ICONMENU_VEHICLE"]										},
+	{ value = "nameplate",			text = L["ICONMENU_NAMEPLATE"],	range = 30							},
 	{ value = "party",				text = PARTY,				range = MAX_PARTY_MEMBERS				},
 	{ value = "raid",				text = RAID,				range = MAX_RAID_MEMBERS				},
 	{ value = "group",				text = GROUP,				range = MAX_RAID_MEMBERS,	desc = L["ICONMENU_GROUPUNIT_DESC"]	},
@@ -95,10 +96,17 @@ function TMW:GetUnits(icon, setting, Conditions)
 		for i, ConditionObject in ipairs(UnitSet.ConditionObjects) do
 			ConditionObject:RequestAutoUpdates(UnitSet, true)
 		end
+
+		-- Register for state changes AFTER requesting updates.
+		-- Requesting updates will trigger checks on all the objects.
+		-- We don't want each check to update the unit set one by one.
+		-- We'll update after they're all registered.
 		TMW:RegisterCallback("TMW_CNDT_OBJ_PASSING_CHANGED", UnitSet)
 	end
-	
-	
+
+	-- Perform an update now that all of the conditions (if any) are in their initial state.
+	UnitSet:Update()
+
 	return UnitSet.exposedUnits, UnitSet
 end
 
@@ -109,22 +117,27 @@ local UnitSet = TMW:NewClass("UnitSet"){
 		return unitsWithExistsEvent[unit] or UnitExists(unit)
 	end,
 
-	OnNewInstance = function(self, unitSettings, Conditions, parent)		
+	OnNewInstance = function(self, unitSettings, Conditions, parent)
 		self.Conditions = Conditions
 		self.parent = parent
 		
+		self.UnitsLookup = {}
 		self.unitSettings = unitSettings
 		self.originalUnits = UNITS:GetOriginalUnitTable(unitSettings)
 		self.updateEvents = {PLAYER_ENTERING_WORLD = true,}
 		self.exposedUnits = {}
+		self.translatedUnits = {}
 		self.allUnitsChangeOnEvent = true
 
 		-- determine the operations that the set needs to stay updated
 		for k, unit in ipairs(self.originalUnits) do
 			unit = tostring(unit)
+
 			if unit == "player" then
-			--	UNITS.unitsWithExistsEvent[unit] = true -- doesnt really have an event, but do this for external checks of unitsWithExistsEvent to increase efficiency.
-			-- if someone legitimately entered "playertarget" then they probably dont deserve to have increased eficiency... dont bother handling player as a base unit
+				--UNITS.unitsWithExistsEvent[unit] = true -- doesnt really have an event, 
+				-- but do this for external checks of unitsWithExistsEvent to increase efficiency.
+				-- if someone legitimately entered "playertarget" then they probably dont deserve to have increased eficiency... 
+				-- dont bother handling player as a base unit
 
 			elseif unit == "target" then -- the unit exactly
 				self.updateEvents.PLAYER_TARGET_CHANGED = true
@@ -182,6 +195,16 @@ local UnitSet = TMW:NewClass("UnitSet"){
 				UNITS.unitsWithBaseExistsEvent[unit] = unit:match("^(arena%d+)")
 				self.allUnitsChangeOnEvent = false
 
+			elseif unit:find("^nameplate%d+$") then -- the unit exactly
+				self.updateEvents.NAME_PLATE_UNIT_ADDED = true
+				self.updateEvents.NAME_PLATE_UNIT_REMOVED = true
+				UNITS.unitsWithExistsEvent[unit] = true
+			elseif unit:find("^nameplate%d+") then -- the unit as a base, with something else tacked onto it.
+				self.updateEvents.NAME_PLATE_UNIT_ADDED = true
+				self.updateEvents.NAME_PLATE_UNIT_REMOVED = true
+				UNITS.unitsWithBaseExistsEvent[unit] = unit:match("^(nameplate%d+)")
+				self.allUnitsChangeOnEvent = false
+
 			elseif unit:find("^maintank") or unit:find("^mainassist") then
 				self.updateEvents["GROUP_ROSTER_UPDATE"] = true
 
@@ -208,6 +231,16 @@ local UnitSet = TMW:NewClass("UnitSet"){
 					self.allUnitsChangeOnEvent = false
 					UNITS.unitsWithBaseExistsEvent[unit] = unit:match("^(group%d+)")
 				end
+
+			elseif unit:find("^vehicle") then
+				-- TODO: This isn't strictly true.
+				-- There might actually be events that work, but I don't feel like finding them at the moment.
+				self.allUnitsChangeOnEvent = false
+
+			elseif unit:find("^mouseover") then
+				-- There is a unit when you gain a mouseover, but there isn't one when you lose it, so we can't have events for this one.
+				self.allUnitsChangeOnEvent = false
+				
 			else
 				-- we found a unit and we dont really know what the fuck it is.
 				-- it MIGHT be a player name (or a derrivative thereof),
@@ -233,8 +266,16 @@ local UnitSet = TMW:NewClass("UnitSet"){
 				-- Override the parent used for the conditions (for Lua conditions mainly)
 				ConditionObjectConstructor.parent = parent or self
 				
-				-- Get a modifiable version
+				-- Modify the conditions:
+				-- Add a UnitExists condition to the beginning, so the rest of the conditions
+				-- will short circuit to false if the unit being checked doesn't exist.
 				local ModifiableConditions = ConditionObjectConstructor:GetPostUserModifiableConditions()
+				local exists = ConditionObjectConstructor:Modify_WrapExistingAndPrependNew()
+				exists.Type = "EXISTS"
+				exists.Unit = "unit" -- this will get replaced momentarily
+				ModifiableConditions[2].AndOr = "AND" -- AND together the exists condition and all subsequent conditions.
+
+				-- Substitute out "unit" with the actual unit being checked.
 				for _, condition in TMW:InNLengthTable(ModifiableConditions) do
 					condition.Unit = condition.Unit
 					:gsub("^unit", unit .. "-")
@@ -242,33 +283,39 @@ local UnitSet = TMW:NewClass("UnitSet"){
 					:gsub("%-%-", "-")
 					:trim("-")
 				end
-				
+
 				-- Modifications are done. Construct the ConditionObject
 				local ConditionObject = ConditionObjectConstructor:Construct()
-				
+
 				if ConditionObject then
 					self.ConditionObjects = self.ConditionObjects or {}
 					self.ConditionObjects[k] = ConditionObject
 					self.ConditionObjects[ConditionObject] = k
 				end
 			end
-		end		
-		
+		end
+
 		for event in pairs(self.updateEvents) do
 			UNITS:RegisterEvent(event, "OnEvent")
 		end
 
+		-- This call will end up being redundant
+		-- with the update done in TMW:GetUnits(), 
+		-- but I'm leaving it here in case anyone
+		-- was manually creating a UnitSet.
 		self:Update()
 	end,
-	
+
 	TMW_CNDT_OBJ_PASSING_CHANGED = function(self, event, ConditionObject, failed)
 		if self.ConditionObjects[ConditionObject] then
 			self:Update()
 		end
 	end,
 
-	Update = function(self)
-		local originalUnits, exposedUnits = self.originalUnits, self.exposedUnits
+	Update = function(self, forceNoExists)
+		local originalUnits,      exposedUnits,      translatedUnits =
+		      self.originalUnits, self.exposedUnits, self.translatedUnits
+		local UnitsLookup = self.UnitsLookup
 		local hasSpecialUnitRefs = self.hasSpecialUnitRefs
 		local mightHaveWackyUnitRefs = self.mightHaveWackyUnitRefs
 
@@ -278,6 +325,14 @@ local UnitSet = TMW:NewClass("UnitSet"){
 		local old_len = #exposedUnits
 		local exposed_len = 0
 		local changed = false
+		
+		-- We must wipe UnitsLookup because we can't surgically update it
+		-- as we iterate. Attempts to do so in the past (before the commit that added this comment)
+		-- caused a bug that led to units being removed from UnitsLookup when in fact they still 
+		-- should have been there. This was triggered when lower-index units would become no longer exposed,
+		-- shifting all units downwards in the exposedUnits table, leading to an issue when clearing out any
+		-- units past the new maximum index of exposedUnits.
+		wipe(UnitsLookup)
 
 		for k = 1, #originalUnits do
 			local unit = originalUnits[k]
@@ -301,6 +356,14 @@ local UnitSet = TMW:NewClass("UnitSet"){
 				unit = subbedUnit
 			end
 
+			if subbedUnit ~= false then
+				-- If subbedUnit isn't false, then the unit didn't need to be subbed,
+				-- or it was successfully subbed.
+				translatedUnits[k] = unit
+			else
+				translatedUnits[k] = nil
+			end
+
 			local hasExistsEvent = UNITS.unitsWithExistsEvent[unit]
 			local baseUnit = UNITS.unitsWithBaseExistsEvent[unit]
 
@@ -311,6 +374,9 @@ local UnitSet = TMW:NewClass("UnitSet"){
 					-- If it was subbed, its a string, and if it didnt need to be subbed, it will be nil.
 					subbedUnit ~= false
 
+					-- Don't expose the unit if the caller knows that this unit actually doesn't exist.
+				and forceNoExists ~= unit
+				
 					-- Don't expose the unit if it has conditions and those conditions failed
 				and (not ConditionObjects or not ConditionObjects[k] or not ConditionObjects[k].Failed)
 
@@ -319,6 +385,7 @@ local UnitSet = TMW:NewClass("UnitSet"){
 				and ((baseUnit and UnitExists(baseUnit)) or (not baseUnit and (not hasExistsEvent or UnitExists(unit))))
 
 			then
+				UnitsLookup[unit] = true
 				if exposedUnits[exposed_len+1] ~= unit then
 					exposedUnits[exposed_len+1] = unit
 					changed = true
@@ -340,16 +407,18 @@ local UnitSet = TMW:NewClass("UnitSet"){
 		if changed then
 			TMW:Fire("TMW_UNITSET_UPDATED", self)
 		end
+
+		return changed
 	end,
 }
 
 TMW:RegisterCallback("TMW_GLOBAL_UPDATE", function()
-	for i, UnitSet in ipairs(TMW.Classes.UnitSet.instances) do
-		if UnitSet.ConditionObjects then
-			for i, ConditionObject in ipairs(UnitSet.ConditionObjects) do
-				ConditionObject:RequestAutoUpdates(UnitSet, false)
+	for i, unitSet in ipairs(UnitSet.instances) do
+		if unitSet.ConditionObjects then
+			for i, ConditionObject in ipairs(unitSet.ConditionObjects) do
+				ConditionObject:RequestAutoUpdates(unitSet, false)
 			end
-			TMW:UnregisterCallback("TMW_CNDT_OBJ_PASSING_CHANGED", UnitSet)
+			TMW:UnregisterCallback("TMW_CNDT_OBJ_PASSING_CHANGED", unitSet)
 		end
 	end
 end)
@@ -368,17 +437,17 @@ function UNITS:GetUnitSet(unitSettings, SerializedConditions)
 	
 	return UnitSet:New(unitSettings, TEMP_conditionsSettingSource, TEMP_conditionsParents)
 end
-TMW:MakeFunctionCached(UNITS, "GetUnitSet")
+TMW:MakeNArgFunctionCached(2, UNITS, "GetUnitSet")
 
 function UNITS:GetOriginalUnitTable(unitSettings)
-	unitSettings = TMW:CleanString(unitSettings):
-	lower(): -- all units should be lowercase
-	-- Stripping color codes doesn't matter now since they aren't inserted now ("#" isnt inserted either)
-	-- but keep this here for compatibility with old setups.
-	gsub("|cffff0000", ""): -- strip color codes (NOTE LOWERCASE)
-	gsub("|r", ""):
-	gsub("#", "") -- strip the # from the dropdown 
-	.. " "
+	unitSettings = TMW:CleanString(unitSettings)
+		:lower() -- all units should be lowercase
+		-- Stripping color codes doesn't matter now since they aren't inserted now ("#" isnt inserted either)
+		-- but keep this here for compatibility with old setups.
+		:gsub("|cffff0000", "") -- strip color codes (NOTE LOWERCASE)
+		:gsub("|r", "")
+		:gsub("#", "") -- strip the # from the dropdown 
+		.. " "
 
 
 	--SUBSTITUTE "party" with "party1-4", etc
@@ -415,7 +484,7 @@ function UNITS:GetOriginalUnitTable(unitSettings)
 		if unit and firstnum and lastnum then
 
 			if abs(lastnum - firstnum) > 100 then
-				TMW:Print("Why on Earth would you want to track more than 100", unit, "units? I'll just ignore it and save you from possibly crashing.")
+				TMW:Print("You can't track more than 100", unit, "units.")
 			else
 				local str = ""
 				local order = firstnum > lastnum and -1 or 1
@@ -431,7 +500,7 @@ function UNITS:GetOriginalUnitTable(unitSettings)
 		end
 	end
 
-	local Units = TMW:SplitNames(unitSettings) -- get a table of everything
+	local Units = TMW:SplitNames(unitSettings, true) -- get a table of everything
 
 	-- REMOVE DUPLICATES
 	TMW.tRemoveDuplicates(Units)
@@ -514,7 +583,7 @@ function UNITS:UpdateGroupedPlayersMap()
 	end
 end
 
-function UNITS:OnEvent(event, ...)
+function UNITS:OnEvent(event, arg1)
 
 	if (event == "GROUP_ROSTER_UPDATE" or event == "RAID_ROSTER_UPDATE") and UNITS.doTankAndAssistMap then
 		UNITS:UpdateTankAndAssistMap()
@@ -529,11 +598,19 @@ function UNITS:OnEvent(event, ...)
 		UNITS:UpdateGroupedPlayersMap()
 	end
 
+	-- NAME_PLATE_UNIT_REMOVED fires while UnitExists is still true for the unit.
+	-- We will pass this to Update() to force it to be treated as not existing.
+	local forceNoExists = event == "NAME_PLATE_UNIT_REMOVED" and arg1
+
 	local instances = UnitSet.instances
 	for i = 1, #instances do
 		local unitSet = instances[i]
 		if unitSet.updateEvents[event] then
-			unitSet:Update()
+			if not unitSet:Update(forceNoExists) then
+				-- If the units in the UnitSet didn't change, still fire a TMW_UNITSET_UPDATED to signal that they may have shuffled around a bit
+				-- (for example, the player changed target, or raid members moved around)
+				TMW:Fire("TMW_UNITSET_UPDATED", unitSet)
+			end
 		end
 	end
 end
@@ -547,7 +624,8 @@ function UNITS:SubstituteSpecialUnit(oldunit)
 		else
 			local oldnumber = tonumber(strmatch(oldunit, "(%d+)")) -- the old number (1)
 			if oldnumber == 1 then
-				return "player"
+				newunit = gsub(oldunit, "group", "player") -- the new unit (party1) (number not changed yet)
+				newunit = gsub(newunit, oldnumber, "", 1)
 			else
 				newunit = gsub(oldunit, "group", "party") -- the new unit (party1) (number not changed yet)
 				newunit = gsub(newunit, oldnumber, oldnumber - 1, 1)

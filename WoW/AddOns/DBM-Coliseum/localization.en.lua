@@ -21,7 +21,6 @@ L:SetTimerLocalization{
 
 L:SetOptionLocalization{
 	WarningSnobold		= "Show warning for Snobold Vassal spawns",
-	PingCharge			= "Ping the minimap when Icehowl is about to charge you",
 	ClearIconsOnIceHowl	= "Clear all icons before charge",
 	TimerNextBoss		= "Show timer for next boss spawn",
 	TimerEmerge			= "Show timer for emerge",
@@ -82,7 +81,7 @@ L:SetGeneralLocalization{
 }
 
 L:SetTimerLocalization{
-	TimerSpecialSpell	= "Next special ability"	
+	TimerSpecialSpell	= "Next special ability"
 }
 
 L:SetWarningLocalization{
@@ -91,8 +90,7 @@ L:SetWarningLocalization{
 	SpecWarnSwitchTarget		= "Switch target",
 	SpecWarnKickNow				= "Interrupt now",
 	WarningTouchDebuff			= "Debuff on >%s<",
-	WarningPoweroftheTwins		= "Power of the Twins - More healing on >%s<",
-	SpecWarnPoweroftheTwins		= "Power of the Twins"
+	WarningPoweroftheTwins2		= "Power of the Twins - More healing on >%s<"
 }
 
 L:SetMiscLocalization{
@@ -106,11 +104,10 @@ L:SetOptionLocalization{
 	SpecWarnSpecial				= "Show special warning when you have to change color",
 	SpecWarnSwitchTarget		= "Show special warning when the other Twin is casting",
 	SpecWarnKickNow				= "Show special warning when you have to interrupt",
-	SpecialWarnOnDebuff			= "Show special warning when debuffed (to switch debuff)",
+	SpecialWarnOnDebuff			= "Show change color special warning when touch debuffed (to switch debuff)",
 	SetIconOnDebuffTarget		= "Set icons on Touch of Light/Darkness debuff targets (heroic)",
 	WarningTouchDebuff			= "Announce Touch of Light/Darkness debuff targets",
-	WarningPoweroftheTwins		= "Announce Power of the Twins targets",
-	SpecWarnPoweroftheTwins		= "Show special warning when you are tanking an empowered Twin"
+	WarningPoweroftheTwins2		= "Announce Power of the Twins targets"
 }
 
 -----------------

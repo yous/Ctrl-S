@@ -11,60 +11,33 @@ local TSM = select(2, ...)
 local Options = TSM:NewModule("Options", "AceEvent-3.0", "AceHook-3.0")
 local L = LibStub("AceLocale-3.0"):GetLocale("TradeSkillMaster_Auctioning") -- loads the localization table
 local AceGUI = LibStub("AceGUI-3.0") -- load the AceGUI libraries
+local private = {}
 
 
-function Options:Load(parent, operation, group)
-	Options.treeGroup = AceGUI:Create("TSMTreeGroup")
-	Options.treeGroup:SetLayout("Fill")
-	Options.treeGroup:SetCallback("OnGroupSelected", function(...) Options:SelectTree(...) end)
-	Options.treeGroup:SetStatusTable(TSM.db.global.optionsTreeStatus)
-	parent:AddChild(Options.treeGroup)
 
-	Options:UpdateTree()
-	if operation then
-		if operation == "" then
-			Options.currentGroup = group
-			Options.treeGroup:SelectByPath(3)
-			Options.currentGroup = nil
-		else
-			Options.treeGroup:SelectByPath(3, operation)
+-- ============================================================================
+-- Module Options
+-- ============================================================================
+
+function Options:Load(container)
+	local tg = AceGUI:Create("TSMTabGroup")
+	tg:SetLayout("Fill")
+	tg:SetFullHeight(true)
+	tg:SetFullWidth(true)
+	tg:SetTabs({{value=1, text=L["General"]}, {value=2, text=L["Whitelist"]}})
+	tg:SetCallback("OnGroupSelected", function(self, _, value)
+		self:ReleaseChildren()
+		if value == 1 then
+			private:DrawGeneralSettings(self)
+		elseif value == 2 then
+			private:DrawWhitelistSettings(self)
 		end
-	else
-		Options.treeGroup:SelectByPath(1)
-	end
+	end)
+	container:AddChild(tg)
+	tg:SelectTab(1)
 end
 
-function Options:UpdateTree()
-	local operationTreeChildren = {}
-
-	for name in pairs(TSM.operations) do
-		tinsert(operationTreeChildren, { value = name, text = name })
-	end
-
-	sort(operationTreeChildren, function(a, b) return a.value < b.value end)
-
-	Options.treeGroup:SetTree({ { value = 1, text = L["Options"] }, { value = 2, text = L["Whitelist"] }, { value = 3, text = L["Operations"], children = operationTreeChildren } })
-end
-
-function Options:SelectTree(treeGroup, _, selection)
-	treeGroup:ReleaseChildren()
-
-	local major, minor = ("\001"):split(selection)
-	major = tonumber(major)
-	if major == 1 then
-		Options:DrawGeneralSettings(treeGroup)
-	elseif major == 2 then
-		Options:DrawWhitelistSettings(treeGroup)
-	elseif minor then
-		Options:DrawOperationSettings(treeGroup, minor)
-	else
-		Options:DrawNewOperation(treeGroup)
-	end
-end
-
-function Options:DrawGeneralSettings(container)
-	local macroOptions = { down = true, up = true, ctrl = true, shift = false, alt = false }
-
+function private:DrawGeneralSettings(container)
 	local page = {
 		{
 			type = "ScrollFrame",
@@ -91,129 +64,32 @@ function Options:DrawGeneralSettings(container)
 							type = "CheckBox",
 							label = L["Disable Invalid Price Warnings"],
 							settingInfo = { TSM.db.global, "disableInvalidMsg" },
+							relativeWidth = 1,
 							tooltip = L["If checked, TSM will not print out a chat message when you have an invalid price for an item. However, it will still show as invalid in the log."],
 						},
 						{
 							type = "Dropdown",
-							label = L["Default Operation Tab"],
-							relativeWidth = 0.49,
-							list = { L["General"], L["Post"], L["Cancel"], L["Reset"] },
-							settingInfo = { TSM.db.global, "defaultOperationTab" },
-							tooltip = L["This dropdown determines the default tab when you visit an operation."],
-						},
-						{
-							type = "Dropdown",
-							label = L["Enable Sounds"],
-							relativeWidth = 0.5,
-							list = {L["None"], "AuctionWindowOpen", "Fishing Reel in", "HumanExploration", "LEVELUP", "MapPing", "MONEYFRAMEOPEN", "QUESTCOMPLETED", "ReadyCheck"},
+							label = L["Scan Complete Sound"],
+							list = TSMAPI:GetSounds(),
 							settingInfo = { TSM.db.global, "scanCompleteSound" },
-							tooltip = L["Play the selected sound when a post / cancel scan is complete and items are ready to be posted / canceled (the gray bar is all the way across).Select None to disable sounds"],
+							tooltip = L["Play the selected sound when a post / cancel scan is complete and items are ready to be posted / canceled (the gray bar is all the way across)."],
 						},
 						{
 							type = "Button",
 							text = L["Test Selected Sound"],
-							relativeWidth = 0.49,
-							callback = function()
-								if TSM.db.global.scanCompleteSound ~= 1 then
-									PlaySound(TSM.Options:GetScanCompleteSound(TSM.db.global.scanCompleteSound), "Master")
-								end
-							end,
-						},
-					},
-				},
-				{
-					type = "Spacer",
-				},
-				{
-					type = "InlineGroup",
-					layout = "flow",
-					title = L["Macro Help"],
-					children = {
-						{
-							type = "Label",
-							text = format(L["There are two ways of making clicking the Post / Cancel Auction button easier. You can put %s and %s in a macro (on separate lines), or use the utility below to have a macro automatically made and bound to scrollwheel for you."], "\"" .. TSMAPI.Design:GetInlineColor("link") .. "/click TSMAuctioningPostButton|r\"", "\"" .. TSMAPI.Design:GetInlineColor("link") .. "/click TSMAuctioningCancelButton|r\""),
-							relativeWidth = 1,
+							callback = function() TSMAPI:DoPlaySound(TSM.db.global.scanCompleteSound) end,
 						},
 						{
-							type = "HeadingLine"
-						},
-						{
-							type = "Label",
-							text = L["ScrollWheel Direction (both recommended):"],
-							relativeWidth = 0.59,
-						},
-						{
-							type = "CheckBox",
-							label = L["Up"],
-							relativeWidth = 0.2,
-							settingInfo = { macroOptions, "up" },
-							tooltip = L["Will bind ScrollWheelUp (plus modifiers below) to the macro created."],
-						},
-						{
-							type = "CheckBox",
-							label = L["Down"],
-							relativeWidth = 0.2,
-							settingInfo = { macroOptions, "down" },
-							tooltip = L["Will bind ScrollWheelDown (plus modifiers below) to the macro created."],
-						},
-						{
-							type = "Label",
-							text = L["Modifiers:"],
-							relativeWidth = 0.24,
-							fontObject = GameFontNormal,
-						},
-						{
-							type = "CheckBox",
-							label = "ALT",
-							relativeWidth = 0.25,
-							settingInfo = { macroOptions, "alt" },
-						},
-						{
-							type = "CheckBox",
-							label = "CTRL",
-							relativeWidth = 0.25,
-							settingInfo = { macroOptions, "ctrl" },
-						},
-						{
-							type = "CheckBox",
-							label = "SHIFT",
-							relativeWidth = 0.25,
-							settingInfo = { macroOptions, "shift" },
+							type = "Dropdown",
+							label = L["Confirm Complete Sound"],
+							list = TSMAPI:GetSounds(),
+							settingInfo = { TSM.db.global, "confirmCompleteSound" },
+							tooltip = L["Play the selected sound when all posts / cancels are confirmed for a post / cancel scan."],
 						},
 						{
 							type = "Button",
-							relativeWidth = 1,
-							text = L["Create Macro and Bind ScrollWheel (with selected options)"],
-							callback = function()
-								DeleteMacro("TSMAucBClick")
-								CreateMacro("TSMAucBClick", 1, "/click TSMAuctioningCancelButton\n/click TSMAuctioningPostButton")
-
-								local modString = ""
-								if macroOptions.ctrl then
-									modString = modString .. "CTRL-"
-								end
-								if macroOptions.alt then
-									modString = modString .. "ALT-"
-								end
-								if macroOptions.shift then
-									modString = modString .. "SHIFT-"
-								end
-
-								local bindingNum = GetCurrentBindingSet()
-								bindingNum = (bindingNum == 1) and 2 or 1
-
-								if macroOptions.up then
-									SetBinding(modString .. "MOUSEWHEELUP", nil, bindingNum)
-									SetBinding(modString .. "MOUSEWHEELUP", "MACRO TSMAucBClick", bindingNum)
-								end
-								if macroOptions.down then
-									SetBinding(modString .. "MOUSEWHEELDOWN", nil, bindingNum)
-									SetBinding(modString .. "MOUSEWHEELDOWN", "MACRO TSMAucBClick", bindingNum)
-								end
-								SaveBindings(2)
-
-								TSM:Print(L["Macro created and keybinding set!"])
-							end,
+							text = L["Test Selected Sound"],
+							callback = function() TSMAPI:DoPlaySound(TSM.db.global.confirmCompleteSound) end,
 						},
 					},
 				},
@@ -221,10 +97,10 @@ function Options:DrawGeneralSettings(container)
 		},
 	}
 
-	TSMAPI:BuildPage(container, page)
+	TSMAPI.GUI:BuildOptions(container, page)
 end
 
-function Options:DrawWhitelistSettings(container)
+function private:DrawWhitelistSettings(container)
 	local function AddPlayer(self, _, value)
 		value = string.trim(strlower(value or ""))
 		if value == "" then return TSM:Print(L["No name entered."]) end
@@ -242,7 +118,7 @@ function Options:DrawWhitelistSettings(container)
 		end
 
 		TSM.db.factionrealm.whitelist[strlower(value)] = value
-		container:SelectByPath(2)
+		container:Reload()
 	end
 
 	local page = {
@@ -264,7 +140,6 @@ function Options:DrawWhitelistSettings(container)
 						},
 						{
 							type = "CheckBox",
-							relativeWidth = 0.49,
 							label = L["Match Whitelist Players"],
 							settingInfo = { TSM.db.global, "matchWhitelist" },
 							tooltip = L["If enabled, instead of not posting when a whitelisted player has an auction posted, Auctioning will match their price."],
@@ -278,8 +153,8 @@ function Options:DrawWhitelistSettings(container)
 					children = {
 						{
 							type = "EditBox",
-							label = L["Player name"],
-							relativeWidth = 0.5,
+							label = L["Player Name"],
+							relativeWidth = 1,
 							callback = AddPlayer,
 							tooltip = L["Add a new player to your whitelist."],
 						},
@@ -309,7 +184,7 @@ function Options:DrawWhitelistSettings(container)
 				relativeWidth = 0.3,
 				callback = function(self)
 					TSM.db.factionrealm.whitelist[name] = nil
-					container:SelectByPath(2)
+					container:Reload()
 				end,
 			})
 	end
@@ -324,81 +199,69 @@ function Options:DrawWhitelistSettings(container)
 			})
 	end
 
-	TSMAPI:BuildPage(container, page)
+	TSMAPI.GUI:BuildOptions(container, page)
 end
 
-function Options:DrawNewOperation(container)
-	local currentGroup = Options.currentGroup
-	local page = {
+
+
+-- ============================================================================
+-- Operation Options
+-- ============================================================================
+
+function Options:GetOperationOptionsInfo()
+	local description = L["Auctioning operations contain settings for posting, canceling, and resetting items in a group. Type the name of the new operation into the box below and hit 'enter' to create a new Auctioning operation."]
+	local tabInfo = {
+		{text = L["General"], callback = private.DrawOperationGeneral},
+		{text = L["Post"], callback = private.DrawOperationPost},
+		{text = CANCEL, callback = private.DrawOperationCancel},
+		{text = L["Reset"], callback = private.DrawOperationReset},
+	}
+	local relationshipInfo = {
 		{
-			-- scroll frame to contain everything
-			type = "ScrollFrame",
-			layout = "List",
-			children = {
-				{
-					type = "InlineGroup",
-					layout = "flow",
-					title = L["New Operation"],
-					children = {
-						{
-							type = "Label",
-							text = L["Auctioning operations contain settings for posting, canceling, and resetting items in a group. Type the name of the new operation into the box below and hit 'enter' to create a new Crafting operation."],
-							relativeWidth = 1,
-						},
-						{
-							type = "EditBox",
-							label = L["Operation Name"],
-							relativeWidth = 0.8,
-							callback = function(self, _, name)
-								name = (name or ""):trim()
-								if name == "" then return end
-								if TSM.operations[name] then
-									self:SetText("")
-									return TSM:Printf(L["Error creating operation. Operation with name '%s' already exists."], name)
-								end
-								TSM.operations[name] = CopyTable(TSM.operationDefaults)
-								Options:UpdateTree()
-								Options.treeGroup:SelectByPath(3, name)
-								TSMAPI:NewOperationCallback("Auctioning", currentGroup, name)
-							end,
-							tooltip = L["Give the new operation a name. A descriptive name will help you find this operation later."],
-						},
-					},
-				},
-			},
+			label = L["General Settings"],
+			{ key = "matchStackSize", label = L["Match Stack Size"] },
+			{ key = "ignoreLowDuration", label = L["Ignore Low Duration Auctions"] },
+			{ key = "blacklist", label = L["Blacklisted Players"] },
+		},
+		{
+			label = L["Post Settings"],
+			{ key = "duration", label = L["Duration"] },
+			{ key = "postCap", label = L["Post Cap"] },
+			{ key = "stackSize", label = L["Stack Size"] },
+			{ key = "stackSizeIsCap", label = L["Allow Partial Stack"] },
+			{ key = "keepQuantity", label = L["Keep Quantity"] },
+			{ key = "keepQtySources", label = L["Sources to Include in Keep Quantity"] },
+			{ key = "maxExpires", label = L["Max Expires"] },
+			{ key = "bidPercent", label = L["Bid Percent"] },
+			{ key = "undercut", label = L["Undercut Amount"] },
+			{ key = "minPrice", label = L["Minimum Price"] },
+			{ key = "priceReset", label = L["When Below Minimum"] },
+			{ key = "maxPrice", label = L["Maximum Price"] },
+			{ key = "aboveMax", label = L["When Above Maximum"] },
+			{ key = "normalPrice", label = L["Normal Price"] },
+		},
+		{
+			label = L["Cancel Settings"],
+			{ key = "cancelUndercut", label = L["Cancel Undercut Auctions"] },
+			{ key = "keepPosted", label = L["Keep Posted"] },
+			{ key = "cancelRepost", label = L["Cancel to Repost Higher"] },
+			{ key = "cancelRepostThreshold", label = L["Repost Higher Threshold"] },
+		},
+		{
+			label = L["Reset Settings"],
+			{ key = "resetEnabled", label = L["Enable Reset Scan"] },
+			{ key = "resetMaxQuantity", label = L["Max Quantity to Buy"] },
+			{ key = "resetMaxInventory", label = L["Max Inventory Quantity"] },
+			{ key = "resetMaxCost", label = L["Max Reset Cost"] },
+			{ key = "resetMinProfit", label = L["Min Reset Profit"] },
+			{ key = "resetResolution", label = L["Price Resolution"] },
+			{ key = "resetMaxItemCost", label = L["Max Cost Per Item"] },
 		},
 	}
-	TSMAPI:BuildPage(container, page)
+	return description, tabInfo, relationshipInfo
 end
 
-function Options:DrawOperationSettings(container, operationName)
-	local tg = AceGUI:Create("TSMTabGroup")
-	tg:SetLayout("Fill")
-	tg:SetFullHeight(true)
-	tg:SetFullWidth(true)
-	tg:SetTabs({ { value = 1, text = L["General"] }, { value = 2, text = L["Post"] }, { value = 3, text = L["Cancel"] }, { value = 4, text = L["Reset"] }, { value = 5, text = TSMAPI.Design:GetInlineColor("advanced") .. L["Relationships"] .. "|r" }, { value = 6, text = L["Management"] } })
-	tg:SetCallback("OnGroupSelected", function(self, _, value)
-		tg:ReleaseChildren()
-		TSMAPI:UpdateOperation("Auctioning", operationName)
-		if value == 1 then
-			Options:DrawOperationGeneral(self, operationName)
-		elseif value == 2 then
-			Options:DrawOperationPost(self, operationName)
-		elseif value == 3 then
-			Options:DrawOperationCancel(self, operationName)
-		elseif value == 4 then
-			Options:DrawOperationReset(self, operationName)
-		elseif value == 5 then
-			Options:DrawOperationRelationships(self, operationName)
-		elseif value == 6 then
-			TSMAPI:DrawOperationManagement(TSM, self, operationName)
-		end
-	end)
-	container:AddChild(tg)
-	tg:SelectTab(TSM.db.global.defaultOperationTab)
-end
-
-function Options:DrawOperationGeneral(container, operationName)
+function private.DrawOperationGeneral(container, operationName)
 	local operation = TSM.operations[operationName]
 	local durationList = { [0] = L["<none>"] }
 	for i = 1, 3 do -- go up to long duration
@@ -426,7 +289,6 @@ function Options:DrawOperationGeneral(container, operationName)
 							type = "Dropdown",
 							label = L["Ignore Low Duration Auctions"],
 							settingInfo = { operation, "ignoreLowDuration" },
-							relativeWidth = 0.5,
 							list = durationList,
 							disabled = operation.relationships.ignoreLowDuration,
 							tooltip = L["Any auctions at or below the selected duration will be ignored. Selecting \"<none>\" will cause no auctions to be ignored based on duration."],
@@ -445,10 +307,10 @@ function Options:DrawOperationGeneral(container, operationName)
 		},
 	}
 
-	TSMAPI:BuildPage(container, page)
+	TSMAPI.GUI:BuildOptions(container, page)
 end
 
-function Options:DrawOperationPost(container, operationName)
+function private.DrawOperationPost(container, operationName)
 	local operation = TSM.operations[operationName]
 	local page = {
 		{
@@ -464,7 +326,6 @@ function Options:DrawOperationPost(container, operationName)
 							type = "Dropdown",
 							label = L["Duration"],
 							settingInfo = { operation, "duration" },
-							relativeWidth = 0.5,
 							list = { [12] = AUCTION_DURATION_ONE, [24] = AUCTION_DURATION_TWO, [48] = AUCTION_DURATION_THREE },
 							disabled = operation.relationships.duration,
 							tooltip = L["How long auctions should be up for."],
@@ -473,71 +334,66 @@ function Options:DrawOperationPost(container, operationName)
 							type = "Slider",
 							label = L["Post Cap"],
 							settingInfo = { operation, "postCap" },
-							relativeWidth = 0.49,
-							min = 0,
-							max = 500,
-							step = 1,
 							disabled = operation.relationships.postCap,
+							min = 0,
+							max = 200,
+							step = 1,
 							tooltip = L["How many auctions at the lowest price tier can be up at any one time. Setting this to 0 disables posting for any groups this operation is applied to."],
 						},
 						{
 							type = "Slider",
 							label = L["Stack Size"],
 							settingInfo = { operation, "stackSize" },
-							min = 1,
-							max = 1000,
-							step = 1,
-							relativeWidth = 0.5,
 							disabled = operation.relationships.stackSize,
+							min = 1,
+							max = 200,
+							step = 1,
 							tooltip = L["How many items should be in a single auction, 20 will mean they are posted in stacks of 20."],
 						},
 						{
 							type = "CheckBox",
-							label = L["Use Stack Size as Cap"],
+							label = L["Allow Partial Stack"],
 							settingInfo = { operation, "stackSizeIsCap" },
 							disabled = operation.relationships.stackSizeIsCap,
-							tooltip = L["If you don't have enough items for a full post, it will post with what you have."],
+							tooltip = L["If enabled, a partial stack will be posted if you don't have enough for a full stack. This has no effect if the stack size is 1."],
+						},
+						{
+							type = "HeadingLine",
 						},
 						{
 							type = "Slider",
 							label = L["Keep Quantity"],
 							settingInfo = { operation, "keepQuantity" },
+							disabled = operation.relationships.keepQuantity,
 							min = 0,
-							max = 1000,
+							max = 5000,
 							step = 1,
-							relativeWidth = 0.5,
-							tooltip = L["How many items you want to keep in your bags and not have Auctioning post."],
+							tooltip = L["How many items you want to keep in your bags (and additional sources) and not have Auctioning post."],
 						},
-					},
-				},
-				{
-					type = "Spacer",
-				},
-				{
-					type = "InlineGroup",
-					layout = "flow",
-					title = L["Auction Price Settings"],
-					children = {
+						{
+							type = "Dropdown",
+							label = L["Sources to Include in Keep Quantity"],
+							disabled = operation.relationships.keepQtySources,
+							relativeWidth = 0.5,
+							list = {bank=BANK, guild=GUILD},
+							value = operation.keepQtySources,
+							multiselect = true,
+							callback = function(_, _, key, value)
+								operation.keepQtySources[key] = value
+							end,
+						},
+						{
+							type = "HeadingLine",
+						},
 						{
 							type = "Slider",
-							label = L["Bid percent"],
-							settingInfo = { operation, "bidPercent" },
-							isPercent = true,
+							label = L["Max Expires"],
+							settingInfo = { operation, "maxExpires" },
+							disabled = operation.relationships.maxExpires or not TSMAPI:HasModule("Accounting"),
 							min = 0,
-							max = 1,
-							step = 0.01,
-							relativeWidth = 0.5,
-							disabled = operation.relationships.bidPercent,
-							tooltip = L["Percentage of the buyout as bid, if you set this to 90% then a 100g buyout will have a 90g bid."],
-						},
-						{
-							type = "EditBox",
-							label = L["Undercut Amount"],
-							settingInfo = { operation, "undercut" },
-							relativeWidth = 0.49,
-							acceptCustom = true,
-							disabled = operation.relationships.undercut,
-							tooltip = L["How much to undercut other auctions by. Format is in \"#g#s#c\". For example, \"50g30s\" means 50 gold, 30 silver, and no copper."],
+							max = 5000,
+							step = 1,
+							tooltip = L["Items will not be posted after they have expired this number of times in a row. A value of 0 will disable this feature."],
 						},
 					},
 				},
@@ -550,10 +406,31 @@ function Options:DrawOperationPost(container, operationName)
 					title = L["Posting Price Settings"],
 					children = {
 						{
+							type = "Slider",
+							label = L["Bid Percent"],
+							settingInfo = { operation, "bidPercent" },
+							isPercent = true,
+							min = 0.01,
+							max = 1,
+							step = 0.01,
+							disabled = operation.relationships.bidPercent,
+							tooltip = L["Percentage of the buyout as bid, if you set this to 90% then a 100g buyout will have a 90g bid."],
+						},
+						{
+							type = "EditBox",
+							label = L["Undercut Amount"],
+							settingInfo = { operation, "undercut" },
+							acceptCustom = true,
+							disabled = operation.relationships.undercut,
+							tooltip = L["How much to undercut other auctions by. Format is in \"#g#s#c\". For example, \"50g30s\" means 50 gold, 30 silver, and no copper."],
+						},
+						{
+							type = "HeadingLine",
+						},
+						{
 							type = "EditBox",
 							label = L["Minimum Price"],
 							settingInfo = { operation, "minPrice" },
-							relativeWidth = 0.49,
 							acceptCustom = true,
 							disabled = operation.relationships.minPrice,
 							tooltip = L["The lowest price you want an item to be posted for. Auctioning will not undercut auctions below this price."],
@@ -561,7 +438,6 @@ function Options:DrawOperationPost(container, operationName)
 						{
 							type = "Dropdown",
 							label = L["When Below Minimum"],
-							relativeWidth = 0.5,
 							list = { ["none"] = L["Don't Post Items"], ["minPrice"] = L["Post at Minimum Price"], ["maxPrice"] = L["Post at Maximum Price"], ["normalPrice"] = L["Post at Normal Price"], ["ignore"] = L["Ignore Auctions Below Min"] },
 							settingInfo = { operation, "priceReset" },
 							disabled = operation.relationships.priceReset,
@@ -571,7 +447,6 @@ function Options:DrawOperationPost(container, operationName)
 							type = "EditBox",
 							label = L["Maximum Price"],
 							settingInfo = { operation, "maxPrice" },
-							relativeWidth = 0.49,
 							acceptCustom = true,
 							disabled = operation.relationships.maxPrice,
 							tooltip = L["The maximum price you want an item to be posted for. Auctioning will not undercut auctions above this price."],
@@ -579,8 +454,7 @@ function Options:DrawOperationPost(container, operationName)
 						{
 							type = "Dropdown",
 							label = L["When Above Maximum"],
-							relativeWidth = 0.5,
-							list = { ["minPrice"] = L["Post at Minimum Price"], ["maxPrice"] = L["Post at Maximum Price"], ["normalPrice"] = L["Post at Normal Price"] },
+							list = { ["none"] = L["Don't Post Items"], ["minPrice"] = L["Post at Minimum Price"], ["maxPrice"] = L["Post at Maximum Price"], ["normalPrice"] = L["Post at Normal Price"] },
 							settingInfo = { operation, "aboveMax" },
 							disabled = operation.relationships.aboveMax,
 							tooltip = L["This dropdown determines what Auctioning will do when the market for an item goes above your maximum price. You can post the items at one of your configured prices."],
@@ -589,7 +463,6 @@ function Options:DrawOperationPost(container, operationName)
 							type = "EditBox",
 							label = L["Normal Price"],
 							settingInfo = { operation, "normalPrice" },
-							relativeWidth = 0.49,
 							acceptCustom = true,
 							disabled = operation.relationships.normalPrice,
 							tooltip = L["Price to post at if there are none of an item currently on the AH."],
@@ -600,10 +473,10 @@ function Options:DrawOperationPost(container, operationName)
 		},
 	}
 
-	TSMAPI:BuildPage(container, page)
+	TSMAPI.GUI:BuildOptions(container, page)
 end
 
-function Options:DrawOperationCancel(container, operationName)
+function private.DrawOperationCancel(container, operationName)
 	local operation = TSM.operations[operationName]
 	local page = {
 		{
@@ -619,7 +492,7 @@ function Options:DrawOperationCancel(container, operationName)
 							type = "CheckBox",
 							label = L["Cancel Undercut Auctions"],
 							settingInfo = { operation, "cancelUndercut" },
-							callback = function() container:ReloadTab() end,
+							callback = function() container:Reload() end,
 							disabled = operation.relationships.cancelUndercut,
 							tooltip = L["If checked, a cancel scan will cancel any auctions which have been undercut and are still above your minimum price."],
 						},
@@ -628,7 +501,6 @@ function Options:DrawOperationCancel(container, operationName)
 							label = L["Keep Posted"],
 							settingInfo = { operation, "keepPosted" },
 							disabled = not operation.cancelUndercut or operation.relationships.keepPosted,
-							relativeWidth = 0.49,
 							min = 0,
 							max = 500,
 							step = 1,
@@ -638,7 +510,7 @@ function Options:DrawOperationCancel(container, operationName)
 							type = "CheckBox",
 							label = L["Cancel to Repost Higher"],
 							settingInfo = { operation, "cancelRepost" },
-							callback = function() container:ReloadTab() end,
+							callback = function() container:Reload() end,
 							disabled = operation.relationships.cancelRepost,
 							tooltip = L["If checked, a cancel scan will cancel any auctions which can be reposted for a higher price."],
 						},
@@ -647,7 +519,6 @@ function Options:DrawOperationCancel(container, operationName)
 							label = L["Repost Higher Threshold"],
 							settingInfo = { operation, "cancelRepostThreshold" },
 							disabled = not operation.cancelRepost or operation.relationships.cancelRepostThreshold,
-							relativeWidth = 0.49,
 							acceptCustom = true,
 							tooltip = L["If an item can't be posted for at least this amount higher than its current value, it won't be canceled to repost higher."],
 						},
@@ -657,10 +528,10 @@ function Options:DrawOperationCancel(container, operationName)
 		},
 	}
 
-	TSMAPI:BuildPage(container, page)
+	TSMAPI.GUI:BuildOptions(container, page)
 end
 
-function Options:DrawOperationReset(container, operationName)
+function private.DrawOperationReset(container, operationName)
 	local operation = TSM.operations[operationName]
 	local page = {
 		{
@@ -677,7 +548,7 @@ function Options:DrawOperationReset(container, operationName)
 							label = L["Enable Reset Scan"],
 							relativeWidth = 1,
 							settingInfo = { operation, "resetEnabled" },
-							callback = function() container:ReloadTab() end,
+							callback = function() container:Reload() end,
 							disabled = operation.relationships.resetEnabled,
 							tooltip = L["If checked, groups which the opperation applies to will be included in a reset scan."],
 						},
@@ -686,9 +557,8 @@ function Options:DrawOperationReset(container, operationName)
 							label = L["Max Quantity to Buy"],
 							settingInfo = { operation, "resetMaxQuantity" },
 							disabled = not operation.resetEnabled or operation.relationships.resetMaxQuantity,
-							relativeWidth = 0.5,
 							min = 1,
-							max = 1000,
+							max = 5000,
 							step = 1,
 							tooltip = L["This is the maximum quantity of an item you want to buy in a single reset scan."],
 						},
@@ -697,9 +567,8 @@ function Options:DrawOperationReset(container, operationName)
 							label = L["Max Inventory Quantity"],
 							settingInfo = { operation, "resetMaxInventory" },
 							disabled = not operation.resetEnabled or operation.relationships.resetMaxInventory,
-							relativeWidth = 0.49,
 							min = 1,
-							max = 1000,
+							max = 5000,
 							step = 1,
 							tooltip = L["This is the maximum quantity of an item you want to have in your inventory after a reset scan."],
 						},
@@ -708,7 +577,6 @@ function Options:DrawOperationReset(container, operationName)
 							label = L["Max Reset Cost"],
 							settingInfo = { operation, "resetMaxCost" },
 							disabled = not operation.resetEnabled or operation.relationships.resetMaxCost,
-							relativeWidth = 0.49,
 							acceptCustom = true,
 							tooltip = L["The maximum amount that you want to spend in order to reset a particular item. This is the total amount, not a per-item amount."],
 						},
@@ -717,7 +585,6 @@ function Options:DrawOperationReset(container, operationName)
 							label = L["Min Reset Profit"],
 							settingInfo = { operation, "resetMinProfit" },
 							disabled = not operation.resetEnabled or operation.relationships.resetMinProfit,
-							relativeWidth = 0.49,
 							acceptCustom = true,
 							tooltip = L["The minimum profit you would want to make from doing a reset. This is a per-item price where profit is the price you reset to minus the average price you spent per item."],
 						},
@@ -726,7 +593,6 @@ function Options:DrawOperationReset(container, operationName)
 							label = L["Price Resolution"],
 							settingInfo = { operation, "resetResolution" },
 							disabled = not operation.resetEnabled or operation.relationships.resetResolution,
-							relativeWidth = 0.49,
 							acceptCustom = true,
 							tooltip = L["This determines what size range of prices should be considered a single price point for the reset scan. For example, if this is set to 1s, an auction at 20g50s20c and an auction at 20g49s45c will both be considered to be the same price level."],
 						},
@@ -735,7 +601,6 @@ function Options:DrawOperationReset(container, operationName)
 							label = L["Max Cost Per Item"],
 							settingInfo = { operation, "resetMaxItemCost" },
 							disabled = not operation.resetEnabled or operation.relationships.resetMaxItemCost,
-							relativeWidth = 0.49,
 							acceptCustom = true,
 							tooltip = L["This is the maximum amount you want to pay for a single item when reseting."],
 						},
@@ -745,54 +610,16 @@ function Options:DrawOperationReset(container, operationName)
 		},
 	}
 
-	TSMAPI:BuildPage(container, page)
+	TSMAPI.GUI:BuildOptions(container, page)
 end
 
-function Options:DrawOperationRelationships(container, operationName)
-	local settingInfo = {
-		{
-			label = L["General Settings"],
-			{ key = "matchStackSize", label = L["Match Stack Size"] },
-			{ key = "ignoreLowDuration", label = L["Ignore Low Duration Auctions"] },
-			{ key = "blacklist", label = L["Blacklisted Players"] },
-		},
-		{
-			label = L["Post Settings"],
-			{ key = "duration", label = L["Duration"] },
-			{ key = "postCap", label = L["Post Cap"] },
-			{ key = "stackSize", label = L["Stack Size"] },
-			{ key = "stackSizeIsCap", label = L["Use Stack Size as Cap"] },
-			{ key = "keepQuantity", label = L["Keep Quantity"] },
-			{ key = "bidPercent", label = L["Bid percent"] },
-			{ key = "undercut", label = L["Undercut Amount"] },
-			{ key = "minPrice", label = L["Minimum Price"] },
-			{ key = "priceReset", label = L["When Below Minimum"] },
-			{ key = "maxPrice", label = L["Maximum Price"] },
-			{ key = "aboveMax", label = L["When Above Maximum"] },
-			{ key = "normalPrice", label = L["Normal Price"] },
-		},
-		{
-			label = L["Cancel Settings"],
-			{ key = "cancelUndercut", label = L["Cancel Undercut Auctions"] },
-			{ key = "keepPosted", label = L["Keep Posted"] },
-			{ key = "cancelRepost", label = L["Cancel to Repost Higher"] },
-			{ key = "cancelRepostThreshold", label = L["Repost Higher Threshold"] },
-		},
-		{
-			label = L["Reset Settings"],
-			{ key = "resetEnabled", label = L["Enable Reset Scan"] },
-			{ key = "resetMaxQuantity", label = L["Max Quantity to Buy"] },
-			{ key = "resetMaxInventory", label = L["Max Inventory Quantity"] },
-			{ key = "resetMaxCost", label = L["Max Reset Cost"] },
-			{ key = "resetMinProfit", label = L["Min Reset Profit"] },
-			{ key = "resetResolution", label = L["Price Resolution"] },
-			{ key = "resetMaxItemCost", label = L["Max Cost Per Item"] },
-		},
-	}
-	TSMAPI:ShowOperationRelationshipTab(TSM, container, TSM.operations[operationName], settingInfo)
-end
 
-function Options:LoadTooltipOptions(container)
+
+-- ============================================================================
+-- Tooltip Options
+-- ============================================================================
+
+function Options:LoadTooltipOptions(container, options)
 	local page = {
 		{
 			type = "SimpleGroup",
@@ -802,34 +629,12 @@ function Options:LoadTooltipOptions(container)
 				{
 					type = "CheckBox",
 					label = L["Show Auctioning values in Tooltip"],
-					settingInfo = { TSM.db.global, "tooltip" },
-					callback = function() container:ReloadTab() end,
+					settingInfo = { options, "operationPrices" },
 					tooltip = L["If checked, the minimum, normal and maximum prices of the first operation for the item will be shown in tooltips."],
 				},
 			},
 		},
 	}
 
-	TSMAPI:BuildPage(container, page)
-end
-
-function Options:GetScanCompleteSound(index)
-	--L["None"], "AuctionWindowOpen", "Fishing Reel in", "HumanExploration", "LEVELUP", "MapPing", "MONEYFRAMEOPEN", "QUESTCOMPLETED", "ReadyCheck"
-	if index == 2 then
-		return "AuctionWindowOpen"
-	elseif index == 3 then
-		return "Fishing Reel in"
-	elseif index == 4 then
-		return "HumanExploration"
-	elseif index == 5 then
-		return "LEVELUP"
-	elseif index == 6 then
-		return "MapPing"
-	elseif index == 7 then
-		return "MONEYFRAMEOPEN"
-	elseif index == 8 then
-		return "QUESTCOMPLETED"
-	elseif index == 9 then
-		return "ReadyCheck"
-	end
+	TSMAPI.GUI:BuildOptions(container, page)
 end

@@ -1,3 +1,69 @@
+v3.0.17
+*Updated TOC version for patch 8.0.
+
+v3.0.16
+*Updated TOC version for patch 7.3.
+*Fixed bugs with changes to how sounds are played.
+
+v3.0.15
+*Updated TOC version for patch 7.2.
+
+v3.0.14
+*Updated TOC version for patch 7.1.
+
+v3.0.13
+*Fixed issue where moving random enchant / staged items were treated as base items.
+
+v3.0.12
+*Fixed some slowness with evaluating prices.
+
+v3.0.11
+*Fixed error when starting a quick post scan.
+
+v3.0.10
+*Using new APIs added to core TSM addon to workaround Blizzard's item caching issues.
+
+v3.0.9
+*Bumped TOC version for patch 7.0.x.
+
+v3.0.8
+*Added some analytics events.
+
+v3.0.7
+*Fixed bug with internal logging message.
+
+v3.0.6
+*Added two new module APIs for third-party addons to use.
+
+v3.0.5
+*Increase max slider values to 5k for reset scan options.
+
+v3.0.4
+*Fixed issue with item auctions not properly updating.
+*Fixed visual issue with log tooltip for reset scan.
+
+v3.0.3
+*Fixed lua error when viewing auctions during special cancel scan.
+
+v3.0.2
+*Fixed bug with blacklisted players not being undercut properly.
+
+v3.0.1
+*Fixed lua error when the post scan detects an invalid configuration.
+
+v3.0
+*Initial 3.0 version!
+\\
+
+v2.4.6
+*Updated for patch 6.2
+
+v2.4.5
+*Fixing interface version.
+
+v2.4.4
+*Updated for patch 6.1.
+
 v2.4.3
 *Added reagent bank for auctioning bankui functions.
 *Ignore Soulbound items for auctioning bankui functions.

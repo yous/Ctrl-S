@@ -103,13 +103,11 @@ L:SetOptionLocalization{
 	TimerPhase1mob	= "Show time for Phase 1 mob active",--Translate
 	TimerNextGaze	= "Show timer for Thaladred's Gaze target changes",--Translate
 	TimerRebirth	= "Show timer for Phoenix Egg rebirth remaining",--Translate
-	RangeFrame		= "显示距离框体",
 	GazeWhisper		= "对萨拉德雷的目标发送密语",
 	GazeIcon		= "对萨拉德雷的目标添加标注"
 }
 
 L:SetMiscLocalization{
-	YellPull1	= "魔法，能量，我的人民陷入其中不能自拔……自从太阳之井被摧毁之后就是如此。欢迎来到未来。真遗憾，你们无法阻止什么。没有人可以阻止我了！Selama ashal’anore！！",
 	YellPhase2	= "你们看，我的个人收藏中有许多武器……",
 	YellPhase3	= "也许我确实低估了你们。虽然让你们同时面对我的四位顾问显得有些不公平，但是我的人民从来都没有得到过公平的待遇。我只是在以牙还牙。",
 	YellPhase4	= "唉，有些时候，有些事情，必须得亲自解决才行。Balamore shanal！",

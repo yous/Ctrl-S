@@ -1,7 +1,7 @@
-local E, L, V, P, G = unpack(ElvUI); --Inport: Engine, Locales, PrivateDB, ProfileDB, GlobalDB, Localize Underscore
+local E, L, V, P, G = unpack(ElvUI); --Import: Engine, Locales, PrivateDB, ProfileDB, GlobalDB, Localize Underscore
 local TT = E:GetModule('Tooltip')
 
-local tiers = { "BRF","HM" }
+local tiers = { "HFC","BRF","HM" }
 local levels = { 
 	"Mythic", 
 	"Heroic", 
@@ -10,6 +10,20 @@ local levels = {
 }
 
 local bosses = {
+	{ -- HFC
+		{ --Mythic
+			10204, 10208, 10212, 10216, 10220, 10224, 10228, 10232, 10236, 10240, 10244, 10248, 10252,
+		},
+		{ -- Herioc
+			10203, 10207, 10211, 10215, 10219, 10223, 10227, 10231, 10235, 10239, 10243, 10247, 10251,
+		},
+		{ -- Normal
+			10202, 10206, 10210, 10214, 10218, 10222, 10226, 10230, 10234, 10238, 10242, 10246, 10250,
+		},
+		{ -- LFR
+			10201, 10205, 10209, 10213, 10217, 10221, 10225, 10229, 10233, 10237, 10241, 10245, 10249,
+		},
+	},
 	{ -- Blackrock Foundry
 		{ --Mythic
 			9319, 9323, 9329, 9333, 9338, 9342, 9353, 9357, 9361, 9365, 
@@ -48,7 +62,7 @@ local function GetProgression(guid)
 	local kills, complete, pos = 0, false, 0
 	local statFunc = guid == playerGUID and GetStatistic or GetComparisonStatistic
 	
-	for tier = 1, 2 do
+	for tier = 1, 3 do
 		progressCache[guid].header[tier] = {}
 		progressCache[guid].info[tier] = {}
 		for level = 1, 4 do
@@ -85,7 +99,7 @@ local function SetProgressionInfo(guid, tt)
 		local updated = 0
 		for i=1, tt:NumLines() do
 			local leftTipText = _G["GameTooltipTextLeft"..i]	
-			for tier = 1, 2 do
+			for tier = 1, 3 do
 				for level = 1, 4 do
 					if (leftTipText:GetText() and leftTipText:GetText():find(tiers[tier]) and leftTipText:GetText():find(levels[level])) then
 						-- update found tooltip text line
@@ -100,8 +114,7 @@ local function SetProgressionInfo(guid, tt)
 		if updated == 1 then return end
 		-- add progression tooltip line
 		if highest > 0 then tt:AddLine(" ") end
-		for tier = 1, 2 do
-			
+		for tier = 1, 3 do
 			for level = 1, 4 do
 				tt:AddDoubleLine(progressCache[guid].header[tier][level], progressCache[guid].info[tier][level], nil, nil, nil, 1, 1, 1)
 			end
@@ -122,6 +135,7 @@ function TT:INSPECT_ACHIEVEMENT_READY(event, GUID)
 end
 
 hooksecurefunc(TT, 'ShowInspectInfo', function(self, tt, unit, level, r, g, b, numTries)
+	if InCombatLockdown() then return end
 	if not E.db.tooltip.progressInfo then return end
 	if not level or level < MAX_PLAYER_LEVEL then return end
 	if not (unit and CanInspect(unit)) then return end

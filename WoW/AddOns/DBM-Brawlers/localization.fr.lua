@@ -7,20 +7,20 @@ local L
 --------------
 -- Brawlers --
 --------------
-L= DBM:GetModLocalization("Brawlers")
+L= DBM:GetModLocalization("BrawlersGeneral")
 
 L:SetGeneralLocalization({
 	name = "Bastonneurs : Options"
 })
 
 L:SetWarningLocalization({
-	warnQueuePosition	= "Vous êtes %d dans la file",
+	warnQueuePosition2	= "Vous êtes %d dans la file",
 	specWarnYourNext	= "Vous êtes le prochain !",
 	specWarnYourTurn	= "C'est à votre tour !"
 })
 
 L:SetOptionLocalization({
-	warnQueuePosition	= "Annoncer votre place dans la file à chaque changement",
+	warnQueuePosition2	= "Annoncer votre place dans la file à chaque changement",
 	specWarnYourNext	= "Afficher une alerte spéciale quand vous êtes le prochain",
 	specWarnYourTurn	= "Alerte spéciale quand c'est à vous de combattre",
 	SpectatorMode		= "Voir les alertes/délais lorsque vous êtes en mode spectateur<br/>(Les \"Alerte spécial\" personnelle, ne sont pas affichées aux spectateurs)",
@@ -61,6 +61,10 @@ L:SetGeneralLocalization({
 	name = "Bastonneurs : Rang 2"
 })
 
+L:SetOptionLocalization({
+	SetIconOnBlat	= "Met un symbole (crâne) sur le vrai Blat"
+})
+
 ------------
 -- Rank 3 --
 ------------
@@ -68,10 +72,6 @@ L= DBM:GetModLocalization("BrawlRank3")
 
 L:SetGeneralLocalization({
 	name = "Bastonneurs : Rang 3"
-})
-
-L:SetOptionLocalization({
-	SetIconOnBlat	= "Met un symbole (crâne) sur le vrai Blat"
 })
 
 ------------
@@ -134,16 +134,20 @@ L:SetGeneralLocalization({
 -------------
 -- Rares 1 --
 -------------
-L= DBM:GetModLocalization("BrawlRare1")
+L= DBM:GetModLocalization("BrawlLegacy")
 
 L:SetGeneralLocalization({
 	name = "Bastonneurs : Défis Héritage"
 })
 
+L:SetOptionLocalization({
+	SpeakOutStrikes		= "Compter le nombre de $spell:141190"
+})
+
 -------------
 -- Rares 2 --
 -------------
-L= DBM:GetModLocalization("BrawlRare2")
+L= DBM:GetModLocalization("BrawlChallenges")
 
 L:SetGeneralLocalization({
 	name = "Bastonneurs : Défis Spéciaux"
@@ -155,8 +159,7 @@ L:SetWarningLocalization({
 
 L:SetOptionLocalization({
 	ArrowOnBoxing		= "Afficher une flèche DBM pendant $spell:140868 et $spell:140862 et $spell:140886",
-	specWarnRPS			= "Afficher une alerte spéciale pour faire le bon choix lors de $spell:141206",
-	SpeakOutStrikes		= "Compter le nombre de $spell:141190"
+	specWarnRPS			= "Afficher une alerte spéciale pour faire le bon choix lors de $spell:141206"
 })
 
 L:SetMiscLocalization({

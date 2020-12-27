@@ -24,7 +24,6 @@ L:SetMiscLocalization{
 
 L:SetOptionLocalization{
 	WarningSnobold				= "Предупреждение о призыве Снобольда-вассала",
-	PingCharge					= "Показать на миникарте место, куда попадает Ледяной Рев, если он избрал вас целью",
 	ClearIconsOnIceHowl			= "Снимать все иконки перед Топотом",
 	TimerNextBoss				= "Отсчет времени до появления следующего противника",
 	TimerEmerge					= "Отсчет времени до появления",
@@ -85,7 +84,7 @@ L:SetGeneralLocalization{
 }
 
 L:SetTimerLocalization{
-	TimerSpecialSpell	= "Следующая спец-способность"	
+	TimerSpecialSpell	= "Следующая спец-способность"
 }
 
 L:SetWarningLocalization{
@@ -94,7 +93,7 @@ L:SetWarningLocalization{
 	SpecWarnSwitchTarget		= "Смена цели",
 	SpecWarnKickNow				= "Прерывание",
 	WarningTouchDebuff			= "Отрицательный эффект на |3-5(>%s<)",
-	WarningPoweroftheTwins		= "Сила близнецов - больше исцеления на |3-3(>%s<)",
+	WarningPoweroftheTwins2		= "Сила близнецов - больше исцеления на |3-3(>%s<)",
 	SpecWarnPoweroftheTwins		= "Сила близнецов"
 }
 
@@ -112,7 +111,7 @@ L:SetOptionLocalization{
 	SpecialWarnOnDebuff			= "Спец-предупреждение, когда отрицательный эффект",
 	SetIconOnDebuffTarget		= "Установить метку на получившего отрицательный эффект (героический режим)",
 	WarningTouchDebuff			= "Объявлять цели, получившие отрицательный эффект",
-	WarningPoweroftheTwins		= "Объявлять цель под воздействем Силы близнецов",
+	WarningPoweroftheTwins2		= "Объявлять цель под воздействем Силы близнецов",
 	SpecWarnPoweroftheTwins		= "Спец-предупреждение, когда на вас Сила близнецов"
 }
 

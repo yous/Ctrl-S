@@ -1,58 +1,57 @@
 local mod	= DBM:NewMod("Loatheb", "DBM-Naxx", 3)
 local L		= mod:GetLocalizedStrings()
 
-mod:SetRevision(("$Revision: 112 $"):sub(12, -3))
+mod:SetRevision("20200524145648")
 mod:SetCreatureID(16011)
 mod:SetEncounterID(1115)
 mod:SetModelID(16110)
 mod:RegisterCombat("combat")--Maybe change to a yell later so pull detection works if you chain pull him from tash gauntlet
 
-mod:EnableModel()
-
 mod:RegisterEventsInCombat(
-	"SPELL_CAST_SUCCESS",
+	"SPELL_CAST_SUCCESS 29234 29204 55052 55593",
 	"UNIT_DIED"
 )
 
-local warnSporeNow	= mod:NewSpellAnnounce(32329, 2)
-local warnSporeSoon	= mod:NewSoonAnnounce(32329, 1)
+--TODO, the 5xxxx spellIds are not from classic
+local warnSporeNow	= mod:NewSpellAnnounce(29234, 2, "134530")
+local warnSporeSoon	= mod:NewSoonAnnounce(29234, 1, "134530")
 local warnDoomNow	= mod:NewSpellAnnounce(29204, 3)
-local warnHealSoon	= mod:NewAnnounce("WarningHealSoon", 4, 48071)
-local warnHealNow	= mod:NewAnnounce("WarningHealNow", 1, 48071, false)
+local warnHealSoon	= mod:NewAnnounce("WarningHealSoon", 4, 55593)
+local warnHealNow	= mod:NewAnnounce("WarningHealNow", 1, 55593, false)
 
-local timerSpore	= mod:NewNextTimer(36, 32329)
-local timerDoom		= mod:NewNextTimer(180, 29204)
-local timerAura		= mod:NewBuffActiveTimer(17, 55593)
+local timerSpore	= mod:NewNextTimer(36, 29234, nil, nil, nil, 5, "134530", DBM_CORE_L.DAMAGE_ICON)
+local timerDoom		= mod:NewNextTimer(180, 29204, nil, nil, nil, 2)
+local timerAura		= mod:NewBuffActiveTimer(17, 55593, nil, nil, nil, 5, nil, DBM_CORE_L.HEALER_ICON)
 
-local doomCounter	= 0
-local sporeTimer	= 36
+mod.vb.doomCounter	= 0
+mod.vb.sporeTimer	= 36
 
 function mod:OnCombatStart(delay)
-	doomCounter = 0
+	self.vb.doomCounter = 0
 	if self:IsDifficulty("normal25") then
-		sporeTimer = 18
+		self.vb.sporeTimer = 18
 	else
-		sporeTimer = 36
+		self.vb.sporeTimer = 36
 	end
-	timerSpore:Start(sporeTimer - delay)
-	warnSporeSoon:Schedule(sporeTimer - 5 - delay)
-	timerDoom:Start(120 - delay, doomCounter + 1)
+	timerSpore:Start(self.vb.sporeTimer - delay)
+	warnSporeSoon:Schedule(self.vb.sporeTimer - 5 - delay)
+	timerDoom:Start(120 - delay, self.vb.doomCounter + 1)
 end
 
 function mod:SPELL_CAST_SUCCESS(args)
 	if args.spellId == 29234 then
-		timerSpore:Start(sporeTimer)
+		timerSpore:Start(self.vb.sporeTimer)
 		warnSporeNow:Show()
-		warnSporeSoon:Schedule(sporeTimer - 5)
+		warnSporeSoon:Schedule(self.vb.sporeTimer - 5)
 	elseif args:IsSpellID(29204, 55052) then
-		doomCounter = doomCounter + 1
+		self.vb.doomCounter = self.vb.doomCounter + 1
 		local timer = 30
-		if doomCounter >= 7 then
-			if doomCounter % 2 == 0 then timer = 17
+		if self.vb.doomCounter >= 7 then
+			if self.vb.doomCounter % 2 == 0 then timer = 17
 			else timer = 12 end
 		end
-		warnDoomNow:Show(doomCounter)
-		timerDoom:Start(timer, doomCounter + 1)
+		warnDoomNow:Show(self.vb.doomCounter)
+		timerDoom:Start(timer, self.vb.doomCounter + 1)
 	elseif args.spellId == 55593 then
 		timerAura:Start()
 		warnHealSoon:Schedule(14)

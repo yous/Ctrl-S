@@ -1,35 +1,38 @@
-local mod = DBM:NewMod("A tool to display the CDs of interrupts around you.", "DBM-Interrupts")
-mod:SetRevision("Revision 2.12.2015")
+local mod = DBM:NewMod("Displays the CDs of interrupts to you (and your raid in some configurations).", "DBM-Interrupts")
+mod:SetRevision("Revision 2.20.2019")
 mod:RegisterEvents("SPELL_CAST_SUCCESS")
 mod:SetZone(DBM_DISABLE_ZONE_DETECTION)
 
 function mod:SPELL_CAST_SUCCESS(args)
     Spells = {
-        MindFreeze={      "MFreeze",    47528,   15},
+        MindFreeze={      "MdFreeze",   47528,   15},
         Strangulate={     "Strangle",   47476,   60},
-        SkullBash={       "SkullB",     106839,  15},
-        SolarBeam={       "SolarB",     78675,   60},
+        SkullBash={       "SkullBash",  106839,  15},
+        SolarBeam={       "SolarBeam",  78675,   60},
         CounterShot={     "CounterSh",  147362,  24},
-        SilencingShot={   "SilenceS",   34490,   24},
+        SilencingShot={   "SilenceSh",  34490,   24},
         CounterSpell={    "CounterSp",  2139,    24},
         AvengersShield={  "AvengerSd",  31935,   15},
         Rebuke={          "Rebuke",     96231,   15},
         Silence={         "Silence",    15487,   45},
-        WindShear={       "WindShr",    57994,   12},
-        SpellLock={       "SpellLk",    19647,   24},
-        OpticalBlast={    "OptBlast",   115782,  24},
+        WindShear={       "WindShear",  57994,   12},
+        SpellLock={       "SpellLock",  19647,   24},
+        OpticalBlast={    "OptlBlast",  115782,  24},
         Pummel={          "Pummel",     6552,    15},
         SpearHandStrike={ "SHStrike",   116705,  15},
+        Disrupt={         "Disrupt",    183752,  15},
     }
-    
+
+    local key, value, Name, ID_no_taint, Duration, _, SpellIcon
+
     for key, value in pairs(Spells) do
         Name            = Spells[key][1]
-        ID              = Spells[key][2]
+        ID_no_taint     = Spells[key][2]
         Duration        = Spells[key][3]
         _, _, SpellIcon = GetSpellInfo(args.spellId)
 
-        if args.spellId == ID then
-            DBM.Bars:CreateBar(Duration, Name.."-"..args.sourceName, SpellIcon)
+        if args.spellId == ID_no_taint then
+            DBM.Bars:CreateBar(Duration, Name..":"..args.sourceName, SpellIcon)
             end
         end
 	end

@@ -47,7 +47,7 @@ function util:setSrcBagFunctions(bagType)
 			local tmpLink = GetGuildBankItemLink(bag, slot)
 			local quantity = select(2, GetGuildBankItemInfo(bag, slot))
 			if tmpLink then
-				return TSMAPI:GetItemString(tmpLink), quantity
+				return TSMAPI.Item:ToItemString(tmpLink), quantity
 			else
 				return nil
 			end
@@ -59,7 +59,7 @@ function util:setSrcBagFunctions(bagType)
 		util.getContainerItemIDSrc = function(bag, slot)
 			local quantity = select(3, GetInboxItem(bag, slot))
 			local tmpLink = GetInboxItemLink(bag, slot)
-			return TSMAPI:GetItemString(tmpLink), quantity
+			return TSMAPI.Item:ToItemString(tmpLink), quantity
 		end
 		util.getContainerNumSlotsSrc = function(bag) return 16 end
 		util.getContainerItemLinkSrc = function(bag, slot) return GetInboxItemLink(bag, slot) end
@@ -71,7 +71,7 @@ function util:setSrcBagFunctions(bagType)
 		util.getContainerItemIDSrc = function(bag, slot)
 			local tmpLink = GetContainerItemLink(bag, slot)
 			local quantity = select(2, GetContainerItemInfo(bag, slot))
-			return TSMAPI:GetItemString(tmpLink), quantity
+			return TSMAPI.Item:ToItemString(tmpLink), quantity
 		end
 		util.getContainerNumSlotsSrc = function(bag) return GetContainerNumSlots(bag) end
 		util.getContainerItemLinkSrc = function(bag, slot) return GetContainerItemLink(bag, slot) end
@@ -89,7 +89,7 @@ function util:setDestBagFunctions(bagType)
 			local tmpLink = GetGuildBankItemLink(bag, slot)
 			local quantity = select(2, GetGuildBankItemInfo(bag, slot))
 			if tmpLink then
-				return TSMAPI:GetItemString(tmpLink), quantity
+				return TSMAPI.Item:ToItemString(tmpLink), quantity
 			else
 				return nil
 			end
@@ -99,27 +99,10 @@ function util:setDestBagFunctions(bagType)
 		util.getContainerItemIDDest = function(bag, slot)
 			local tmpLink = GetContainerItemLink(bag, slot)
 			local quantity = select(2, GetContainerItemInfo(bag, slot))
-			return TSMAPI:GetItemString(tmpLink), quantity
+			return TSMAPI.Item:ToItemString(tmpLink), quantity
 		end
 		util.getContainerNumSlotsDest = function(bag) return GetContainerNumSlots(bag) end
 		util.getContainerItemLinkDest = function(bag, slot) return GetContainerItemLink(bag, slot) end
 		util.getContainerNumFreeSlotsDest = function(bag) return GetContainerNumFreeSlots(bag) end
 	end
-end
-
---
---This will find a special bag for your special item
---
-function util:canGoInBag(item, destTable)
-	local itemFamily = GetItemFamily(item)
-	local default
-	for bag, _ in pairs(destTable) do
-		local bagFamily = GetItemFamily(GetBagName(bag)) or 0
-		if itemFamily and bagFamily and bagFamily > 0 and bit.band(itemFamily, bagFamily) > 0 then
-			return bag
-		elseif bagFamily == 0 then
-			default = bag
-		end
-	end
-	return default
 end
