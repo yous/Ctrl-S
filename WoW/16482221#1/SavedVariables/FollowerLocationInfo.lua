@@ -1,12 +1,27 @@
 
+FollowerLocationInfoCache = {
+	["Locale"] = "koKR",
+	["npcNames"] = {
+	},
+	["npcTitles"] = {
+	},
+	["objectNames"] = {
+	},
+	["questNames"] = {
+	},
+}
 FollowerLocationInfoDB = {
 	["BrokerTitle_Coords"] = false,
 	["BrokerTitle_NumFollowers"] = true,
 	["ExternalURL"] = "WoWHead",
-	["ListOpen"] = true,
-	["Minimap"] = {
-		["enabled"] = true,
+	["LDB_NumFollowers"] = true,
+	["LDB_PlayerCoords"] = false,
+	["LDB_TargetCoords"] = false,
+	["LDBi_Data"] = {
+		["hide"] = false,
 	},
+	["LDBi_Enabled"] = true,
+	["ListOpen"] = true,
 	["ShowCollectedFollower"] = true,
 	["ShowCoordsFrame"] = true,
 	["ShowFollowerID"] = true,
@@ -40,4 +55,5 @@ FollowerLocationInfoDB = {
 		[37179] = "아이들을 위하여!",
 		[37276] = "뭉치면 산다",
 	},
+	["standalone"] = false,
 }

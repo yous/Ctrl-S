@@ -1,6 +1,17 @@
 
 DecursiveDB = {
 	["class"] = {
+		["HUNTER"] = {
+			["CureOrder"] = {
+				-11, -- [1]
+				-15, -- [2]
+				nil, -- [3]
+				-12, -- [4]
+				[8] = -13,
+				[16] = -14,
+				[32] = -16,
+			},
+		},
 		["WARLOCK"] = {
 			["CureOrder"] = {
 				-12, -- [1]
@@ -18,6 +29,7 @@ DecursiveDB = {
 	},
 	["profileKeys"] = {
 		["김곱충 - 줄진"] = "Default",
+		["나는길을몰라 - 아즈샤라"] = "Default",
 	},
 	["profiles"] = {
 		["Default"] = {

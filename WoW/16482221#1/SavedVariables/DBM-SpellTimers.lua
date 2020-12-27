@@ -1,6 +1,7 @@
 
 DBM_SpellTimers_Settings = {
 	["active_in_pvp"] = true,
+	["disable_encounter"] = true,
 	["enabled"] = true,
 	["only_from_raid"] = true,
 	["own_bargroup"] = false,
@@ -55,6 +56,21 @@ DBM_SpellTimers_Settings = {
 			["cooldown"] = 60,
 			["spell"] = 120146,
 		}, -- [10]
+		{
+			["bartext"] = "%spell: %player",
+			["cooldown"] = 60,
+			["spell"] = 176246,
+		}, -- [11]
+		{
+			["bartext"] = "%spell: %player",
+			["cooldown"] = 60,
+			["spell"] = 224873,
+		}, -- [12]
+		{
+			["bartext"] = "%spell: %player",
+			["cooldown"] = 60,
+			["spell"] = 281400,
+		}, -- [13]
 	},
 	["portal_horde"] = {
 		{
@@ -107,6 +123,21 @@ DBM_SpellTimers_Settings = {
 			["cooldown"] = 60,
 			["spell"] = 120146,
 		}, -- [10]
+		{
+			["bartext"] = "%spell: %player",
+			["cooldown"] = 60,
+			["spell"] = 176244,
+		}, -- [11]
+		{
+			["bartext"] = "%spell: %player",
+			["cooldown"] = 60,
+			["spell"] = 224873,
+		}, -- [12]
+		{
+			["bartext"] = "%spell: %player",
+			["cooldown"] = 60,
+			["spell"] = 281402,
+		}, -- [13]
 	},
 	["show_portal"] = true,
 	["showlocal"] = true,
@@ -159,12 +190,7 @@ DBM_SpellTimers_Settings = {
 			["enabled"] = true,
 			["spell"] = 31821,
 		}, -- [8]
-		{
-			["bartext"] = "%spell: %player",
-			["cooldown"] = 180,
-			["enabled"] = true,
-			["spell"] = 6346,
-		}, -- [9]
+		nil, -- [9]
 		{
 			["bartext"] = "%spell: %player",
 			["cooldown"] = 90,
@@ -219,41 +245,29 @@ DBM_SpellTimers_Settings = {
 			["enabled"] = true,
 			["spell"] = 97462,
 		}, -- [18]
-		{
-			["bartext"] = "%spell: %player",
-			["cooldown"] = 180,
-			["enabled"] = true,
-			["spell"] = 114203,
-		}, -- [19]
-		{
-			["bartext"] = "%spell: %player",
-			["cooldown"] = 180,
-			["enabled"] = true,
-			["spell"] = 114207,
-		}, -- [20]
-		{
+		[21] = {
 			["bartext"] = "%spell: %player",
 			["cooldown"] = 600,
 			["enabled"] = true,
 			["spell"] = 22700,
-		}, -- [21]
-		{
+		},
+		[22] = {
 			["bartext"] = "%spell: %player",
 			["cooldown"] = 600,
 			["enabled"] = true,
 			["spell"] = 44389,
-		}, -- [22]
-		{
+		},
+		[23] = {
 			["bartext"] = "%spell: %player",
 			["cooldown"] = 300,
 			["enabled"] = true,
 			["spell"] = 54711,
-		}, -- [23]
-		{
+		},
+		[24] = {
 			["bartext"] = "%spell: %player",
 			["cooldown"] = 600,
 			["enabled"] = true,
 			["spell"] = 67826,
-		}, -- [24]
+		},
 	},
 }
