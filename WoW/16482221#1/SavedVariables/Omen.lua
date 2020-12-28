@@ -34,7 +34,18 @@ Omen3DB = {
 		},
 		["나는길을몰라 - 아즈샤라"] = {
 			["Autocollapse"] = true,
+			["Background"] = {
+				["Texture"] = "Blizzard Dialog Background",
+			},
+			["Bar"] = {
+				["Texture"] = "Details2020",
+			},
 			["CollapseHide"] = true,
+			["Locked"] = true,
+			["MinimapIcon"] = {
+				["hide"] = true,
+				["minimapPos"] = 142.6667203682368,
+			},
 			["PositionH"] = 93.99998474121094,
 			["PositionW"] = 200.0001220703125,
 			["PositionX"] = 23.50014495849609,

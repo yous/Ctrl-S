@@ -25,7 +25,7 @@ DecursiveDB = {
 		},
 	},
 	["global"] = {
-		["LastVersionAnnounce"] = 1396878908,
+		["LastVersionAnnounce"] = 1609166182,
 	},
 	["profileKeys"] = {
 		["김곱충 - 줄진"] = "Default",

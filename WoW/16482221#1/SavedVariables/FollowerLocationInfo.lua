@@ -19,6 +19,7 @@ FollowerLocationInfoDB = {
 	["LDB_TargetCoords"] = false,
 	["LDBi_Data"] = {
 		["hide"] = false,
+		["minimapPos"] = 191.7934265016419,
 	},
 	["LDBi_Enabled"] = true,
 	["ListOpen"] = true,

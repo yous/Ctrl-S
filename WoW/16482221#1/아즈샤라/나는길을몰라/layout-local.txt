@@ -1,8 +1,1 @@
 Version: 1
-Frame: DetailsWelcomeWindow
-FrameLevel: 1
-Anchor: CENTER
-X: -200
-Y: 0
-W: 612
-H: 315
