@@ -70,9 +70,9 @@ local function showRealDate(curseDate)
 end
 
 DBM = {
-	Revision = parseCurseDate("20201227002524"),
-	DisplayVersion = "9.0.15 alpha", -- the string that is shown as version
-	ReleaseRevision = releaseDate(2020, 12, 23) -- the date of the latest stable version that is available, optionally pass hours, minutes, and seconds for multiple releases in one day
+	Revision = parseCurseDate("20201229034705"),
+	DisplayVersion = "9.0.16 alpha", -- the string that is shown as version
+	ReleaseRevision = releaseDate(2020, 12, 27) -- the date of the latest stable version that is available, optionally pass hours, minutes, and seconds for multiple releases in one day
 }
 DBM.HighestRelease = DBM.ReleaseRevision --Updated if newer version is detected, used by update nags to reflect critical fixes user is missing on boss pulls
 
@@ -475,7 +475,7 @@ local dataBroker
 local voiceSessionDisabled = false
 local handleSync
 
-local fakeBWVersion, fakeBWHash = 198, "8394f9b"--198.1
+local fakeBWVersion, fakeBWHash = 199, "d06bd70"--199.1
 local bwVersionResponseString = "V^%d^%s"
 local enableIcons = true -- set to false when a raid leader or a promoted player has a newer version of DBM
 
@@ -1387,12 +1387,12 @@ do
 			end
 			if GetAddOnEnableState(playerName, "VEM-Core") >= 1 then
 				self:Disable(true)
-				C_TimerAfter(15, function() AddMsg(self, L.VEM) end)
+				self:Schedule(15, infniteLoopNotice, self, L.VEM)
 				return
 			end
 			if GetAddOnEnableState(playerName, "DBM-Profiles") >= 1 then
 				self:Disable(true)
-				C_TimerAfter(15, function() AddMsg(self, L.OUTDATEDPROFILES) end)
+				self:Schedule(15, infniteLoopNotice, self, L.OUTDATEDPROFILES)
 				return
 			end
 			if GetAddOnEnableState(playerName, "DBM-SpellTimers") >= 1 then
@@ -1411,7 +1411,7 @@ do
 			end
 			if GetAddOnEnableState(playerName, "DPMCore") >= 1 then
 				self:Disable(true)
-				C_TimerAfter(15, function() AddMsg(self, L.DPMCORE) end)
+				self:Schedule(15, infniteLoopNotice, self, L.DPMCORE)
 				return
 			end
 			if GetAddOnEnableState(playerName, "DBM-VictorySound") >= 1 then
@@ -12188,7 +12188,7 @@ end
 
 function bossModPrototype:SetRevision(revision)
 	revision = parseCurseDate(revision or "")
-	if not revision or revision == "20201227002524" then
+	if not revision or revision == "20201229034705" then
 		-- bad revision: either forgot the svn keyword or using github
 		revision = DBM.Revision
 	end

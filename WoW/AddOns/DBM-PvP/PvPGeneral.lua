@@ -1,10 +1,11 @@
 local mod	= DBM:NewMod("PvPGeneral", "DBM-PvP")
 local L		= mod:GetLocalizedStrings()
 
+local DBM = DBM
 local GetPlayerFactionGroup = GetPlayerFactionGroup or UnitFactionGroup -- Classic Compat fix
 local isClassic = WOW_PROJECT_ID == WOW_PROJECT_CLASSIC
 
-mod:SetRevision("20201216203747")
+mod:SetRevision("20201228165845")
 mod:SetZone(DBM_DISABLE_ZONE_DETECTION)
 mod:RegisterEvents(
 	"ZONE_CHANGED_NEW_AREA",
@@ -23,7 +24,7 @@ do
 	local IsInInstance, C_ChatInfo = IsInInstance, C_ChatInfo
 	local bgzone = false
 
-	function mod:ZONE_CHANGED_NEW_AREA()
+	local function Init(self)
 		local _, instanceType = IsInInstance()
 		if instanceType == "pvp" or instanceType == "arena" then
 			C_ChatInfo.SendAddonMessage(isClassic and "D4C" or "D4", "H", "INSTANCE_CHAT")
@@ -36,10 +37,14 @@ do
 			bgzone = false
 			self:UnsubscribeAssault()
 			self:UnsubscribeFlags()
-			if self.Options.HideBossEmoteFrame then
+			if mod.Options.HideBossEmoteFrame then
 				DBM:HideBlizzardEvents(0, true)
 			end
 		end
+	end
+
+	function mod:ZONE_CHANGED_NEW_AREA()
+		self:Schedule(0.5, Init, self)
 	end
 	mod.PLAYER_ENTERING_WORLD	= mod.ZONE_CHANGED_NEW_AREA
 	mod.OnInitialize			= mod.ZONE_CHANGED_NEW_AREA
@@ -225,7 +230,9 @@ do
 					bar.bar:Hide()
 				end
 			end
-			remainingTimer:Start(timeSeconds)
+			if not remainingTimer:IsStarted() then
+				remainingTimer:Start(timeSeconds)
+			end
 		end
 		self:Schedule(timeSeconds + 1, function()
 			if not isClassic and instanceType == "arena" then
@@ -236,9 +243,7 @@ do
 			if info and info.state == 1 and self.Options.TimerRemaining then
 				local minutes, seconds = info.text:match("(%d+):(%d+)")
 				if minutes and seconds then
-					local remaining = tonumber(seconds) + (tonumber(minutes) * 60) + 1
-					local elapsed = 120 - remaining
-					remainingTimer:Update(elapsed, 120)
+					remainingTimer:Update(119 - tonumber(seconds) - (tonumber(minutes) * 60), 120)
 				end
 			end
 		end, self)

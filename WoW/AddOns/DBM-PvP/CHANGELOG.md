@@ -1,23 +1,29 @@
 # <DBM> PvP
 
-## [r100](https://github.com/DeadlyBossMods/DBM-PvP/tree/r100) (2020-12-16)
-[Full Changelog](https://github.com/DeadlyBossMods/DBM-PvP/compare/r99...r100) [Previous Releases](https://github.com/DeadlyBossMods/DBM-PvP/releases)
+## [r101](https://github.com/DeadlyBossMods/DBM-PvP/tree/r101) (2020-12-28)
+[Full Changelog](https://github.com/DeadlyBossMods/DBM-PvP/compare/r100...r101) [Previous Releases](https://github.com/DeadlyBossMods/DBM-PvP/releases)
 
-- Arty3 (#46)  
-    * Implement #33  
-- Arty3 (#45)  
-    * Add shadowlands arena ID  
-    * Fix some silvershard mine issues  
-    * Fix #34  
-    * Might as well clean up some locales  
-- Arty3 (#44)  
-    * Add shadowlands arena ID  
-    * Fix some silvershard mine issues  
-- Add shadowlands arena ID (#43)  
-- Update CI  
-- Update README.md  
-- Delete .travis.yml  
-- Update ci.yml  
-- Create ci.yml  
-- Classic batch syncs, knock off an extra 1.5 seconds (#41)  
-- custom classic rule  
+- Merge pull request #52 from DeadlyBossMods/QartemisT-patch-1  
+    Fix hand-in unit for ashran  
+- Fix hand-in unit for ashran  
+- Merge pull request #51 from DeadlyBossMods/remaining  
+    Cleaner.  
+- Update SilvershardMines.lua  
+- Update SilvershardMines.lua  
+- Update PvPGeneral.lua  
+- Merge branch 'master' into remaining  
+- Cleaner.  
+- Normalize the loading to be better  
+- Merge pull request #49 from DeadlyBossMods/remaining  
+    Remanining timer doesn't fire a 2nd start if already running, shuts u…  
+- Minamize some locales  
+- Remanining timer doesn't fire a 2nd start if already running, shuts up errors  
+- Merge pull request #48 from DeadlyBossMods/ci  
+    Derp  
+- Derp  
+- Ci (#47)  
+- Implement #33  
+- Might as well clean up some locales  
+- Fix #34  
+- Fix some silvershard mine issues  
+- Add shadowlands arena ID  
