@@ -3,5 +3,7 @@
 /WoW/16482221#1/**/*.bak
 /WoW/16482221#1/**/*.old
 /WoW/16482221#1/**/cache.md5
+/WoW/16482221#1/*/*/SavedVariables/Details.lua
+/WoW/16482221#1/*/*/SavedVariables/Details_EncounterDetails.lua
 /WoW/16482221#1/*/*/SavedVariables/ElvUI.lua
 /WoW/16482221#1/*/*/SavedVariables/Skada.lua
