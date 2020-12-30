@@ -1,0 +1,38 @@
+teece | 2020-10-22 | 9.0.2
+	Updated libraries that were generating errors
+
+teece | 2020-10-12 | 9.0.1
+	Updated addon for 9.0 prepatch (big thanks to RegloPri)
+	General bug fixes
+
+teece | 2019-02-08 | v 8.3.0
+	Updated raid IDs and progression display for both raid frame and tooltip
+	Fixed Gem IDs 
+
+teece | 2019-06-25 | v 8.2.0
+	Updated raid IDs and progression display for both raid frame and tooltip
+	Updated UIlibs 
+
+teece | 2018-08-26 | v 8.0.1
+	Updated raid IDs and progression display for both raid frame and tooltip
+	Updated enchant check slots to reflect the BFA enchant options (issue 73)
+	Updated list of good gems/enchants
+	Fixed issue with weapon ilvl showing too high
+	Fixed issue with bagnon generating an error if installed but disabled (issue 71)
+	Updated Traditional Chinese localization
+	Added button to toggle addon loaded message, defaults to off  
+	
+
+teece | 2018-07-22
+	* Base 8.0 compatability changes
+
+------------------------------------------------------------------------
+r814 | olzenkhaw | 2018-04-13 00:19:06 +0000 (Fri, 13 Apr 2018) | 1 line
+Changed paths:
+   M /trunk/Oilvl.toc
+   M /trunk/libs/LibQTip-1.0/LibQTip-1.0.lua
+   M /trunk/libs/LibQTip-1.0/LibQTip-1.0.toc
+
+v6.7.37 - Update LibQTip lib to v7.3.5.3
+------------------------------------------------------------------------
+
