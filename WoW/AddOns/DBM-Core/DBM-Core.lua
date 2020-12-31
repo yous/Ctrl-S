@@ -70,8 +70,8 @@ local function showRealDate(curseDate)
 end
 
 DBM = {
-	Revision = parseCurseDate("20201230014944"),
-	DisplayVersion = "9.0.16 alpha", -- the string that is shown as version
+	Revision = parseCurseDate("20201228030636"),
+	DisplayVersion = "9.0.15", -- the string that is shown as version
 	ReleaseRevision = releaseDate(2020, 12, 27) -- the date of the latest stable version that is available, optionally pass hours, minutes, and seconds for multiple releases in one day
 }
 DBM.HighestRelease = DBM.ReleaseRevision --Updated if newer version is detected, used by update nags to reflect critical fixes user is missing on boss pulls
@@ -3038,17 +3038,8 @@ do
 			if #iconSeter > 0 then
 				tsort(iconSeter, function(a, b) return a > b end)
 				local elected = iconSeter[1]
-				if playerName == elected:sub(elected:find(" ") + 1) then--Highest revision in raid, auto allow, period, even if out of date, you're revision in raid that has assist
+				if playerName == elected:sub(elected:find(" ") + 1) then
 					enableIcons = true
-					DBM:Debug("You have been elected as primary icon setter for raid for having newest revision in raid that has assist/lead", 2)
-				end
-				--Initiate backups that at least have latest version, in case the main elect doesn't have icons enabled
-				for i = 2, 3 do--Allow top 3 revisions in raid to set icons, instead of just top one
-					local electedBackup = iconSeter[i]
-					if updateNotificationDisplayed == 0 and electedBackup and playerName == electedBackup:sub(elected:find(" ") + 1) then
-						enableIcons = true
-						DBM:Debug("You have been elected as one of 2 backup icon setters in raid that have assist/lead", 2)
-					end
 				end
 			end
 		elseif IsInGroup() then
@@ -12197,7 +12188,7 @@ end
 
 function bossModPrototype:SetRevision(revision)
 	revision = parseCurseDate(revision or "")
-	if not revision or revision == "20201230014944" then
+	if not revision or revision == "20201228030636" then
 		-- bad revision: either forgot the svn keyword or using github
 		revision = DBM.Revision
 	end

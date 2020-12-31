@@ -1,7 +1,7 @@
 local mod	= DBM:NewMod(2418, "DBM-CastleNathria", nil, 1190)
 local L		= mod:GetLocalizedStrings()
 
-mod:SetRevision("20201229011624")
+mod:SetRevision("20201227231325")
 mod:SetCreatureID(166644)
 mod:SetEncounterID(2405)
 mod:SetUsedIcons(1, 2)
@@ -270,7 +270,7 @@ function mod:SPELL_AURA_APPLIED(args)
 			specWarnGlyphofDestructionTaunt:Show(args.destName)
 			specWarnGlyphofDestructionTaunt:Play("tauntboss")
 		end
-		timerGlyphofDestruction:Start(self:IsEasy() and 8 or 4, args.destName)
+		timerGlyphofDestruction:Start(args.destName)
 	elseif spellId == 327902 then
 		warnFixate:CombinedShow(0.5, args.destName)
 		if args:IsPlayer() then

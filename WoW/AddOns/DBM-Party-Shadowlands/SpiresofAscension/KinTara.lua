@@ -1,7 +1,7 @@
 local mod	= DBM:NewMod(2399, "DBM-Party-Shadowlands", 5, 1186)
 local L		= mod:GetLocalizedStrings()
 
-mod:SetRevision("20201228151841")
+mod:SetRevision("20201206174353")
 mod:SetCreatureID(162059, 163077)--162059 Kin-Tara, 163077 Azules
 mod:SetEncounterID(2357)
 mod:SetBossHPInfoToHighest()
@@ -64,6 +64,7 @@ function mod:OnCombatStart(delay)
 	--Kin-Tara
 	timerOverheadSlashCD:Start(8.3-delay)
 	timerFlightCD:Start(30.5-delay)
+	DBM:AddMsg("Note, Kin-Tara flight detection on this is using experimental code, report if phase change detection doesn't look functional")
 end
 
 function mod:OnCombatEnd()
@@ -78,7 +79,7 @@ function mod:SPELL_CAST_START(args)
 			self:UnregisterShortTermEvents()
 		end
 		specWarnOverheadSlash:Show()--Will be moved to fire earlier with timers
-		specWarnOverheadSlash:Play("defensive")
+		specWarnOverheadSlash:Play("gathershare")
 		timerOverheadSlashCD:Start()
 	elseif spellId == 327481 then
 		if self.vb.flightActive then
