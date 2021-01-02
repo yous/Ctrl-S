@@ -2,6 +2,56 @@
 TellMeWhenDB = {
 	["Version"] = 90301,
 	["global"] = {
+		["Groups"] = {
+			{
+				["Icons"] = {
+					{
+						["States"] = {
+							{
+							}, -- [1]
+							nil, -- [2]
+							{
+							}, -- [3]
+							{
+							}, -- [4]
+						},
+					}, -- [1]
+					{
+						["States"] = {
+							{
+							}, -- [1]
+							nil, -- [2]
+							{
+							}, -- [3]
+							{
+							}, -- [4]
+						},
+					}, -- [2]
+					{
+						["States"] = {
+							{
+							}, -- [1]
+							nil, -- [2]
+							{
+							}, -- [3]
+							{
+							}, -- [4]
+						},
+					}, -- [3]
+					{
+						["States"] = {
+							{
+							}, -- [1]
+							nil, -- [2]
+							{
+							}, -- [3]
+							{
+							}, -- [4]
+						},
+					}, -- [4]
+				},
+			}, -- [1]
+		},
 		["HelpSettings"] = {
 			["CNDT_ANDOR_FIRSTSEE"] = true,
 			["CNDT_PARENTHESES_FIRSTSEE"] = true,
@@ -62,7 +112,13 @@ TellMeWhenDB = {
 							["Events"] = {
 								[1] = {
 									["Animation"] = "ACTVTNGLOW",
-									["Event"] = "OnFinish",
+									["Event"] = "WCSP",
+									["OnConditionConditions"] = {
+										[1] = {
+											["Type"] = "SPELLCD",
+										},
+										["n"] = 1,
+									},
 									["Type"] = "Animations",
 								},
 								["n"] = 1,
@@ -88,7 +144,13 @@ TellMeWhenDB = {
 							["Events"] = {
 								[1] = {
 									["Animation"] = "ACTVTNGLOW",
-									["Event"] = "OnFinish",
+									["Event"] = "WCSP",
+									["OnConditionConditions"] = {
+										[1] = {
+											["Type"] = "SPELLCD",
+										},
+										["n"] = 1,
+									},
 									["Type"] = "Animations",
 								},
 								["n"] = 1,
@@ -111,66 +173,100 @@ TellMeWhenDB = {
 						}, -- [2]
 						{
 							["Enabled"] = true,
-							["Name"] = "교묘한 사격",
+							["Events"] = {
+								[1] = {
+									["Animation"] = "ACTVTNGLOW",
+									["Event"] = "WCSP",
+									["OnConditionConditions"] = {
+										[1] = {
+											["Type"] = "SPELLCD",
+										},
+										["n"] = 1,
+									},
+									["Type"] = "Animations",
+								},
+								["n"] = 1,
+							},
+							["Name"] = "광폭화",
+							["ShowTimer"] = true,
+							["ShowTimerText"] = true,
 							["States"] = {
 								{
 								}, -- [1]
-								nil, -- [2]
+								{
+									["Alpha"] = 0.5,
+								}, -- [2]
 								{
 								}, -- [3]
 								{
 								}, -- [4]
 							},
-							["Type"] = "buff",
+							["Type"] = "cooldown",
 						}, -- [3]
 						{
 							["Enabled"] = true,
-							["Name"] = "정밀 사격",
+							["Events"] = {
+								[1] = {
+									["Animation"] = "ACTVTNGLOW",
+									["Event"] = "WCSP",
+									["OnConditionConditions"] = {
+										[1] = {
+											["Type"] = "SPELLCD",
+										},
+										["n"] = 1,
+									},
+									["Type"] = "Animations",
+								},
+								["n"] = 1,
+							},
+							["Name"] = "173087",
 							["ShowTimer"] = true,
 							["ShowTimerText"] = true,
 							["States"] = {
 								{
 								}, -- [1]
-								nil, -- [2]
+								{
+									["Alpha"] = 0.5,
+								}, -- [2]
 								{
 								}, -- [3]
 								{
 								}, -- [4]
 							},
-							["Type"] = "buff",
+							["Type"] = "item",
 						}, -- [4]
 						{
 							["Enabled"] = true,
-							["Name"] = "꾸준한 집중",
+							["Events"] = {
+								[1] = {
+									["Animation"] = "ACTVTNGLOW",
+									["Event"] = "WCSP",
+									["OnConditionConditions"] = {
+										[1] = {
+											["Type"] = "SPELLCD",
+										},
+										["n"] = 1,
+									},
+									["Type"] = "Animations",
+								},
+								["n"] = 1,
+							},
+							["Name"] = "야생 영혼",
 							["ShowTimer"] = true,
 							["ShowTimerText"] = true,
 							["States"] = {
 								{
 								}, -- [1]
-								nil, -- [2]
+								{
+									["Alpha"] = 0.5,
+								}, -- [2]
 								{
 								}, -- [3]
 								{
 								}, -- [4]
 							},
-							["Type"] = "buff",
+							["Type"] = "cooldown",
 						}, -- [5]
-						{
-							["Enabled"] = true,
-							["Name"] = "실탄 장전",
-							["ShowTimer"] = true,
-							["ShowTimerText"] = true,
-							["States"] = {
-								{
-								}, -- [1]
-								nil, -- [2]
-								{
-								}, -- [3]
-								{
-								}, -- [4]
-							},
-							["Type"] = "buff",
-						}, -- [6]
 						{
 							["Conditions"] = {
 								[1] = {
@@ -186,6 +282,28 @@ TellMeWhenDB = {
 								["n"] = 2,
 							},
 							["Enabled"] = true,
+							["Events"] = {
+								[1] = {
+									["Animation"] = "ACTVTNGLOW",
+									["Event"] = "WCSP",
+									["OnConditionConditions"] = {
+										[1] = {
+											["Icon"] = "TMW:icon:1VyAefWgJxek",
+											["Type"] = "ICON",
+										},
+										[2] = {
+											["Type"] = "SPELLCD",
+										},
+										[3] = {
+											["Type"] = "MANAUSABLE",
+										},
+										["n"] = 3,
+									},
+									["Type"] = "Animations",
+								},
+								["n"] = 1,
+							},
+							["GUID"] = "TMW:icon:1VyAefWgJxek",
 							["ManaCheck"] = true,
 							["Name"] = "마무리 사격",
 							["ShowTimer"] = true,
@@ -202,8 +320,28 @@ TellMeWhenDB = {
 								}, -- [4]
 							},
 							["Type"] = "cooldown",
+						}, -- [6]
+						{
+							["Enabled"] = true,
+							["Name"] = "반격의 사격",
+							["ShowTimer"] = true,
+							["ShowTimerText"] = true,
+							["States"] = {
+								{
+								}, -- [1]
+								{
+									["Alpha"] = 0.5,
+								}, -- [2]
+								{
+								}, -- [3]
+								{
+								}, -- [4]
+							},
+							["Type"] = "cooldown",
 						}, -- [7]
 						{
+							["Enabled"] = true,
+							["Name"] = "교묘한 사격",
 							["States"] = {
 								{
 								}, -- [1]
@@ -213,8 +351,13 @@ TellMeWhenDB = {
 								{
 								}, -- [4]
 							},
+							["Type"] = "buff",
 						}, -- [8]
 						{
+							["Enabled"] = true,
+							["Name"] = "정밀 사격",
+							["ShowTimer"] = true,
+							["ShowTimerText"] = true,
 							["States"] = {
 								{
 								}, -- [1]
@@ -224,7 +367,40 @@ TellMeWhenDB = {
 								{
 								}, -- [4]
 							},
+							["Type"] = "buff",
 						}, -- [9]
+						{
+							["Enabled"] = true,
+							["Name"] = "꾸준한 집중",
+							["ShowTimer"] = true,
+							["ShowTimerText"] = true,
+							["States"] = {
+								{
+								}, -- [1]
+								nil, -- [2]
+								{
+								}, -- [3]
+								{
+								}, -- [4]
+							},
+							["Type"] = "buff",
+						}, -- [10]
+						{
+							["Enabled"] = true,
+							["Name"] = "실탄 장전",
+							["ShowTimer"] = true,
+							["ShowTimerText"] = true,
+							["States"] = {
+								{
+								}, -- [1]
+								nil, -- [2]
+								{
+								}, -- [3]
+								{
+								}, -- [4]
+							},
+							["Type"] = "buff",
+						}, -- [11]
 						{
 							["States"] = {
 								{
@@ -235,15 +411,124 @@ TellMeWhenDB = {
 								{
 								}, -- [4]
 							},
-						}, -- [10]
+						}, -- [12]
+						{
+							["States"] = {
+								{
+								}, -- [1]
+								nil, -- [2]
+								{
+								}, -- [3]
+								{
+								}, -- [4]
+							},
+						}, -- [13]
+						{
+							["States"] = {
+								{
+								}, -- [1]
+								nil, -- [2]
+								{
+								}, -- [3]
+								{
+								}, -- [4]
+							},
+						}, -- [14]
+						{
+							["States"] = {
+								{
+								}, -- [1]
+								nil, -- [2]
+								{
+								}, -- [3]
+								{
+								}, -- [4]
+							},
+						}, -- [15]
+						{
+							["States"] = {
+								{
+								}, -- [1]
+								nil, -- [2]
+								{
+								}, -- [3]
+								{
+								}, -- [4]
+							},
+						}, -- [16]
+						{
+							["States"] = {
+								{
+								}, -- [1]
+								nil, -- [2]
+								{
+								}, -- [3]
+								{
+								}, -- [4]
+							},
+						}, -- [17]
+						{
+							["States"] = {
+								{
+								}, -- [1]
+								nil, -- [2]
+								{
+								}, -- [3]
+								{
+								}, -- [4]
+							},
+						}, -- [18]
+						{
+							["States"] = {
+								{
+								}, -- [1]
+								nil, -- [2]
+								{
+								}, -- [3]
+								{
+								}, -- [4]
+							},
+						}, -- [19]
+						{
+							["States"] = {
+								{
+								}, -- [1]
+								nil, -- [2]
+								{
+								}, -- [3]
+								{
+								}, -- [4]
+							},
+						}, -- [20]
+						{
+							["States"] = {
+								{
+								}, -- [1]
+								nil, -- [2]
+								{
+								}, -- [3]
+								{
+								}, -- [4]
+							},
+						}, -- [21]
+						{
+							["States"] = {
+								{
+								}, -- [1]
+								nil, -- [2]
+								{
+								}, -- [3]
+								{
+								}, -- [4]
+							},
+						}, -- [22]
 					},
 					["Locked"] = true,
 					["Point"] = {
-						["point"] = "BOTTOM",
-						["relativePoint"] = "BOTTOM",
 						["x"] = 0.0001686889037078655,
-						["y"] = 170,
+						["y"] = -140,
 					},
+					["Rows"] = 2,
 					["Scale"] = 1.3,
 				}, -- [1]
 			},

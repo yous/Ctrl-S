@@ -1,0 +1,23 @@
+VER 3 0100000000000003 "눈속임" "132180"
+#showtooltip 눈속임
+/시전 [@mouseover,help][@target,help] 눈속임
+END
+VER 3 0100000000000004 "반격의 사격" "249170"
+#showtooltip 반격의 사격
+/시전취소
+/시전 반격의 사격
+END
+VER 3 0100000000000001 "빙결 덫" "135834"
+#showtooltip 빙결 덫
+/시전 [@cursor] 빙결 덫
+END
+VER 3 0100000000000005 "정조준" "132329"
+#showtooltip 정조준
+/시전 광폭화
+/시전 정조준
+/시전 조준 사격
+END
+VER 3 0100000000000002 "타르 덫" "576309"
+#showtooltip 타르 덫
+/시전 [@cursoe] 타르 덫
+END

@@ -27,7 +27,7 @@ DBM_AllSavedOptions = {
 		["ChatFrame"] = "DEFAULT_CHAT_FRAME",
 		["CheckGear"] = true,
 		["ChosenVoicePack"] = "Mununyu",
-		["CoreSavedRevision"] = 20201230014944,
+		["CoreSavedRevision"] = 20201228030636,
 		["CountdownVoice"] = "Corsica",
 		["CountdownVoice2"] = "Kolt",
 		["CountdownVoice3"] = "Pewsey",
@@ -300,5 +300,5 @@ DBM_AllSavedOptions = {
 	},
 }
 DBM_MinimapIcon = {
-	["minimapPos"] = 229.1849239868385,
+	["minimapPos"] = 128.7843034891917,
 }

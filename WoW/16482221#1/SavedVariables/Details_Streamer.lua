@@ -40,7 +40,7 @@ Details_StreamerDB = {
 			["main_frame_strata"] = "LOW",
 			["minimap"] = {
 				["hide"] = false,
-				["minimapPos"] = 125.9723687492373,
+				["minimapPos"] = 14.03621651087114,
 				["radius"] = 160,
 			},
 			["per_second"] = {

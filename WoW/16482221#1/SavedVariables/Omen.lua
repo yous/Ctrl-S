@@ -43,13 +43,12 @@ Omen3DB = {
 			["CollapseHide"] = true,
 			["Locked"] = true,
 			["MinimapIcon"] = {
-				["hide"] = true,
-				["minimapPos"] = 142.6667203682368,
+				["minimapPos"] = 353.1572404697493,
 			},
 			["PositionH"] = 93.99998474121094,
 			["PositionW"] = 200.0001220703125,
-			["PositionX"] = 23.50014495849609,
-			["PositionY"] = 953.9998168945312,
+			["PositionX"] = 23.50026702880859,
+			["PositionY"] = 442.9996643066406,
 			["Shown"] = false,
 		},
 		["나라잃은토템 - 줄진"] = {

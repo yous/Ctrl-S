@@ -29,6 +29,9 @@ TomTomDB = {
 					-100, -- [5]
 				},
 			},
+			["general"] = {
+				["corpse_arrow"] = false,
+			},
 		},
 	},
 }
