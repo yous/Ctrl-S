@@ -1581,3 +1581,7 @@ Change Log:
 * Added SL spells for Castle Nathria
 * Added SL spells for Theater of Pain
 * Added SL spells for De Other Side
+
+4.57.4
+* Fixed SL spells for Castle Nathria
+* Added Shadowlands spells (world)
