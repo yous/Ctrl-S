@@ -1,9 +1,0 @@
-## Interface: 60200
-## Title: oUF Maelstrom
-## Author: Soeters
-## Version: r1
-## OptionalDeps: oUF
-## Notes: Track maelstrom weapon like combo points.
-
-
-core.lua
