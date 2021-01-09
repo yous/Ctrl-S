@@ -34,7 +34,7 @@ DBMShadowlands_SavedStats = {
 		["normal25Kills"] = 0,
 		["normal25Pulls"] = 0,
 		["normalKills"] = 0,
-		["normalPulls"] = 0,
+		["normalPulls"] = 1,
 		["timewalkerKills"] = 0,
 		["timewalkerPulls"] = 0,
 	},

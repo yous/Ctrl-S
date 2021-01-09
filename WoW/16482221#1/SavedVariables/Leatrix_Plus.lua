@@ -85,6 +85,7 @@ LeaPlusDB = {
 	["MuteInterface"] = "Off",
 	["MuteR21X"] = "Off",
 	["MuteReady"] = "Off",
+	["MuteRockets"] = "Off",
 	["MuteSniffing"] = "Off",
 	["MuteSunflower"] = "Off",
 	["MuteTrains"] = "Off",
