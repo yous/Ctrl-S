@@ -1585,3 +1585,7 @@ Change Log:
 4.57.4
 * Fixed SL spells for Castle Nathria
 * Added Shadowlands spells (world)
+
+4.58
+* Updated ToC for WoW Classic 1.13.6 (again)
+* Updated LibUIDropDownMenu to 4.00.9000236639
