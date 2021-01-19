@@ -1,10 +1,82 @@
-lightweight tag 38f66a24de3a0f2682df2db897e70029374179e6 DetailsRetail.9.0.2.8102.144
+lightweight tag d93fa5248f17230ceb6ef99df9fbe3f20a54feaa DetailsRetail.9.0.2.8154.144
 Author:	Tercio Jose <terciob19@hotmail.com>
-Date:	Tue Dec 22 11:44:23 2020 -0300
+Date:	Sat Jan 16 15:57:59 2021 -0300
 
-commit 38f66a24de3a0f2682df2db897e70029374179e6
+commit d93fa5248f17230ceb6ef99df9fbe3f20a54feaa
 Author: Tercio Jose <terciob19@hotmail.com>
-Date:   Tue Dec 22 11:44:23 2020 -0300
+Date:   Sat Jan 16 15:57:59 2021 -0300
 
-    More fixes
+    More fixes and development
+
+commit 09601d7e11de36f9a0c691fa0470b37716c4c61a
+Author: Tercio Jose <terciob19@hotmail.com>
+Date:   Sat Jan 9 13:18:08 2021 -0300
+
+    Added "Square" mode to Details! Streamer plugin
+
+commit b97fe099add18ce20eee8bebf466eda6c5208aad
+Author: Tercio Jose <terciob19@hotmail.com>
+Date:   Sat Jan 9 13:03:44 2021 -0300
+
+    Plugins
+
+commit bda28297467b97818ad5cf53787a3f279cdce91f
+Author: Tercio Jose <terciob19@hotmail.com>
+Date:   Fri Jan 1 14:28:27 2021 -0300
+
+    General Fixes
+    
+    - Added Phial of Serenity from Kyrians to Potion Usage.
+    - Merged all warriors whirlwind.
+    - Cleanup on old cooldowns.
+    - Added Rake and Binding Shot to Crowd Control.
+    - Fixed some cases of DeathLog not showing healing.
+
+commit bda28297467b97818ad5cf53787a3f279cdce91f
+Author: Tercio Jose <terciob19@hotmail.com>
+Date:   Fri Jan 1 14:28:27 2021 -0300
+
+    General Fixes
+    
+    - Added Phial of Serenity from Kyrians to Potion Usage.
+    - Merged all warriors whirlwind.
+    - Cleanup on old cooldowns.
+    - Added Rake and Binding Shot to Crowd Control.
+    - Fixed some cases of DeathLog not showing healing.
+
+commit 906aba6e30629886fd1e8259aba3c9b3acfccdea
+Author: Toni Jarjour <39845673+tonijarjour@users.noreply.github.com>
+Date:   Fri Dec 25 20:28:30 2020 -0500
+
+    Update Details_EncounterDetails.toc
+
+commit 9ade8d5b4514e5c37c18275f95f7554542027454
+Author: Toni Jarjour <39845673+tonijarjour@users.noreply.github.com>
+Date:   Fri Dec 25 20:28:28 2020 -0500
+
+    Update Details_RaidCheck.toc
+
+commit 61af45f83663d6b873dbd4d209b5b1450ed19b60
+Author: Toni Jarjour <39845673+tonijarjour@users.noreply.github.com>
+Date:   Fri Dec 25 20:28:27 2020 -0500
+
+    Update Details_Streamer.toc
+
+commit 6ead8715003220c3649ad9ce23ae70eafd22cf72
+Author: Toni Jarjour <39845673+tonijarjour@users.noreply.github.com>
+Date:   Fri Dec 25 20:28:26 2020 -0500
+
+    Update Details_TinyThreat.toc
+
+commit f580b8684e3c1f97ae25534b7ab884e4d86718db
+Author: Toni Jarjour <39845673+tonijarjour@users.noreply.github.com>
+Date:   Fri Dec 25 20:28:24 2020 -0500
+
+    Update Details_Vanguard.toc
+
+commit e360a2e4fd9882789dbe2b4a3ad7ded48041663f
+Author: Toni Jarjour <39845673+tonijarjour@users.noreply.github.com>
+Date:   Fri Dec 25 20:27:48 2020 -0500
+
+    Update Details_DataStorage.toc
 

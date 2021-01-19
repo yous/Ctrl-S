@@ -1589,3 +1589,7 @@ Change Log:
 4.58
 * Updated ToC for WoW Classic 1.13.6 (again)
 * Updated LibUIDropDownMenu to 4.00.9000236639
+
+4.59
+* Fixed dropdown library issues with Classic
+* Added SL spells for Castle Nathria
