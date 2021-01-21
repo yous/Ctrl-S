@@ -25,6 +25,7 @@ Details_StreamerDB = {
 			},
 			["font_face"] = "Friz Quadrata TT",
 			["font_size"] = 10,
+			["grow_direction"] = "right",
 			["is_first_run"] = false,
 			["main_frame_color"] = {
 				0, -- [1]
@@ -65,7 +66,10 @@ Details_StreamerDB = {
 			["row_spacement"] = 21,
 			["row_texture"] = "Details Serenity",
 			["scale"] = 1,
+			["square_amount"] = 5,
+			["square_size"] = 32,
 			["use_spark"] = true,
+			["use_square_mode"] = false,
 			["x"] = 0,
 			["y"] = 4.57763671875e-05,
 		},

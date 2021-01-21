@@ -1,10 +1,9 @@
 VER 3 0100000000000003 "눈속임" "132180"
 #showtooltip 눈속임
-/시전 [@mouseover,help][help] 눈속임
+/시전 [@mouseover,help][help][@pet] 눈속임
 END
 VER 3 0100000000000004 "반격의 사격" "249170"
 #showtooltip 반격의 사격
-/시전취소
 /시전취소
 /시전 [@mouseover,harm,nodead][@focus,harm,nodead][harm,nodead] 반격의 사격
 END
@@ -21,7 +20,6 @@ END
 VER 3 0100000000000006 "죽은 척하기" "132293"
 #showtooltip 죽은 척하기
 /시전취소
-/시전취소
 /시전 죽은 척하기
 END
 VER 3 0100000000000002 "타르 덫" "576309"
@@ -31,12 +29,10 @@ END
 VER 3 0100000000000008 "평정의 사격" "136020"
 #showtooltip 평정의 사격
 /시전취소
-/시전취소
 /시전 [@mouseover,harm,nodead][@focus,harm,nodead][harm,nodead] 평정의 사격
 END
 VER 3 0100000000000007 "활기" "461117"
 #showtooltip 활기
-/시전취소
 /시전취소
 /시전 활기
 END
