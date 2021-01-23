@@ -1593,3 +1593,7 @@ Change Log:
 4.59
 * Fixed dropdown library issues with Classic
 * Added SL spells for Castle Nathria
+
+4.59.1
+* Renamed files for CurseForge updater
+* Added SL spells for Torghast
