@@ -531,8 +531,100 @@ TellMeWhenDB = {
 					["Rows"] = 2,
 					["Scale"] = 1.3,
 				}, -- [1]
+				{
+					["Columns"] = 1,
+					["GUID"] = "TMW:group:1W3Lo0LoQ7KP",
+					["Icons"] = {
+						{
+							["CustomTex"] = "NONE",
+							["Enabled"] = true,
+							["PowerType"] = -1,
+							["SettingsPerView"] = {
+								["bar"] = {
+									["TextLayout"] = "bar1",
+									["Texts"] = {
+										"", -- [1]
+										"", -- [2]
+									},
+								},
+							},
+							["States"] = {
+								{
+								}, -- [1]
+								nil, -- [2]
+								{
+								}, -- [3]
+								{
+								}, -- [4]
+							},
+							["Type"] = "value",
+						}, -- [1]
+						{
+							["CustomTex"] = "NONE",
+							["Enabled"] = true,
+							["SettingsPerView"] = {
+								["bar"] = {
+									["Texts"] = {
+										"", -- [1]
+										"", -- [2]
+									},
+								},
+							},
+							["States"] = {
+								{
+								}, -- [1]
+								nil, -- [2]
+								{
+								}, -- [3]
+								{
+								}, -- [4]
+							},
+							["Type"] = "value",
+						}, -- [2]
+						{
+							["States"] = {
+								{
+								}, -- [1]
+								nil, -- [2]
+								{
+								}, -- [3]
+								{
+								}, -- [4]
+							},
+						}, -- [3]
+						{
+							["States"] = {
+								{
+								}, -- [1]
+								nil, -- [2]
+								{
+								}, -- [3]
+								{
+								}, -- [4]
+							},
+						}, -- [4]
+					},
+					["Locked"] = true,
+					["Point"] = {
+						["x"] = 4.661859120786546e-05,
+						["y"] = -165,
+					},
+					["Rows"] = 2,
+					["Scale"] = 1.3,
+					["SettingsPerView"] = {
+						["bar"] = {
+							["BorderBar"] = 0.5,
+							["BorderInset"] = false,
+							["Icon"] = false,
+							["SizeX"] = 150,
+							["SizeY"] = 5,
+						},
+					},
+					["View"] = "bar",
+				}, -- [2]
 			},
 			["Locked"] = true,
+			["NumGroups"] = 2,
 			["Version"] = 90301,
 		},
 		["나라잃은토템 - 줄진"] = {
