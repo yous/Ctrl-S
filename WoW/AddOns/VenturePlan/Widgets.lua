@@ -406,12 +406,22 @@ local function nop()
 end
 local function FollowerButton_OnDragStart(self)
 	if self:IsEnabled() then
-		CovenantMissionFrame:TriggerEvent(CovenantMission.Event.OnFollowerFrameDragStart, self);
+		local fa = CovenantMissionFrame.MissionTab.MissionPage.Board.framesByBoardIndex
+		local fid = self.info.followerID
+		if not self.info.isAutoTroop then
+			for i=0,4 do
+				local f = fa[i]
+				if f:IsShown() and f:GetFollowerGUID() == fid then
+					return
+				end
+			end
+		end
+		CovenantMissionFrame:OnDragStartFollowerButton(CovenantMissionFrame:GetPlacerFrame(), self, 24);
 	end
 end
 local function FollowerButton_OnDragStop(self)
 	if self:IsEnabled() then
-		CovenantMissionFrame:TriggerEvent(CovenantMission.Event.OnFollowerFrameDragStop, self);
+		CovenantMissionFrame:OnDragStopFollowerButton(CovenantMissionFrame:GetPlacerFrame());
 	end
 end
 local function FollowerButton_OnClick(self, b)
@@ -545,8 +555,10 @@ local function FollowerList_SyncXPGain(self, setXPGain)
 		if not (w:IsShown() and info and not info.isAutoTroop and not info.isMaxLevel and info.xp and info.levelXP and (info.levelXP-info.xp) <= xpGain) then
 			local c = NORMAL_FONT_COLOR
 			w.Level:SetTextColor(c.r, c.g, c.b)
+			w.Blip:Hide()
 		else
 			w.Level:SetTextColor(0.15, 0.85, 0.15)
+			w.Blip:Show()
 		end
 	end
 end
@@ -1359,7 +1371,14 @@ function Factory.FollowerListButton(parent, isTroop)
 	t:SetAlpha(0.75)
 	t:SetSize(24, 7)
 	t:SetPoint("BOTTOMLEFT", f.HealthBG, "BOTTOMLEFT")
-	f.Health = t
+	t, f.Health = f2:CreateTexture(nil, "ARTWORK"), t
+	t:SetSize(8,8)
+	t:SetPoint("CENTER", 13, 15)
+	t:SetTexture("Interface/Minimap/PartyRaidBlipsV2")
+	t:SetTexCoord(0, 20/64, 0, 20/32)
+	t:SetVertexColor(0.1, 0.85, 0.1)
+	t:Hide()
+	f.Blip = t
 	f.GetInfo = FollowerButton_GetInfo
 	f.GetFollowerGUID = FollowerButton_GetFollowerGUID
 	f.SetEmpty = nop
