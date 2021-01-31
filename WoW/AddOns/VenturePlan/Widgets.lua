@@ -465,7 +465,7 @@ local function FollowerButton_OnEnter(self)
 		if si and si.type == "nop" then
 			dc, guideLine = 0.60, "It does nothing."
 		end
-		if si.desc then
+		if si and si.desc then
 			dc, guideLine = 0.60, si.desc .. (guideLine and "|n" .. guideLine or "")
 		end
 		GameTooltip:AddLine(s.description, dc, dc, dc, 1)

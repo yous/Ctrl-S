@@ -304,4 +304,8 @@ T.KnownSpells = {
 	[106]={type="nuke", target="cleave", damageATK=40, },
 	[109]={type="nop"},
 	[110]={type="heal", target=4, healATK=40, },
+	[80]={type="aura", target=1, damageATK1=60, duration=3, damageATK=20, noFirstTick=true, },
+	[100]={type="heal", target=4, healATK=40, },
+	[140]={type="aura", target="enemy-back", damageATK1=60, duration=2, modDamageDealt=-10, },
+	[58]={type="nuke", target="cleave", damageATK=50, },
 }
