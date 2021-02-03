@@ -553,7 +553,7 @@ WeakAurasSaved = {
 				["relativeAnchor"] = 1,
 				["showAllBuffs"] = false,
 				["showAllDebuffs"] = false,
-				["showBolster"] = true,
+				["showBolster"] = false,
 				["showCustom"] = false,
 				["showDungeon"] = true,
 				["showEnrage"] = true,
@@ -788,6 +788,4513 @@ WeakAurasSaved = {
 			["xOffset"] = 0,
 			["yOffset"] = 0,
 			["zoom"] = 0,
+		},
+		["EDE [DOS] Blood Barrier Inc"] = {
+			["actions"] = {
+				["finish"] = {
+					["do_sound"] = false,
+				},
+				["init"] = {
+				},
+				["start"] = {
+					["do_sound"] = true,
+					["sound"] = "Interface\\AddOns\\WeakAuras\\Media\\Sounds\\WarningSiren.ogg",
+				},
+			},
+			["alpha"] = 1,
+			["anchorFrameType"] = "SCREEN",
+			["anchorPoint"] = "CENTER",
+			["animation"] = {
+				["finish"] = {
+					["duration_type"] = "seconds",
+					["easeStrength"] = 3,
+					["easeType"] = "none",
+					["type"] = "none",
+				},
+				["main"] = {
+					["duration_type"] = "seconds",
+					["easeStrength"] = 3,
+					["easeType"] = "none",
+					["type"] = "none",
+				},
+				["start"] = {
+					["duration_type"] = "seconds",
+					["easeStrength"] = 3,
+					["easeType"] = "none",
+					["type"] = "none",
+				},
+			},
+			["authorOptions"] = {
+			},
+			["auto"] = false,
+			["backgroundColor"] = {
+				0, -- [1]
+				0, -- [2]
+				0, -- [3]
+				0.5, -- [4]
+			},
+			["barColor"] = {
+				1, -- [1]
+				0, -- [2]
+				0, -- [3]
+				1, -- [4]
+			},
+			["color"] = {
+				1, -- [1]
+				1, -- [2]
+				1, -- [3]
+				1, -- [4]
+			},
+			["conditions"] = {
+			},
+			["config"] = {
+			},
+			["cooldown"] = true,
+			["cooldownEdge"] = false,
+			["cooldownSwipe"] = true,
+			["cooldownTextDisabled"] = false,
+			["desaturate"] = false,
+			["displayIcon"] = "1394889",
+			["frameStrata"] = 1,
+			["height"] = 1,
+			["icon"] = true,
+			["iconSource"] = 0,
+			["icon_color"] = {
+				1, -- [1]
+				1, -- [2]
+				1, -- [3]
+				1, -- [4]
+			},
+			["icon_side"] = "RIGHT",
+			["id"] = "EDE [DOS] Blood Barrier Inc",
+			["information"] = {
+				["ignoreOptionsEventErrors"] = true,
+			},
+			["internalVersion"] = 40,
+			["inverse"] = false,
+			["keepAspectRatio"] = false,
+			["load"] = {
+				["class"] = {
+					["multi"] = {
+					},
+				},
+				["size"] = {
+					["multi"] = {
+						["party"] = true,
+					},
+					["single"] = "party",
+				},
+				["spec"] = {
+					["multi"] = {
+					},
+				},
+				["talent"] = {
+					["multi"] = {
+					},
+				},
+				["use_size"] = true,
+				["use_zoneId"] = false,
+				["use_zonegroupId"] = false,
+				["zonegroupId"] = "413",
+			},
+			["orientation"] = "HORIZONTAL",
+			["parent"] = "Ellesmere's Dungeon Essentials",
+			["preferToUpdate"] = false,
+			["regionType"] = "icon",
+			["selfPoint"] = "CENTER",
+			["semver"] = "1.0.4",
+			["spark"] = false,
+			["sparkBlendMode"] = "ADD",
+			["sparkColor"] = {
+				1, -- [1]
+				1, -- [2]
+				1, -- [3]
+				1, -- [4]
+			},
+			["sparkHeight"] = 30,
+			["sparkHidden"] = "NEVER",
+			["sparkOffsetX"] = 0,
+			["sparkOffsetY"] = 0,
+			["sparkRotation"] = 0,
+			["sparkRotationMode"] = "AUTO",
+			["sparkTexture"] = "Interface\\CastingBar\\UI-CastingBar-Spark",
+			["sparkWidth"] = 10,
+			["subRegions"] = {
+			},
+			["texture"] = "Blizzard",
+			["tocversion"] = 90002,
+			["triggers"] = {
+				[1] = {
+					["trigger"] = {
+						["auranames"] = {
+							"", -- [1]
+						},
+						["debuffType"] = "HARMFUL",
+						["destUnit"] = "player",
+						["duration"] = "20",
+						["event"] = "Cast",
+						["genericShowOn"] = "showOnCooldown",
+						["names"] = {
+						},
+						["realSpellName"] = 0,
+						["spellId"] = 322759,
+						["spellIds"] = {
+						},
+						["spellName"] = 0,
+						["subeventPrefix"] = "SPELL",
+						["subeventSuffix"] = "_CAST_SUCCESS",
+						["type"] = "status",
+						["unevent"] = "auto",
+						["unit"] = "boss",
+						["useName"] = true,
+						["use_absorbMode"] = true,
+						["use_destUnit"] = false,
+						["use_genericShowOn"] = true,
+						["use_spellId"] = true,
+						["use_spellName"] = true,
+						["use_track"] = true,
+						["use_unit"] = true,
+					},
+					["untrigger"] = {
+						["unit"] = "boss",
+					},
+				},
+				["activeTriggerMode"] = -10,
+			},
+			["uid"] = "DIDqJJlVmg(",
+			["url"] = "https://wago.io/uYX5mP3U5/5",
+			["useAdjustededMax"] = false,
+			["useAdjustededMin"] = false,
+			["version"] = 5,
+			["width"] = 1,
+			["xOffset"] = -3000,
+			["yOffset"] = 0,
+			["zoom"] = 0,
+		},
+		["EDE [DOS] Erupting Darkness"] = {
+			["actions"] = {
+				["finish"] = {
+					["do_sound"] = false,
+				},
+				["init"] = {
+				},
+				["start"] = {
+					["do_sound"] = true,
+					["sound"] = "Interface\\Addons\\Details\\sounds\\sound_gun2.ogg",
+				},
+			},
+			["alpha"] = 1,
+			["anchorFrameType"] = "SCREEN",
+			["anchorPoint"] = "CENTER",
+			["animation"] = {
+				["finish"] = {
+					["duration_type"] = "seconds",
+					["easeStrength"] = 3,
+					["easeType"] = "none",
+					["type"] = "none",
+				},
+				["main"] = {
+					["duration_type"] = "seconds",
+					["easeStrength"] = 3,
+					["easeType"] = "none",
+					["type"] = "none",
+				},
+				["start"] = {
+					["duration_type"] = "seconds",
+					["easeStrength"] = 3,
+					["easeType"] = "none",
+					["type"] = "none",
+				},
+			},
+			["authorOptions"] = {
+			},
+			["auto"] = false,
+			["backgroundColor"] = {
+				0, -- [1]
+				0, -- [2]
+				0, -- [3]
+				0.5, -- [4]
+			},
+			["barColor"] = {
+				1, -- [1]
+				0, -- [2]
+				0, -- [3]
+				1, -- [4]
+			},
+			["color"] = {
+				1, -- [1]
+				1, -- [2]
+				1, -- [3]
+				1, -- [4]
+			},
+			["conditions"] = {
+			},
+			["config"] = {
+			},
+			["cooldown"] = true,
+			["cooldownEdge"] = false,
+			["cooldownSwipe"] = true,
+			["cooldownTextDisabled"] = false,
+			["desaturate"] = false,
+			["displayIcon"] = "136181",
+			["frameStrata"] = 1,
+			["height"] = 1,
+			["icon"] = true,
+			["iconSource"] = 0,
+			["icon_color"] = {
+				1, -- [1]
+				1, -- [2]
+				1, -- [3]
+				1, -- [4]
+			},
+			["icon_side"] = "RIGHT",
+			["id"] = "EDE [DOS] Erupting Darkness",
+			["information"] = {
+				["ignoreOptionsEventErrors"] = true,
+			},
+			["internalVersion"] = 40,
+			["inverse"] = false,
+			["keepAspectRatio"] = false,
+			["load"] = {
+				["class"] = {
+					["multi"] = {
+					},
+				},
+				["size"] = {
+					["multi"] = {
+						["party"] = true,
+					},
+					["single"] = "party",
+				},
+				["spec"] = {
+					["multi"] = {
+					},
+				},
+				["talent"] = {
+					["multi"] = {
+					},
+				},
+				["use_size"] = true,
+				["use_zoneId"] = false,
+				["use_zonegroupId"] = false,
+				["zonegroupId"] = "413",
+			},
+			["orientation"] = "HORIZONTAL",
+			["parent"] = "Ellesmere's Dungeon Essentials",
+			["preferToUpdate"] = false,
+			["regionType"] = "icon",
+			["selfPoint"] = "CENTER",
+			["semver"] = "1.0.4",
+			["spark"] = false,
+			["sparkBlendMode"] = "ADD",
+			["sparkColor"] = {
+				1, -- [1]
+				1, -- [2]
+				1, -- [3]
+				1, -- [4]
+			},
+			["sparkHeight"] = 30,
+			["sparkHidden"] = "NEVER",
+			["sparkOffsetX"] = 0,
+			["sparkOffsetY"] = 0,
+			["sparkRotation"] = 0,
+			["sparkRotationMode"] = "AUTO",
+			["sparkTexture"] = "Interface\\CastingBar\\UI-CastingBar-Spark",
+			["sparkWidth"] = 10,
+			["subRegions"] = {
+			},
+			["texture"] = "Blizzard",
+			["tocversion"] = 90002,
+			["triggers"] = {
+				[1] = {
+					["trigger"] = {
+						["auranames"] = {
+							"", -- [1]
+						},
+						["debuffType"] = "HARMFUL",
+						["destUnit"] = "player",
+						["duration"] = "2",
+						["event"] = "Cast",
+						["genericShowOn"] = "showOnCooldown",
+						["nameplateType"] = "hostile",
+						["names"] = {
+						},
+						["realSpellName"] = 0,
+						["spellId"] = 334051,
+						["spellIds"] = {
+						},
+						["spellName"] = 0,
+						["subeventPrefix"] = "SPELL",
+						["subeventSuffix"] = "_CAST_START",
+						["type"] = "status",
+						["unevent"] = "auto",
+						["unit"] = "nameplate",
+						["useName"] = true,
+						["use_absorbMode"] = true,
+						["use_destUnit"] = false,
+						["use_genericShowOn"] = true,
+						["use_nameplateType"] = false,
+						["use_spellId"] = true,
+						["use_spellName"] = true,
+						["use_track"] = true,
+						["use_unit"] = true,
+					},
+					["untrigger"] = {
+						["unit"] = "nameplate",
+					},
+				},
+				["activeTriggerMode"] = -10,
+			},
+			["uid"] = "6YMXGijvpCg",
+			["url"] = "https://wago.io/uYX5mP3U5/5",
+			["useAdjustededMax"] = false,
+			["useAdjustededMin"] = false,
+			["version"] = 5,
+			["width"] = 1,
+			["xOffset"] = -3000,
+			["yOffset"] = 0,
+			["zoom"] = 0,
+		},
+		["EDE [HOA] Stone Breath"] = {
+			["actions"] = {
+				["finish"] = {
+				},
+				["init"] = {
+				},
+				["start"] = {
+					["do_sound"] = true,
+					["sound"] = "Interface\\Addons\\Details\\sounds\\sound_gun2.ogg",
+				},
+			},
+			["alpha"] = 1,
+			["anchorFrameType"] = "SCREEN",
+			["anchorPoint"] = "CENTER",
+			["animation"] = {
+				["finish"] = {
+					["duration_type"] = "seconds",
+					["easeStrength"] = 3,
+					["easeType"] = "none",
+					["type"] = "none",
+				},
+				["main"] = {
+					["duration_type"] = "seconds",
+					["easeStrength"] = 3,
+					["easeType"] = "none",
+					["type"] = "none",
+				},
+				["start"] = {
+					["duration_type"] = "seconds",
+					["easeStrength"] = 3,
+					["easeType"] = "none",
+					["type"] = "none",
+				},
+			},
+			["authorOptions"] = {
+			},
+			["auto"] = true,
+			["color"] = {
+				1, -- [1]
+				1, -- [2]
+				1, -- [3]
+				1, -- [4]
+			},
+			["conditions"] = {
+			},
+			["config"] = {
+			},
+			["cooldown"] = true,
+			["cooldownEdge"] = false,
+			["cooldownSwipe"] = true,
+			["cooldownTextDisabled"] = false,
+			["desaturate"] = false,
+			["displayIcon"] = "463521",
+			["frameStrata"] = 1,
+			["height"] = 1,
+			["icon"] = true,
+			["iconSource"] = -1,
+			["id"] = "EDE [HOA] Stone Breath",
+			["information"] = {
+				["ignoreOptionsEventErrors"] = true,
+			},
+			["internalVersion"] = 40,
+			["inverse"] = false,
+			["keepAspectRatio"] = false,
+			["load"] = {
+				["class"] = {
+					["multi"] = {
+					},
+				},
+				["size"] = {
+					["multi"] = {
+					},
+				},
+				["spec"] = {
+					["multi"] = {
+					},
+				},
+				["talent"] = {
+					["multi"] = {
+					},
+				},
+				["use_zoneId"] = false,
+				["use_zonegroupId"] = true,
+				["zonegroupId"] = "409",
+			},
+			["parent"] = "Ellesmere's Dungeon Essentials",
+			["preferToUpdate"] = false,
+			["regionType"] = "icon",
+			["selfPoint"] = "CENTER",
+			["semver"] = "1.0.4",
+			["subRegions"] = {
+			},
+			["tocversion"] = 90002,
+			["triggers"] = {
+				[1] = {
+					["trigger"] = {
+						["auraspellids"] = {
+							"326632", -- [1]
+						},
+						["debuffType"] = "HARMFUL",
+						["duration"] = "1",
+						["event"] = "Cast",
+						["nameplateType"] = "hostile",
+						["names"] = {
+						},
+						["spellId"] = 346866,
+						["spellIds"] = {
+						},
+						["subeventPrefix"] = "SPELL",
+						["subeventSuffix"] = "_CAST_START",
+						["type"] = "status",
+						["unevent"] = "auto",
+						["unit"] = "nameplate",
+						["useExactSpellId"] = true,
+						["use_absorbMode"] = true,
+						["use_nameplateType"] = true,
+						["use_spellId"] = true,
+						["use_unit"] = true,
+					},
+					["untrigger"] = {
+						["unit"] = "nameplate",
+					},
+				},
+				["activeTriggerMode"] = -10,
+			},
+			["uid"] = "ZL7TE0vdMKQ",
+			["url"] = "https://wago.io/uYX5mP3U5/5",
+			["version"] = 5,
+			["width"] = 1,
+			["xOffset"] = -3000,
+			["yOffset"] = 0,
+			["zoom"] = 0.3,
+		},
+		["EDE [HOA] Unleashed Suffering"] = {
+			["actions"] = {
+				["finish"] = {
+				},
+				["init"] = {
+				},
+				["start"] = {
+					["do_sound"] = true,
+					["sound"] = "Interface\\Addons\\Details\\sounds\\sound_gun2.ogg",
+				},
+			},
+			["alpha"] = 1,
+			["anchorFrameType"] = "SCREEN",
+			["anchorPoint"] = "CENTER",
+			["animation"] = {
+				["finish"] = {
+					["duration_type"] = "seconds",
+					["easeStrength"] = 3,
+					["easeType"] = "none",
+					["type"] = "none",
+				},
+				["main"] = {
+					["duration_type"] = "seconds",
+					["easeStrength"] = 3,
+					["easeType"] = "none",
+					["type"] = "none",
+				},
+				["start"] = {
+					["duration_type"] = "seconds",
+					["easeStrength"] = 3,
+					["easeType"] = "none",
+					["type"] = "none",
+				},
+			},
+			["authorOptions"] = {
+			},
+			["auto"] = false,
+			["backgroundColor"] = {
+				0, -- [1]
+				0, -- [2]
+				0, -- [3]
+				0.5, -- [4]
+			},
+			["barColor"] = {
+				1, -- [1]
+				0, -- [2]
+				0, -- [3]
+				1, -- [4]
+			},
+			["color"] = {
+				1, -- [1]
+				1, -- [2]
+				1, -- [3]
+				1, -- [4]
+			},
+			["conditions"] = {
+			},
+			["config"] = {
+			},
+			["cooldown"] = true,
+			["cooldownEdge"] = false,
+			["cooldownSwipe"] = true,
+			["cooldownTextDisabled"] = false,
+			["desaturate"] = false,
+			["displayIcon"] = "1035037",
+			["frameStrata"] = 1,
+			["height"] = 1,
+			["icon"] = true,
+			["iconSource"] = 0,
+			["icon_color"] = {
+				1, -- [1]
+				1, -- [2]
+				1, -- [3]
+				1, -- [4]
+			},
+			["icon_side"] = "RIGHT",
+			["id"] = "EDE [HOA] Unleashed Suffering",
+			["information"] = {
+				["ignoreOptionsEventErrors"] = true,
+			},
+			["internalVersion"] = 40,
+			["inverse"] = false,
+			["keepAspectRatio"] = false,
+			["load"] = {
+				["class"] = {
+					["multi"] = {
+					},
+				},
+				["size"] = {
+					["multi"] = {
+					},
+				},
+				["spec"] = {
+					["multi"] = {
+					},
+				},
+				["talent"] = {
+					["multi"] = {
+					},
+				},
+				["use_zonegroupId"] = true,
+				["zonegroupId"] = "409",
+			},
+			["orientation"] = "HORIZONTAL",
+			["parent"] = "Ellesmere's Dungeon Essentials",
+			["preferToUpdate"] = false,
+			["regionType"] = "icon",
+			["selfPoint"] = "CENTER",
+			["semver"] = "1.0.4",
+			["spark"] = false,
+			["sparkBlendMode"] = "ADD",
+			["sparkColor"] = {
+				1, -- [1]
+				1, -- [2]
+				1, -- [3]
+				1, -- [4]
+			},
+			["sparkHeight"] = 30,
+			["sparkHidden"] = "NEVER",
+			["sparkOffsetX"] = 0,
+			["sparkOffsetY"] = 0,
+			["sparkRotation"] = 0,
+			["sparkRotationMode"] = "AUTO",
+			["sparkTexture"] = "Interface\\CastingBar\\UI-CastingBar-Spark",
+			["sparkWidth"] = 10,
+			["subRegions"] = {
+			},
+			["texture"] = "Blizzard",
+			["tocversion"] = 90002,
+			["triggers"] = {
+				[1] = {
+					["trigger"] = {
+						["auranames"] = {
+							"", -- [1]
+						},
+						["buffShowOn"] = "showOnActive",
+						["debuffType"] = "HARMFUL",
+						["destUnit"] = "player",
+						["duration"] = "3",
+						["event"] = "Cast",
+						["genericShowOn"] = "showOnCooldown",
+						["names"] = {
+						},
+						["percentpower"] = "90",
+						["percentpower_operator"] = ">",
+						["realSpellName"] = 0,
+						["spellId"] = "323236",
+						["spellIds"] = {
+						},
+						["spellName"] = 0,
+						["subeventPrefix"] = "SPELL",
+						["subeventSuffix"] = "_CAST_START",
+						["type"] = "status",
+						["unevent"] = "auto",
+						["unit"] = "boss",
+						["useName"] = true,
+						["use_absorbMode"] = true,
+						["use_cloneId"] = true,
+						["use_destUnit"] = false,
+						["use_genericShowOn"] = true,
+						["use_percentpower"] = true,
+						["use_powertype"] = false,
+						["use_spellId"] = true,
+						["use_spellName"] = true,
+						["use_track"] = true,
+						["use_unit"] = true,
+					},
+					["untrigger"] = {
+						["unit"] = "boss",
+					},
+				},
+				["activeTriggerMode"] = -10,
+			},
+			["uid"] = "PlSFl(tgKML",
+			["url"] = "https://wago.io/uYX5mP3U5/5",
+			["useAdjustededMax"] = false,
+			["useAdjustededMin"] = false,
+			["useTooltip"] = false,
+			["version"] = 5,
+			["width"] = 1,
+			["xOffset"] = -3000,
+			["yOffset"] = 0,
+			["zoom"] = 0,
+		},
+		["EDE [MOTS] Bewildering Pollen (Boss) 2"] = {
+			["actions"] = {
+				["finish"] = {
+				},
+				["init"] = {
+				},
+				["start"] = {
+					["do_sound"] = true,
+					["sound"] = "Interface\\Addons\\Details\\sounds\\sound_gun2.ogg",
+				},
+			},
+			["alpha"] = 1,
+			["anchorFrameType"] = "SCREEN",
+			["anchorPoint"] = "CENTER",
+			["animation"] = {
+				["finish"] = {
+					["duration_type"] = "seconds",
+					["easeStrength"] = 3,
+					["easeType"] = "none",
+					["type"] = "none",
+				},
+				["main"] = {
+					["duration_type"] = "seconds",
+					["easeStrength"] = 3,
+					["easeType"] = "none",
+					["type"] = "none",
+				},
+				["start"] = {
+					["duration_type"] = "seconds",
+					["easeStrength"] = 3,
+					["easeType"] = "none",
+					["type"] = "none",
+				},
+			},
+			["authorOptions"] = {
+			},
+			["auto"] = false,
+			["backgroundColor"] = {
+				0, -- [1]
+				0, -- [2]
+				0, -- [3]
+				0.5, -- [4]
+			},
+			["barColor"] = {
+				1, -- [1]
+				0, -- [2]
+				0, -- [3]
+				1, -- [4]
+			},
+			["color"] = {
+				1, -- [1]
+				1, -- [2]
+				1, -- [3]
+				1, -- [4]
+			},
+			["conditions"] = {
+			},
+			["config"] = {
+			},
+			["cooldown"] = true,
+			["cooldownEdge"] = false,
+			["cooldownSwipe"] = true,
+			["cooldownTextDisabled"] = false,
+			["desaturate"] = false,
+			["displayIcon"] = "134219",
+			["frameStrata"] = 1,
+			["height"] = 1,
+			["icon"] = true,
+			["iconSource"] = 0,
+			["icon_color"] = {
+				1, -- [1]
+				1, -- [2]
+				1, -- [3]
+				1, -- [4]
+			},
+			["icon_side"] = "RIGHT",
+			["id"] = "EDE [MOTS] Bewildering Pollen (Boss) 2",
+			["information"] = {
+				["ignoreOptionsEventErrors"] = true,
+			},
+			["internalVersion"] = 40,
+			["inverse"] = false,
+			["keepAspectRatio"] = false,
+			["load"] = {
+				["class"] = {
+					["multi"] = {
+					},
+				},
+				["size"] = {
+					["multi"] = {
+					},
+				},
+				["spec"] = {
+					["multi"] = {
+					},
+				},
+				["talent"] = {
+					["multi"] = {
+					},
+				},
+				["use_encounter"] = true,
+				["use_zoneId"] = true,
+				["use_zonegroupId"] = false,
+				["zoneId"] = "1669",
+				["zonegroupId"] = "13334",
+			},
+			["orientation"] = "HORIZONTAL",
+			["parent"] = "Ellesmere's Dungeon Essentials",
+			["preferToUpdate"] = false,
+			["regionType"] = "icon",
+			["selfPoint"] = "CENTER",
+			["semver"] = "1.0.4",
+			["spark"] = false,
+			["sparkBlendMode"] = "ADD",
+			["sparkColor"] = {
+				1, -- [1]
+				1, -- [2]
+				1, -- [3]
+				1, -- [4]
+			},
+			["sparkHeight"] = 30,
+			["sparkHidden"] = "NEVER",
+			["sparkOffsetX"] = 0,
+			["sparkOffsetY"] = 0,
+			["sparkRotation"] = 0,
+			["sparkRotationMode"] = "AUTO",
+			["sparkTexture"] = "Interface\\CastingBar\\UI-CastingBar-Spark",
+			["sparkWidth"] = 10,
+			["subRegions"] = {
+			},
+			["texture"] = "Blizzard",
+			["tocversion"] = 90002,
+			["triggers"] = {
+				[1] = {
+					["trigger"] = {
+						["auranames"] = {
+							"", -- [1]
+						},
+						["buffShowOn"] = "showOnActive",
+						["debuffType"] = "HELPFUL",
+						["destUnit"] = "player",
+						["duration"] = "3.5",
+						["event"] = "Cast",
+						["genericShowOn"] = "showOnCooldown",
+						["names"] = {
+						},
+						["percentpower"] = "90",
+						["percentpower_operator"] = ">",
+						["realSpellName"] = 0,
+						["spellId"] = 323137,
+						["spellIds"] = {
+						},
+						["spellName"] = 0,
+						["subeventPrefix"] = "SPELL",
+						["subeventSuffix"] = "_CAST_START",
+						["type"] = "status",
+						["unevent"] = "auto",
+						["unit"] = "boss",
+						["useName"] = true,
+						["use_absorbMode"] = true,
+						["use_cloneId"] = true,
+						["use_destUnit"] = false,
+						["use_genericShowOn"] = true,
+						["use_percentpower"] = true,
+						["use_powertype"] = false,
+						["use_spellId"] = true,
+						["use_spellName"] = true,
+						["use_track"] = true,
+						["use_unit"] = true,
+					},
+					["untrigger"] = {
+						["unit"] = "boss",
+					},
+				},
+				["activeTriggerMode"] = -10,
+			},
+			["uid"] = "TsDdJ5(NjSe",
+			["url"] = "https://wago.io/uYX5mP3U5/5",
+			["useAdjustededMax"] = false,
+			["useAdjustededMin"] = false,
+			["useTooltip"] = false,
+			["version"] = 5,
+			["width"] = 1,
+			["xOffset"] = -3000,
+			["yOffset"] = 0,
+			["zoom"] = 0,
+		},
+		["EDE [MOTS] Bewildering Pollen (Trash)"] = {
+			["actions"] = {
+				["finish"] = {
+				},
+				["init"] = {
+				},
+				["start"] = {
+					["do_sound"] = true,
+					["sound"] = "Interface\\Addons\\Details\\sounds\\sound_gun2.ogg",
+				},
+			},
+			["alpha"] = 1,
+			["anchorFrameType"] = "SCREEN",
+			["anchorPoint"] = "CENTER",
+			["animation"] = {
+				["finish"] = {
+					["duration_type"] = "seconds",
+					["easeStrength"] = 3,
+					["easeType"] = "none",
+					["type"] = "none",
+				},
+				["main"] = {
+					["duration_type"] = "seconds",
+					["easeStrength"] = 3,
+					["easeType"] = "none",
+					["type"] = "none",
+				},
+				["start"] = {
+					["duration_type"] = "seconds",
+					["easeStrength"] = 3,
+					["easeType"] = "none",
+					["type"] = "none",
+				},
+			},
+			["authorOptions"] = {
+			},
+			["auto"] = true,
+			["backgroundColor"] = {
+				0, -- [1]
+				0, -- [2]
+				0, -- [3]
+				0.5, -- [4]
+			},
+			["barColor"] = {
+				1, -- [1]
+				0, -- [2]
+				0, -- [3]
+				1, -- [4]
+			},
+			["color"] = {
+				1, -- [1]
+				1, -- [2]
+				1, -- [3]
+				1, -- [4]
+			},
+			["conditions"] = {
+			},
+			["config"] = {
+			},
+			["cooldown"] = true,
+			["cooldownEdge"] = false,
+			["cooldownSwipe"] = true,
+			["cooldownTextDisabled"] = false,
+			["desaturate"] = false,
+			["displayIcon"] = "134219",
+			["frameStrata"] = 1,
+			["height"] = 1,
+			["icon"] = true,
+			["iconSource"] = -1,
+			["icon_color"] = {
+				1, -- [1]
+				1, -- [2]
+				1, -- [3]
+				1, -- [4]
+			},
+			["icon_side"] = "RIGHT",
+			["id"] = "EDE [MOTS] Bewildering Pollen (Trash)",
+			["information"] = {
+				["ignoreOptionsEventErrors"] = true,
+			},
+			["internalVersion"] = 40,
+			["inverse"] = false,
+			["keepAspectRatio"] = false,
+			["load"] = {
+				["class"] = {
+					["multi"] = {
+					},
+				},
+				["size"] = {
+					["multi"] = {
+					},
+				},
+				["spec"] = {
+					["multi"] = {
+					},
+				},
+				["talent"] = {
+					["multi"] = {
+					},
+				},
+				["use_encounter"] = false,
+				["use_zoneId"] = true,
+				["use_zonegroupId"] = false,
+				["zoneId"] = "1669",
+				["zonegroupId"] = "13334",
+			},
+			["orientation"] = "HORIZONTAL",
+			["parent"] = "Ellesmere's Dungeon Essentials",
+			["preferToUpdate"] = false,
+			["regionType"] = "icon",
+			["selfPoint"] = "CENTER",
+			["semver"] = "1.0.4",
+			["spark"] = false,
+			["sparkBlendMode"] = "ADD",
+			["sparkColor"] = {
+				1, -- [1]
+				1, -- [2]
+				1, -- [3]
+				1, -- [4]
+			},
+			["sparkHeight"] = 30,
+			["sparkHidden"] = "NEVER",
+			["sparkOffsetX"] = 0,
+			["sparkOffsetY"] = 0,
+			["sparkRotation"] = 0,
+			["sparkRotationMode"] = "AUTO",
+			["sparkTexture"] = "Interface\\CastingBar\\UI-CastingBar-Spark",
+			["sparkWidth"] = 10,
+			["subRegions"] = {
+			},
+			["texture"] = "Blizzard",
+			["tocversion"] = 90002,
+			["triggers"] = {
+				[1] = {
+					["trigger"] = {
+						["auranames"] = {
+							"322487", -- [1]
+						},
+						["buffShowOn"] = "showOnActive",
+						["combinePerUnit"] = false,
+						["debuffType"] = "HARMFUL",
+						["destUnit"] = "player",
+						["duration"] = "2",
+						["event"] = "Cast",
+						["genericShowOn"] = "showOnCooldown",
+						["match_count"] = "0",
+						["match_countOperator"] = ">",
+						["names"] = {
+						},
+						["percentpower"] = "90",
+						["percentpower_operator"] = ">",
+						["realSpellName"] = 0,
+						["showClones"] = true,
+						["spellId"] = 321968,
+						["spellIds"] = {
+						},
+						["spellName"] = 0,
+						["subeventPrefix"] = "SPELL",
+						["subeventSuffix"] = "_CAST_SUCCESS",
+						["type"] = "status",
+						["unevent"] = "auto",
+						["unit"] = "nameplate",
+						["useMatch_count"] = true,
+						["useName"] = true,
+						["use_absorbMode"] = true,
+						["use_cloneId"] = true,
+						["use_destUnit"] = false,
+						["use_genericShowOn"] = true,
+						["use_percentpower"] = true,
+						["use_powertype"] = false,
+						["use_sourceUnit"] = true,
+						["use_spellId"] = true,
+						["use_spellName"] = true,
+						["use_track"] = true,
+						["use_unit"] = true,
+					},
+					["untrigger"] = {
+						["unit"] = "nameplate",
+					},
+				},
+				["activeTriggerMode"] = -10,
+			},
+			["uid"] = "WXh3uyi22y8",
+			["url"] = "https://wago.io/uYX5mP3U5/5",
+			["useAdjustededMax"] = false,
+			["useAdjustededMin"] = false,
+			["useTooltip"] = false,
+			["version"] = 5,
+			["width"] = 1,
+			["xOffset"] = -3000,
+			["yOffset"] = 0,
+			["zoom"] = 0,
+		},
+		["EDE [MTS] Radiant Breath"] = {
+			["actions"] = {
+				["finish"] = {
+					["do_sound"] = false,
+				},
+				["init"] = {
+				},
+				["start"] = {
+					["do_sound"] = true,
+					["sound"] = "Interface\\Addons\\Details\\sounds\\sound_gun2.ogg",
+				},
+			},
+			["alpha"] = 1,
+			["anchorFrameType"] = "SCREEN",
+			["anchorPoint"] = "CENTER",
+			["animation"] = {
+				["finish"] = {
+					["duration_type"] = "seconds",
+					["easeStrength"] = 3,
+					["easeType"] = "none",
+					["type"] = "none",
+				},
+				["main"] = {
+					["duration_type"] = "seconds",
+					["easeStrength"] = 3,
+					["easeType"] = "none",
+					["type"] = "none",
+				},
+				["start"] = {
+					["duration_type"] = "seconds",
+					["easeStrength"] = 3,
+					["easeType"] = "none",
+					["type"] = "none",
+				},
+			},
+			["authorOptions"] = {
+			},
+			["auto"] = true,
+			["backgroundColor"] = {
+				0, -- [1]
+				0, -- [2]
+				0, -- [3]
+				0.5, -- [4]
+			},
+			["barColor"] = {
+				1, -- [1]
+				0, -- [2]
+				0, -- [3]
+				1, -- [4]
+			},
+			["color"] = {
+				1, -- [1]
+				1, -- [2]
+				1, -- [3]
+				1, -- [4]
+			},
+			["conditions"] = {
+			},
+			["config"] = {
+			},
+			["cooldown"] = true,
+			["cooldownEdge"] = false,
+			["cooldownSwipe"] = true,
+			["cooldownTextDisabled"] = false,
+			["desaturate"] = false,
+			["displayIcon"] = "3528278",
+			["frameStrata"] = 1,
+			["height"] = 1,
+			["icon"] = true,
+			["iconSource"] = -1,
+			["icon_color"] = {
+				1, -- [1]
+				1, -- [2]
+				1, -- [3]
+				1, -- [4]
+			},
+			["icon_side"] = "RIGHT",
+			["id"] = "EDE [MTS] Radiant Breath",
+			["information"] = {
+				["ignoreOptionsEventErrors"] = true,
+			},
+			["internalVersion"] = 40,
+			["inverse"] = false,
+			["keepAspectRatio"] = false,
+			["load"] = {
+				["class"] = {
+					["multi"] = {
+					},
+				},
+				["size"] = {
+					["multi"] = {
+						["party"] = true,
+					},
+					["single"] = "party",
+				},
+				["spec"] = {
+					["multi"] = {
+					},
+				},
+				["talent"] = {
+					["multi"] = {
+					},
+				},
+				["use_size"] = true,
+				["use_zoneId"] = false,
+				["use_zonegroupId"] = false,
+				["zoneId"] = "",
+				["zonegroupId"] = "13334",
+			},
+			["orientation"] = "HORIZONTAL",
+			["parent"] = "Ellesmere's Dungeon Essentials",
+			["preferToUpdate"] = false,
+			["regionType"] = "icon",
+			["selfPoint"] = "CENTER",
+			["semver"] = "1.0.4",
+			["spark"] = false,
+			["sparkBlendMode"] = "ADD",
+			["sparkColor"] = {
+				1, -- [1]
+				1, -- [2]
+				1, -- [3]
+				1, -- [4]
+			},
+			["sparkHeight"] = 30,
+			["sparkHidden"] = "NEVER",
+			["sparkOffsetX"] = 0,
+			["sparkOffsetY"] = 0,
+			["sparkRotation"] = 0,
+			["sparkRotationMode"] = "AUTO",
+			["sparkTexture"] = "Interface\\CastingBar\\UI-CastingBar-Spark",
+			["sparkWidth"] = 10,
+			["subRegions"] = {
+			},
+			["texture"] = "Blizzard",
+			["tocversion"] = 90002,
+			["triggers"] = {
+				[1] = {
+					["trigger"] = {
+						["auranames"] = {
+							"322487", -- [1]
+						},
+						["buffShowOn"] = "showOnActive",
+						["combinePerUnit"] = false,
+						["debuffType"] = "HARMFUL",
+						["destUnit"] = "player",
+						["duration"] = "2",
+						["event"] = "Cast",
+						["genericShowOn"] = "showOnCooldown",
+						["match_count"] = "0",
+						["match_countOperator"] = ">",
+						["names"] = {
+						},
+						["percentpower"] = "90",
+						["percentpower_operator"] = ">",
+						["realSpellName"] = 0,
+						["showClones"] = true,
+						["spellId"] = 340160,
+						["spellIds"] = {
+						},
+						["spellName"] = 0,
+						["subeventPrefix"] = "SPELL",
+						["subeventSuffix"] = "_CAST_SUCCESS",
+						["type"] = "status",
+						["unevent"] = "auto",
+						["unit"] = "nameplate",
+						["useMatch_count"] = true,
+						["useName"] = true,
+						["use_absorbMode"] = true,
+						["use_cloneId"] = true,
+						["use_destUnit"] = false,
+						["use_genericShowOn"] = true,
+						["use_percentpower"] = true,
+						["use_powertype"] = false,
+						["use_sourceUnit"] = true,
+						["use_spellId"] = true,
+						["use_spellName"] = true,
+						["use_track"] = true,
+						["use_unit"] = true,
+					},
+					["untrigger"] = {
+						["unit"] = "nameplate",
+					},
+				},
+				["activeTriggerMode"] = -10,
+			},
+			["uid"] = "wChrOtjXFYi",
+			["url"] = "https://wago.io/uYX5mP3U5/5",
+			["useAdjustededMax"] = false,
+			["useAdjustededMin"] = false,
+			["useTooltip"] = false,
+			["version"] = 5,
+			["width"] = 1,
+			["xOffset"] = -3000,
+			["yOffset"] = 0,
+			["zoom"] = 0,
+		},
+		["EDE [NW] Gut Slice"] = {
+			["actions"] = {
+				["finish"] = {
+				},
+				["init"] = {
+				},
+				["start"] = {
+					["do_sound"] = true,
+					["sound"] = "Interface\\Addons\\Details\\sounds\\sound_gun2.ogg",
+				},
+			},
+			["alpha"] = 1,
+			["anchorFrameType"] = "SCREEN",
+			["anchorPoint"] = "CENTER",
+			["animation"] = {
+				["finish"] = {
+					["duration_type"] = "seconds",
+					["easeStrength"] = 3,
+					["easeType"] = "none",
+					["type"] = "none",
+				},
+				["main"] = {
+					["duration_type"] = "seconds",
+					["easeStrength"] = 3,
+					["easeType"] = "none",
+					["type"] = "none",
+				},
+				["start"] = {
+					["duration_type"] = "seconds",
+					["easeStrength"] = 3,
+					["easeType"] = "none",
+					["type"] = "none",
+				},
+			},
+			["authorOptions"] = {
+			},
+			["auto"] = true,
+			["color"] = {
+				1, -- [1]
+				1, -- [2]
+				1, -- [3]
+				1, -- [4]
+			},
+			["conditions"] = {
+			},
+			["config"] = {
+			},
+			["cooldown"] = true,
+			["cooldownEdge"] = false,
+			["cooldownSwipe"] = true,
+			["cooldownTextDisabled"] = false,
+			["desaturate"] = false,
+			["displayIcon"] = "132155",
+			["frameStrata"] = 1,
+			["height"] = 1,
+			["icon"] = true,
+			["iconSource"] = -1,
+			["id"] = "EDE [NW] Gut Slice",
+			["information"] = {
+				["ignoreOptionsEventErrors"] = true,
+			},
+			["internalVersion"] = 40,
+			["inverse"] = false,
+			["keepAspectRatio"] = false,
+			["load"] = {
+				["class"] = {
+					["multi"] = {
+					},
+				},
+				["size"] = {
+					["multi"] = {
+					},
+				},
+				["spec"] = {
+					["multi"] = {
+					},
+				},
+				["talent"] = {
+					["multi"] = {
+					},
+				},
+				["use_zoneId"] = false,
+				["use_zonegroupId"] = true,
+				["zonegroupId"] = "410",
+			},
+			["parent"] = "Ellesmere's Dungeon Essentials",
+			["preferToUpdate"] = false,
+			["regionType"] = "icon",
+			["selfPoint"] = "CENTER",
+			["semver"] = "1.0.4",
+			["subRegions"] = {
+			},
+			["tocversion"] = 90002,
+			["triggers"] = {
+				[1] = {
+					["trigger"] = {
+						["auraspellids"] = {
+							"321821", -- [1]
+						},
+						["debuffType"] = "HARMFUL",
+						["destUnit"] = "player",
+						["duration"] = "1",
+						["event"] = "Cast",
+						["fetchTooltip"] = false,
+						["names"] = {
+						},
+						["remaining"] = "3",
+						["remaining_operator"] = "<",
+						["spellId"] = 333477,
+						["spellIds"] = {
+						},
+						["subeventPrefix"] = "SPELL",
+						["subeventSuffix"] = "_CAST_START",
+						["type"] = "status",
+						["unevent"] = "auto",
+						["unit"] = "nameplate",
+						["useExactSpellId"] = true,
+						["use_absorbMode"] = true,
+						["use_destUnit"] = false,
+						["use_remaining"] = false,
+						["use_spellId"] = true,
+						["use_unit"] = true,
+					},
+					["untrigger"] = {
+						["unit"] = "nameplate",
+					},
+				},
+				["activeTriggerMode"] = -10,
+			},
+			["uid"] = "XaBAZl6ZXVB",
+			["url"] = "https://wago.io/uYX5mP3U5/5",
+			["version"] = 5,
+			["width"] = 1,
+			["xOffset"] = -3000,
+			["yOffset"] = 0,
+			["zoom"] = 0.3,
+		},
+		["EDE [NW] Necrotic Breath"] = {
+			["actions"] = {
+				["finish"] = {
+				},
+				["init"] = {
+				},
+				["start"] = {
+					["do_sound"] = true,
+					["sound"] = "Interface\\Addons\\Details\\sounds\\sound_gun2.ogg",
+				},
+			},
+			["alpha"] = 1,
+			["anchorFrameType"] = "SCREEN",
+			["anchorPoint"] = "CENTER",
+			["animation"] = {
+				["finish"] = {
+					["duration_type"] = "seconds",
+					["easeStrength"] = 3,
+					["easeType"] = "none",
+					["type"] = "none",
+				},
+				["main"] = {
+					["duration_type"] = "seconds",
+					["easeStrength"] = 3,
+					["easeType"] = "none",
+					["type"] = "none",
+				},
+				["start"] = {
+					["duration_type"] = "seconds",
+					["easeStrength"] = 3,
+					["easeType"] = "none",
+					["type"] = "none",
+				},
+			},
+			["authorOptions"] = {
+			},
+			["auto"] = false,
+			["color"] = {
+				1, -- [1]
+				1, -- [2]
+				1, -- [3]
+				1, -- [4]
+			},
+			["conditions"] = {
+			},
+			["config"] = {
+			},
+			["cooldown"] = true,
+			["cooldownEdge"] = false,
+			["cooldownSwipe"] = true,
+			["cooldownTextDisabled"] = false,
+			["desaturate"] = false,
+			["displayIcon"] = "2576093",
+			["frameStrata"] = 1,
+			["height"] = 1,
+			["icon"] = true,
+			["iconSource"] = 0,
+			["id"] = "EDE [NW] Necrotic Breath",
+			["information"] = {
+				["ignoreOptionsEventErrors"] = true,
+			},
+			["internalVersion"] = 40,
+			["inverse"] = false,
+			["keepAspectRatio"] = false,
+			["load"] = {
+				["class"] = {
+					["multi"] = {
+					},
+				},
+				["size"] = {
+					["multi"] = {
+					},
+				},
+				["spec"] = {
+					["multi"] = {
+					},
+				},
+				["talent"] = {
+					["multi"] = {
+					},
+				},
+				["use_encounter"] = true,
+				["use_zonegroupId"] = true,
+				["zonegroupId"] = "410",
+			},
+			["parent"] = "Ellesmere's Dungeon Essentials",
+			["preferToUpdate"] = false,
+			["regionType"] = "icon",
+			["selfPoint"] = "CENTER",
+			["semver"] = "1.0.4",
+			["subRegions"] = {
+			},
+			["tocversion"] = 90002,
+			["triggers"] = {
+				[1] = {
+					["trigger"] = {
+						["auranames"] = {
+							"333633", -- [1]
+						},
+						["debuffType"] = "HARMFUL",
+						["destUnit"] = "player",
+						["duration"] = "10",
+						["event"] = "Cast",
+						["genericShowOn"] = "showOnCooldown",
+						["names"] = {
+						},
+						["realSpellName"] = 0,
+						["spell"] = "333488",
+						["spellId"] = 333488,
+						["spellIds"] = {
+						},
+						["spellName"] = 0,
+						["subeventPrefix"] = "SPELL",
+						["subeventSuffix"] = "_CAST_SUCCESS",
+						["type"] = "status",
+						["unevent"] = "auto",
+						["unit"] = "boss",
+						["useName"] = true,
+						["use_absorbMode"] = true,
+						["use_destUnit"] = false,
+						["use_genericShowOn"] = true,
+						["use_spell"] = false,
+						["use_spellId"] = true,
+						["use_spellName"] = true,
+						["use_track"] = true,
+						["use_unit"] = true,
+					},
+					["untrigger"] = {
+						["unit"] = "boss",
+					},
+				},
+				["activeTriggerMode"] = -10,
+			},
+			["uid"] = "f40QVOFJkHZ",
+			["url"] = "https://wago.io/uYX5mP3U5/5",
+			["version"] = 5,
+			["width"] = 1,
+			["xOffset"] = -3000,
+			["yOffset"] = 0,
+			["zoom"] = 0,
+		},
+		["EDE [NW] Repentance Check"] = {
+			["actions"] = {
+				["finish"] = {
+					["do_sound"] = false,
+					["sound"] = "Interface\\Addons\\WeakAuras\\PowerAurasMedia\\Sounds\\hurricane.ogg",
+					["stop_sound"] = true,
+				},
+				["init"] = {
+				},
+				["start"] = {
+					["do_glow"] = false,
+					["do_loop"] = false,
+					["do_sound"] = false,
+					["glow_action"] = "show",
+					["glow_frame_type"] = "FRAMESELECTOR",
+					["glow_type"] = "buttonOverlay",
+					["sound"] = "Interface\\AddOns\\WeakAuras\\Media\\Sounds\\BikeHorn.ogg",
+					["sound_repeat"] = 10,
+				},
+			},
+			["alpha"] = 1,
+			["anchorFrameType"] = "SCREEN",
+			["anchorPoint"] = "CENTER",
+			["animation"] = {
+				["finish"] = {
+					["duration_type"] = "seconds",
+					["easeStrength"] = 3,
+					["easeType"] = "none",
+					["type"] = "none",
+				},
+				["main"] = {
+					["duration_type"] = "seconds",
+					["easeStrength"] = 3,
+					["easeType"] = "none",
+					["preset"] = "bounce",
+					["type"] = "preset",
+				},
+				["start"] = {
+					["duration_type"] = "seconds",
+					["easeStrength"] = 3,
+					["easeType"] = "none",
+					["type"] = "none",
+				},
+			},
+			["authorOptions"] = {
+			},
+			["auto"] = false,
+			["color"] = {
+				1, -- [1]
+				1, -- [2]
+				1, -- [3]
+				1, -- [4]
+			},
+			["conditions"] = {
+				{
+					["changes"] = {
+						{
+						}, -- [1]
+					},
+					["check"] = {
+					},
+				}, -- [1]
+			},
+			["config"] = {
+			},
+			["cooldown"] = false,
+			["cooldownEdge"] = false,
+			["cooldownSwipe"] = true,
+			["cooldownTextDisabled"] = false,
+			["customTextUpdate"] = "update",
+			["desaturate"] = false,
+			["displayIcon"] = "135942",
+			["frameStrata"] = 3,
+			["height"] = 80,
+			["icon"] = true,
+			["iconSource"] = 0,
+			["id"] = "EDE [NW] Repentance Check",
+			["information"] = {
+				["ignoreOptionsEventErrors"] = true,
+			},
+			["internalVersion"] = 40,
+			["inverse"] = false,
+			["keepAspectRatio"] = false,
+			["load"] = {
+				["affixes"] = {
+					["multi"] = {
+					},
+				},
+				["class"] = {
+					["multi"] = {
+					},
+					["single"] = "PALADIN",
+				},
+				["difficulty"] = {
+					["multi"] = {
+					},
+				},
+				["faction"] = {
+					["multi"] = {
+					},
+				},
+				["ingroup"] = {
+					["multi"] = {
+						["group"] = true,
+						["raid"] = true,
+					},
+				},
+				["instance_type"] = {
+					["single"] = 23,
+				},
+				["pvptalent"] = {
+					["multi"] = {
+					},
+				},
+				["race"] = {
+					["multi"] = {
+					},
+				},
+				["role"] = {
+					["multi"] = {
+					},
+				},
+				["size"] = {
+					["multi"] = {
+						["arena"] = true,
+						["flexible"] = true,
+						["fortyman"] = true,
+						["party"] = true,
+						["pvp"] = true,
+						["scenario"] = true,
+						["ten"] = true,
+						["twenty"] = true,
+						["twentyfive"] = true,
+					},
+				},
+				["spec"] = {
+					["multi"] = {
+						true, -- [1]
+					},
+					["single"] = 1,
+				},
+				["spellknown"] = 53563,
+				["talent"] = {
+					["multi"] = {
+						[7] = true,
+						[9] = true,
+					},
+					["single"] = 19,
+				},
+				["talent2"] = {
+					["multi"] = {
+						[20] = true,
+					},
+					["single"] = 20,
+				},
+				["talent3"] = {
+					["multi"] = {
+					},
+				},
+				["use_class"] = true,
+				["use_combat"] = false,
+				["use_encounterid"] = false,
+				["use_instance_type"] = true,
+				["use_never"] = false,
+				["use_size"] = false,
+				["use_spec"] = false,
+				["use_spellknown"] = false,
+				["use_talent"] = false,
+				["use_zoneId"] = false,
+				["use_zonegroupId"] = true,
+				["zoneId"] = "1666, 1667, 1668",
+				["zonegroupId"] = "410",
+			},
+			["parent"] = "Ellesmere's Dungeon Essentials",
+			["preferToUpdate"] = false,
+			["regionType"] = "icon",
+			["selfPoint"] = "CENTER",
+			["semver"] = "1.0.4",
+			["stickyDuration"] = false,
+			["subRegions"] = {
+				{
+					["glow"] = true,
+					["glowBorder"] = false,
+					["glowColor"] = {
+						1, -- [1]
+						1, -- [2]
+						1, -- [3]
+						1, -- [4]
+					},
+					["glowFrequency"] = 0.25,
+					["glowLength"] = 10,
+					["glowLines"] = 8,
+					["glowScale"] = 1,
+					["glowThickness"] = 1,
+					["glowType"] = "buttonOverlay",
+					["glowXOffset"] = 0,
+					["glowYOffset"] = 0,
+					["type"] = "subglow",
+					["useGlowColor"] = false,
+				}, -- [1]
+			},
+			["tocversion"] = 90002,
+			["triggers"] = {
+				[1] = {
+					["trigger"] = {
+						["auranames"] = {
+							"Beacon of Light", -- [1]
+						},
+						["auraspellids"] = {
+							"53563", -- [1]
+						},
+						["buffShowOn"] = "showOnActive",
+						["combineMatches"] = "showLowest",
+						["custom_hide"] = "timed",
+						["debuffType"] = "HELPFUL",
+						["duration"] = "1",
+						["event"] = "Talent Known",
+						["genericShowOn"] = "showOnCooldown",
+						["group_count"] = "0",
+						["group_countOperator"] = "==",
+						["ignoreDead"] = false,
+						["inverse"] = true,
+						["name"] = "Greater Blessing of Wisdom",
+						["names"] = {
+							"Beacon of Light", -- [1]
+						},
+						["ownOnly"] = true,
+						["realSpellName"] = 0,
+						["spellId"] = "203539",
+						["spellIds"] = {
+						},
+						["spellName"] = 0,
+						["subeventPrefix"] = "SPELL",
+						["subeventSuffix"] = "_CAST_START",
+						["talent"] = {
+							["single"] = 8,
+						},
+						["type"] = "status",
+						["unevent"] = "auto",
+						["unit"] = "group",
+						["useAffected"] = true,
+						["useExactSpellId"] = true,
+						["useGroup_count"] = true,
+						["useName"] = false,
+						["use_debuffClass"] = false,
+						["use_genericShowOn"] = true,
+						["use_inverse"] = true,
+						["use_specific_unit"] = false,
+						["use_spellId"] = true,
+						["use_spellName"] = true,
+						["use_talent"] = true,
+						["use_tooltip"] = false,
+						["use_track"] = true,
+						["use_unit"] = true,
+					},
+					["untrigger"] = {
+					},
+				},
+				["activeTriggerMode"] = -10,
+				["disjunctive"] = "all",
+			},
+			["uid"] = "ItfMSDCrEVV",
+			["url"] = "https://wago.io/uYX5mP3U5/5",
+			["version"] = 5,
+			["width"] = 80,
+			["xOffset"] = -15,
+			["yOffset"] = 90,
+			["zoom"] = 0,
+		},
+		["EDE [NW] Shadow Well"] = {
+			["actions"] = {
+				["finish"] = {
+				},
+				["init"] = {
+				},
+				["start"] = {
+					["do_sound"] = true,
+					["sound"] = "Interface\\Addons\\Details\\sounds\\sound_gun2.ogg",
+				},
+			},
+			["alpha"] = 1,
+			["anchorFrameType"] = "SCREEN",
+			["anchorPoint"] = "CENTER",
+			["animation"] = {
+				["finish"] = {
+					["duration_type"] = "seconds",
+					["easeStrength"] = 3,
+					["easeType"] = "none",
+					["type"] = "none",
+				},
+				["main"] = {
+					["duration_type"] = "seconds",
+					["easeStrength"] = 3,
+					["easeType"] = "none",
+					["type"] = "none",
+				},
+				["start"] = {
+					["duration_type"] = "seconds",
+					["easeStrength"] = 3,
+					["easeType"] = "none",
+					["type"] = "none",
+				},
+			},
+			["authorOptions"] = {
+			},
+			["auto"] = true,
+			["color"] = {
+				1, -- [1]
+				1, -- [2]
+				1, -- [3]
+				1, -- [4]
+			},
+			["conditions"] = {
+			},
+			["config"] = {
+			},
+			["cooldown"] = true,
+			["cooldownEdge"] = false,
+			["cooldownSwipe"] = true,
+			["cooldownTextDisabled"] = false,
+			["desaturate"] = false,
+			["displayIcon"] = "2576095",
+			["frameStrata"] = 1,
+			["height"] = 1,
+			["icon"] = true,
+			["iconSource"] = -1,
+			["id"] = "EDE [NW] Shadow Well",
+			["information"] = {
+				["ignoreOptionsEventErrors"] = true,
+			},
+			["internalVersion"] = 40,
+			["inverse"] = false,
+			["keepAspectRatio"] = false,
+			["load"] = {
+				["class"] = {
+					["multi"] = {
+					},
+				},
+				["size"] = {
+					["multi"] = {
+					},
+				},
+				["spec"] = {
+					["multi"] = {
+					},
+				},
+				["talent"] = {
+					["multi"] = {
+					},
+				},
+				["use_zoneId"] = false,
+				["use_zonegroupId"] = true,
+				["zonegroupId"] = "410",
+			},
+			["parent"] = "Ellesmere's Dungeon Essentials",
+			["preferToUpdate"] = false,
+			["regionType"] = "icon",
+			["selfPoint"] = "CENTER",
+			["semver"] = "1.0.4",
+			["subRegions"] = {
+			},
+			["tocversion"] = 90002,
+			["triggers"] = {
+				[1] = {
+					["trigger"] = {
+						["auraspellids"] = {
+							"321821", -- [1]
+						},
+						["debuffType"] = "HARMFUL",
+						["destUnit"] = "player",
+						["duration"] = "1",
+						["event"] = "Cast",
+						["fetchTooltip"] = false,
+						["names"] = {
+						},
+						["remaining"] = "3",
+						["remaining_operator"] = "<",
+						["spellId"] = 320571,
+						["spellIds"] = {
+						},
+						["subeventPrefix"] = "SPELL",
+						["subeventSuffix"] = "_CAST_START",
+						["type"] = "status",
+						["unevent"] = "auto",
+						["unit"] = "nameplate",
+						["useExactSpellId"] = true,
+						["use_absorbMode"] = true,
+						["use_destUnit"] = false,
+						["use_remaining"] = false,
+						["use_spellId"] = true,
+						["use_unit"] = true,
+					},
+					["untrigger"] = {
+						["unit"] = "nameplate",
+					},
+				},
+				["activeTriggerMode"] = -10,
+			},
+			["uid"] = "1rfAzY5xQ6k",
+			["url"] = "https://wago.io/uYX5mP3U5/5",
+			["version"] = 5,
+			["width"] = 1,
+			["xOffset"] = -3000,
+			["yOffset"] = 0,
+			["zoom"] = 0.3,
+		},
+		["EDE [OTHERS] Blinding Light Check"] = {
+			["actions"] = {
+				["finish"] = {
+					["do_sound"] = false,
+					["sound"] = "Interface\\Addons\\WeakAuras\\PowerAurasMedia\\Sounds\\hurricane.ogg",
+					["stop_sound"] = true,
+				},
+				["init"] = {
+				},
+				["start"] = {
+					["do_glow"] = false,
+					["do_loop"] = false,
+					["do_sound"] = false,
+					["glow_action"] = "show",
+					["glow_frame_type"] = "FRAMESELECTOR",
+					["glow_type"] = "buttonOverlay",
+					["sound"] = "Interface\\AddOns\\WeakAuras\\Media\\Sounds\\BikeHorn.ogg",
+					["sound_repeat"] = 10,
+				},
+			},
+			["alpha"] = 1,
+			["anchorFrameType"] = "SCREEN",
+			["anchorPoint"] = "CENTER",
+			["animation"] = {
+				["finish"] = {
+					["duration_type"] = "seconds",
+					["easeStrength"] = 3,
+					["easeType"] = "none",
+					["type"] = "none",
+				},
+				["main"] = {
+					["duration_type"] = "seconds",
+					["easeStrength"] = 3,
+					["easeType"] = "none",
+					["preset"] = "bounce",
+					["type"] = "preset",
+				},
+				["start"] = {
+					["duration_type"] = "seconds",
+					["easeStrength"] = 3,
+					["easeType"] = "none",
+					["type"] = "none",
+				},
+			},
+			["authorOptions"] = {
+			},
+			["auto"] = false,
+			["color"] = {
+				1, -- [1]
+				1, -- [2]
+				1, -- [3]
+				1, -- [4]
+			},
+			["conditions"] = {
+				{
+					["changes"] = {
+						{
+						}, -- [1]
+					},
+					["check"] = {
+					},
+				}, -- [1]
+			},
+			["config"] = {
+			},
+			["cooldown"] = false,
+			["cooldownEdge"] = false,
+			["cooldownSwipe"] = true,
+			["cooldownTextDisabled"] = false,
+			["customTextUpdate"] = "update",
+			["desaturate"] = false,
+			["displayIcon"] = "571553",
+			["frameStrata"] = 3,
+			["height"] = 80,
+			["icon"] = true,
+			["iconSource"] = 0,
+			["id"] = "EDE [OTHERS] Blinding Light Check",
+			["information"] = {
+				["ignoreOptionsEventErrors"] = true,
+			},
+			["internalVersion"] = 40,
+			["inverse"] = false,
+			["keepAspectRatio"] = false,
+			["load"] = {
+				["affixes"] = {
+					["multi"] = {
+					},
+				},
+				["class"] = {
+					["multi"] = {
+					},
+					["single"] = "PALADIN",
+				},
+				["difficulty"] = {
+					["multi"] = {
+					},
+				},
+				["faction"] = {
+					["multi"] = {
+					},
+				},
+				["ingroup"] = {
+					["multi"] = {
+						["group"] = true,
+						["raid"] = true,
+					},
+				},
+				["instance_type"] = {
+					["single"] = 23,
+				},
+				["pvptalent"] = {
+					["multi"] = {
+					},
+				},
+				["race"] = {
+					["multi"] = {
+					},
+				},
+				["role"] = {
+					["multi"] = {
+					},
+				},
+				["size"] = {
+					["multi"] = {
+						["arena"] = true,
+						["flexible"] = true,
+						["fortyman"] = true,
+						["party"] = true,
+						["pvp"] = true,
+						["scenario"] = true,
+						["ten"] = true,
+						["twenty"] = true,
+						["twentyfive"] = true,
+					},
+				},
+				["spec"] = {
+					["multi"] = {
+						true, -- [1]
+					},
+					["single"] = 1,
+				},
+				["spellknown"] = 53563,
+				["talent"] = {
+					["multi"] = {
+						[7] = true,
+						[8] = true,
+					},
+					["single"] = 19,
+				},
+				["talent2"] = {
+					["multi"] = {
+						[20] = true,
+					},
+					["single"] = 20,
+				},
+				["talent3"] = {
+					["multi"] = {
+					},
+				},
+				["use_class"] = true,
+				["use_combat"] = false,
+				["use_encounterid"] = false,
+				["use_instance_type"] = true,
+				["use_never"] = false,
+				["use_size"] = false,
+				["use_spec"] = false,
+				["use_spellknown"] = false,
+				["use_talent"] = false,
+				["use_zoneId"] = false,
+				["use_zonegroupId"] = true,
+				["zoneId"] = "1666, 1667, 1668",
+				["zonegroupId"] = "413, 409, 415, 412, 419, 414, 415",
+			},
+			["parent"] = "Ellesmere's Dungeon Essentials",
+			["preferToUpdate"] = false,
+			["regionType"] = "icon",
+			["selfPoint"] = "CENTER",
+			["semver"] = "1.0.4",
+			["stickyDuration"] = false,
+			["subRegions"] = {
+				{
+					["glow"] = true,
+					["glowBorder"] = false,
+					["glowColor"] = {
+						1, -- [1]
+						1, -- [2]
+						1, -- [3]
+						1, -- [4]
+					},
+					["glowFrequency"] = 0.25,
+					["glowLength"] = 10,
+					["glowLines"] = 8,
+					["glowScale"] = 1,
+					["glowThickness"] = 1,
+					["glowType"] = "buttonOverlay",
+					["glowXOffset"] = 0,
+					["glowYOffset"] = 0,
+					["type"] = "subglow",
+					["useGlowColor"] = false,
+				}, -- [1]
+			},
+			["tocversion"] = 90002,
+			["triggers"] = {
+				[1] = {
+					["trigger"] = {
+						["auranames"] = {
+							"Beacon of Light", -- [1]
+						},
+						["auraspellids"] = {
+							"53563", -- [1]
+						},
+						["buffShowOn"] = "showOnActive",
+						["combineMatches"] = "showLowest",
+						["custom_hide"] = "timed",
+						["debuffType"] = "HELPFUL",
+						["duration"] = "1",
+						["event"] = "Talent Known",
+						["genericShowOn"] = "showOnCooldown",
+						["group_count"] = "0",
+						["group_countOperator"] = "==",
+						["ignoreDead"] = false,
+						["inverse"] = true,
+						["name"] = "Greater Blessing of Wisdom",
+						["names"] = {
+							"Beacon of Light", -- [1]
+						},
+						["ownOnly"] = true,
+						["realSpellName"] = 0,
+						["spellId"] = "203539",
+						["spellIds"] = {
+						},
+						["spellName"] = 0,
+						["subeventPrefix"] = "SPELL",
+						["subeventSuffix"] = "_CAST_START",
+						["talent"] = {
+							["single"] = 9,
+						},
+						["type"] = "status",
+						["unevent"] = "auto",
+						["unit"] = "group",
+						["useAffected"] = true,
+						["useExactSpellId"] = true,
+						["useGroup_count"] = true,
+						["useName"] = false,
+						["use_debuffClass"] = false,
+						["use_genericShowOn"] = true,
+						["use_inverse"] = true,
+						["use_specific_unit"] = false,
+						["use_spellId"] = true,
+						["use_spellName"] = true,
+						["use_talent"] = true,
+						["use_tooltip"] = false,
+						["use_track"] = true,
+						["use_unit"] = true,
+					},
+					["untrigger"] = {
+					},
+				},
+				["activeTriggerMode"] = -10,
+				["disjunctive"] = "all",
+			},
+			["uid"] = "1ePm4dV(vOc",
+			["url"] = "https://wago.io/uYX5mP3U5/5",
+			["version"] = 5,
+			["width"] = 80,
+			["xOffset"] = -15,
+			["yOffset"] = 90,
+			["zoom"] = 0,
+		},
+		["EDE [PF] Belch Plague"] = {
+			["actions"] = {
+				["finish"] = {
+					["do_sound"] = false,
+				},
+				["init"] = {
+				},
+				["start"] = {
+					["do_sound"] = true,
+					["sound"] = "Interface\\Addons\\Details\\sounds\\sound_gun2.ogg",
+				},
+			},
+			["alpha"] = 1,
+			["anchorFrameType"] = "SCREEN",
+			["anchorPoint"] = "CENTER",
+			["animation"] = {
+				["finish"] = {
+					["duration_type"] = "seconds",
+					["easeStrength"] = 3,
+					["easeType"] = "none",
+					["type"] = "none",
+				},
+				["main"] = {
+					["duration_type"] = "seconds",
+					["easeStrength"] = 3,
+					["easeType"] = "none",
+					["type"] = "none",
+				},
+				["start"] = {
+					["duration_type"] = "seconds",
+					["easeStrength"] = 3,
+					["easeType"] = "none",
+					["type"] = "none",
+				},
+			},
+			["authorOptions"] = {
+			},
+			["auto"] = false,
+			["color"] = {
+				1, -- [1]
+				1, -- [2]
+				1, -- [3]
+				1, -- [4]
+			},
+			["conditions"] = {
+			},
+			["config"] = {
+			},
+			["cooldown"] = true,
+			["cooldownEdge"] = false,
+			["cooldownSwipe"] = true,
+			["cooldownTextDisabled"] = false,
+			["customText"] = "",
+			["desaturate"] = false,
+			["displayIcon"] = "132108",
+			["frameStrata"] = 1,
+			["height"] = 1,
+			["icon"] = true,
+			["iconSource"] = 0,
+			["id"] = "EDE [PF] Belch Plague",
+			["information"] = {
+				["ignoreOptionsEventErrors"] = true,
+			},
+			["internalVersion"] = 40,
+			["inverse"] = false,
+			["keepAspectRatio"] = false,
+			["load"] = {
+				["class"] = {
+					["multi"] = {
+					},
+				},
+				["size"] = {
+					["multi"] = {
+						["party"] = true,
+					},
+					["single"] = "party",
+				},
+				["spec"] = {
+					["multi"] = {
+					},
+				},
+				["talent"] = {
+					["multi"] = {
+					},
+				},
+				["use_size"] = true,
+				["use_zoneId"] = false,
+				["use_zonegroupId"] = false,
+				["zonegroupId"] = "415",
+			},
+			["parent"] = "Ellesmere's Dungeon Essentials",
+			["preferToUpdate"] = false,
+			["regionType"] = "icon",
+			["selfPoint"] = "CENTER",
+			["semver"] = "1.0.4",
+			["subRegions"] = {
+			},
+			["tocversion"] = 90002,
+			["triggers"] = {
+				[1] = {
+					["trigger"] = {
+						["auraspellids"] = {
+						},
+						["debuffType"] = "HARMFUL",
+						["duration"] = "5",
+						["event"] = "Cast",
+						["genericShowOn"] = "showOnCooldown",
+						["names"] = {
+						},
+						["realSpellName"] = 0,
+						["spellId"] = 327233,
+						["spellIds"] = {
+						},
+						["spellName"] = 0,
+						["subeventPrefix"] = "SPELL",
+						["subeventSuffix"] = "_CAST_START",
+						["type"] = "status",
+						["unevent"] = "auto",
+						["unit"] = "nameplate",
+						["use_absorbMode"] = true,
+						["use_cloneId"] = true,
+						["use_genericShowOn"] = true,
+						["use_spellId"] = true,
+						["use_spellName"] = true,
+						["use_track"] = true,
+						["use_unit"] = true,
+					},
+					["untrigger"] = {
+						["unit"] = "nameplate",
+					},
+				},
+				["activeTriggerMode"] = -10,
+				["disjunctive"] = "any",
+			},
+			["uid"] = "jSoO8VxYfO0",
+			["url"] = "https://wago.io/uYX5mP3U5/5",
+			["version"] = 5,
+			["width"] = 1,
+			["xOffset"] = -3000,
+			["yOffset"] = 0,
+			["zoom"] = 0.3,
+		},
+		["EDE [PF] Festering Belch"] = {
+			["actions"] = {
+				["finish"] = {
+				},
+				["init"] = {
+				},
+				["start"] = {
+					["do_sound"] = true,
+					["sound"] = "Interface\\Addons\\Details\\sounds\\sound_gun2.ogg",
+				},
+			},
+			["alpha"] = 1,
+			["anchorFrameType"] = "SCREEN",
+			["anchorPoint"] = "CENTER",
+			["animation"] = {
+				["finish"] = {
+					["duration_type"] = "seconds",
+					["easeStrength"] = 3,
+					["easeType"] = "none",
+					["type"] = "none",
+				},
+				["main"] = {
+					["duration_type"] = "seconds",
+					["easeStrength"] = 3,
+					["easeType"] = "none",
+					["type"] = "none",
+				},
+				["start"] = {
+					["duration_type"] = "seconds",
+					["easeStrength"] = 3,
+					["easeType"] = "none",
+					["type"] = "none",
+				},
+			},
+			["authorOptions"] = {
+			},
+			["auto"] = true,
+			["backgroundColor"] = {
+				0, -- [1]
+				0, -- [2]
+				0, -- [3]
+				0.5, -- [4]
+			},
+			["barColor"] = {
+				1, -- [1]
+				0, -- [2]
+				0, -- [3]
+				1, -- [4]
+			},
+			["color"] = {
+				1, -- [1]
+				1, -- [2]
+				1, -- [3]
+				1, -- [4]
+			},
+			["conditions"] = {
+			},
+			["config"] = {
+			},
+			["cooldown"] = true,
+			["cooldownEdge"] = false,
+			["cooldownSwipe"] = true,
+			["cooldownTextDisabled"] = false,
+			["customText"] = "function()\n    if aura_env.state and aura_env.state.destName then\n    return WA_ClassColorName(aura_env.state.destName)    \n    end\nend",
+			["desaturate"] = false,
+			["displayIcon"] = "134437",
+			["frameStrata"] = 1,
+			["height"] = 1,
+			["icon"] = true,
+			["iconSource"] = -1,
+			["icon_color"] = {
+				1, -- [1]
+				1, -- [2]
+				1, -- [3]
+				1, -- [4]
+			},
+			["icon_side"] = "RIGHT",
+			["id"] = "EDE [PF] Festering Belch",
+			["information"] = {
+				["ignoreOptionsEventErrors"] = true,
+			},
+			["internalVersion"] = 40,
+			["inverse"] = false,
+			["keepAspectRatio"] = false,
+			["load"] = {
+				["class"] = {
+					["multi"] = {
+					},
+				},
+				["size"] = {
+					["multi"] = {
+					},
+				},
+				["spec"] = {
+					["multi"] = {
+					},
+				},
+				["talent"] = {
+					["multi"] = {
+					},
+				},
+				["use_zoneId"] = false,
+				["use_zonegroupId"] = true,
+				["zonegroupId"] = "415",
+			},
+			["orientation"] = "HORIZONTAL",
+			["parent"] = "Ellesmere's Dungeon Essentials",
+			["preferToUpdate"] = false,
+			["regionType"] = "icon",
+			["selfPoint"] = "CENTER",
+			["semver"] = "1.0.4",
+			["spark"] = false,
+			["sparkBlendMode"] = "ADD",
+			["sparkColor"] = {
+				1, -- [1]
+				1, -- [2]
+				1, -- [3]
+				1, -- [4]
+			},
+			["sparkHeight"] = 30,
+			["sparkHidden"] = "NEVER",
+			["sparkOffsetX"] = 0,
+			["sparkOffsetY"] = 0,
+			["sparkRotation"] = 0,
+			["sparkRotationMode"] = "AUTO",
+			["sparkTexture"] = "Interface\\CastingBar\\UI-CastingBar-Spark",
+			["sparkWidth"] = 10,
+			["subRegions"] = {
+			},
+			["texture"] = "Blizzard",
+			["tocversion"] = 90002,
+			["triggers"] = {
+				[1] = {
+					["trigger"] = {
+						["auraspellids"] = {
+						},
+						["debuffType"] = "HARMFUL",
+						["duration"] = "1",
+						["event"] = "Cast",
+						["names"] = {
+						},
+						["spellId"] = 318949,
+						["spellIds"] = {
+						},
+						["subeventPrefix"] = "SPELL",
+						["subeventSuffix"] = "_CAST_START",
+						["type"] = "status",
+						["unevent"] = "auto",
+						["unit"] = "nameplate",
+						["use_absorbMode"] = true,
+						["use_spellId"] = true,
+						["use_unit"] = true,
+					},
+					["untrigger"] = {
+						["unit"] = "nameplate",
+					},
+				},
+				["activeTriggerMode"] = -10,
+				["customTriggerLogic"] = "function(t)\nreturn t[1]\nend",
+				["disjunctive"] = "any",
+			},
+			["uid"] = "TYAZN)BAw(e",
+			["url"] = "https://wago.io/uYX5mP3U5/5",
+			["useAdjustededMax"] = false,
+			["useAdjustededMin"] = false,
+			["useTooltip"] = false,
+			["version"] = 5,
+			["width"] = 1,
+			["xOffset"] = -3000,
+			["yOffset"] = 0,
+			["zoom"] = 0,
+		},
+		["EDE [SD] Echoing Thrust"] = {
+			["actions"] = {
+				["finish"] = {
+					["do_sound"] = false,
+				},
+				["init"] = {
+				},
+				["start"] = {
+					["do_sound"] = true,
+					["sound"] = "Interface\\Addons\\Details\\sounds\\sound_gun2.ogg",
+				},
+			},
+			["alpha"] = 1,
+			["anchorFrameType"] = "SCREEN",
+			["anchorPoint"] = "CENTER",
+			["animation"] = {
+				["finish"] = {
+					["duration_type"] = "seconds",
+					["easeStrength"] = 3,
+					["easeType"] = "none",
+					["type"] = "none",
+				},
+				["main"] = {
+					["duration_type"] = "seconds",
+					["easeStrength"] = 3,
+					["easeType"] = "none",
+					["type"] = "none",
+				},
+				["start"] = {
+					["duration_type"] = "seconds",
+					["easeStrength"] = 3,
+					["easeType"] = "none",
+					["type"] = "none",
+				},
+			},
+			["authorOptions"] = {
+			},
+			["auto"] = true,
+			["backgroundColor"] = {
+				0, -- [1]
+				0, -- [2]
+				0, -- [3]
+				0.5, -- [4]
+			},
+			["barColor"] = {
+				1, -- [1]
+				0, -- [2]
+				0, -- [3]
+				1, -- [4]
+			},
+			["color"] = {
+				1, -- [1]
+				1, -- [2]
+				1, -- [3]
+				1, -- [4]
+			},
+			["conditions"] = {
+			},
+			["config"] = {
+			},
+			["cooldown"] = true,
+			["cooldownEdge"] = false,
+			["cooldownSwipe"] = true,
+			["cooldownTextDisabled"] = false,
+			["desaturate"] = false,
+			["displayIcon"] = "3259845",
+			["frameStrata"] = 1,
+			["height"] = 1,
+			["icon"] = true,
+			["iconSource"] = -1,
+			["icon_color"] = {
+				1, -- [1]
+				1, -- [2]
+				1, -- [3]
+				1, -- [4]
+			},
+			["icon_side"] = "RIGHT",
+			["id"] = "EDE [SD] Echoing Thrust",
+			["information"] = {
+				["ignoreOptionsEventErrors"] = true,
+			},
+			["internalVersion"] = 40,
+			["inverse"] = false,
+			["keepAspectRatio"] = false,
+			["load"] = {
+				["class"] = {
+					["multi"] = {
+					},
+				},
+				["role"] = {
+					["multi"] = {
+						["TANK"] = true,
+					},
+					["single"] = "TANK",
+				},
+				["size"] = {
+					["multi"] = {
+						["party"] = true,
+					},
+					["single"] = "party",
+				},
+				["spec"] = {
+					["multi"] = {
+					},
+				},
+				["talent"] = {
+					["multi"] = {
+					},
+				},
+				["use_size"] = true,
+				["use_zoneId"] = false,
+				["use_zonegroupId"] = false,
+				["zonegroupId"] = "412",
+			},
+			["orientation"] = "HORIZONTAL",
+			["parent"] = "Ellesmere's Dungeon Essentials",
+			["preferToUpdate"] = false,
+			["regionType"] = "icon",
+			["selfPoint"] = "CENTER",
+			["semver"] = "1.0.4",
+			["spark"] = false,
+			["sparkBlendMode"] = "ADD",
+			["sparkColor"] = {
+				1, -- [1]
+				1, -- [2]
+				1, -- [3]
+				1, -- [4]
+			},
+			["sparkHeight"] = 30,
+			["sparkHidden"] = "NEVER",
+			["sparkOffsetX"] = 0,
+			["sparkOffsetY"] = 0,
+			["sparkRotation"] = 0,
+			["sparkRotationMode"] = "AUTO",
+			["sparkTexture"] = "Interface\\CastingBar\\UI-CastingBar-Spark",
+			["sparkWidth"] = 10,
+			["subRegions"] = {
+			},
+			["texture"] = "Blizzard",
+			["tocversion"] = 90002,
+			["triggers"] = {
+				[1] = {
+					["trigger"] = {
+						["auranames"] = {
+							"", -- [1]
+						},
+						["buffShowOn"] = "showOnActive",
+						["debuffType"] = "HARMFUL",
+						["destUnit"] = "player",
+						["duration"] = "5",
+						["event"] = "Cast",
+						["names"] = {
+						},
+						["npcId"] = "165318",
+						["percentpower"] = "90",
+						["percentpower_operator"] = ">",
+						["spellId"] = 320991,
+						["spellIds"] = {
+						},
+						["subeventPrefix"] = "SPELL",
+						["subeventSuffix"] = "_CAST_SUCCESS",
+						["type"] = "status",
+						["unevent"] = "auto",
+						["unit"] = "nameplate",
+						["useName"] = true,
+						["use_absorbMode"] = true,
+						["use_cloneId"] = true,
+						["use_destUnit"] = false,
+						["use_npcId"] = false,
+						["use_percentpower"] = true,
+						["use_powertype"] = false,
+						["use_sourceUnit"] = true,
+						["use_spellId"] = true,
+						["use_unit"] = true,
+					},
+					["untrigger"] = {
+						["unit"] = "nameplate",
+					},
+				},
+				["activeTriggerMode"] = -10,
+			},
+			["uid"] = "gUk85eBA88J",
+			["url"] = "https://wago.io/uYX5mP3U5/5",
+			["useAdjustededMax"] = false,
+			["useAdjustededMin"] = false,
+			["useTooltip"] = false,
+			["version"] = 5,
+			["width"] = 1,
+			["xOffset"] = -3000,
+			["yOffset"] = 0,
+			["zoom"] = 0,
+		},
+		["EDE [SD] Growing Mistrust"] = {
+			["actions"] = {
+				["finish"] = {
+				},
+				["init"] = {
+				},
+				["start"] = {
+					["do_sound"] = true,
+					["sound"] = "Interface\\Addons\\Details\\sounds\\sound_gun2.ogg",
+				},
+			},
+			["alpha"] = 1,
+			["anchorFrameType"] = "SCREEN",
+			["anchorPoint"] = "CENTER",
+			["animation"] = {
+				["finish"] = {
+					["duration_type"] = "seconds",
+					["easeStrength"] = 3,
+					["easeType"] = "none",
+					["type"] = "none",
+				},
+				["main"] = {
+					["duration_type"] = "seconds",
+					["easeStrength"] = 3,
+					["easeType"] = "none",
+					["type"] = "none",
+				},
+				["start"] = {
+					["duration_type"] = "seconds",
+					["easeStrength"] = 3,
+					["easeType"] = "none",
+					["type"] = "none",
+				},
+			},
+			["authorOptions"] = {
+			},
+			["auto"] = true,
+			["backgroundColor"] = {
+				0, -- [1]
+				0, -- [2]
+				0, -- [3]
+				0.5, -- [4]
+			},
+			["barColor"] = {
+				1, -- [1]
+				0, -- [2]
+				0, -- [3]
+				1, -- [4]
+			},
+			["color"] = {
+				1, -- [1]
+				1, -- [2]
+				1, -- [3]
+				1, -- [4]
+			},
+			["conditions"] = {
+			},
+			["config"] = {
+			},
+			["cooldown"] = true,
+			["cooldownEdge"] = false,
+			["cooldownSwipe"] = true,
+			["cooldownTextDisabled"] = false,
+			["desaturate"] = false,
+			["displayIcon"] = "3528309",
+			["frameStrata"] = 1,
+			["height"] = 1,
+			["icon"] = true,
+			["iconSource"] = 0,
+			["icon_color"] = {
+				1, -- [1]
+				1, -- [2]
+				1, -- [3]
+				1, -- [4]
+			},
+			["icon_side"] = "RIGHT",
+			["id"] = "EDE [SD] Growing Mistrust",
+			["information"] = {
+				["ignoreOptionsEventErrors"] = true,
+			},
+			["internalVersion"] = 40,
+			["inverse"] = false,
+			["keepAspectRatio"] = false,
+			["load"] = {
+				["class"] = {
+					["multi"] = {
+					},
+				},
+				["role"] = {
+					["multi"] = {
+						["TANK"] = true,
+					},
+					["single"] = "TANK",
+				},
+				["size"] = {
+					["multi"] = {
+					},
+				},
+				["spec"] = {
+					["multi"] = {
+					},
+				},
+				["talent"] = {
+					["multi"] = {
+					},
+				},
+				["use_zonegroupId"] = true,
+				["zonegroupId"] = "412",
+			},
+			["orientation"] = "HORIZONTAL",
+			["parent"] = "Ellesmere's Dungeon Essentials",
+			["preferToUpdate"] = false,
+			["regionType"] = "icon",
+			["selfPoint"] = "CENTER",
+			["semver"] = "1.0.4",
+			["spark"] = false,
+			["sparkBlendMode"] = "ADD",
+			["sparkColor"] = {
+				1, -- [1]
+				1, -- [2]
+				1, -- [3]
+				1, -- [4]
+			},
+			["sparkHeight"] = 30,
+			["sparkHidden"] = "NEVER",
+			["sparkOffsetX"] = 0,
+			["sparkOffsetY"] = 0,
+			["sparkRotation"] = 0,
+			["sparkRotationMode"] = "AUTO",
+			["sparkTexture"] = "Interface\\CastingBar\\UI-CastingBar-Spark",
+			["sparkWidth"] = 10,
+			["subRegions"] = {
+			},
+			["texture"] = "Blizzard",
+			["tocversion"] = 90002,
+			["triggers"] = {
+				[1] = {
+					["trigger"] = {
+						["auranames"] = {
+							"", -- [1]
+						},
+						["buffShowOn"] = "showOnActive",
+						["debuffType"] = "HARMFUL",
+						["destUnit"] = "player",
+						["duration"] = "5",
+						["event"] = "Combat Log",
+						["names"] = {
+						},
+						["npcId"] = "165318",
+						["percentpower"] = "90",
+						["percentpower_operator"] = ">",
+						["sourceNpcId"] = "162049",
+						["sourceUnit"] = "player",
+						["spell"] = "Growing Mistrust",
+						["spellId"] = 322169,
+						["spellIds"] = {
+						},
+						["spellName"] = "Growing Mistrust",
+						["subeventPrefix"] = "SPELL",
+						["subeventSuffix"] = "_CAST_SUCCESS",
+						["type"] = "event",
+						["unevent"] = "timed",
+						["unit"] = "nameplate",
+						["useName"] = true,
+						["use_absorbMode"] = true,
+						["use_cloneId"] = false,
+						["use_destUnit"] = false,
+						["use_npcId"] = false,
+						["use_percentpower"] = true,
+						["use_powertype"] = false,
+						["use_sourceNpcId"] = true,
+						["use_sourceUnit"] = false,
+						["use_spell"] = true,
+						["use_spellId"] = false,
+						["use_spellName"] = false,
+						["use_unit"] = true,
+					},
+					["untrigger"] = {
+						["unit"] = "nameplate",
+					},
+				},
+				["activeTriggerMode"] = -10,
+			},
+			["uid"] = "fdE9bSI4Q5L",
+			["url"] = "https://wago.io/uYX5mP3U5/5",
+			["useAdjustededMax"] = false,
+			["useAdjustededMin"] = false,
+			["useTooltip"] = false,
+			["version"] = 5,
+			["width"] = 1,
+			["xOffset"] = -3000,
+			["yOffset"] = 0,
+			["zoom"] = 0,
+		},
+		["EDE [SD] Severing Slice"] = {
+			["actions"] = {
+				["finish"] = {
+				},
+				["init"] = {
+				},
+				["start"] = {
+					["do_sound"] = true,
+					["sound"] = "Interface\\Addons\\Details\\sounds\\sound_gun2.ogg",
+				},
+			},
+			["alpha"] = 1,
+			["anchorFrameType"] = "SCREEN",
+			["anchorPoint"] = "CENTER",
+			["animation"] = {
+				["finish"] = {
+					["duration_type"] = "seconds",
+					["easeStrength"] = 3,
+					["easeType"] = "none",
+					["type"] = "none",
+				},
+				["main"] = {
+					["duration_type"] = "seconds",
+					["easeStrength"] = 3,
+					["easeType"] = "none",
+					["type"] = "none",
+				},
+				["start"] = {
+					["duration_type"] = "seconds",
+					["easeStrength"] = 3,
+					["easeType"] = "none",
+					["type"] = "none",
+				},
+			},
+			["authorOptions"] = {
+			},
+			["auto"] = true,
+			["backgroundColor"] = {
+				0, -- [1]
+				0, -- [2]
+				0, -- [3]
+				0.5, -- [4]
+			},
+			["barColor"] = {
+				1, -- [1]
+				0, -- [2]
+				0, -- [3]
+				1, -- [4]
+			},
+			["color"] = {
+				1, -- [1]
+				1, -- [2]
+				1, -- [3]
+				1, -- [4]
+			},
+			["conditions"] = {
+			},
+			["config"] = {
+			},
+			["cooldown"] = true,
+			["cooldownEdge"] = false,
+			["cooldownSwipe"] = true,
+			["cooldownTextDisabled"] = false,
+			["desaturate"] = false,
+			["displayIcon"] = "1476626",
+			["frameStrata"] = 1,
+			["height"] = 1,
+			["icon"] = true,
+			["iconSource"] = -1,
+			["icon_color"] = {
+				1, -- [1]
+				1, -- [2]
+				1, -- [3]
+				1, -- [4]
+			},
+			["icon_side"] = "RIGHT",
+			["id"] = "EDE [SD] Severing Slice",
+			["information"] = {
+				["ignoreOptionsEventErrors"] = true,
+			},
+			["internalVersion"] = 40,
+			["inverse"] = false,
+			["keepAspectRatio"] = false,
+			["load"] = {
+				["class"] = {
+					["multi"] = {
+					},
+				},
+				["role"] = {
+					["multi"] = {
+						["TANK"] = true,
+					},
+					["single"] = "TANK",
+				},
+				["size"] = {
+					["multi"] = {
+					},
+				},
+				["spec"] = {
+					["multi"] = {
+					},
+				},
+				["talent"] = {
+					["multi"] = {
+					},
+				},
+				["use_zonegroupId"] = true,
+				["zonegroupId"] = "412",
+			},
+			["orientation"] = "HORIZONTAL",
+			["parent"] = "Ellesmere's Dungeon Essentials",
+			["preferToUpdate"] = false,
+			["regionType"] = "icon",
+			["selfPoint"] = "CENTER",
+			["semver"] = "1.0.4",
+			["spark"] = false,
+			["sparkBlendMode"] = "ADD",
+			["sparkColor"] = {
+				1, -- [1]
+				1, -- [2]
+				1, -- [3]
+				1, -- [4]
+			},
+			["sparkHeight"] = 30,
+			["sparkHidden"] = "NEVER",
+			["sparkOffsetX"] = 0,
+			["sparkOffsetY"] = 0,
+			["sparkRotation"] = 0,
+			["sparkRotationMode"] = "AUTO",
+			["sparkTexture"] = "Interface\\CastingBar\\UI-CastingBar-Spark",
+			["sparkWidth"] = 10,
+			["subRegions"] = {
+			},
+			["texture"] = "Blizzard",
+			["tocversion"] = 90002,
+			["triggers"] = {
+				[1] = {
+					["trigger"] = {
+						["auranames"] = {
+							"", -- [1]
+						},
+						["buffShowOn"] = "showOnActive",
+						["debuffType"] = "HARMFUL",
+						["destUnit"] = "player",
+						["duration"] = "5",
+						["event"] = "Cast",
+						["names"] = {
+						},
+						["npcId"] = "165318",
+						["percentpower"] = "90",
+						["percentpower_operator"] = ">",
+						["spellId"] = 322429,
+						["spellIds"] = {
+						},
+						["subeventPrefix"] = "SPELL",
+						["subeventSuffix"] = "_CAST_SUCCESS",
+						["type"] = "status",
+						["unevent"] = "auto",
+						["unit"] = "nameplate",
+						["useName"] = true,
+						["use_absorbMode"] = true,
+						["use_cloneId"] = true,
+						["use_destUnit"] = false,
+						["use_npcId"] = false,
+						["use_percentpower"] = true,
+						["use_powertype"] = false,
+						["use_sourceUnit"] = true,
+						["use_spellId"] = true,
+						["use_unit"] = true,
+					},
+					["untrigger"] = {
+						["unit"] = "nameplate",
+					},
+				},
+				["activeTriggerMode"] = -10,
+			},
+			["uid"] = "TwCn5rllTb3",
+			["url"] = "https://wago.io/uYX5mP3U5/5",
+			["useAdjustededMax"] = false,
+			["useAdjustededMin"] = false,
+			["useTooltip"] = false,
+			["version"] = 5,
+			["width"] = 1,
+			["xOffset"] = -3000,
+			["yOffset"] = 0,
+			["zoom"] = 0,
+		},
+		["EDE [SD] Sweeping Slash"] = {
+			["actions"] = {
+				["finish"] = {
+				},
+				["init"] = {
+				},
+				["start"] = {
+					["do_sound"] = true,
+					["sound"] = "Interface\\Addons\\Details\\sounds\\sound_gun2.ogg",
+				},
+			},
+			["alpha"] = 1,
+			["anchorFrameType"] = "SCREEN",
+			["anchorPoint"] = "CENTER",
+			["animation"] = {
+				["finish"] = {
+					["duration_type"] = "seconds",
+					["easeStrength"] = 3,
+					["easeType"] = "none",
+					["type"] = "none",
+				},
+				["main"] = {
+					["duration_type"] = "seconds",
+					["easeStrength"] = 3,
+					["easeType"] = "none",
+					["type"] = "none",
+				},
+				["start"] = {
+					["duration_type"] = "seconds",
+					["easeStrength"] = 3,
+					["easeType"] = "none",
+					["type"] = "none",
+				},
+			},
+			["authorOptions"] = {
+			},
+			["auto"] = true,
+			["backgroundColor"] = {
+				0, -- [1]
+				0, -- [2]
+				0, -- [3]
+				0.5, -- [4]
+			},
+			["barColor"] = {
+				1, -- [1]
+				0, -- [2]
+				0, -- [3]
+				1, -- [4]
+			},
+			["color"] = {
+				1, -- [1]
+				1, -- [2]
+				1, -- [3]
+				1, -- [4]
+			},
+			["conditions"] = {
+			},
+			["config"] = {
+			},
+			["cooldown"] = true,
+			["cooldownEdge"] = false,
+			["cooldownSwipe"] = true,
+			["cooldownTextDisabled"] = false,
+			["desaturate"] = false,
+			["displayIcon"] = "463521",
+			["frameStrata"] = 1,
+			["height"] = 1,
+			["icon"] = true,
+			["iconSource"] = -1,
+			["icon_color"] = {
+				1, -- [1]
+				1, -- [2]
+				1, -- [3]
+				1, -- [4]
+			},
+			["icon_side"] = "RIGHT",
+			["id"] = "EDE [SD] Sweeping Slash",
+			["information"] = {
+				["ignoreOptionsEventErrors"] = true,
+			},
+			["internalVersion"] = 40,
+			["inverse"] = false,
+			["keepAspectRatio"] = false,
+			["load"] = {
+				["class"] = {
+					["multi"] = {
+					},
+				},
+				["role"] = {
+					["multi"] = {
+						["TANK"] = true,
+					},
+					["single"] = "TANK",
+				},
+				["size"] = {
+					["multi"] = {
+					},
+				},
+				["spec"] = {
+					["multi"] = {
+					},
+				},
+				["talent"] = {
+					["multi"] = {
+					},
+				},
+				["use_zonegroupId"] = true,
+				["zonegroupId"] = "412",
+			},
+			["orientation"] = "HORIZONTAL",
+			["parent"] = "Ellesmere's Dungeon Essentials",
+			["preferToUpdate"] = false,
+			["regionType"] = "icon",
+			["selfPoint"] = "CENTER",
+			["semver"] = "1.0.4",
+			["spark"] = false,
+			["sparkBlendMode"] = "ADD",
+			["sparkColor"] = {
+				1, -- [1]
+				1, -- [2]
+				1, -- [3]
+				1, -- [4]
+			},
+			["sparkHeight"] = 30,
+			["sparkHidden"] = "NEVER",
+			["sparkOffsetX"] = 0,
+			["sparkOffsetY"] = 0,
+			["sparkRotation"] = 0,
+			["sparkRotationMode"] = "AUTO",
+			["sparkTexture"] = "Interface\\CastingBar\\UI-CastingBar-Spark",
+			["sparkWidth"] = 10,
+			["subRegions"] = {
+			},
+			["texture"] = "Blizzard",
+			["tocversion"] = 90002,
+			["triggers"] = {
+				[1] = {
+					["trigger"] = {
+						["auranames"] = {
+							"", -- [1]
+						},
+						["buffShowOn"] = "showOnActive",
+						["debuffType"] = "HARMFUL",
+						["destUnit"] = "player",
+						["duration"] = "5",
+						["event"] = "Cast",
+						["names"] = {
+						},
+						["npcId"] = "165318",
+						["percentpower"] = "90",
+						["percentpower_operator"] = ">",
+						["spellId"] = 334329,
+						["spellIds"] = {
+						},
+						["subeventPrefix"] = "SPELL",
+						["subeventSuffix"] = "_CAST_SUCCESS",
+						["type"] = "status",
+						["unevent"] = "auto",
+						["unit"] = "nameplate",
+						["useName"] = true,
+						["use_absorbMode"] = true,
+						["use_cloneId"] = true,
+						["use_destUnit"] = false,
+						["use_npcId"] = false,
+						["use_percentpower"] = true,
+						["use_powertype"] = false,
+						["use_sourceUnit"] = true,
+						["use_spellId"] = true,
+						["use_unit"] = true,
+					},
+					["untrigger"] = {
+						["unit"] = "nameplate",
+					},
+				},
+				["activeTriggerMode"] = -10,
+			},
+			["uid"] = "R1UDDXjbxNU",
+			["url"] = "https://wago.io/uYX5mP3U5/5",
+			["useAdjustededMax"] = false,
+			["useAdjustededMin"] = false,
+			["useTooltip"] = false,
+			["version"] = 5,
+			["width"] = 1,
+			["xOffset"] = -3000,
+			["yOffset"] = 0,
+			["zoom"] = 0,
+		},
+		["EDE [SOA] Run Through"] = {
+			["actions"] = {
+				["finish"] = {
+				},
+				["init"] = {
+				},
+				["start"] = {
+					["do_sound"] = true,
+					["sound"] = "Interface\\Addons\\Details\\sounds\\sound_gun2.ogg",
+				},
+			},
+			["alpha"] = 1,
+			["anchorFrameType"] = "SCREEN",
+			["anchorPoint"] = "CENTER",
+			["animation"] = {
+				["finish"] = {
+					["duration_type"] = "seconds",
+					["easeStrength"] = 3,
+					["easeType"] = "none",
+					["type"] = "none",
+				},
+				["main"] = {
+					["duration_type"] = "seconds",
+					["easeStrength"] = 3,
+					["easeType"] = "none",
+					["type"] = "none",
+				},
+				["start"] = {
+					["duration_type"] = "seconds",
+					["easeStrength"] = 3,
+					["easeType"] = "none",
+					["type"] = "none",
+				},
+			},
+			["authorOptions"] = {
+			},
+			["auto"] = false,
+			["backgroundColor"] = {
+				0, -- [1]
+				0, -- [2]
+				0, -- [3]
+				0.5, -- [4]
+			},
+			["barColor"] = {
+				1, -- [1]
+				0, -- [2]
+				0, -- [3]
+				1, -- [4]
+			},
+			["color"] = {
+				1, -- [1]
+				1, -- [2]
+				1, -- [3]
+				1, -- [4]
+			},
+			["conditions"] = {
+			},
+			["config"] = {
+			},
+			["cooldown"] = true,
+			["cooldownEdge"] = false,
+			["cooldownSwipe"] = true,
+			["cooldownTextDisabled"] = false,
+			["desaturate"] = false,
+			["displayIcon"] = "132337",
+			["frameStrata"] = 1,
+			["height"] = 1,
+			["icon"] = true,
+			["iconSource"] = 0,
+			["icon_color"] = {
+				1, -- [1]
+				1, -- [2]
+				1, -- [3]
+				1, -- [4]
+			},
+			["icon_side"] = "RIGHT",
+			["id"] = "EDE [SOA] Run Through",
+			["information"] = {
+				["ignoreOptionsEventErrors"] = true,
+			},
+			["internalVersion"] = 40,
+			["inverse"] = false,
+			["keepAspectRatio"] = false,
+			["load"] = {
+				["class"] = {
+					["multi"] = {
+					},
+				},
+				["role"] = {
+					["multi"] = {
+						["TANK"] = true,
+					},
+					["single"] = "TANK",
+				},
+				["size"] = {
+					["multi"] = {
+					},
+				},
+				["spec"] = {
+					["multi"] = {
+					},
+				},
+				["talent"] = {
+					["multi"] = {
+					},
+				},
+				["use_zonegroupId"] = true,
+				["zonegroupId"] = "419",
+			},
+			["orientation"] = "HORIZONTAL",
+			["parent"] = "Ellesmere's Dungeon Essentials",
+			["preferToUpdate"] = false,
+			["regionType"] = "icon",
+			["selfPoint"] = "CENTER",
+			["semver"] = "1.0.4",
+			["spark"] = false,
+			["sparkBlendMode"] = "ADD",
+			["sparkColor"] = {
+				1, -- [1]
+				1, -- [2]
+				1, -- [3]
+				1, -- [4]
+			},
+			["sparkHeight"] = 30,
+			["sparkHidden"] = "NEVER",
+			["sparkOffsetX"] = 0,
+			["sparkOffsetY"] = 0,
+			["sparkRotation"] = 0,
+			["sparkRotationMode"] = "AUTO",
+			["sparkTexture"] = "Interface\\CastingBar\\UI-CastingBar-Spark",
+			["sparkWidth"] = 10,
+			["subRegions"] = {
+			},
+			["texture"] = "Blizzard",
+			["tocversion"] = 90002,
+			["triggers"] = {
+				[1] = {
+					["trigger"] = {
+						["auranames"] = {
+							"323943", -- [1]
+						},
+						["debuffType"] = "HARMFUL",
+						["destUnit"] = "player",
+						["duration"] = "2",
+						["event"] = "Cast",
+						["genericShowOn"] = "showOnCooldown",
+						["names"] = {
+						},
+						["realSpellName"] = "323943",
+						["spellId"] = 323943,
+						["spellIds"] = {
+						},
+						["spellName"] = "323943",
+						["subeventPrefix"] = "SPELL",
+						["subeventSuffix"] = "_CAST_START",
+						["type"] = "status",
+						["unevent"] = "auto",
+						["unit"] = "boss",
+						["useName"] = true,
+						["use_absorbMode"] = true,
+						["use_destUnit"] = false,
+						["use_genericShowOn"] = true,
+						["use_spellId"] = true,
+						["use_spellName"] = true,
+						["use_track"] = true,
+						["use_unit"] = true,
+					},
+					["untrigger"] = {
+						["unit"] = "boss",
+					},
+				},
+				["activeTriggerMode"] = -10,
+			},
+			["uid"] = "qADD0kZB8Zh",
+			["url"] = "https://wago.io/uYX5mP3U5/5",
+			["useAdjustededMax"] = false,
+			["useAdjustededMin"] = false,
+			["useTooltip"] = false,
+			["version"] = 5,
+			["width"] = 1,
+			["xOffset"] = -3000,
+			["yOffset"] = 0,
+			["zoom"] = 0,
+		},
+		["EDE [TOP] Death Winds"] = {
+			["actions"] = {
+				["finish"] = {
+					["do_sound"] = false,
+				},
+				["init"] = {
+				},
+				["start"] = {
+					["do_sound"] = true,
+					["sound"] = "Interface\\Addons\\Details\\sounds\\sound_gun2.ogg",
+					["sound_channel"] = "SFX",
+				},
+			},
+			["alpha"] = 1,
+			["anchorFrameType"] = "SCREEN",
+			["anchorPoint"] = "CENTER",
+			["animation"] = {
+				["finish"] = {
+					["duration_type"] = "seconds",
+					["easeStrength"] = 3,
+					["easeType"] = "none",
+					["type"] = "none",
+				},
+				["main"] = {
+					["duration_type"] = "seconds",
+					["easeStrength"] = 3,
+					["easeType"] = "none",
+					["type"] = "none",
+				},
+				["start"] = {
+					["duration_type"] = "seconds",
+					["easeStrength"] = 3,
+					["easeType"] = "none",
+					["type"] = "none",
+				},
+			},
+			["authorOptions"] = {
+			},
+			["auto"] = false,
+			["backgroundColor"] = {
+				0, -- [1]
+				0, -- [2]
+				0, -- [3]
+				0.5, -- [4]
+			},
+			["barColor"] = {
+				1, -- [1]
+				0, -- [2]
+				0, -- [3]
+				1, -- [4]
+			},
+			["color"] = {
+				1, -- [1]
+				1, -- [2]
+				1, -- [3]
+				1, -- [4]
+			},
+			["conditions"] = {
+			},
+			["config"] = {
+			},
+			["cooldown"] = true,
+			["cooldownEdge"] = false,
+			["cooldownSwipe"] = true,
+			["cooldownTextDisabled"] = false,
+			["desaturate"] = false,
+			["displayIcon"] = "3528295",
+			["frameStrata"] = 1,
+			["height"] = 1,
+			["icon"] = true,
+			["iconSource"] = -1,
+			["icon_color"] = {
+				1, -- [1]
+				1, -- [2]
+				1, -- [3]
+				1, -- [4]
+			},
+			["icon_side"] = "RIGHT",
+			["id"] = "EDE [TOP] Death Winds",
+			["information"] = {
+				["ignoreOptionsEventErrors"] = true,
+			},
+			["internalVersion"] = 40,
+			["inverse"] = false,
+			["keepAspectRatio"] = false,
+			["load"] = {
+				["class"] = {
+					["multi"] = {
+					},
+				},
+				["role"] = {
+					["multi"] = {
+						["TANK"] = true,
+					},
+					["single"] = "TANK",
+				},
+				["size"] = {
+					["multi"] = {
+						["party"] = true,
+					},
+					["single"] = "party",
+				},
+				["spec"] = {
+					["multi"] = {
+					},
+				},
+				["talent"] = {
+					["multi"] = {
+					},
+				},
+				["use_size"] = true,
+				["use_zoneId"] = false,
+				["use_zonegroupId"] = false,
+				["zonegroupId"] = "414",
+			},
+			["orientation"] = "HORIZONTAL",
+			["parent"] = "Ellesmere's Dungeon Essentials",
+			["preferToUpdate"] = false,
+			["regionType"] = "icon",
+			["selfPoint"] = "CENTER",
+			["semver"] = "1.0.4",
+			["spark"] = false,
+			["sparkBlendMode"] = "ADD",
+			["sparkColor"] = {
+				1, -- [1]
+				1, -- [2]
+				1, -- [3]
+				1, -- [4]
+			},
+			["sparkHeight"] = 30,
+			["sparkHidden"] = "NEVER",
+			["sparkOffsetX"] = 0,
+			["sparkOffsetY"] = 0,
+			["sparkRotation"] = 0,
+			["sparkRotationMode"] = "AUTO",
+			["sparkTexture"] = "Interface\\CastingBar\\UI-CastingBar-Spark",
+			["sparkWidth"] = 10,
+			["subRegions"] = {
+			},
+			["texture"] = "Blizzard",
+			["tocversion"] = 90002,
+			["triggers"] = {
+				[1] = {
+					["trigger"] = {
+						["auranames"] = {
+							"330700", -- [1]
+						},
+						["debuffType"] = "HARMFUL",
+						["destUnit"] = "player",
+						["duration"] = "2.5",
+						["event"] = "Cast",
+						["genericShowOn"] = "showOnCooldown",
+						["names"] = {
+						},
+						["realSpellName"] = "317231",
+						["spellId"] = 333294,
+						["spellIds"] = {
+						},
+						["spellName"] = "317231",
+						["subeventPrefix"] = "SPELL",
+						["subeventSuffix"] = "_CAST_START",
+						["type"] = "status",
+						["unevent"] = "auto",
+						["unit"] = "nameplate",
+						["useName"] = true,
+						["use_absorbMode"] = true,
+						["use_destUnit"] = false,
+						["use_genericShowOn"] = true,
+						["use_spellId"] = true,
+						["use_spellName"] = true,
+						["use_track"] = true,
+						["use_unit"] = true,
+					},
+					["untrigger"] = {
+						["unit"] = "nameplate",
+					},
+				},
+				["activeTriggerMode"] = -10,
+			},
+			["uid"] = "6BUGWC)1ZRb",
+			["url"] = "https://wago.io/uYX5mP3U5/5",
+			["useAdjustededMax"] = false,
+			["useAdjustededMin"] = false,
+			["useTooltip"] = false,
+			["version"] = 5,
+			["width"] = 1,
+			["xOffset"] = -3000,
+			["yOffset"] = 0,
+			["zoom"] = 0,
+		},
+		["EDE [TOP] Ghostly Charge"] = {
+			["actions"] = {
+				["finish"] = {
+					["do_sound"] = false,
+				},
+				["init"] = {
+				},
+				["start"] = {
+					["do_sound"] = true,
+					["sound"] = "Interface\\Addons\\Details\\sounds\\sound_gun2.ogg",
+				},
+			},
+			["alpha"] = 1,
+			["anchorFrameType"] = "SCREEN",
+			["anchorPoint"] = "CENTER",
+			["animation"] = {
+				["finish"] = {
+					["duration_type"] = "seconds",
+					["easeStrength"] = 3,
+					["easeType"] = "none",
+					["type"] = "none",
+				},
+				["main"] = {
+					["duration_type"] = "seconds",
+					["easeStrength"] = 3,
+					["easeType"] = "none",
+					["type"] = "none",
+				},
+				["start"] = {
+					["duration_type"] = "seconds",
+					["easeStrength"] = 3,
+					["easeType"] = "none",
+					["type"] = "none",
+				},
+			},
+			["authorOptions"] = {
+			},
+			["auto"] = false,
+			["backgroundColor"] = {
+				0, -- [1]
+				0, -- [2]
+				0, -- [3]
+				0.5, -- [4]
+			},
+			["barColor"] = {
+				1, -- [1]
+				0, -- [2]
+				0, -- [3]
+				1, -- [4]
+			},
+			["color"] = {
+				1, -- [1]
+				1, -- [2]
+				1, -- [3]
+				1, -- [4]
+			},
+			["conditions"] = {
+			},
+			["config"] = {
+			},
+			["cooldown"] = true,
+			["cooldownEdge"] = false,
+			["cooldownSwipe"] = true,
+			["cooldownTextDisabled"] = false,
+			["desaturate"] = false,
+			["displayIcon"] = "3511738",
+			["frameStrata"] = 1,
+			["height"] = 1,
+			["icon"] = true,
+			["iconSource"] = 0,
+			["icon_color"] = {
+				1, -- [1]
+				1, -- [2]
+				1, -- [3]
+				1, -- [4]
+			},
+			["icon_side"] = "RIGHT",
+			["id"] = "EDE [TOP] Ghostly Charge",
+			["information"] = {
+				["ignoreOptionsEventErrors"] = true,
+			},
+			["internalVersion"] = 40,
+			["inverse"] = false,
+			["keepAspectRatio"] = false,
+			["load"] = {
+				["class"] = {
+					["multi"] = {
+					},
+				},
+				["role"] = {
+					["multi"] = {
+						["TANK"] = true,
+					},
+					["single"] = "TANK",
+				},
+				["size"] = {
+					["multi"] = {
+						["party"] = true,
+					},
+					["single"] = "party",
+				},
+				["spec"] = {
+					["multi"] = {
+					},
+				},
+				["talent"] = {
+					["multi"] = {
+					},
+				},
+				["use_size"] = true,
+				["use_zoneId"] = false,
+				["use_zonegroupId"] = false,
+				["zonegroupId"] = "414",
+			},
+			["orientation"] = "HORIZONTAL",
+			["parent"] = "Ellesmere's Dungeon Essentials",
+			["preferToUpdate"] = false,
+			["regionType"] = "icon",
+			["selfPoint"] = "CENTER",
+			["semver"] = "1.0.4",
+			["spark"] = false,
+			["sparkBlendMode"] = "ADD",
+			["sparkColor"] = {
+				1, -- [1]
+				1, -- [2]
+				1, -- [3]
+				1, -- [4]
+			},
+			["sparkHeight"] = 30,
+			["sparkHidden"] = "NEVER",
+			["sparkOffsetX"] = 0,
+			["sparkOffsetY"] = 0,
+			["sparkRotation"] = 0,
+			["sparkRotationMode"] = "AUTO",
+			["sparkTexture"] = "Interface\\CastingBar\\UI-CastingBar-Spark",
+			["sparkWidth"] = 10,
+			["subRegions"] = {
+			},
+			["texture"] = "Blizzard",
+			["tocversion"] = 90002,
+			["triggers"] = {
+				[1] = {
+					["trigger"] = {
+						["auranames"] = {
+							"", -- [1]
+							"324449", -- [2]
+						},
+						["debuffType"] = "HARMFUL",
+						["destUnit"] = "player",
+						["duration"] = "2",
+						["event"] = "Combat Log",
+						["genericShowOn"] = "showOnCooldown",
+						["names"] = {
+						},
+						["realSpellName"] = "339751",
+						["spellId"] = "339706",
+						["spellIds"] = {
+						},
+						["spellName"] = "339751",
+						["subeventPrefix"] = "SPELL",
+						["subeventSuffix"] = "_CAST_START",
+						["type"] = "event",
+						["unevent"] = "timed",
+						["unit"] = "boss",
+						["useName"] = true,
+						["use_absorbMode"] = true,
+						["use_destUnit"] = false,
+						["use_genericShowOn"] = true,
+						["use_spellId"] = true,
+						["use_spellName"] = false,
+						["use_track"] = true,
+						["use_unit"] = true,
+					},
+					["untrigger"] = {
+						["unit"] = "boss",
+					},
+				},
+				["activeTriggerMode"] = -10,
+			},
+			["uid"] = "fg2HTz7oNrE",
+			["url"] = "https://wago.io/uYX5mP3U5/5",
+			["useAdjustededMax"] = false,
+			["useAdjustededMin"] = false,
+			["useTooltip"] = false,
+			["version"] = 5,
+			["width"] = 1,
+			["xOffset"] = -3000,
+			["yOffset"] = 0,
+			["zoom"] = 0,
+		},
+		["EDE [TOP] Vile Eruption"] = {
+			["actions"] = {
+				["finish"] = {
+					["do_sound"] = false,
+				},
+				["init"] = {
+				},
+				["start"] = {
+					["do_sound"] = true,
+					["sound"] = "Interface\\Addons\\Details\\sounds\\sound_gun2.ogg",
+				},
+			},
+			["alpha"] = 1,
+			["anchorFrameType"] = "SCREEN",
+			["anchorPoint"] = "CENTER",
+			["animation"] = {
+				["finish"] = {
+					["duration_type"] = "seconds",
+					["easeStrength"] = 3,
+					["easeType"] = "none",
+					["type"] = "none",
+				},
+				["main"] = {
+					["duration_type"] = "seconds",
+					["easeStrength"] = 3,
+					["easeType"] = "none",
+					["type"] = "none",
+				},
+				["start"] = {
+					["duration_type"] = "seconds",
+					["easeStrength"] = 3,
+					["easeType"] = "none",
+					["type"] = "none",
+				},
+			},
+			["authorOptions"] = {
+			},
+			["auto"] = false,
+			["backgroundColor"] = {
+				0, -- [1]
+				0, -- [2]
+				0, -- [3]
+				0.5, -- [4]
+			},
+			["barColor"] = {
+				1, -- [1]
+				0, -- [2]
+				0, -- [3]
+				1, -- [4]
+			},
+			["color"] = {
+				1, -- [1]
+				1, -- [2]
+				1, -- [3]
+				1, -- [4]
+			},
+			["conditions"] = {
+			},
+			["config"] = {
+			},
+			["cooldown"] = true,
+			["cooldownEdge"] = false,
+			["cooldownSwipe"] = true,
+			["cooldownTextDisabled"] = false,
+			["desaturate"] = false,
+			["displayIcon"] = "136182",
+			["frameStrata"] = 1,
+			["height"] = 1,
+			["icon"] = true,
+			["iconSource"] = -1,
+			["icon_color"] = {
+				1, -- [1]
+				1, -- [2]
+				1, -- [3]
+				1, -- [4]
+			},
+			["icon_side"] = "RIGHT",
+			["id"] = "EDE [TOP] Vile Eruption",
+			["information"] = {
+				["ignoreOptionsEventErrors"] = true,
+			},
+			["internalVersion"] = 40,
+			["inverse"] = false,
+			["keepAspectRatio"] = false,
+			["load"] = {
+				["class"] = {
+					["multi"] = {
+					},
+				},
+				["role"] = {
+					["multi"] = {
+						["TANK"] = true,
+					},
+					["single"] = "TANK",
+				},
+				["size"] = {
+					["multi"] = {
+						["party"] = true,
+					},
+					["single"] = "party",
+				},
+				["spec"] = {
+					["multi"] = {
+					},
+				},
+				["talent"] = {
+					["multi"] = {
+					},
+				},
+				["use_size"] = true,
+				["use_zoneId"] = false,
+				["use_zonegroupId"] = false,
+				["zonegroupId"] = "414",
+			},
+			["orientation"] = "HORIZONTAL",
+			["parent"] = "Ellesmere's Dungeon Essentials",
+			["preferToUpdate"] = false,
+			["regionType"] = "icon",
+			["selfPoint"] = "CENTER",
+			["semver"] = "1.0.4",
+			["spark"] = false,
+			["sparkBlendMode"] = "ADD",
+			["sparkColor"] = {
+				1, -- [1]
+				1, -- [2]
+				1, -- [3]
+				1, -- [4]
+			},
+			["sparkHeight"] = 30,
+			["sparkHidden"] = "NEVER",
+			["sparkOffsetX"] = 0,
+			["sparkOffsetY"] = 0,
+			["sparkRotation"] = 0,
+			["sparkRotationMode"] = "AUTO",
+			["sparkTexture"] = "Interface\\CastingBar\\UI-CastingBar-Spark",
+			["sparkWidth"] = 10,
+			["subRegions"] = {
+			},
+			["texture"] = "Blizzard",
+			["tocversion"] = 90002,
+			["triggers"] = {
+				[1] = {
+					["trigger"] = {
+						["auranames"] = {
+							"330700", -- [1]
+						},
+						["debuffType"] = "HARMFUL",
+						["destUnit"] = "player",
+						["duration"] = "2.5",
+						["event"] = "Cast",
+						["genericShowOn"] = "showOnCooldown",
+						["names"] = {
+						},
+						["realSpellName"] = "317231",
+						["spellId"] = 330592,
+						["spellIds"] = {
+						},
+						["spellName"] = "317231",
+						["subeventPrefix"] = "SPELL",
+						["subeventSuffix"] = "_CAST_START",
+						["type"] = "status",
+						["unevent"] = "auto",
+						["unit"] = "nameplate",
+						["useName"] = true,
+						["use_absorbMode"] = true,
+						["use_destUnit"] = false,
+						["use_genericShowOn"] = true,
+						["use_spellId"] = true,
+						["use_spellName"] = true,
+						["use_track"] = true,
+						["use_unit"] = true,
+					},
+					["untrigger"] = {
+						["unit"] = "nameplate",
+					},
+				},
+				["activeTriggerMode"] = -10,
+			},
+			["uid"] = "iho8vMeNRic",
+			["url"] = "https://wago.io/uYX5mP3U5/5",
+			["useAdjustededMax"] = false,
+			["useAdjustededMin"] = false,
+			["useTooltip"] = false,
+			["version"] = 5,
+			["width"] = 1,
+			["xOffset"] = -3000,
+			["yOffset"] = 0,
+			["zoom"] = 0,
+		},
+		["EDE[TOP] Dark Devastation"] = {
+			["actions"] = {
+				["finish"] = {
+					["do_sound"] = false,
+				},
+				["init"] = {
+				},
+				["start"] = {
+					["do_sound"] = true,
+					["sound"] = "Interface\\Addons\\Details\\sounds\\sound_gun2.ogg",
+				},
+			},
+			["alpha"] = 1,
+			["anchorFrameType"] = "SCREEN",
+			["anchorPoint"] = "CENTER",
+			["animation"] = {
+				["finish"] = {
+					["duration_type"] = "seconds",
+					["easeStrength"] = 3,
+					["easeType"] = "none",
+					["type"] = "none",
+				},
+				["main"] = {
+					["duration_type"] = "seconds",
+					["easeStrength"] = 3,
+					["easeType"] = "none",
+					["type"] = "none",
+				},
+				["start"] = {
+					["duration_type"] = "seconds",
+					["easeStrength"] = 3,
+					["easeType"] = "none",
+					["type"] = "none",
+				},
+			},
+			["authorOptions"] = {
+			},
+			["auto"] = false,
+			["backgroundColor"] = {
+				0, -- [1]
+				0, -- [2]
+				0, -- [3]
+				0.5, -- [4]
+			},
+			["barColor"] = {
+				1, -- [1]
+				0, -- [2]
+				0, -- [3]
+				1, -- [4]
+			},
+			["color"] = {
+				1, -- [1]
+				1, -- [2]
+				1, -- [3]
+				1, -- [4]
+			},
+			["conditions"] = {
+			},
+			["config"] = {
+			},
+			["cooldown"] = true,
+			["cooldownEdge"] = false,
+			["cooldownSwipe"] = true,
+			["cooldownTextDisabled"] = false,
+			["desaturate"] = false,
+			["displayIcon"] = "2576088",
+			["frameStrata"] = 1,
+			["height"] = 1,
+			["icon"] = true,
+			["iconSource"] = 0,
+			["icon_color"] = {
+				1, -- [1]
+				1, -- [2]
+				1, -- [3]
+				1, -- [4]
+			},
+			["icon_side"] = "RIGHT",
+			["id"] = "EDE[TOP] Dark Devastation",
+			["information"] = {
+				["ignoreOptionsEventErrors"] = true,
+			},
+			["internalVersion"] = 40,
+			["inverse"] = false,
+			["keepAspectRatio"] = false,
+			["load"] = {
+				["class"] = {
+					["multi"] = {
+					},
+				},
+				["role"] = {
+					["multi"] = {
+						["TANK"] = true,
+					},
+					["single"] = "TANK",
+				},
+				["size"] = {
+					["multi"] = {
+						["party"] = true,
+					},
+					["single"] = "party",
+				},
+				["spec"] = {
+					["multi"] = {
+					},
+				},
+				["talent"] = {
+					["multi"] = {
+					},
+				},
+				["use_size"] = true,
+				["use_zoneId"] = false,
+				["use_zonegroupId"] = false,
+				["zonegroupId"] = "414",
+			},
+			["orientation"] = "HORIZONTAL",
+			["parent"] = "Ellesmere's Dungeon Essentials",
+			["preferToUpdate"] = false,
+			["regionType"] = "icon",
+			["selfPoint"] = "CENTER",
+			["semver"] = "1.0.4",
+			["spark"] = false,
+			["sparkBlendMode"] = "ADD",
+			["sparkColor"] = {
+				1, -- [1]
+				1, -- [2]
+				1, -- [3]
+				1, -- [4]
+			},
+			["sparkHeight"] = 30,
+			["sparkHidden"] = "NEVER",
+			["sparkOffsetX"] = 0,
+			["sparkOffsetY"] = 0,
+			["sparkRotation"] = 0,
+			["sparkRotationMode"] = "AUTO",
+			["sparkTexture"] = "Interface\\CastingBar\\UI-CastingBar-Spark",
+			["sparkWidth"] = 10,
+			["subRegions"] = {
+			},
+			["texture"] = "Blizzard",
+			["tocversion"] = 90002,
+			["triggers"] = {
+				[1] = {
+					["trigger"] = {
+						["auranames"] = {
+							"Remove Haunted Memento", -- [1]
+							"319626", -- [2]
+						},
+						["debuffType"] = "HARMFUL",
+						["destUnit"] = "player",
+						["duration"] = "1.5",
+						["event"] = "Cast",
+						["genericShowOn"] = "showOnCooldown",
+						["names"] = {
+						},
+						["realSpellName"] = "323608",
+						["spellId"] = 323608,
+						["spellIds"] = {
+						},
+						["spellName"] = "323608",
+						["subeventPrefix"] = "SPELL",
+						["subeventSuffix"] = "_CAST_START",
+						["type"] = "status",
+						["unevent"] = "auto",
+						["unit"] = "boss",
+						["useName"] = true,
+						["use_absorbMode"] = true,
+						["use_destUnit"] = false,
+						["use_genericShowOn"] = true,
+						["use_spellId"] = true,
+						["use_spellName"] = true,
+						["use_track"] = true,
+						["use_unit"] = true,
+					},
+					["untrigger"] = {
+						["unit"] = "boss",
+					},
+				},
+				["activeTriggerMode"] = -10,
+			},
+			["uid"] = "mm0UDC2ijhX",
+			["url"] = "https://wago.io/uYX5mP3U5/5",
+			["useAdjustededMax"] = false,
+			["useAdjustededMin"] = false,
+			["useTooltip"] = false,
+			["version"] = 5,
+			["width"] = 1,
+			["xOffset"] = -3000,
+			["yOffset"] = 0,
+			["zoom"] = 0,
+		},
+		["Ellesmere's Dungeon Essentials"] = {
+			["actions"] = {
+				["finish"] = {
+				},
+				["init"] = {
+				},
+				["start"] = {
+				},
+			},
+			["align"] = "CENTER",
+			["anchorFrameType"] = "SCREEN",
+			["anchorPoint"] = "CENTER",
+			["animate"] = false,
+			["animation"] = {
+				["finish"] = {
+					["duration_type"] = "seconds",
+					["easeStrength"] = 3,
+					["easeType"] = "none",
+					["type"] = "none",
+				},
+				["main"] = {
+					["duration_type"] = "seconds",
+					["easeStrength"] = 3,
+					["easeType"] = "none",
+					["type"] = "none",
+				},
+				["start"] = {
+					["duration_type"] = "seconds",
+					["easeStrength"] = 3,
+					["easeType"] = "none",
+					["type"] = "none",
+				},
+			},
+			["arcLength"] = 360,
+			["authorOptions"] = {
+			},
+			["backdropColor"] = {
+				1, -- [1]
+				1, -- [2]
+				1, -- [3]
+				0.5, -- [4]
+			},
+			["border"] = false,
+			["borderBackdrop"] = "Blizzard Tooltip",
+			["borderColor"] = {
+				0, -- [1]
+				0, -- [2]
+				0, -- [3]
+				1, -- [4]
+			},
+			["borderEdge"] = "Square Full White",
+			["borderInset"] = 1,
+			["borderOffset"] = 4,
+			["borderSize"] = 2,
+			["columnSpace"] = 1,
+			["conditions"] = {
+			},
+			["config"] = {
+			},
+			["constantFactor"] = "RADIUS",
+			["controlledChildren"] = {
+				"EDE [DOS] Blood Barrier Inc", -- [1]
+				"EDE [DOS] Erupting Darkness", -- [2]
+				"EDE [MTS] Radiant Breath", -- [3]
+				"EDE [NW] Gut Slice", -- [4]
+				"EDE [PF] Belch Plague", -- [5]
+				"EDE [SD] Echoing Thrust", -- [6]
+				"EDE [SD] Severing Slice", -- [7]
+				"EDE [SD] Growing Mistrust", -- [8]
+				"EDE [TOP] Vile Eruption", -- [9]
+				"EDE [TOP] Death Winds", -- [10]
+				"EDE[TOP] Dark Devastation", -- [11]
+				"EDE [TOP] Ghostly Charge", -- [12]
+				"EDE [HOA] Stone Breath", -- [13]
+				"EDE [HOA] Unleashed Suffering", -- [14]
+				"EDE [SOA] Run Through", -- [15]
+				"EDE [NW] Necrotic Breath", -- [16]
+				"EDE [SD] Sweeping Slash", -- [17]
+				"EDE [PF] Festering Belch", -- [18]
+				"EDE [NW] Repentance Check", -- [19]
+				"EDE [OTHERS] Blinding Light Check", -- [20]
+				"EDE [NW] Shadow Well", -- [21]
+				"EDE [MOTS] Bewildering Pollen (Boss) 2", -- [22]
+				"EDE [MOTS] Bewildering Pollen (Trash)", -- [23]
+			},
+			["frameStrata"] = 1,
+			["fullCircle"] = true,
+			["gridType"] = "RD",
+			["gridWidth"] = 5,
+			["grow"] = "RIGHT",
+			["id"] = "Ellesmere's Dungeon Essentials",
+			["information"] = {
+			},
+			["internalVersion"] = 40,
+			["limit"] = 5,
+			["load"] = {
+				["class"] = {
+					["multi"] = {
+					},
+				},
+				["size"] = {
+					["multi"] = {
+					},
+				},
+				["spec"] = {
+					["multi"] = {
+					},
+				},
+				["talent"] = {
+					["multi"] = {
+					},
+				},
+			},
+			["preferToUpdate"] = false,
+			["radius"] = 200,
+			["regionType"] = "dynamicgroup",
+			["rotation"] = 0,
+			["rowSpace"] = 1,
+			["scale"] = 1,
+			["selfPoint"] = "LEFT",
+			["semver"] = "1.0.4",
+			["sort"] = "none",
+			["space"] = 2,
+			["stagger"] = 0,
+			["subRegions"] = {
+			},
+			["tocversion"] = 90002,
+			["triggers"] = {
+				{
+					["trigger"] = {
+						["debuffType"] = "HELPFUL",
+						["event"] = "Health",
+						["names"] = {
+						},
+						["spellIds"] = {
+						},
+						["subeventPrefix"] = "SPELL",
+						["subeventSuffix"] = "_CAST_START",
+						["type"] = "aura2",
+						["unit"] = "player",
+					},
+					["untrigger"] = {
+					},
+				}, -- [1]
+			},
+			["uid"] = "8bL1ytmZrbb",
+			["url"] = "https://wago.io/uYX5mP3U5/5",
+			["useLimit"] = false,
+			["version"] = 5,
+			["xOffset"] = -23.999877929688,
+			["yOffset"] = 9.9998779296875,
+		},
+		["Great Vault on Weekly Reward frame"] = {
+			["actions"] = {
+				["finish"] = {
+				},
+				["init"] = {
+					["do_custom"] = false,
+				},
+				["start"] = {
+				},
+			},
+			["anchorFrameType"] = "SCREEN",
+			["anchorPoint"] = "CENTER",
+			["animation"] = {
+				["finish"] = {
+					["duration_type"] = "seconds",
+					["easeStrength"] = 3,
+					["easeType"] = "none",
+					["type"] = "none",
+				},
+				["main"] = {
+					["duration_type"] = "seconds",
+					["easeStrength"] = 3,
+					["easeType"] = "none",
+					["type"] = "none",
+				},
+				["start"] = {
+					["duration_type"] = "seconds",
+					["easeStrength"] = 3,
+					["easeType"] = "none",
+					["type"] = "none",
+				},
+			},
+			["authorOptions"] = {
+			},
+			["automaticWidth"] = "Auto",
+			["color"] = {
+				1, -- [1]
+				1, -- [2]
+				1, -- [3]
+				1, -- [4]
+			},
+			["conditions"] = {
+			},
+			["config"] = {
+			},
+			["customTextUpdate"] = "event",
+			["displayText"] = "",
+			["displayText_format_p_format"] = "timed",
+			["displayText_format_p_time_dynamic"] = false,
+			["displayText_format_p_time_precision"] = 1,
+			["fixedWidth"] = 200,
+			["font"] = "Friz Quadrata TT",
+			["fontSize"] = 12,
+			["frameStrata"] = 1,
+			["id"] = "Great Vault on Weekly Reward frame",
+			["information"] = {
+			},
+			["internalVersion"] = 40,
+			["justify"] = "LEFT",
+			["load"] = {
+				["class"] = {
+					["multi"] = {
+					},
+				},
+				["level"] = "60",
+				["level_operator"] = ">=",
+				["size"] = {
+					["multi"] = {
+					},
+				},
+				["spec"] = {
+					["multi"] = {
+					},
+				},
+				["talent"] = {
+					["multi"] = {
+					},
+				},
+				["use_level"] = true,
+			},
+			["outline"] = "OUTLINE",
+			["preferToUpdate"] = false,
+			["regionType"] = "text",
+			["selfPoint"] = "BOTTOM",
+			["semver"] = "1.0.9",
+			["shadowColor"] = {
+				0, -- [1]
+				0, -- [2]
+				0, -- [3]
+				1, -- [4]
+			},
+			["shadowXOffset"] = 1,
+			["shadowYOffset"] = -1,
+			["subRegions"] = {
+			},
+			["tocversion"] = 90002,
+			["triggers"] = {
+				[1] = {
+					["trigger"] = {
+						["custom"] = "function(event)\n    if PVPQueueFrame then\n        aura_env.RatedPvP = PVPQueueFrame.HonorInset.RatedPanel.WeeklyChest\n        aura_env.CasualPvP = PVPQueueFrame.HonorInset.CasualPanel.WeeklyChest\n        end\n    if ChallengesFrame then\n        aura_env.ChallengeKey = ChallengesFrame.WeeklyInfo.Child.WeeklyChest\n    end\n    LoadAddOn('Blizzard_WeeklyRewards')\n    local GreatVaultFrame = \"WeeklyRewardsFrame\" -- frame name to reference when adding to UISpecialFrames\n    local RPvP = aura_env.RatedPvP\n    local CPvP = aura_env.CasualPvP\n    local CKey = aura_env.ChallengeKey\n    if event == \"GLOBAL_MOUSE_UP\" then\n        if not WeeklyRewardsFrame:IsVisible() and\n        ((RPvP and RPvP:IsVisible() and RPvP:IsMouseOver()) or\n            (CPvP and CPvP:IsVisible() and CPvP:IsMouseOver()) or\n            (CKey and CKey:IsVisible() and CKey:IsMouseOver())) then\n            WeeklyRewardsFrame:Show()\n            tinsert(UISpecialFrames, GreatVaultFrame) -- UISpecialFrames | see more at https://wow.gamepedia.com/Make_frames_closable_with_the_Escape_key\n        elseif WeeklyRewardsFrame:IsVisible() and\n        ((RPvP and RPvP:IsVisible() and RPvP:IsMouseOver()) or\n            (CPvP and CPvP:IsVisible() and CPvP:IsMouseOver()) or\n            (CKey and CKey:IsVisible() and CKey:IsMouseOver())) then\n            WeeklyRewardsFrame:Hide()\n        end\n    end\nend",
+						["custom_hide"] = "timed",
+						["custom_type"] = "event",
+						["debuffType"] = "HELPFUL",
+						["event"] = "Health",
+						["events"] = "GLOBAL_MOUSE_UP",
+						["names"] = {
+						},
+						["spellIds"] = {
+						},
+						["subeventPrefix"] = "SPELL",
+						["subeventSuffix"] = "_CAST_START",
+						["type"] = "custom",
+						["unit"] = "player",
+					},
+					["untrigger"] = {
+					},
+				},
+				["activeTriggerMode"] = -10,
+			},
+			["uid"] = "eXtQuDwDOsa",
+			["url"] = "https://wago.io/8VoPnmm5Z/10",
+			["version"] = 10,
+			["wordWrap"] = "WordWrap",
+			["xOffset"] = 0,
+			["yOffset"] = 0,
 		},
 	},
 	["dynamicIconCache"] = {

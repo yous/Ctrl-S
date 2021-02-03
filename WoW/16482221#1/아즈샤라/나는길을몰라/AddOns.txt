@@ -1,0 +1,14 @@
+WeakAurasCompanion: enabled
+WeakAurasArchive: enabled
+RaiderIO_DB_US_H_R: disabled
+RaiderIO_DB_US_H: disabled
+RaiderIO_DB_US_A_R: disabled
+RaiderIO_DB_US_A: disabled
+RaiderIO_DB_TW_H_R: disabled
+RaiderIO_DB_TW_H: disabled
+RaiderIO_DB_TW_A_R: disabled
+RaiderIO_DB_TW_A: disabled
+RaiderIO_DB_EU_H_R: disabled
+RaiderIO_DB_EU_H: disabled
+RaiderIO_DB_EU_A_R: disabled
+RaiderIO_DB_EU_A: disabled

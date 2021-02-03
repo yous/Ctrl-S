@@ -111,6 +111,7 @@ DBM_AllSavedOptions = {
 		["InfoFrameFontSize"] = 12,
 		["InfoFrameFontStyle"] = "None",
 		["InfoFrameLines"] = 0,
+		["InfoFrameLocked"] = false,
 		["InfoFramePoint"] = "CENTER",
 		["InfoFrameShowSelf"] = false,
 		["InfoFrameX"] = 75,

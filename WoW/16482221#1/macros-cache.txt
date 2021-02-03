@@ -1,6 +1,14 @@
 VER 3 0000000000000001 "Decursive" "INV_MISC_QUESTIONMARK"
 /script DecursiveRootTable.Dcr:Println('유효한 주문 없음')
 END
+VER 3 0000000000000004 "달빛 봉오리" "INV_MISC_QUESTIONMARK"
+/대상 달빛 봉오리
+/script T={1,2,3,4,7} i=GetRaidTargetIndex("target") if i==nil then i=GetRaidTargetIndex("unit") c=i SetRaidTarget("target",T[c]) end
+END
+VER 3 0000000000000003 "위대한 금고" "INV_MISC_QUESTIONMARK"
+/run LoadAddOn("Blizzard_WeeklyRewards");
+/run if WeeklyRewardsFrame:IsShown() then WeeklyRewardsFrame:Hide() else WeeklyRewardsFrame:Show() end
+END
 VER 3 0000000000000002 "응징의 격노" "SPELL_HOLY_AVENGINEWRATH"
 #showtooltip 응징의 격노
 /use 13

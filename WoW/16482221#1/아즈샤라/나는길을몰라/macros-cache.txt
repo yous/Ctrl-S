@@ -1,6 +1,14 @@
+VER 3 010000000000000A "고정 사격" "132213"
+#showtooltip 고정 사격
+/시전 [nochanneling:속사] 고정 사격
+END
 VER 3 0100000000000003 "눈속임" "132180"
 #showtooltip 눈속임
 /시전 [@mouseover,help][help][@pet] 눈속임
+END
+VER 3 010000000000000B "마무리 사격" "INV_MISC_QUESTIONMARK"
+#showtooltip 마무리 사격
+/시전 [@mouseover,harm,nodead][] 마무리 사격
 END
 VER 3 0100000000000004 "반격의 사격" "249170"
 #showtooltip 반격의 사격
@@ -11,11 +19,27 @@ VER 3 0100000000000001 "빙결 덫" "135834"
 #showtooltip 빙결 덫
 /시전 [@cursor] 빙결 덫
 END
+VER 3 010000000000000D "신비한 사격" "132218"
+#showtooltip 신비한 사격
+/시전 [nochanneling:속사] 신비한 사격
+END
+VER 3 010000000000000C "연발 공격" "132205"
+#showtooltip 연발 공격
+/시전 [@cursor] 연발 공격
+END
+VER 3 010000000000000E "일제 사격" "132330"
+#showtooltip 일제 사격
+/시전 [nochanneling:속사] 일제 사격
+END
 VER 3 0100000000000005 "정조준" "132329"
 #showtooltip 정조준
 /시전 광폭화
 /시전 정조준
 /시전 조준 사격
+END
+VER 3 0100000000000009 "조준 사격" "135130"
+#showtooltip 조준 사격
+/시전 [nochanneling:속사] 조준 사격
 END
 VER 3 0100000000000006 "죽은 척하기" "132293"
 #showtooltip 죽은 척하기
