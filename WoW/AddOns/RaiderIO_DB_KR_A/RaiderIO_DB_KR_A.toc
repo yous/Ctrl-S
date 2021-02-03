@@ -1,0 +1,11 @@
+## Interface: 90002
+## Title: Raider.IO |cffFFFFFFMythic Plus|r (Korea - Alliance)
+## Author: Vladinator (Voidzone-Ravencrest), Aspyr (Aspyrox-Skullcrusher) and Isak (Isak-Sargeras)
+## Dependencies: RaiderIO
+## DefaultState: enabled
+## X-Type: Mythic Plus
+## X-Region: Korea
+## X-Faction: Alliance
+## X-Website: https://raider.io
+../RaiderIO/db/db_kr_alliance_characters.lua
+../RaiderIO/db/db_kr_alliance_lookup.lua
