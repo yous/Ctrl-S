@@ -15,7 +15,7 @@ DBM_AllSavedOptions = {
 		["AutoAcceptGuildInvite"] = false,
 		["AutoReplySound"] = true,
 		["AutoRespond"] = true,
-		["AutologBosses"] = false,
+		["AutologBosses"] = true,
 		["BadIDAlert"] = false,
 		["BadTimerAlert"] = false,
 		["BigBrotherAnnounceToRaid"] = false,
@@ -301,5 +301,6 @@ DBM_AllSavedOptions = {
 	},
 }
 DBM_MinimapIcon = {
+	["hide"] = true,
 	["minimapPos"] = 128.7843034891917,
 }

@@ -20,6 +20,8 @@ Quartz3DB = {
 		},
 		["Latency"] = {
 		},
+		["LibDualSpec-1.0"] = {
+		},
 		["Mirror"] = {
 		},
 		["Pet"] = {
@@ -32,6 +34,7 @@ Quartz3DB = {
 		["Player"] = {
 			["profiles"] = {
 				["Default"] = {
+					["h"] = 20,
 					["x"] = 835,
 				},
 			},
@@ -50,6 +53,7 @@ Quartz3DB = {
 	},
 	["profileKeys"] = {
 		["김곱충 - 줄진"] = "Default",
+		["나는길을몰라 - 아즈샤라"] = "Default",
 	},
 	["profiles"] = {
 		["Default"] = {

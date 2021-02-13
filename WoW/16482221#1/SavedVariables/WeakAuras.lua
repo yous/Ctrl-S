@@ -2,6 +2,186 @@
 WeakAurasSaved = {
 	["dbVersion"] = 40,
 	["displays"] = {
+		["!돌"] = {
+			["actions"] = {
+				["finish"] = {
+				},
+				["init"] = {
+					["custom"] = "aura_env.options = {'party', 'guild', 'spam'}\n\naura_env.types = {}\n\nfor _, v in ipairs(aura_env.options) do\n    \n    if aura_env.config[\"enabled\"..v] then\n        aura_env.types[v] = true\n    end\n    \nend\n\naura_env.ids = {\n    [138019] = true, -- Legion\n    [158923] = true, -- BfA\n    [180653] = true, -- Shadowlands\n    [151086] = true, -- Tournament\n}\n\naura_env.key = nil\n\naura_env.update = function()\n    for bag = 0, NUM_BAG_SLOTS do\n        local bSlots = GetContainerNumSlots(bag)\n        for slot = 1, bSlots do\n            local itemLink, _, _, itemID = select(7, GetContainerItemInfo(bag, slot))\n            if aura_env.ids[itemID] then\n                aura_env.key = itemLink\n                return\n            end\n        end\n    end\nend\n\naura_env.link = function(channel)\n    \n    channel = channel or \"PARTY\"\n    \n    if channel == \"PARTY\" then\n        if aura_env.config.spam and (aura_env.timeParty or 0) > (GetTime() - 30) then\n            return\n        end\n        aura_env.timeParty = GetTime()\n    else\n        if aura_env.config.spam and (aura_env.timeGuild or 0) > (GetTime() - 30) then\n            return\n        end\n        aura_env.timeGuild = GetTime()\n    end\n    \n    if aura_env.key == nil then aura_env.update() end\n    if aura_env.key ~= nil then SendChatMessage(aura_env.key, channel) end\nend",
+					["do_custom"] = true,
+				},
+				["start"] = {
+				},
+			},
+			["anchorFrameType"] = "SCREEN",
+			["anchorPoint"] = "CENTER",
+			["animation"] = {
+				["finish"] = {
+					["duration_type"] = "seconds",
+					["easeStrength"] = 3,
+					["easeType"] = "none",
+					["type"] = "none",
+				},
+				["main"] = {
+					["duration_type"] = "seconds",
+					["easeStrength"] = 3,
+					["easeType"] = "none",
+					["type"] = "none",
+				},
+				["start"] = {
+					["duration_type"] = "seconds",
+					["easeStrength"] = 3,
+					["easeType"] = "none",
+					["type"] = "none",
+				},
+			},
+			["authorOptions"] = {
+				{
+					["noMerge"] = true,
+					["text"] = "Options",
+					["type"] = "header",
+					["useName"] = true,
+					["width"] = 1,
+				}, -- [1]
+				{
+					["default"] = true,
+					["key"] = "party",
+					["name"] = "Party Chat",
+					["type"] = "toggle",
+					["useDesc"] = false,
+					["width"] = 1,
+				}, -- [2]
+				{
+					["default"] = true,
+					["key"] = "guild",
+					["name"] = "Guild Chat",
+					["type"] = "toggle",
+					["useDesc"] = false,
+					["width"] = 1,
+				}, -- [3]
+				{
+					["default"] = true,
+					["key"] = "spam",
+					["name"] = "Spam Protection",
+					["type"] = "toggle",
+					["useDesc"] = false,
+					["width"] = 1,
+				}, -- [4]
+				{
+					["noMerge"] = true,
+					["text"] = "Credits",
+					["type"] = "header",
+					["useName"] = true,
+					["width"] = 1,
+				}, -- [5]
+				{
+					["fontSize"] = "medium",
+					["text"] = "Author: Luckyone (EU) - LaughingSkull\n\nDiscord: discord.gg/xRY4bwA\n\nCredits: AcidWeb, Azilroka, Buds",
+					["type"] = "description",
+					["width"] = 2,
+				}, -- [6]
+			},
+			["automaticWidth"] = "Auto",
+			["color"] = {
+				1, -- [1]
+				1, -- [2]
+				1, -- [3]
+				1, -- [4]
+			},
+			["conditions"] = {
+			},
+			["config"] = {
+				["guild"] = true,
+				["party"] = true,
+				["spam"] = true,
+			},
+			["customTextUpdate"] = "event",
+			["desc"] = "Made by Luckyone",
+			["displayText"] = "",
+			["displayText_format_p_format"] = "timed",
+			["displayText_format_p_time_dynamic"] = false,
+			["displayText_format_p_time_precision"] = 1,
+			["fixedWidth"] = 200,
+			["font"] = "Expressway",
+			["fontSize"] = 12,
+			["frameStrata"] = 2,
+			["id"] = "!돌",
+			["information"] = {
+				["ignoreOptionsEventErrors"] = true,
+			},
+			["internalVersion"] = 40,
+			["justify"] = "CENTER",
+			["load"] = {
+				["class"] = {
+					["multi"] = {
+					},
+				},
+				["level"] = "40",
+				["level_operator"] = ">=",
+				["size"] = {
+					["multi"] = {
+					},
+				},
+				["spec"] = {
+					["multi"] = {
+					},
+				},
+				["talent"] = {
+					["multi"] = {
+					},
+				},
+				["use_level"] = true,
+				["use_never"] = false,
+			},
+			["outline"] = "OUTLINE",
+			["preferToUpdate"] = false,
+			["regionType"] = "text",
+			["selfPoint"] = "CENTER",
+			["semver"] = "4.1.0",
+			["shadowColor"] = {
+				0, -- [1]
+				0, -- [2]
+				0, -- [3]
+				1, -- [4]
+			},
+			["shadowXOffset"] = 0,
+			["shadowYOffset"] = 0,
+			["subRegions"] = {
+			},
+			["tocversion"] = 90002,
+			["triggers"] = {
+				[1] = {
+					["trigger"] = {
+						["custom"] = "function(event, message)\n    if event == \"BAG_UPDATE\" then\n        aura_env.update()\n    elseif message and (string.lower(message) == \"!keys\" or string.lower(message) == \"!돌\") then\n        if event == \"CHAT_MSG_GUILD\" and aura_env.config.guild then\n            aura_env.link(\"GUILD\")\n        elseif event ~= \"CHAT_MSG_GUILD\" and aura_env.config.party then\n            aura_env.link()\n        end\n    end\nend",
+						["custom_hide"] = "timed",
+						["custom_type"] = "event",
+						["debuffType"] = "HELPFUL",
+						["duration"] = "1",
+						["dynamicDuration"] = true,
+						["event"] = "Combat Log",
+						["events"] = "BAG_UPDATE, CHAT_MSG_PARTY, CHAT_MSG_PARTY_LEADER, CHAT_MSG_GUILD",
+						["names"] = {
+						},
+						["spellIds"] = {
+						},
+						["subeventPrefix"] = "SPELL",
+						["subeventSuffix"] = "_CAST_START",
+						["type"] = "custom",
+						["unevent"] = "timed",
+						["unit"] = "player",
+					},
+					["untrigger"] = {
+					},
+				},
+				["activeTriggerMode"] = -10,
+			},
+			["uid"] = "EwlIjQfR(4D",
+			["url"] = "https://wago.io/bfakeys/30",
+			["version"] = 30,
+			["wordWrap"] = "WordWrap",
+			["xOffset"] = 0,
+			["yOffset"] = 0,
+		},
 		["BfA: Nameplate Enemy Auras"] = {
 			["actions"] = {
 				["finish"] = {
@@ -533,12 +713,12 @@ WeakAurasSaved = {
 			},
 			["config"] = {
 				["additionalCustom"] = "",
-				["anchorPoint"] = 2,
+				["anchorPoint"] = 3,
 				["blacklistCustom"] = "",
 				["borderAlpha"] = 0.9,
 				["borderSize"] = 1,
 				["frameStrata"] = 1,
-				["growEvenly"] = true,
+				["growEvenly"] = false,
 				["growthDirection"] = 4,
 				["missingBorderColor"] = {
 					1, -- [1]
@@ -550,7 +730,7 @@ WeakAurasSaved = {
 				["mouseoverAlpha"] = 1,
 				["mouseoverFrameStrata"] = 3,
 				["nonTargetAlpha"] = 0.75,
-				["relativeAnchor"] = 1,
+				["relativeAnchor"] = 4,
 				["showAllBuffs"] = false,
 				["showAllDebuffs"] = false,
 				["showBolster"] = false,
@@ -571,7 +751,7 @@ WeakAurasSaved = {
 				["useAlpha"] = true,
 				["useAlphaMouseover"] = false,
 				["useAlphaTarget"] = true,
-				["xOffset"] = 0,
+				["xOffset"] = -10,
 				["yOffset"] = 0,
 			},
 			["cooldown"] = true,
@@ -785,9 +965,315 @@ WeakAurasSaved = {
 			["url"] = "https://wago.io/SyNLm-ACX/44",
 			["version"] = 44,
 			["width"] = 30,
-			["xOffset"] = 0,
+			["xOffset"] = -10,
 			["yOffset"] = 0,
 			["zoom"] = 0,
+		},
+		["Dungeon RIO and Class"] = {
+			["actions"] = {
+				["finish"] = {
+				},
+				["init"] = {
+					["custom"] = "local function GetRioScore(fullname)    \n    local score = 0;    \n    \n    if not RaiderIO then return score end;\n    \n    if not string.match(fullname, \"-\") then\n        local realmName = GetRealmName();\n        fullname = fullname..\"-\"..realmName;        \n    end\n    \n    local FACTIONS = { Alliance = 1, Horde = 2, Neutral = 3 }\n    local playerFactionID = FACTIONS[UnitFactionGroup(\"player\")]    \n    local playerProfile = RaiderIO.GetProfile(fullname, playerFactionID);\n    local currentScore = 0;\n    local previousScore = 0;\n    \n    if (playerProfile ~= nil) then\n        if playerProfile.mythicKeystoneProfile ~= nil then\n            currentScore = playerProfile.mythicKeystoneProfile.currentScore or 0;    \n            previousScore = playerProfile.mythicKeystoneProfile.previousScore or 0;\n        end\n    end    \n    \n    score = currentScore\n    \n    local previousRIO = _G[\"ShowRIORaitingWA1PreviousRIO\"];\n    \n    if previousRIO == true and currentScore < previousScore then\n        score = previousScore\n    end\n    \n    return score;\nend\n\nlocal function componentToHex(c)\n    c = math.floor(c * 255)    \n    local hex = string.format(\"%x\", c)    \n    if (hex:len() == 1) then\n        return \"0\"..hex;\n    end    \n    return hex;\nend\n\nlocal function rgbToHex(r, g, b)\n    return componentToHex(r)..componentToHex(g)..componentToHex(b);\nend\n\n\nlocal function getColorStr(hexColor)\n    return \"|cff\"..hexColor..\"+|r\";\nend\n\nlocal function getRioScoreColorText(rioScore) \n    if not RaiderIO then return nil end;\n    \n    local r, g, b = RaiderIO.GetScoreColor(rioScore);\n    local hex = rgbToHex(r, g, b);    \n    return getColorStr(hex);\nend\n\nlocal function getRioScoreText(rioScore)\n    local colorText = getRioScoreColorText(rioScore);\n    if colorText == nil then return \"\" end\n    \n    local rioText = colorText:gsub(\"+\", rioScore);\n    \n    local textFormat = _G[\"ShowRIORaitingWA1TextFormatRIO\"]\n    local trim = _G[\"ShowRIORaitingWA1Trim\"]\n    if (textFormat ~= nil and trim ~= nil and trim(textFormat) ~= \"\") then\n        rioText = textFormat:gsub(\"@rio\", rioText)        \n    end\n    \n    return rioText..\" \";\nend\n\nlocal function getIndex(values, val)\n    local index={};\n    \n    for k,v in pairs(values) do\n        index[v]=k;\n    end\n    \n    return index[val];\nend\n\nlocal function filterTable(t, ids)\n    for i, id in ipairs(ids) do\n        for j = #t, 1, -1 do\n            if ( t[j] == id ) then\n                tremove(t, j);\n                break;\n            end\n        end\n    end\nend\n\nlocal function addFilteredId(self, id)\n    if ( not self.filteredIDs ) then\n        self.filteredIDs = { };\n    end\n    tinsert(self.filteredIDs, id);\nend\n\naura_env.Trim = function(str)\n    local match = string.match\n    return match(str,'^()%s*$') and '' or match(str,'^%s*(.*%S)')\nend\n\naura_env.UpdateApplicantMember = function(member, appID, memberIdx, ...)     \n    if( RaiderIO == nil ) then return; end    \n    if( _G[\"ShowRIORaitingWA1NotShowApplicantRio\"] == true ) then return; end\n    \n    local textName = member.Name:GetText();\n    local name, class = C_LFGList.GetApplicantMemberInfo(appID, memberIdx);\n    local rioScore = GetRioScore(name);    \n    local rioText;    \n    if (rioScore > 0) then\n        rioText = getRioScoreText(rioScore);\n    else\n        rioText = \"\";\n    end\n    \n    if ( memberIdx > 1 ) then\n        member.Name:SetText(\"  \"..rioText..textName);\n    else\n        member.Name:SetText(rioText..textName);\n    end\n    \n    local nameLength = 100;\n    if ( relationship ) then\n        nameLength = nameLength - 22;\n    end\n    \n    if ( member.Name:GetWidth() > nameLength ) then\n        member.Name:SetWidth(nameLength);\n    end\nend\n\naura_env.SearchEntryUpdate = function(entry, ...)\n    if( not LFGListFrame.SearchPanel:IsShown() ) then return; end\n    \n    local categoryID = LFGListFrame.SearchPanel.categoryID;\n    local resultID = entry.resultID;\n    local resultInfo = C_LFGList.GetSearchResultInfo(resultID);\n    local leaderName = resultInfo.leaderName;\n    entry.rioScore = 0;\n    \n    if (leaderName ~= nil) then\n        entry.rioScore = GetRioScore(leaderName);\n    end\n    \n    for i = 1, 5 do\n        local texture = \"tex\"..i;                \n        if (entry.DataDisplay.Enumerate[texture]) then\n            entry.DataDisplay.Enumerate[texture]:Hide();\n        end                \n    end\n    \n    if (categoryID == 2 and _G[\"ShowRIORaitingWA1NotShowClasses\"] ~= true) then\n        local numMembers = resultInfo.numMembers;\n        local _, appStatus, pendingStatus, appDuration = C_LFGList.GetApplicationInfo(resultID);\n        local isApplication = entry.isApplication;\n        \n        entry.DataDisplay:SetPoint(\"RIGHT\", entry.DataDisplay:GetParent(), \"RIGHT\", 0, -5);\n        \n        local orderIndexes = {};\n        \n        for i=1, numMembers do                    \n            local role, class = C_LFGList.GetSearchResultMemberInfo(resultID, i);\n            local orderIndex = getIndex(LFG_LIST_GROUP_DATA_ROLE_ORDER, role);\n            table.insert(orderIndexes, {orderIndex, class});\n        end\n        \n        table.sort(orderIndexes, function(a,b)\n                return a[1] < b[1]\n        end);\n        \n        local xOffset = -88;\n        \n        for i = 1, numMembers do\n            local class = orderIndexes[i][2];\n            local classColor = RAID_CLASS_COLORS[class];\n            local r, g, b, a = classColor:GetRGBA();\n            local texture = \"tex\"..i;\n            \n            if (not entry.DataDisplay.Enumerate[texture]) then\n                entry.DataDisplay.Enumerate[texture] = entry.DataDisplay.Enumerate:CreateTexture(nil, \"ARTWORK\");\n                entry.DataDisplay.Enumerate[texture]:SetSize(10, 3);\n                entry.DataDisplay.Enumerate[texture]:SetPoint(\"RIGHT\", entry.DataDisplay.Enumerate, \"RIGHT\", xOffset, 15);\n            end\n            \n            entry.DataDisplay.Enumerate[texture]:Show();                    \n            entry.DataDisplay.Enumerate[texture]:SetColorTexture(r, g, b, 0.75);\n            \n            xOffset = xOffset + 18;                    \n        end\n    end            \n    \n    local name = entry.Name:GetText() or \"\";\n    \n    local rioText;    \n    if (entry.rioScore > 0 and _G[\"ShowRIORaitingWA1NotShowRio\"] ~= true) then\n        rioText = getRioScoreText(entry.rioScore);\n    else\n        rioText = \"\";\n    end\n    entry.Name:SetText(rioText..name);\nend\n\naura_env.SortSearchResults = function(results)\n    \n    local sortMethod = _G[\"ShowRIORaitingWA1SortMethod\"] or 1;\n    local removeRole = _G[\"ShowRIORaitingWA1RemoveWithoutRole\"] or false;\n    local minRio = _G[\"ShowRIORaitingWA1MinRio\"] or -1;\n    local maxRio = _G[\"ShowRIORaitingWA1MaxRio\"] or 9999;\n    local filterRIO = _G[\"ShowRIORaitingWA1FilterRIO\"] or false;\n    local categoryID = LFGListFrame.SearchPanel.categoryID;\n    \n    local function RemainingSlotsForLocalPlayerRole(lfgSearchResultID)    \n        local roleRemainingKeyLookup = {\n            [\"TANK\"] = \"TANK_REMAINING\",\n            [\"HEALER\"] = \"HEALER_REMAINING\",\n            [\"DAMAGER\"] = \"DAMAGER_REMAINING\",\n        };\n        local roles = C_LFGList.GetSearchResultMemberCounts(lfgSearchResultID);\n        local playerRole = GetSpecializationRole(GetSpecialization());\n        return roles[roleRemainingKeyLookup[playerRole]];\n    end\n    \n    local function FilterSearchResults(searchResultID)\n        local searchResultInfo = C_LFGList.GetSearchResultInfo(searchResultID);\n        \n        if (searchResultInfo == nil) then\n            return;\n        end        \n        \n        local remainingRole = RemainingSlotsForLocalPlayerRole(searchResultID) > 0\n        \n        if removeRole == true then            \n            if (remainingRole == false) then\n                LFGListSearchPanel_AddFilteredID(LFGListFrame.SearchPanel, searchResultID);\n            end\n        end \n        \n        local leaderName = searchResultInfo.leaderName;\n        local rioScore = 0;\n        \n        if (leaderName ~= nil) then\n            rioScore = GetRioScore(leaderName);\n        end \n        \n        if (not RaiderIO) then filterRIO = false end\n        \n        if (filterRIO == true) then            \n            if (rioScore < minRio or rioScore > maxRio) then\n                LFGListSearchPanel_AddFilteredID(LFGListFrame.SearchPanel, searchResultID);\n            end\n        end\n    end\n    \n    local function SortSearchResultsCB(searchResultID1, searchResultID2)\n        local searchResultInfo1 = C_LFGList.GetSearchResultInfo(searchResultID1);\n        local searchResultInfo2 = C_LFGList.GetSearchResultInfo(searchResultID2);\n        \n        if (searchResultInfo1 == nil) then\n            return false;\n        end        \n        \n        if (searchResultInfo2 == nil) then\n            return true;\n        end    \n        \n        local remainingRole1 = RemainingSlotsForLocalPlayerRole(searchResultID1) > 0;\n        local remainingRole2 = RemainingSlotsForLocalPlayerRole(searchResultID2) > 0;\n        \n        local leaderName1 = searchResultInfo1.leaderName;\n        local leaderName2 = searchResultInfo2.leaderName;\n        \n        local rioScore1 = 0;\n        local rioScore2 = 0;       \n        \n        if (leaderName1 ~= nil) then\n            rioScore1 = GetRioScore(leaderName1);\n        end   \n        if (leaderName2 ~= nil) then\n            rioScore2 = GetRioScore(leaderName2);\n        end       \n        \n        if (remainingRole1 ~= remainingRole2) then\n            return remainingRole1;\n        end\n        \n        if (sortMethod == 3) then\n            return rioScore1 > rioScore2;\n        else\n            return rioScore1 < rioScore2;\n        end\n    end\n    \n    if (#results > 0 and categoryID == 2) then\n        for i,id in ipairs(results) do\n            FilterSearchResults(id)\n        end\n        \n        if (LFGListFrame.SearchPanel.filteredIDs) then\n            LFGListUtil_FilterSearchResults(LFGListFrame.SearchPanel.results, LFGListFrame.SearchPanel.filteredIDs);\n            LFGListFrame.SearchPanel.filteredIDs = nil;\n        end\n    end\n    \n    if sortMethod ~= 1 then\n        table.sort(results, SortSearchResultsCB);\n    end\n    \n    if #results > 0 then\n        LFGListSearchPanel_UpdateResults(LFGListFrame.SearchPanel);\n    end\nend\n\naura_env.SortApplicants = function(applicants)    \n    local sortMethod = _G[\"ShowRIORaitingWA1ApplicantSortMethod\"] or 1;\n    local minRio = _G[\"ShowRIORaitingWA1ApplicantMinRio\"] or -1;\n    local maxRio = _G[\"ShowRIORaitingWA1ApplicantMaxRio\"] or 9999;\n    local filterRIO = _G[\"ShowRIORaitingWA1ApplicantFilterRIO\"] or false;\n    local categoryID = LFGListFrame.CategorySelection.selectedCategory;\n    \n    local function FilterApplicants(applicantID)\n        local applicantInfo = C_LFGList.GetApplicantInfo(applicantID);\n        \n        if (applicantInfo == nil) then\n            return;\n        end \n        \n        local name = C_LFGList.GetApplicantMemberInfo(applicantInfo.applicantID, 1);\n        local rioScore = 0;\n        \n        if (name ~= nil) then\n            rioScore = GetRioScore(name);\n        end   \n        \n        if (filterRIO == true) then\n            if (rioScore < minRio or rioScore > maxRio) then\n                addFilteredId(LFGListFrame.ApplicationViewer, applicantID)\n            end\n        end\n    end\n    \n    local function SortApplicantsCB(applicantID1, applicantID2)\n        local applicantInfo1 = C_LFGList.GetApplicantInfo(applicantID1);\n        local applicantInfo2 = C_LFGList.GetApplicantInfo(applicantID2);\n        \n        if (applicantInfo1 == nil) then\n            return false;\n        end        \n        \n        if (applicantInfo2 == nil) then\n            return true;\n        end    \n        \n        local name1 = C_LFGList.GetApplicantMemberInfo(applicantInfo1.applicantID, 1);\n        local name2 = C_LFGList.GetApplicantMemberInfo(applicantInfo2.applicantID, 1);\n        \n        local rioScore1 = 0;\n        local rioScore2 = 0;       \n        \n        if (name1 ~= nil) then\n            rioScore1 = GetRioScore(name1);\n        end   \n        if (name2 ~= nil) then\n            rioScore2 = GetRioScore(name2);\n        end\n        \n        if (sortMethod == 3) then\n            return rioScore1 > rioScore2;\n        else\n            return rioScore1 < rioScore2;\n        end\n    end\n    \n    if (categoryID == 2 and #applicants > 0) then\n        for i,id in ipairs(applicants) do\n            FilterApplicants(id)\n        end\n        \n        if (LFGListFrame.ApplicationViewer.filteredIDs) then\n            filterTable(applicants, LFGListFrame.ApplicationViewer.filteredIDs);\n            LFGListFrame.ApplicationViewer.filteredIDs = nil;\n        end\n    end\n    \n    if (sortMethod ~= 1 and #applicants > 1) then \n        table.sort(applicants, SortApplicantsCB);        \n        LFGListApplicationViewer_UpdateResults(LFGListFrame.ApplicationViewer);\n    end\n    \n    if (#applicants > 0) then        \n        LFGListApplicationViewer_UpdateResults(LFGListFrame.ApplicationViewer);\n    end\nend\n\nlocal isLoad = _G[\"ShowRIORaitingWA1\"];\n\n_G[\"ShowRIORaitingWA1NotShowRio\"] = aura_env.config.NotShowRio\n_G[\"ShowRIORaitingWA1NotShowApplicantRio\"] = aura_env.config.NotShowApplicantRio\n_G[\"ShowRIORaitingWA1NotShowClasses\"] = aura_env.config.NotShowClasses \n_G[\"ShowRIORaitingWA1TextFormatRIO\"] = aura_env.config.TextFormatRIO;\n_G[\"ShowRIORaitingWA1Trim\"] = aura_env.Trim;\n_G[\"ShowRIORaitingWA1SortMethod\"] = aura_env.config.RioSort;\n_G[\"ShowRIORaitingWA1ApplicantSortMethod\"] = aura_env.config.ApplicantRioSort;\n_G[\"ShowRIORaitingWA1RemoveWithoutRole\"] = aura_env.config.RemoveWithoutRole;\n_G[\"ShowRIORaitingWA1MinRio\"] = aura_env.config.MinRio;\n_G[\"ShowRIORaitingWA1MaxRio\"] = aura_env.config.MaxRio;\n_G[\"ShowRIORaitingWA1ApplicantMinRio\"] = aura_env.config.ApplicantMinRio;\n_G[\"ShowRIORaitingWA1ApplicantMaxRio\"] = aura_env.config.ApplicantMaxRio;\n_G[\"ShowRIORaitingWA1FilterRIO\"] = aura_env.config.FilterRIO;\n_G[\"ShowRIORaitingWA1ApplicantFilterRIO\"] = aura_env.config.ApplicantFilterRIO;\n_G[\"ShowRIORaitingWA1PreviousRIO\"] = aura_env.config.ShowPreviousRIO;\n\nif (not isLoad) then \n    hooksecurefunc(\"LFGListUtil_SortSearchResults\", aura_env.SortSearchResults);\n    hooksecurefunc(\"LFGListSearchEntry_Update\", aura_env.SearchEntryUpdate);\n    hooksecurefunc(\"LFGListUtil_SortApplicants\", aura_env.SortApplicants);\n    hooksecurefunc(\"LFGListApplicationViewer_UpdateApplicantMember\", aura_env.UpdateApplicantMember);\n    _G[\"ShowRIORaitingWA1\"] = true;\nend\n\n\n\n",
+					["do_custom"] = true,
+				},
+				["start"] = {
+				},
+			},
+			["anchorFrameType"] = "SCREEN",
+			["anchorPoint"] = "CENTER",
+			["animation"] = {
+				["finish"] = {
+					["duration_type"] = "seconds",
+					["easeStrength"] = 3,
+					["easeType"] = "none",
+					["type"] = "none",
+				},
+				["main"] = {
+					["duration_type"] = "seconds",
+					["easeStrength"] = 3,
+					["easeType"] = "none",
+					["type"] = "none",
+				},
+				["start"] = {
+					["duration_type"] = "seconds",
+					["easeStrength"] = 3,
+					["easeType"] = "none",
+					["type"] = "none",
+				},
+			},
+			["authorOptions"] = {
+				{
+					["default"] = "",
+					["desc"] = "use tag @rio for show rio rating text",
+					["key"] = "TextFormatRIO",
+					["length"] = 10,
+					["multiline"] = false,
+					["name"] = "Text format RIO",
+					["type"] = "input",
+					["useDesc"] = true,
+					["useLength"] = false,
+					["width"] = 2,
+				}, -- [1]
+				{
+					["default"] = true,
+					["key"] = "ShowPreviousRIO",
+					["name"] = "Show previous season RIO rating",
+					["type"] = "toggle",
+					["useDesc"] = false,
+					["width"] = 1,
+				}, -- [2]
+				{
+					["default"] = false,
+					["key"] = "NotShowClasses",
+					["name"] = "Don't show classes",
+					["type"] = "toggle",
+					["useDesc"] = false,
+					["width"] = 2,
+				}, -- [3]
+				{
+					["default"] = false,
+					["key"] = "NotShowRio",
+					["name"] = "Don't show leader RIO",
+					["type"] = "toggle",
+					["useDesc"] = false,
+					["width"] = 2,
+				}, -- [4]
+				{
+					["default"] = false,
+					["key"] = "NotShowApplicantRio",
+					["name"] = "Don't show applicant RIO",
+					["type"] = "toggle",
+					["useDesc"] = false,
+					["width"] = 2,
+				}, -- [5]
+				{
+					["default"] = false,
+					["desc"] = "Remove parties without slot for your role",
+					["key"] = "RemoveWithoutRole",
+					["name"] = "Don't show parties without slot for your role",
+					["type"] = "toggle",
+					["useDesc"] = true,
+					["width"] = 2,
+				}, -- [6]
+				{
+					["noMerge"] = false,
+					["text"] = "",
+					["type"] = "header",
+					["useName"] = false,
+					["width"] = 1,
+				}, -- [7]
+				{
+					["default"] = false,
+					["key"] = "FilterRIO",
+					["name"] = "Enable RIO rating filter for groups",
+					["type"] = "toggle",
+					["useDesc"] = false,
+					["width"] = 2,
+				}, -- [8]
+				{
+					["default"] = -1,
+					["key"] = "MinRio",
+					["max"] = 9999,
+					["min"] = -1,
+					["name"] = "Minimal RIO rating",
+					["step"] = 1,
+					["type"] = "number",
+					["useDesc"] = false,
+					["width"] = 1,
+				}, -- [9]
+				{
+					["default"] = 9999,
+					["key"] = "MaxRio",
+					["max"] = 9999,
+					["min"] = -1,
+					["name"] = "Maximum RIO rating",
+					["step"] = 1,
+					["type"] = "number",
+					["useDesc"] = false,
+					["width"] = 1,
+				}, -- [10]
+				{
+					["noMerge"] = false,
+					["text"] = "",
+					["type"] = "header",
+					["useName"] = false,
+					["width"] = 1,
+				}, -- [11]
+				{
+					["default"] = false,
+					["key"] = "ApplicantFilterRIO",
+					["name"] = "Enable RIO rating filter for applicants",
+					["type"] = "toggle",
+					["useDesc"] = false,
+					["width"] = 2,
+				}, -- [12]
+				{
+					["default"] = -1,
+					["key"] = "ApplicantMinRio",
+					["max"] = 9999,
+					["min"] = -1,
+					["name"] = "Minimal applicant RIO rating",
+					["step"] = 1,
+					["type"] = "number",
+					["useDesc"] = false,
+					["width"] = 1,
+				}, -- [13]
+				{
+					["default"] = 9999,
+					["key"] = "ApplicantMaxRio",
+					["max"] = 9999,
+					["min"] = -1,
+					["name"] = "Maximum applicant RIO rating",
+					["step"] = 1,
+					["type"] = "number",
+					["useDesc"] = false,
+					["width"] = 1,
+				}, -- [14]
+				{
+					["noMerge"] = false,
+					["text"] = "",
+					["type"] = "header",
+					["useName"] = false,
+					["width"] = 1,
+				}, -- [15]
+				{
+					["default"] = 1,
+					["key"] = "RioSort",
+					["name"] = "Sort by RIO rating",
+					["type"] = "select",
+					["useDesc"] = false,
+					["values"] = {
+						"None", -- [1]
+						"Ascending", -- [2]
+						"Descending", -- [3]
+					},
+					["width"] = 1,
+				}, -- [16]
+				{
+					["default"] = 1,
+					["key"] = "ApplicantRioSort",
+					["name"] = "Applicants sort by RIO rating",
+					["type"] = "select",
+					["useDesc"] = false,
+					["values"] = {
+						"None", -- [1]
+						"Ascending", -- [2]
+						"Descending", -- [3]
+					},
+					["width"] = 1,
+				}, -- [17]
+			},
+			["automaticWidth"] = "Auto",
+			["color"] = {
+				1, -- [1]
+				1, -- [2]
+				1, -- [3]
+				1, -- [4]
+			},
+			["conditions"] = {
+			},
+			["config"] = {
+				["ApplicantFilterRIO"] = false,
+				["ApplicantMaxRio"] = 9999,
+				["ApplicantMinRio"] = 2500,
+				["ApplicantRioSort"] = 3,
+				["FilterRIO"] = false,
+				["MaxRio"] = 9999,
+				["MinRio"] = 1000,
+				["NotShowApplicantRio"] = false,
+				["NotShowClasses"] = false,
+				["NotShowRio"] = false,
+				["RemoveWithoutRole"] = true,
+				["RioSort"] = 3,
+				["ShowPreviousRIO"] = true,
+				["TextFormatRIO"] = "[@rio]",
+			},
+			["customTextUpdate"] = "event",
+			["displayText"] = "%p\n",
+			["displayText_format_p_format"] = "timed",
+			["displayText_format_p_time_dynamic"] = false,
+			["displayText_format_p_time_precision"] = 1,
+			["fixedWidth"] = 200,
+			["font"] = "Friz Quadrata TT",
+			["fontSize"] = 12,
+			["frameStrata"] = 1,
+			["id"] = "Dungeon RIO and Class",
+			["information"] = {
+				["ignoreOptionsEventErrors"] = true,
+			},
+			["internalVersion"] = 40,
+			["justify"] = "LEFT",
+			["load"] = {
+				["class"] = {
+					["multi"] = {
+					},
+				},
+				["size"] = {
+					["multi"] = {
+					},
+				},
+				["spec"] = {
+					["multi"] = {
+					},
+				},
+				["talent"] = {
+					["multi"] = {
+					},
+				},
+				["use_never"] = false,
+			},
+			["outline"] = "OUTLINE",
+			["preferToUpdate"] = false,
+			["regionType"] = "text",
+			["selfPoint"] = "BOTTOM",
+			["semver"] = "1.0.13",
+			["shadowColor"] = {
+				0, -- [1]
+				0, -- [2]
+				0, -- [3]
+				1, -- [4]
+			},
+			["shadowXOffset"] = 1,
+			["shadowYOffset"] = -1,
+			["subRegions"] = {
+			},
+			["tocversion"] = 90002,
+			["triggers"] = {
+				[1] = {
+					["trigger"] = {
+						["buffShowOn"] = "showOnActive",
+						["custom_hide"] = "custom",
+						["custom_type"] = "event",
+						["debuffType"] = "HELPFUL",
+						["duration"] = "1",
+						["event"] = "Conditions",
+						["events"] = "PLAYER_ENTERING_WORLD",
+						["names"] = {
+						},
+						["spellIds"] = {
+						},
+						["subeventPrefix"] = "SPELL",
+						["subeventSuffix"] = "_CAST_START",
+						["type"] = "status",
+						["unevent"] = "auto",
+						["unit"] = "target",
+						["use_absorbMode"] = true,
+						["use_alwaystrue"] = true,
+						["use_unit"] = true,
+					},
+					["untrigger"] = {
+					},
+				},
+				["activeTriggerMode"] = -10,
+				["disjunctive"] = "any",
+			},
+			["uid"] = "IxpIcJ0ZtE8",
+			["url"] = "https://wago.io/klC4qqHaF/14",
+			["version"] = 14,
+			["wordWrap"] = "WordWrap",
+			["xOffset"] = 0,
+			["yOffset"] = 0,
 		},
 		["EDE [DOS] Blood Barrier Inc"] = {
 			["actions"] = {
@@ -5296,6 +5782,2476 @@ WeakAurasSaved = {
 			["xOffset"] = 0,
 			["yOffset"] = 0,
 		},
+		["Inscrutable Quantum Device"] = {
+			["actions"] = {
+				["finish"] = {
+				},
+				["init"] = {
+				},
+				["start"] = {
+				},
+			},
+			["anchorFrameType"] = "SCREEN",
+			["anchorPoint"] = "CENTER",
+			["animation"] = {
+				["finish"] = {
+					["duration_type"] = "seconds",
+					["easeStrength"] = 3,
+					["easeType"] = "none",
+					["type"] = "none",
+				},
+				["main"] = {
+					["duration_type"] = "seconds",
+					["easeStrength"] = 3,
+					["easeType"] = "none",
+					["type"] = "none",
+				},
+				["start"] = {
+					["duration_type"] = "seconds",
+					["easeStrength"] = 3,
+					["easeType"] = "none",
+					["type"] = "none",
+				},
+			},
+			["authorOptions"] = {
+			},
+			["backdropColor"] = {
+				1, -- [1]
+				1, -- [2]
+				1, -- [3]
+				0.5, -- [4]
+			},
+			["border"] = false,
+			["borderBackdrop"] = "Blizzard Tooltip",
+			["borderColor"] = {
+				0, -- [1]
+				0, -- [2]
+				0, -- [3]
+				1, -- [4]
+			},
+			["borderEdge"] = "Square Full White",
+			["borderInset"] = 1,
+			["borderOffset"] = 4,
+			["borderSize"] = 2,
+			["conditions"] = {
+			},
+			["config"] = {
+			},
+			["controlledChildren"] = {
+				"Inscrutable Quantum Device Available", -- [1]
+				"Inscrutable Quantum Device CD", -- [2]
+				"Inscrutable Quantum Device CC Break", -- [3]
+				"Inscrutable Quantum Device Heal", -- [4]
+				"Inscrutable Quantum Device Mana", -- [5]
+				"Inscrutable Quantum Device Execute", -- [6]
+				"Inscrutable Quantum Device Crit", -- [7]
+				"Inscrutable Quantum Device Haste", -- [8]
+				"Inscrutable Quantum Device Mastery", -- [9]
+				"Inscrutable Quantum Device Versa", -- [10]
+			},
+			["frameStrata"] = 1,
+			["id"] = "Inscrutable Quantum Device",
+			["information"] = {
+				["groupOffset"] = true,
+			},
+			["internalVersion"] = 40,
+			["load"] = {
+				["class"] = {
+					["multi"] = {
+					},
+				},
+				["size"] = {
+					["multi"] = {
+					},
+				},
+				["spec"] = {
+					["multi"] = {
+					},
+				},
+				["talent"] = {
+					["multi"] = {
+					},
+				},
+			},
+			["preferToUpdate"] = false,
+			["regionType"] = "group",
+			["scale"] = 1,
+			["selfPoint"] = "BOTTOMLEFT",
+			["semver"] = "1.0.5",
+			["subRegions"] = {
+			},
+			["tocversion"] = 90002,
+			["triggers"] = {
+				{
+					["trigger"] = {
+						["debuffType"] = "HELPFUL",
+						["event"] = "Health",
+						["names"] = {
+						},
+						["spellIds"] = {
+						},
+						["subeventPrefix"] = "SPELL",
+						["subeventSuffix"] = "_CAST_START",
+						["type"] = "aura2",
+						["unit"] = "player",
+					},
+					["untrigger"] = {
+					},
+				}, -- [1]
+			},
+			["uid"] = "i7it7)Ri4Ik",
+			["url"] = "https://wago.io/G_ZnwseH-/6",
+			["version"] = 6,
+			["xOffset"] = 0,
+			["yOffset"] = -75,
+		},
+		["Inscrutable Quantum Device Available"] = {
+			["actions"] = {
+				["finish"] = {
+				},
+				["init"] = {
+				},
+				["start"] = {
+				},
+			},
+			["alpha"] = 1,
+			["anchorFrameType"] = "SCREEN",
+			["anchorPoint"] = "CENTER",
+			["animation"] = {
+				["finish"] = {
+					["duration_type"] = "seconds",
+					["easeStrength"] = 3,
+					["easeType"] = "none",
+					["type"] = "none",
+				},
+				["main"] = {
+					["duration_type"] = "seconds",
+					["easeStrength"] = 3,
+					["easeType"] = "none",
+					["type"] = "none",
+				},
+				["start"] = {
+					["duration_type"] = "seconds",
+					["easeStrength"] = 3,
+					["easeType"] = "none",
+					["type"] = "none",
+				},
+			},
+			["authorOptions"] = {
+			},
+			["color"] = {
+				1, -- [1]
+				1, -- [2]
+				1, -- [3]
+				1, -- [4]
+			},
+			["conditions"] = {
+			},
+			["config"] = {
+			},
+			["cooldown"] = false,
+			["cooldownEdge"] = false,
+			["cooldownSwipe"] = true,
+			["cooldownTextDisabled"] = false,
+			["desaturate"] = false,
+			["frameStrata"] = 3,
+			["height"] = 40,
+			["icon"] = true,
+			["iconSource"] = -1,
+			["id"] = "Inscrutable Quantum Device Available",
+			["information"] = {
+			},
+			["internalVersion"] = 40,
+			["inverse"] = false,
+			["keepAspectRatio"] = false,
+			["load"] = {
+				["class"] = {
+					["multi"] = {
+					},
+				},
+				["item_bonusid_equipped"] = "Inscrutable Quantum Device",
+				["itemequiped"] = 179350,
+				["itemtypeequipped"] = {
+				},
+				["size"] = {
+					["multi"] = {
+					},
+				},
+				["spec"] = {
+					["multi"] = {
+					},
+				},
+				["talent"] = {
+					["multi"] = {
+					},
+				},
+				["use_item_bonusid_equipped"] = false,
+				["use_itemequiped"] = true,
+			},
+			["parent"] = "Inscrutable Quantum Device",
+			["preferToUpdate"] = false,
+			["regionType"] = "icon",
+			["selfPoint"] = "CENTER",
+			["semver"] = "1.0.5",
+			["subRegions"] = {
+				{
+					["anchorXOffset"] = 0,
+					["anchorYOffset"] = 0,
+					["rotateText"] = "NONE",
+					["text_anchorPoint"] = "CENTER",
+					["text_automaticWidth"] = "Auto",
+					["text_color"] = {
+						1, -- [1]
+						1, -- [2]
+						1, -- [3]
+						1, -- [4]
+					},
+					["text_fixedWidth"] = 64,
+					["text_font"] = "Expressway",
+					["text_fontSize"] = 30,
+					["text_fontType"] = "OUTLINE",
+					["text_justify"] = "CENTER",
+					["text_selfPoint"] = "AUTO",
+					["text_shadowColor"] = {
+						0, -- [1]
+						0, -- [2]
+						0, -- [3]
+						1, -- [4]
+					},
+					["text_shadowXOffset"] = 0,
+					["text_shadowYOffset"] = 0,
+					["text_text"] = "%s",
+					["text_text_format_s_format"] = "none",
+					["text_visible"] = true,
+					["text_wordWrap"] = "WordWrap",
+					["type"] = "subtext",
+				}, -- [1]
+				{
+					["glow"] = false,
+					["glowBorder"] = false,
+					["glowColor"] = {
+						1, -- [1]
+						1, -- [2]
+						1, -- [3]
+						1, -- [4]
+					},
+					["glowFrequency"] = 0.25,
+					["glowLength"] = 10,
+					["glowLines"] = 8,
+					["glowScale"] = 1,
+					["glowThickness"] = 1,
+					["glowType"] = "buttonOverlay",
+					["glowXOffset"] = 0,
+					["glowYOffset"] = 0,
+					["type"] = "subglow",
+					["useGlowColor"] = false,
+				}, -- [2]
+			},
+			["tocversion"] = 90002,
+			["triggers"] = {
+				[1] = {
+					["trigger"] = {
+						["debuffType"] = "HELPFUL",
+						["duration"] = "1",
+						["event"] = "Cooldown Progress (Item)",
+						["genericShowOn"] = "showOnReady",
+						["itemName"] = 179350,
+						["names"] = {
+						},
+						["realSpellName"] = 0,
+						["spellIds"] = {
+						},
+						["spellName"] = 0,
+						["subeventPrefix"] = "SPELL",
+						["subeventSuffix"] = "_CAST_START",
+						["type"] = "status",
+						["unevent"] = "auto",
+						["unit"] = "player",
+						["use_genericShowOn"] = true,
+						["use_itemName"] = true,
+						["use_spellName"] = true,
+						["use_track"] = true,
+					},
+					["untrigger"] = {
+						["genericShowOn"] = "showOnReady",
+					},
+				},
+				["activeTriggerMode"] = -10,
+			},
+			["uid"] = "9oSo)oHa3wr",
+			["url"] = "https://wago.io/G_ZnwseH-/6",
+			["version"] = 6,
+			["width"] = 40,
+			["xOffset"] = 105,
+			["yOffset"] = -25,
+			["zoom"] = 0,
+		},
+		["Inscrutable Quantum Device CC Break"] = {
+			["actions"] = {
+				["finish"] = {
+				},
+				["init"] = {
+				},
+				["start"] = {
+				},
+			},
+			["alpha"] = 1,
+			["anchorFrameType"] = "SCREEN",
+			["anchorPoint"] = "CENTER",
+			["animation"] = {
+				["finish"] = {
+					["duration_type"] = "seconds",
+					["easeStrength"] = 3,
+					["easeType"] = "none",
+					["type"] = "none",
+				},
+				["main"] = {
+					["duration_type"] = "seconds",
+					["easeStrength"] = 3,
+					["easeType"] = "none",
+					["type"] = "none",
+				},
+				["start"] = {
+					["duration_type"] = "seconds",
+					["easeStrength"] = 3,
+					["easeType"] = "none",
+					["type"] = "none",
+				},
+			},
+			["authorOptions"] = {
+			},
+			["color"] = {
+				0, -- [1]
+				0.019607843137255, -- [2]
+				0.96862745098039, -- [3]
+				1, -- [4]
+			},
+			["conditions"] = {
+			},
+			["config"] = {
+			},
+			["cooldown"] = false,
+			["cooldownEdge"] = false,
+			["cooldownSwipe"] = false,
+			["cooldownTextDisabled"] = false,
+			["desaturate"] = false,
+			["displayIcon"] = 2000857,
+			["frameStrata"] = 5,
+			["height"] = 40,
+			["icon"] = true,
+			["iconSource"] = 0,
+			["id"] = "Inscrutable Quantum Device CC Break",
+			["information"] = {
+			},
+			["internalVersion"] = 40,
+			["inverse"] = false,
+			["keepAspectRatio"] = false,
+			["load"] = {
+				["class"] = {
+					["multi"] = {
+					},
+				},
+				["item_bonusid_equipped"] = "Inscrutable Quantum Device",
+				["itemequiped"] = 179350,
+				["itemtypeequipped"] = {
+				},
+				["size"] = {
+					["multi"] = {
+					},
+				},
+				["spec"] = {
+					["multi"] = {
+					},
+				},
+				["talent"] = {
+					["multi"] = {
+					},
+				},
+				["use_item_bonusid_equipped"] = false,
+				["use_itemequiped"] = true,
+				["use_vehicle"] = false,
+			},
+			["parent"] = "Inscrutable Quantum Device",
+			["preferToUpdate"] = false,
+			["regionType"] = "icon",
+			["selfPoint"] = "CENTER",
+			["semver"] = "1.0.5",
+			["subRegions"] = {
+				{
+					["anchorXOffset"] = 0,
+					["anchorYOffset"] = 0,
+					["rotateText"] = "NONE",
+					["text_anchorPoint"] = "CENTER",
+					["text_anchorYOffset"] = 5,
+					["text_automaticWidth"] = "Auto",
+					["text_color"] = {
+						1, -- [1]
+						1, -- [2]
+						1, -- [3]
+						1, -- [4]
+					},
+					["text_fixedWidth"] = 64,
+					["text_font"] = "Expressway",
+					["text_fontSize"] = 14,
+					["text_fontType"] = "OUTLINE",
+					["text_justify"] = "CENTER",
+					["text_selfPoint"] = "AUTO",
+					["text_shadowColor"] = {
+						0, -- [1]
+						0, -- [2]
+						0, -- [3]
+						1, -- [4]
+					},
+					["text_shadowXOffset"] = 0,
+					["text_shadowYOffset"] = 0,
+					["text_text"] = "BREAK",
+					["text_text_format_p_abbreviate"] = false,
+					["text_text_format_p_abbreviate_max"] = 8,
+					["text_text_format_p_big_number_format"] = "AbbreviateNumbers",
+					["text_text_format_p_decimal_precision"] = 1,
+					["text_text_format_p_format"] = "timed",
+					["text_text_format_p_gcd_cast"] = false,
+					["text_text_format_p_gcd_channel"] = false,
+					["text_text_format_p_gcd_gcd"] = true,
+					["text_text_format_p_gcd_hide_zero"] = false,
+					["text_text_format_p_time_dynamic"] = false,
+					["text_text_format_p_time_precision"] = 0,
+					["text_text_format_s_format"] = "none",
+					["text_visible"] = true,
+					["text_wordWrap"] = "WordWrap",
+					["type"] = "subtext",
+				}, -- [1]
+				{
+					["anchorXOffset"] = 0,
+					["anchorYOffset"] = 0,
+					["rotateText"] = "NONE",
+					["text_anchorPoint"] = "CENTER",
+					["text_anchorYOffset"] = -6,
+					["text_automaticWidth"] = "Auto",
+					["text_color"] = {
+						1, -- [1]
+						1, -- [2]
+						1, -- [3]
+						1, -- [4]
+					},
+					["text_fixedWidth"] = 64,
+					["text_font"] = "Expressway",
+					["text_fontSize"] = 14,
+					["text_fontType"] = "OUTLINE",
+					["text_justify"] = "CENTER",
+					["text_selfPoint"] = "AUTO",
+					["text_shadowColor"] = {
+						0, -- [1]
+						0, -- [2]
+						0, -- [3]
+						1, -- [4]
+					},
+					["text_shadowXOffset"] = 0,
+					["text_shadowYOffset"] = 0,
+					["text_text"] = "CC",
+					["text_text_format_p_abbreviate"] = false,
+					["text_text_format_p_abbreviate_max"] = 8,
+					["text_text_format_p_big_number_format"] = "AbbreviateNumbers",
+					["text_text_format_p_decimal_precision"] = 1,
+					["text_text_format_p_format"] = "timed",
+					["text_text_format_p_gcd_cast"] = false,
+					["text_text_format_p_gcd_channel"] = false,
+					["text_text_format_p_gcd_gcd"] = true,
+					["text_text_format_p_gcd_hide_zero"] = false,
+					["text_text_format_p_time_dynamic"] = false,
+					["text_text_format_p_time_precision"] = 0,
+					["text_text_format_s_format"] = "none",
+					["text_visible"] = true,
+					["text_wordWrap"] = "WordWrap",
+					["type"] = "subtext",
+				}, -- [2]
+				{
+					["glow"] = true,
+					["glowBorder"] = false,
+					["glowColor"] = {
+						1, -- [1]
+						1, -- [2]
+						1, -- [3]
+						1, -- [4]
+					},
+					["glowFrequency"] = 0.25,
+					["glowLength"] = 10,
+					["glowLines"] = 8,
+					["glowScale"] = 1,
+					["glowThickness"] = 1,
+					["glowType"] = "ACShine",
+					["glowXOffset"] = 0,
+					["glowYOffset"] = 0,
+					["type"] = "subglow",
+					["useGlowColor"] = false,
+				}, -- [3]
+			},
+			["tocversion"] = 90002,
+			["triggers"] = {
+				[1] = {
+					["trigger"] = {
+						["auraspellids"] = {
+							"330366", -- [1]
+						},
+						["debuffType"] = "HELPFUL",
+						["duration"] = "1",
+						["event"] = "Crowd Controlled",
+						["names"] = {
+						},
+						["percenthealth"] = "20",
+						["percenthealth_operator"] = "<=",
+						["spellIds"] = {
+						},
+						["subeventPrefix"] = "SPELL",
+						["subeventSuffix"] = "_CAST_START",
+						["type"] = "status",
+						["unevent"] = "auto",
+						["unit"] = "target",
+						["useExactSpellId"] = true,
+						["use_absorbMode"] = true,
+						["use_controlled"] = true,
+						["use_health"] = false,
+						["use_percenthealth"] = true,
+						["use_unit"] = true,
+					},
+					["untrigger"] = {
+						["unit"] = "target",
+					},
+				},
+				[2] = {
+					["trigger"] = {
+						["debuffType"] = "HELPFUL",
+						["duration"] = "1",
+						["event"] = "Cooldown Progress (Item)",
+						["genericShowOn"] = "showOnReady",
+						["itemName"] = 179350,
+						["realSpellName"] = 0,
+						["spellName"] = 0,
+						["type"] = "status",
+						["unevent"] = "auto",
+						["unit"] = "player",
+						["use_genericShowOn"] = true,
+						["use_itemName"] = true,
+						["use_spellName"] = true,
+						["use_track"] = true,
+					},
+					["untrigger"] = {
+						["genericShowOn"] = "showOnReady",
+					},
+				},
+				["activeTriggerMode"] = -10,
+			},
+			["uid"] = "vkNzxU(fgF1",
+			["url"] = "https://wago.io/G_ZnwseH-/6",
+			["version"] = 6,
+			["width"] = 40,
+			["xOffset"] = 105,
+			["yOffset"] = -25,
+			["zoom"] = 0.32,
+		},
+		["Inscrutable Quantum Device CD"] = {
+			["actions"] = {
+				["finish"] = {
+				},
+				["init"] = {
+				},
+				["start"] = {
+				},
+			},
+			["alpha"] = 1,
+			["anchorFrameType"] = "SCREEN",
+			["anchorPoint"] = "CENTER",
+			["animation"] = {
+				["finish"] = {
+					["duration_type"] = "seconds",
+					["easeStrength"] = 3,
+					["easeType"] = "none",
+					["type"] = "none",
+				},
+				["main"] = {
+					["duration_type"] = "seconds",
+					["easeStrength"] = 3,
+					["easeType"] = "none",
+					["type"] = "none",
+				},
+				["start"] = {
+					["duration_type"] = "seconds",
+					["easeStrength"] = 3,
+					["easeType"] = "none",
+					["type"] = "none",
+				},
+			},
+			["authorOptions"] = {
+			},
+			["color"] = {
+				1, -- [1]
+				1, -- [2]
+				1, -- [3]
+				1, -- [4]
+			},
+			["conditions"] = {
+				{
+					["changes"] = {
+						{
+							["property"] = "sub.2.glow",
+							["value"] = true,
+						}, -- [1]
+					},
+					["check"] = {
+						["op"] = "<=",
+						["trigger"] = 1,
+						["variable"] = "expirationTime",
+					},
+				}, -- [1]
+			},
+			["config"] = {
+			},
+			["cooldown"] = true,
+			["cooldownEdge"] = false,
+			["cooldownSwipe"] = false,
+			["cooldownTextDisabled"] = false,
+			["desaturate"] = true,
+			["frameStrata"] = 5,
+			["height"] = 40,
+			["icon"] = true,
+			["iconSource"] = -1,
+			["id"] = "Inscrutable Quantum Device CD",
+			["information"] = {
+			},
+			["internalVersion"] = 40,
+			["inverse"] = false,
+			["keepAspectRatio"] = false,
+			["load"] = {
+				["class"] = {
+					["multi"] = {
+					},
+				},
+				["item_bonusid_equipped"] = "Inscrutable Quantum Device",
+				["itemequiped"] = 179350,
+				["itemtypeequipped"] = {
+				},
+				["size"] = {
+					["multi"] = {
+					},
+				},
+				["spec"] = {
+					["multi"] = {
+					},
+				},
+				["talent"] = {
+					["multi"] = {
+					},
+				},
+				["use_item_bonusid_equipped"] = false,
+				["use_itemequiped"] = true,
+			},
+			["parent"] = "Inscrutable Quantum Device",
+			["preferToUpdate"] = false,
+			["regionType"] = "icon",
+			["selfPoint"] = "CENTER",
+			["semver"] = "1.0.5",
+			["subRegions"] = {
+				{
+					["anchorXOffset"] = 0,
+					["anchorYOffset"] = 0,
+					["rotateText"] = "NONE",
+					["text_anchorPoint"] = "CENTER",
+					["text_automaticWidth"] = "Auto",
+					["text_color"] = {
+						1, -- [1]
+						1, -- [2]
+						1, -- [3]
+						1, -- [4]
+					},
+					["text_fixedWidth"] = 64,
+					["text_font"] = "Expressway",
+					["text_fontSize"] = 24,
+					["text_fontType"] = "OUTLINE",
+					["text_justify"] = "CENTER",
+					["text_selfPoint"] = "AUTO",
+					["text_shadowColor"] = {
+						0, -- [1]
+						0, -- [2]
+						0, -- [3]
+						1, -- [4]
+					},
+					["text_shadowXOffset"] = 0,
+					["text_shadowYOffset"] = 0,
+					["text_text"] = "%p",
+					["text_text_format_p_format"] = "timed",
+					["text_text_format_p_time_dynamic"] = false,
+					["text_text_format_p_time_precision"] = 1,
+					["text_text_format_s_format"] = "none",
+					["text_text_format_t_format"] = "timed",
+					["text_text_format_t_time_dynamic"] = false,
+					["text_text_format_t_time_precision"] = 1,
+					["text_visible"] = true,
+					["text_wordWrap"] = "WordWrap",
+					["type"] = "subtext",
+				}, -- [1]
+				{
+					["glow"] = false,
+					["glowBorder"] = false,
+					["glowColor"] = {
+						1, -- [1]
+						1, -- [2]
+						1, -- [3]
+						1, -- [4]
+					},
+					["glowFrequency"] = 0.25,
+					["glowLength"] = 10,
+					["glowLines"] = 8,
+					["glowScale"] = 1,
+					["glowThickness"] = 1,
+					["glowType"] = "buttonOverlay",
+					["glowXOffset"] = 0,
+					["glowYOffset"] = 0,
+					["type"] = "subglow",
+					["useGlowColor"] = false,
+				}, -- [2]
+			},
+			["tocversion"] = 90002,
+			["triggers"] = {
+				[1] = {
+					["trigger"] = {
+						["debuffType"] = "HELPFUL",
+						["duration"] = "1",
+						["event"] = "Cooldown Progress (Item)",
+						["genericShowOn"] = "showOnCooldown",
+						["itemName"] = 179350,
+						["names"] = {
+						},
+						["realSpellName"] = 0,
+						["remaining"] = "20",
+						["remaining_operator"] = "<=",
+						["spellIds"] = {
+						},
+						["spellName"] = 0,
+						["subeventPrefix"] = "SPELL",
+						["subeventSuffix"] = "_CAST_START",
+						["type"] = "status",
+						["unevent"] = "auto",
+						["unit"] = "player",
+						["use_genericShowOn"] = true,
+						["use_itemName"] = true,
+						["use_remaining"] = true,
+						["use_spellName"] = true,
+						["use_track"] = true,
+					},
+					["untrigger"] = {
+					},
+				},
+				["activeTriggerMode"] = -10,
+				["disjunctive"] = "any",
+			},
+			["uid"] = "N6jOWYWsXqi",
+			["url"] = "https://wago.io/G_ZnwseH-/6",
+			["version"] = 6,
+			["width"] = 40,
+			["xOffset"] = 105,
+			["yOffset"] = -25,
+			["zoom"] = 0,
+		},
+		["Inscrutable Quantum Device Crit"] = {
+			["actions"] = {
+				["finish"] = {
+				},
+				["init"] = {
+				},
+				["start"] = {
+				},
+			},
+			["alpha"] = 1,
+			["anchorFrameType"] = "SCREEN",
+			["anchorPoint"] = "CENTER",
+			["animation"] = {
+				["finish"] = {
+					["duration_type"] = "seconds",
+					["easeStrength"] = 3,
+					["easeType"] = "none",
+					["type"] = "none",
+				},
+				["main"] = {
+					["duration_type"] = "seconds",
+					["easeStrength"] = 3,
+					["easeType"] = "none",
+					["type"] = "none",
+				},
+				["start"] = {
+					["duration_type"] = "seconds",
+					["easeStrength"] = 3,
+					["easeType"] = "none",
+					["type"] = "none",
+				},
+			},
+			["authorOptions"] = {
+			},
+			["color"] = {
+				1, -- [1]
+				1, -- [2]
+				1, -- [3]
+				1, -- [4]
+			},
+			["conditions"] = {
+			},
+			["config"] = {
+			},
+			["cooldown"] = true,
+			["cooldownEdge"] = false,
+			["cooldownSwipe"] = true,
+			["cooldownTextDisabled"] = false,
+			["desaturate"] = false,
+			["frameStrata"] = 3,
+			["height"] = 40,
+			["icon"] = true,
+			["iconSource"] = -1,
+			["id"] = "Inscrutable Quantum Device Crit",
+			["information"] = {
+			},
+			["internalVersion"] = 40,
+			["inverse"] = false,
+			["keepAspectRatio"] = false,
+			["load"] = {
+				["class"] = {
+					["multi"] = {
+					},
+				},
+				["item_bonusid_equipped"] = "Inscrutable Quantum Device",
+				["itemequiped"] = 179350,
+				["itemtypeequipped"] = {
+				},
+				["size"] = {
+					["multi"] = {
+					},
+				},
+				["spec"] = {
+					["multi"] = {
+					},
+				},
+				["talent"] = {
+					["multi"] = {
+					},
+				},
+				["use_item_bonusid_equipped"] = false,
+				["use_itemequiped"] = true,
+			},
+			["parent"] = "Inscrutable Quantum Device",
+			["preferToUpdate"] = false,
+			["regionType"] = "icon",
+			["selfPoint"] = "CENTER",
+			["semver"] = "1.0.5",
+			["subRegions"] = {
+				{
+					["anchorXOffset"] = 0,
+					["anchorYOffset"] = 0,
+					["rotateText"] = "NONE",
+					["text_anchorPoint"] = "CENTER",
+					["text_automaticWidth"] = "Auto",
+					["text_color"] = {
+						1, -- [1]
+						1, -- [2]
+						1, -- [3]
+						1, -- [4]
+					},
+					["text_fixedWidth"] = 64,
+					["text_font"] = "Expressway",
+					["text_fontSize"] = 30,
+					["text_fontType"] = "OUTLINE",
+					["text_justify"] = "CENTER",
+					["text_selfPoint"] = "AUTO",
+					["text_shadowColor"] = {
+						0, -- [1]
+						0, -- [2]
+						0, -- [3]
+						1, -- [4]
+					},
+					["text_shadowXOffset"] = 0,
+					["text_shadowYOffset"] = 0,
+					["text_text"] = "%p",
+					["text_text_format_p_abbreviate"] = false,
+					["text_text_format_p_abbreviate_max"] = 8,
+					["text_text_format_p_big_number_format"] = "AbbreviateNumbers",
+					["text_text_format_p_decimal_precision"] = 1,
+					["text_text_format_p_format"] = "timed",
+					["text_text_format_p_gcd_cast"] = false,
+					["text_text_format_p_gcd_channel"] = false,
+					["text_text_format_p_gcd_gcd"] = true,
+					["text_text_format_p_gcd_hide_zero"] = false,
+					["text_text_format_p_time_dynamic"] = false,
+					["text_text_format_p_time_precision"] = 0,
+					["text_text_format_s_format"] = "none",
+					["text_visible"] = true,
+					["text_wordWrap"] = "WordWrap",
+					["type"] = "subtext",
+				}, -- [1]
+				{
+					["anchorXOffset"] = 0,
+					["anchorYOffset"] = 0,
+					["rotateText"] = "NONE",
+					["text_anchorPoint"] = "INNER_BOTTOM",
+					["text_anchorYOffset"] = -5,
+					["text_automaticWidth"] = "Auto",
+					["text_color"] = {
+						1, -- [1]
+						1, -- [2]
+						1, -- [3]
+						1, -- [4]
+					},
+					["text_fixedWidth"] = 64,
+					["text_font"] = "Expressway",
+					["text_fontSize"] = 12,
+					["text_fontType"] = "OUTLINE",
+					["text_justify"] = "CENTER",
+					["text_selfPoint"] = "AUTO",
+					["text_shadowColor"] = {
+						0, -- [1]
+						0, -- [2]
+						0, -- [3]
+						1, -- [4]
+					},
+					["text_shadowXOffset"] = 0,
+					["text_shadowYOffset"] = 0,
+					["text_text"] = "Crit",
+					["text_text_format_p_abbreviate"] = false,
+					["text_text_format_p_abbreviate_max"] = 8,
+					["text_text_format_p_big_number_format"] = "AbbreviateNumbers",
+					["text_text_format_p_decimal_precision"] = 1,
+					["text_text_format_p_format"] = "timed",
+					["text_text_format_p_gcd_cast"] = false,
+					["text_text_format_p_gcd_channel"] = false,
+					["text_text_format_p_gcd_gcd"] = true,
+					["text_text_format_p_gcd_hide_zero"] = false,
+					["text_text_format_p_time_dynamic"] = false,
+					["text_text_format_p_time_precision"] = 0,
+					["text_text_format_s_format"] = "none",
+					["text_visible"] = true,
+					["text_wordWrap"] = "WordWrap",
+					["type"] = "subtext",
+				}, -- [2]
+				{
+					["glow"] = true,
+					["glowBorder"] = false,
+					["glowColor"] = {
+						1, -- [1]
+						1, -- [2]
+						1, -- [3]
+						1, -- [4]
+					},
+					["glowFrequency"] = 0.25,
+					["glowLength"] = 10,
+					["glowLines"] = 8,
+					["glowScale"] = 1,
+					["glowThickness"] = 1,
+					["glowType"] = "ACShine",
+					["glowXOffset"] = 0,
+					["glowYOffset"] = 0,
+					["type"] = "subglow",
+					["useGlowColor"] = false,
+				}, -- [3]
+			},
+			["tocversion"] = 90002,
+			["triggers"] = {
+				[1] = {
+					["trigger"] = {
+						["auraspellids"] = {
+							"330366", -- [1]
+						},
+						["debuffType"] = "HELPFUL",
+						["event"] = "Health",
+						["names"] = {
+						},
+						["spellIds"] = {
+						},
+						["subeventPrefix"] = "SPELL",
+						["subeventSuffix"] = "_CAST_START",
+						["type"] = "aura2",
+						["unit"] = "player",
+						["useExactSpellId"] = true,
+					},
+					["untrigger"] = {
+					},
+				},
+				["activeTriggerMode"] = -10,
+			},
+			["uid"] = "g5)uq8GiBP(",
+			["url"] = "https://wago.io/G_ZnwseH-/6",
+			["version"] = 6,
+			["width"] = 40,
+			["xOffset"] = 105,
+			["yOffset"] = -25,
+			["zoom"] = 0.32,
+		},
+		["Inscrutable Quantum Device Execute"] = {
+			["actions"] = {
+				["finish"] = {
+				},
+				["init"] = {
+				},
+				["start"] = {
+				},
+			},
+			["alpha"] = 1,
+			["anchorFrameType"] = "SCREEN",
+			["anchorPoint"] = "CENTER",
+			["animation"] = {
+				["finish"] = {
+					["duration_type"] = "seconds",
+					["easeStrength"] = 3,
+					["easeType"] = "none",
+					["type"] = "none",
+				},
+				["main"] = {
+					["duration_type"] = "seconds",
+					["easeStrength"] = 3,
+					["easeType"] = "none",
+					["type"] = "none",
+				},
+				["start"] = {
+					["duration_type"] = "seconds",
+					["easeStrength"] = 3,
+					["easeType"] = "none",
+					["type"] = "none",
+				},
+			},
+			["authorOptions"] = {
+			},
+			["color"] = {
+				0.8078431372549, -- [1]
+				0.019607843137255, -- [2]
+				0, -- [3]
+				1, -- [4]
+			},
+			["conditions"] = {
+			},
+			["config"] = {
+			},
+			["cooldown"] = false,
+			["cooldownEdge"] = false,
+			["cooldownSwipe"] = false,
+			["cooldownTextDisabled"] = false,
+			["desaturate"] = false,
+			["displayIcon"] = 2000857,
+			["frameStrata"] = 4,
+			["height"] = 40,
+			["icon"] = true,
+			["iconSource"] = 0,
+			["id"] = "Inscrutable Quantum Device Execute",
+			["information"] = {
+			},
+			["internalVersion"] = 40,
+			["inverse"] = false,
+			["keepAspectRatio"] = false,
+			["load"] = {
+				["class"] = {
+					["multi"] = {
+					},
+				},
+				["item_bonusid_equipped"] = "Inscrutable Quantum Device",
+				["itemequiped"] = 179350,
+				["itemtypeequipped"] = {
+				},
+				["size"] = {
+					["multi"] = {
+					},
+				},
+				["spec"] = {
+					["multi"] = {
+					},
+				},
+				["talent"] = {
+					["multi"] = {
+					},
+				},
+				["use_item_bonusid_equipped"] = false,
+				["use_itemequiped"] = true,
+			},
+			["parent"] = "Inscrutable Quantum Device",
+			["preferToUpdate"] = false,
+			["regionType"] = "icon",
+			["selfPoint"] = "CENTER",
+			["semver"] = "1.0.5",
+			["subRegions"] = {
+				{
+					["anchorXOffset"] = 0,
+					["anchorYOffset"] = 0,
+					["rotateText"] = "NONE",
+					["text_anchorPoint"] = "CENTER",
+					["text_anchorYOffset"] = 6,
+					["text_automaticWidth"] = "Auto",
+					["text_color"] = {
+						1, -- [1]
+						1, -- [2]
+						1, -- [3]
+						1, -- [4]
+					},
+					["text_fixedWidth"] = 64,
+					["text_font"] = "Expressway",
+					["text_fontSize"] = 15,
+					["text_fontType"] = "OUTLINE",
+					["text_justify"] = "CENTER",
+					["text_selfPoint"] = "AUTO",
+					["text_shadowColor"] = {
+						0, -- [1]
+						0, -- [2]
+						0, -- [3]
+						1, -- [4]
+					},
+					["text_shadowXOffset"] = 0,
+					["text_shadowYOffset"] = 0,
+					["text_text"] = "EXE",
+					["text_text_format_p_abbreviate"] = false,
+					["text_text_format_p_abbreviate_max"] = 8,
+					["text_text_format_p_big_number_format"] = "AbbreviateNumbers",
+					["text_text_format_p_decimal_precision"] = 1,
+					["text_text_format_p_format"] = "timed",
+					["text_text_format_p_gcd_cast"] = false,
+					["text_text_format_p_gcd_channel"] = false,
+					["text_text_format_p_gcd_gcd"] = true,
+					["text_text_format_p_gcd_hide_zero"] = false,
+					["text_text_format_p_time_dynamic"] = false,
+					["text_text_format_p_time_precision"] = 0,
+					["text_text_format_s_format"] = "none",
+					["text_visible"] = true,
+					["text_wordWrap"] = "WordWrap",
+					["type"] = "subtext",
+				}, -- [1]
+				{
+					["anchorXOffset"] = 0,
+					["anchorYOffset"] = 0,
+					["rotateText"] = "NONE",
+					["text_anchorPoint"] = "CENTER",
+					["text_anchorYOffset"] = -5,
+					["text_automaticWidth"] = "Auto",
+					["text_color"] = {
+						1, -- [1]
+						1, -- [2]
+						1, -- [3]
+						1, -- [4]
+					},
+					["text_fixedWidth"] = 64,
+					["text_font"] = "Expressway",
+					["text_fontSize"] = 15,
+					["text_fontType"] = "OUTLINE",
+					["text_justify"] = "CENTER",
+					["text_selfPoint"] = "AUTO",
+					["text_shadowColor"] = {
+						0, -- [1]
+						0, -- [2]
+						0, -- [3]
+						1, -- [4]
+					},
+					["text_shadowXOffset"] = 0,
+					["text_shadowYOffset"] = 0,
+					["text_text"] = "CUTE",
+					["text_text_format_p_abbreviate"] = false,
+					["text_text_format_p_abbreviate_max"] = 8,
+					["text_text_format_p_big_number_format"] = "AbbreviateNumbers",
+					["text_text_format_p_decimal_precision"] = 1,
+					["text_text_format_p_format"] = "timed",
+					["text_text_format_p_gcd_cast"] = false,
+					["text_text_format_p_gcd_channel"] = false,
+					["text_text_format_p_gcd_gcd"] = true,
+					["text_text_format_p_gcd_hide_zero"] = false,
+					["text_text_format_p_time_dynamic"] = false,
+					["text_text_format_p_time_precision"] = 0,
+					["text_text_format_s_format"] = "none",
+					["text_visible"] = true,
+					["text_wordWrap"] = "WordWrap",
+					["type"] = "subtext",
+				}, -- [2]
+				{
+					["glow"] = true,
+					["glowBorder"] = false,
+					["glowColor"] = {
+						1, -- [1]
+						1, -- [2]
+						1, -- [3]
+						1, -- [4]
+					},
+					["glowFrequency"] = 0.25,
+					["glowLength"] = 10,
+					["glowLines"] = 8,
+					["glowScale"] = 1,
+					["glowThickness"] = 1,
+					["glowType"] = "buttonOverlay",
+					["glowXOffset"] = 0,
+					["glowYOffset"] = 0,
+					["type"] = "subglow",
+					["useGlowColor"] = false,
+				}, -- [3]
+			},
+			["tocversion"] = 90002,
+			["triggers"] = {
+				[1] = {
+					["trigger"] = {
+						["auraspellids"] = {
+							"330366", -- [1]
+						},
+						["debuffType"] = "HELPFUL",
+						["duration"] = "1",
+						["event"] = "Health",
+						["names"] = {
+						},
+						["percenthealth"] = "20",
+						["percenthealth_operator"] = "<=",
+						["spellIds"] = {
+						},
+						["subeventPrefix"] = "SPELL",
+						["subeventSuffix"] = "_CAST_START",
+						["type"] = "status",
+						["unevent"] = "auto",
+						["unit"] = "target",
+						["useExactSpellId"] = true,
+						["use_absorbMode"] = true,
+						["use_health"] = false,
+						["use_percenthealth"] = true,
+						["use_unit"] = true,
+					},
+					["untrigger"] = {
+						["unit"] = "target",
+					},
+				},
+				[2] = {
+					["trigger"] = {
+						["debuffType"] = "HELPFUL",
+						["duration"] = "1",
+						["event"] = "Cooldown Progress (Item)",
+						["genericShowOn"] = "showOnReady",
+						["itemName"] = 179350,
+						["realSpellName"] = 0,
+						["spellName"] = 0,
+						["type"] = "status",
+						["unevent"] = "auto",
+						["unit"] = "player",
+						["use_genericShowOn"] = true,
+						["use_itemName"] = true,
+						["use_spellName"] = true,
+						["use_track"] = true,
+					},
+					["untrigger"] = {
+						["genericShowOn"] = "showOnReady",
+					},
+				},
+				[3] = {
+					["trigger"] = {
+						["auraspellids"] = {
+							"330366", -- [1]
+						},
+						["debuffType"] = "HELPFUL",
+						["duration"] = "1",
+						["event"] = "Health",
+						["names"] = {
+						},
+						["percenthealth"] = "0",
+						["percenthealth_operator"] = ">",
+						["spellIds"] = {
+						},
+						["subeventPrefix"] = "SPELL",
+						["subeventSuffix"] = "_CAST_START",
+						["type"] = "status",
+						["unevent"] = "auto",
+						["unit"] = "target",
+						["useExactSpellId"] = true,
+						["use_absorbMode"] = true,
+						["use_health"] = false,
+						["use_percenthealth"] = true,
+						["use_unit"] = true,
+					},
+					["untrigger"] = {
+						["unit"] = "target",
+					},
+				},
+				["activeTriggerMode"] = -10,
+			},
+			["uid"] = "W5N8vC)NpyX",
+			["url"] = "https://wago.io/G_ZnwseH-/6",
+			["version"] = 6,
+			["width"] = 40,
+			["xOffset"] = 105,
+			["yOffset"] = -25,
+			["zoom"] = 0.32,
+		},
+		["Inscrutable Quantum Device Haste"] = {
+			["actions"] = {
+				["finish"] = {
+				},
+				["init"] = {
+				},
+				["start"] = {
+				},
+			},
+			["alpha"] = 1,
+			["anchorFrameType"] = "SCREEN",
+			["anchorPoint"] = "CENTER",
+			["animation"] = {
+				["finish"] = {
+					["duration_type"] = "seconds",
+					["easeStrength"] = 3,
+					["easeType"] = "none",
+					["type"] = "none",
+				},
+				["main"] = {
+					["duration_type"] = "seconds",
+					["easeStrength"] = 3,
+					["easeType"] = "none",
+					["type"] = "none",
+				},
+				["start"] = {
+					["duration_type"] = "seconds",
+					["easeStrength"] = 3,
+					["easeType"] = "none",
+					["type"] = "none",
+				},
+			},
+			["authorOptions"] = {
+			},
+			["color"] = {
+				1, -- [1]
+				1, -- [2]
+				1, -- [3]
+				1, -- [4]
+			},
+			["conditions"] = {
+			},
+			["config"] = {
+			},
+			["cooldown"] = true,
+			["cooldownEdge"] = false,
+			["cooldownSwipe"] = true,
+			["cooldownTextDisabled"] = false,
+			["desaturate"] = false,
+			["frameStrata"] = 3,
+			["height"] = 40,
+			["icon"] = true,
+			["iconSource"] = -1,
+			["id"] = "Inscrutable Quantum Device Haste",
+			["information"] = {
+			},
+			["internalVersion"] = 40,
+			["inverse"] = false,
+			["keepAspectRatio"] = false,
+			["load"] = {
+				["class"] = {
+					["multi"] = {
+					},
+				},
+				["item_bonusid_equipped"] = "Inscrutable Quantum Device",
+				["itemequiped"] = 179350,
+				["itemtypeequipped"] = {
+				},
+				["size"] = {
+					["multi"] = {
+					},
+				},
+				["spec"] = {
+					["multi"] = {
+					},
+				},
+				["talent"] = {
+					["multi"] = {
+					},
+				},
+				["use_item_bonusid_equipped"] = false,
+				["use_itemequiped"] = true,
+			},
+			["parent"] = "Inscrutable Quantum Device",
+			["preferToUpdate"] = false,
+			["regionType"] = "icon",
+			["selfPoint"] = "CENTER",
+			["semver"] = "1.0.5",
+			["subRegions"] = {
+				{
+					["anchorXOffset"] = 0,
+					["anchorYOffset"] = 0,
+					["rotateText"] = "NONE",
+					["text_anchorPoint"] = "CENTER",
+					["text_automaticWidth"] = "Auto",
+					["text_color"] = {
+						1, -- [1]
+						1, -- [2]
+						1, -- [3]
+						1, -- [4]
+					},
+					["text_fixedWidth"] = 64,
+					["text_font"] = "Expressway",
+					["text_fontSize"] = 30,
+					["text_fontType"] = "OUTLINE",
+					["text_justify"] = "CENTER",
+					["text_selfPoint"] = "AUTO",
+					["text_shadowColor"] = {
+						0, -- [1]
+						0, -- [2]
+						0, -- [3]
+						1, -- [4]
+					},
+					["text_shadowXOffset"] = 0,
+					["text_shadowYOffset"] = 0,
+					["text_text"] = "%p",
+					["text_text_format_p_abbreviate"] = false,
+					["text_text_format_p_abbreviate_max"] = 8,
+					["text_text_format_p_big_number_format"] = "AbbreviateNumbers",
+					["text_text_format_p_decimal_precision"] = 1,
+					["text_text_format_p_format"] = "timed",
+					["text_text_format_p_gcd_cast"] = false,
+					["text_text_format_p_gcd_channel"] = false,
+					["text_text_format_p_gcd_gcd"] = true,
+					["text_text_format_p_gcd_hide_zero"] = false,
+					["text_text_format_p_time_dynamic"] = false,
+					["text_text_format_p_time_precision"] = 0,
+					["text_text_format_s_format"] = "none",
+					["text_visible"] = true,
+					["text_wordWrap"] = "WordWrap",
+					["type"] = "subtext",
+				}, -- [1]
+				{
+					["anchorXOffset"] = 0,
+					["anchorYOffset"] = 0,
+					["rotateText"] = "NONE",
+					["text_anchorPoint"] = "INNER_BOTTOM",
+					["text_anchorYOffset"] = -5,
+					["text_automaticWidth"] = "Auto",
+					["text_color"] = {
+						1, -- [1]
+						1, -- [2]
+						1, -- [3]
+						1, -- [4]
+					},
+					["text_fixedWidth"] = 64,
+					["text_font"] = "Expressway",
+					["text_fontSize"] = 12,
+					["text_fontType"] = "OUTLINE",
+					["text_justify"] = "CENTER",
+					["text_selfPoint"] = "AUTO",
+					["text_shadowColor"] = {
+						0, -- [1]
+						0, -- [2]
+						0, -- [3]
+						1, -- [4]
+					},
+					["text_shadowXOffset"] = 0,
+					["text_shadowYOffset"] = 0,
+					["text_text"] = "Haste",
+					["text_text_format_p_abbreviate"] = false,
+					["text_text_format_p_abbreviate_max"] = 8,
+					["text_text_format_p_big_number_format"] = "AbbreviateNumbers",
+					["text_text_format_p_decimal_precision"] = 1,
+					["text_text_format_p_format"] = "timed",
+					["text_text_format_p_gcd_cast"] = false,
+					["text_text_format_p_gcd_channel"] = false,
+					["text_text_format_p_gcd_gcd"] = true,
+					["text_text_format_p_gcd_hide_zero"] = false,
+					["text_text_format_p_time_dynamic"] = false,
+					["text_text_format_p_time_precision"] = 0,
+					["text_text_format_s_format"] = "none",
+					["text_visible"] = true,
+					["text_wordWrap"] = "WordWrap",
+					["type"] = "subtext",
+				}, -- [2]
+				{
+					["glow"] = true,
+					["glowBorder"] = false,
+					["glowColor"] = {
+						1, -- [1]
+						1, -- [2]
+						1, -- [3]
+						1, -- [4]
+					},
+					["glowFrequency"] = 0.25,
+					["glowLength"] = 10,
+					["glowLines"] = 8,
+					["glowScale"] = 1,
+					["glowThickness"] = 1,
+					["glowType"] = "ACShine",
+					["glowXOffset"] = 0,
+					["glowYOffset"] = 0,
+					["type"] = "subglow",
+					["useGlowColor"] = false,
+				}, -- [3]
+			},
+			["tocversion"] = 90002,
+			["triggers"] = {
+				[1] = {
+					["trigger"] = {
+						["auraspellids"] = {
+							"330368", -- [1]
+						},
+						["debuffType"] = "HELPFUL",
+						["event"] = "Health",
+						["names"] = {
+						},
+						["spellIds"] = {
+						},
+						["subeventPrefix"] = "SPELL",
+						["subeventSuffix"] = "_CAST_START",
+						["type"] = "aura2",
+						["unit"] = "player",
+						["useExactSpellId"] = true,
+					},
+					["untrigger"] = {
+					},
+				},
+				["activeTriggerMode"] = -10,
+			},
+			["uid"] = "IJyvTnXtusT",
+			["url"] = "https://wago.io/G_ZnwseH-/6",
+			["version"] = 6,
+			["width"] = 40,
+			["xOffset"] = 105,
+			["yOffset"] = -25,
+			["zoom"] = 0.32,
+		},
+		["Inscrutable Quantum Device Heal"] = {
+			["actions"] = {
+				["finish"] = {
+				},
+				["init"] = {
+				},
+				["start"] = {
+				},
+			},
+			["alpha"] = 1,
+			["anchorFrameType"] = "SCREEN",
+			["anchorPoint"] = "CENTER",
+			["animation"] = {
+				["finish"] = {
+					["duration_type"] = "seconds",
+					["easeStrength"] = 3,
+					["easeType"] = "none",
+					["type"] = "none",
+				},
+				["main"] = {
+					["duration_type"] = "seconds",
+					["easeStrength"] = 3,
+					["easeType"] = "none",
+					["type"] = "none",
+				},
+				["start"] = {
+					["duration_type"] = "seconds",
+					["easeStrength"] = 3,
+					["easeType"] = "none",
+					["type"] = "none",
+				},
+			},
+			["authorOptions"] = {
+			},
+			["color"] = {
+				0.11764705882353, -- [1]
+				0.96862745098039, -- [2]
+				0, -- [3]
+				1, -- [4]
+			},
+			["conditions"] = {
+			},
+			["config"] = {
+			},
+			["cooldown"] = false,
+			["cooldownEdge"] = false,
+			["cooldownSwipe"] = false,
+			["cooldownTextDisabled"] = false,
+			["desaturate"] = false,
+			["displayIcon"] = 2000857,
+			["frameStrata"] = 5,
+			["height"] = 40,
+			["icon"] = true,
+			["iconSource"] = 0,
+			["id"] = "Inscrutable Quantum Device Heal",
+			["information"] = {
+			},
+			["internalVersion"] = 40,
+			["inverse"] = false,
+			["keepAspectRatio"] = false,
+			["load"] = {
+				["class"] = {
+					["multi"] = {
+					},
+				},
+				["item_bonusid_equipped"] = "Inscrutable Quantum Device",
+				["itemequiped"] = 179350,
+				["itemtypeequipped"] = {
+				},
+				["size"] = {
+					["multi"] = {
+					},
+				},
+				["spec"] = {
+					["multi"] = {
+					},
+				},
+				["talent"] = {
+					["multi"] = {
+					},
+				},
+				["use_item_bonusid_equipped"] = false,
+				["use_itemequiped"] = true,
+			},
+			["parent"] = "Inscrutable Quantum Device",
+			["preferToUpdate"] = false,
+			["regionType"] = "icon",
+			["selfPoint"] = "CENTER",
+			["semver"] = "1.0.5",
+			["subRegions"] = {
+				{
+					["anchorXOffset"] = 0,
+					["anchorYOffset"] = 0,
+					["rotateText"] = "NONE",
+					["text_anchorPoint"] = "CENTER",
+					["text_anchorYOffset"] = 0,
+					["text_automaticWidth"] = "Auto",
+					["text_color"] = {
+						1, -- [1]
+						1, -- [2]
+						1, -- [3]
+						1, -- [4]
+					},
+					["text_fixedWidth"] = 64,
+					["text_font"] = "Expressway",
+					["text_fontSize"] = 20,
+					["text_fontType"] = "OUTLINE",
+					["text_justify"] = "CENTER",
+					["text_selfPoint"] = "AUTO",
+					["text_shadowColor"] = {
+						0, -- [1]
+						0, -- [2]
+						0, -- [3]
+						1, -- [4]
+					},
+					["text_shadowXOffset"] = 0,
+					["text_shadowYOffset"] = 0,
+					["text_text"] = "HEAL",
+					["text_text_format_p_abbreviate"] = false,
+					["text_text_format_p_abbreviate_max"] = 8,
+					["text_text_format_p_big_number_format"] = "AbbreviateNumbers",
+					["text_text_format_p_decimal_precision"] = 1,
+					["text_text_format_p_format"] = "timed",
+					["text_text_format_p_gcd_cast"] = false,
+					["text_text_format_p_gcd_channel"] = false,
+					["text_text_format_p_gcd_gcd"] = true,
+					["text_text_format_p_gcd_hide_zero"] = false,
+					["text_text_format_p_time_dynamic"] = false,
+					["text_text_format_p_time_precision"] = 0,
+					["text_text_format_s_format"] = "none",
+					["text_visible"] = true,
+					["text_wordWrap"] = "WordWrap",
+					["type"] = "subtext",
+				}, -- [1]
+				{
+					["glow"] = true,
+					["glowBorder"] = false,
+					["glowColor"] = {
+						1, -- [1]
+						1, -- [2]
+						1, -- [3]
+						1, -- [4]
+					},
+					["glowFrequency"] = 0.25,
+					["glowLength"] = 10,
+					["glowLines"] = 8,
+					["glowScale"] = 1,
+					["glowThickness"] = 1,
+					["glowType"] = "ACShine",
+					["glowXOffset"] = 0,
+					["glowYOffset"] = 0,
+					["type"] = "subglow",
+					["useGlowColor"] = false,
+				}, -- [2]
+			},
+			["tocversion"] = 90002,
+			["triggers"] = {
+				[1] = {
+					["trigger"] = {
+						["auraspellids"] = {
+							"330366", -- [1]
+						},
+						["debuffType"] = "HELPFUL",
+						["duration"] = "1",
+						["event"] = "Health",
+						["names"] = {
+						},
+						["percenthealth"] = "30",
+						["percenthealth_operator"] = "<=",
+						["spellIds"] = {
+						},
+						["subeventPrefix"] = "SPELL",
+						["subeventSuffix"] = "_CAST_START",
+						["type"] = "status",
+						["unevent"] = "auto",
+						["unit"] = "party",
+						["useExactSpellId"] = true,
+						["use_absorbMode"] = true,
+						["use_controlled"] = true,
+						["use_health"] = false,
+						["use_ignoreDead"] = true,
+						["use_ignoreDisconnected"] = true,
+						["use_percenthealth"] = true,
+						["use_unit"] = true,
+					},
+					["untrigger"] = {
+						["unit"] = "party",
+					},
+				},
+				[2] = {
+					["trigger"] = {
+						["debuffType"] = "HELPFUL",
+						["duration"] = "1",
+						["event"] = "Cooldown Progress (Item)",
+						["genericShowOn"] = "showOnReady",
+						["itemName"] = 179350,
+						["realSpellName"] = 0,
+						["spellName"] = 0,
+						["type"] = "status",
+						["unevent"] = "auto",
+						["unit"] = "player",
+						["use_genericShowOn"] = true,
+						["use_itemName"] = true,
+						["use_spellName"] = true,
+						["use_track"] = true,
+					},
+					["untrigger"] = {
+						["genericShowOn"] = "showOnReady",
+					},
+				},
+				["activeTriggerMode"] = -10,
+			},
+			["uid"] = "5cKHiMQzXJp",
+			["url"] = "https://wago.io/G_ZnwseH-/6",
+			["version"] = 6,
+			["width"] = 40,
+			["xOffset"] = 105,
+			["yOffset"] = -25,
+			["zoom"] = 0.32,
+		},
+		["Inscrutable Quantum Device Mana"] = {
+			["actions"] = {
+				["finish"] = {
+				},
+				["init"] = {
+				},
+				["start"] = {
+				},
+			},
+			["alpha"] = 1,
+			["anchorFrameType"] = "SCREEN",
+			["anchorPoint"] = "CENTER",
+			["animation"] = {
+				["finish"] = {
+					["duration_type"] = "seconds",
+					["easeStrength"] = 3,
+					["easeType"] = "none",
+					["type"] = "none",
+				},
+				["main"] = {
+					["duration_type"] = "seconds",
+					["easeStrength"] = 3,
+					["easeType"] = "none",
+					["type"] = "none",
+				},
+				["start"] = {
+					["duration_type"] = "seconds",
+					["easeStrength"] = 3,
+					["easeType"] = "none",
+					["type"] = "none",
+				},
+			},
+			["authorOptions"] = {
+			},
+			["color"] = {
+				0, -- [1]
+				0.019607843137255, -- [2]
+				0.96862745098039, -- [3]
+				1, -- [4]
+			},
+			["conditions"] = {
+			},
+			["config"] = {
+			},
+			["cooldown"] = false,
+			["cooldownEdge"] = false,
+			["cooldownSwipe"] = false,
+			["cooldownTextDisabled"] = false,
+			["desaturate"] = false,
+			["displayIcon"] = 2000857,
+			["frameStrata"] = 4,
+			["height"] = 40,
+			["icon"] = true,
+			["iconSource"] = 0,
+			["id"] = "Inscrutable Quantum Device Mana",
+			["information"] = {
+			},
+			["internalVersion"] = 40,
+			["inverse"] = false,
+			["keepAspectRatio"] = false,
+			["load"] = {
+				["class"] = {
+					["multi"] = {
+					},
+				},
+				["item_bonusid_equipped"] = "Inscrutable Quantum Device",
+				["itemequiped"] = 179350,
+				["itemtypeequipped"] = {
+				},
+				["size"] = {
+					["multi"] = {
+					},
+				},
+				["spec"] = {
+					["multi"] = {
+					},
+				},
+				["talent"] = {
+					["multi"] = {
+					},
+				},
+				["use_item_bonusid_equipped"] = false,
+				["use_itemequiped"] = true,
+			},
+			["parent"] = "Inscrutable Quantum Device",
+			["preferToUpdate"] = false,
+			["regionType"] = "icon",
+			["selfPoint"] = "CENTER",
+			["semver"] = "1.0.5",
+			["subRegions"] = {
+				{
+					["anchorXOffset"] = 0,
+					["anchorYOffset"] = 0,
+					["rotateText"] = "NONE",
+					["text_anchorPoint"] = "CENTER",
+					["text_anchorYOffset"] = 5,
+					["text_automaticWidth"] = "Auto",
+					["text_color"] = {
+						1, -- [1]
+						1, -- [2]
+						1, -- [3]
+						1, -- [4]
+					},
+					["text_fixedWidth"] = 64,
+					["text_font"] = "Expressway",
+					["text_fontSize"] = 14,
+					["text_fontType"] = "OUTLINE",
+					["text_justify"] = "CENTER",
+					["text_selfPoint"] = "AUTO",
+					["text_shadowColor"] = {
+						0, -- [1]
+						0, -- [2]
+						0, -- [3]
+						1, -- [4]
+					},
+					["text_shadowXOffset"] = 0,
+					["text_shadowYOffset"] = 0,
+					["text_text"] = "GRANT",
+					["text_text_format_p_abbreviate"] = false,
+					["text_text_format_p_abbreviate_max"] = 8,
+					["text_text_format_p_big_number_format"] = "AbbreviateNumbers",
+					["text_text_format_p_decimal_precision"] = 1,
+					["text_text_format_p_format"] = "timed",
+					["text_text_format_p_gcd_cast"] = false,
+					["text_text_format_p_gcd_channel"] = false,
+					["text_text_format_p_gcd_gcd"] = true,
+					["text_text_format_p_gcd_hide_zero"] = false,
+					["text_text_format_p_time_dynamic"] = false,
+					["text_text_format_p_time_precision"] = 0,
+					["text_text_format_s_format"] = "none",
+					["text_visible"] = true,
+					["text_wordWrap"] = "WordWrap",
+					["type"] = "subtext",
+				}, -- [1]
+				{
+					["anchorXOffset"] = 0,
+					["anchorYOffset"] = 0,
+					["rotateText"] = "NONE",
+					["text_anchorPoint"] = "CENTER",
+					["text_anchorYOffset"] = -5,
+					["text_automaticWidth"] = "Auto",
+					["text_color"] = {
+						1, -- [1]
+						1, -- [2]
+						1, -- [3]
+						1, -- [4]
+					},
+					["text_fixedWidth"] = 64,
+					["text_font"] = "Expressway",
+					["text_fontSize"] = 14,
+					["text_fontType"] = "OUTLINE",
+					["text_justify"] = "CENTER",
+					["text_selfPoint"] = "AUTO",
+					["text_shadowColor"] = {
+						0, -- [1]
+						0, -- [2]
+						0, -- [3]
+						1, -- [4]
+					},
+					["text_shadowXOffset"] = 0,
+					["text_shadowYOffset"] = 0,
+					["text_text"] = "MANA",
+					["text_text_format_p_abbreviate"] = false,
+					["text_text_format_p_abbreviate_max"] = 8,
+					["text_text_format_p_big_number_format"] = "AbbreviateNumbers",
+					["text_text_format_p_decimal_precision"] = 1,
+					["text_text_format_p_format"] = "timed",
+					["text_text_format_p_gcd_cast"] = false,
+					["text_text_format_p_gcd_channel"] = false,
+					["text_text_format_p_gcd_gcd"] = true,
+					["text_text_format_p_gcd_hide_zero"] = false,
+					["text_text_format_p_time_dynamic"] = false,
+					["text_text_format_p_time_precision"] = 0,
+					["text_text_format_s_format"] = "none",
+					["text_visible"] = true,
+					["text_wordWrap"] = "WordWrap",
+					["type"] = "subtext",
+				}, -- [2]
+				{
+					["glow"] = true,
+					["glowBorder"] = false,
+					["glowColor"] = {
+						1, -- [1]
+						1, -- [2]
+						1, -- [3]
+						1, -- [4]
+					},
+					["glowFrequency"] = 0.25,
+					["glowLength"] = 10,
+					["glowLines"] = 8,
+					["glowScale"] = 1,
+					["glowThickness"] = 1,
+					["glowType"] = "ACShine",
+					["glowXOffset"] = 0,
+					["glowYOffset"] = 0,
+					["type"] = "subglow",
+					["useGlowColor"] = false,
+				}, -- [3]
+			},
+			["tocversion"] = 90002,
+			["triggers"] = {
+				[1] = {
+					["trigger"] = {
+						["auraspellids"] = {
+							"330366", -- [1]
+						},
+						["debuffType"] = "HELPFUL",
+						["duration"] = "1",
+						["event"] = "Power",
+						["names"] = {
+						},
+						["percenthealth"] = "20",
+						["percenthealth_operator"] = "<=",
+						["percentpower"] = "20",
+						["percentpower_operator"] = "<",
+						["power"] = "20",
+						["power_operator"] = "<",
+						["role"] = "HEALER",
+						["spellIds"] = {
+						},
+						["subeventPrefix"] = "SPELL",
+						["subeventSuffix"] = "_CAST_START",
+						["type"] = "status",
+						["unevent"] = "auto",
+						["unit"] = "party",
+						["useExactSpellId"] = true,
+						["use_absorbMode"] = true,
+						["use_controlled"] = true,
+						["use_health"] = false,
+						["use_ignoreDead"] = true,
+						["use_ignoreDisconnected"] = true,
+						["use_percenthealth"] = true,
+						["use_percentpower"] = true,
+						["use_power"] = false,
+						["use_role"] = true,
+						["use_unit"] = true,
+					},
+					["untrigger"] = {
+						["unit"] = "party",
+					},
+				},
+				[2] = {
+					["trigger"] = {
+						["debuffType"] = "HELPFUL",
+						["duration"] = "1",
+						["event"] = "Cooldown Progress (Item)",
+						["genericShowOn"] = "showOnReady",
+						["itemName"] = 179350,
+						["realSpellName"] = 0,
+						["spellName"] = 0,
+						["type"] = "status",
+						["unevent"] = "auto",
+						["unit"] = "player",
+						["use_genericShowOn"] = true,
+						["use_itemName"] = true,
+						["use_spellName"] = true,
+						["use_track"] = true,
+					},
+					["untrigger"] = {
+						["genericShowOn"] = "showOnReady",
+					},
+				},
+				["activeTriggerMode"] = -10,
+				["customTriggerLogic"] = "\n\n",
+				["disjunctive"] = "all",
+			},
+			["uid"] = "9HqDmiFNMmk",
+			["url"] = "https://wago.io/G_ZnwseH-/6",
+			["version"] = 6,
+			["width"] = 40,
+			["xOffset"] = 105,
+			["yOffset"] = -25,
+			["zoom"] = 0.32,
+		},
+		["Inscrutable Quantum Device Mastery"] = {
+			["actions"] = {
+				["finish"] = {
+				},
+				["init"] = {
+				},
+				["start"] = {
+				},
+			},
+			["alpha"] = 1,
+			["anchorFrameType"] = "SCREEN",
+			["anchorPoint"] = "CENTER",
+			["animation"] = {
+				["finish"] = {
+					["duration_type"] = "seconds",
+					["easeStrength"] = 3,
+					["easeType"] = "none",
+					["type"] = "none",
+				},
+				["main"] = {
+					["duration_type"] = "seconds",
+					["easeStrength"] = 3,
+					["easeType"] = "none",
+					["type"] = "none",
+				},
+				["start"] = {
+					["duration_type"] = "seconds",
+					["easeStrength"] = 3,
+					["easeType"] = "none",
+					["type"] = "none",
+				},
+			},
+			["authorOptions"] = {
+			},
+			["color"] = {
+				1, -- [1]
+				1, -- [2]
+				1, -- [3]
+				1, -- [4]
+			},
+			["conditions"] = {
+			},
+			["config"] = {
+			},
+			["cooldown"] = true,
+			["cooldownEdge"] = false,
+			["cooldownSwipe"] = true,
+			["cooldownTextDisabled"] = false,
+			["desaturate"] = false,
+			["frameStrata"] = 3,
+			["height"] = 40,
+			["icon"] = true,
+			["iconSource"] = -1,
+			["id"] = "Inscrutable Quantum Device Mastery",
+			["information"] = {
+			},
+			["internalVersion"] = 40,
+			["inverse"] = false,
+			["keepAspectRatio"] = false,
+			["load"] = {
+				["class"] = {
+					["multi"] = {
+					},
+				},
+				["item_bonusid_equipped"] = "Inscrutable Quantum Device",
+				["itemequiped"] = 179350,
+				["itemtypeequipped"] = {
+				},
+				["size"] = {
+					["multi"] = {
+					},
+				},
+				["spec"] = {
+					["multi"] = {
+					},
+				},
+				["talent"] = {
+					["multi"] = {
+					},
+				},
+				["use_item_bonusid_equipped"] = false,
+				["use_itemequiped"] = true,
+			},
+			["parent"] = "Inscrutable Quantum Device",
+			["preferToUpdate"] = false,
+			["regionType"] = "icon",
+			["selfPoint"] = "CENTER",
+			["semver"] = "1.0.5",
+			["subRegions"] = {
+				{
+					["anchorXOffset"] = 0,
+					["anchorYOffset"] = 0,
+					["rotateText"] = "NONE",
+					["text_anchorPoint"] = "CENTER",
+					["text_automaticWidth"] = "Auto",
+					["text_color"] = {
+						1, -- [1]
+						1, -- [2]
+						1, -- [3]
+						1, -- [4]
+					},
+					["text_fixedWidth"] = 64,
+					["text_font"] = "Expressway",
+					["text_fontSize"] = 30,
+					["text_fontType"] = "OUTLINE",
+					["text_justify"] = "CENTER",
+					["text_selfPoint"] = "AUTO",
+					["text_shadowColor"] = {
+						0, -- [1]
+						0, -- [2]
+						0, -- [3]
+						1, -- [4]
+					},
+					["text_shadowXOffset"] = 0,
+					["text_shadowYOffset"] = 0,
+					["text_text"] = "%p",
+					["text_text_format_p_abbreviate"] = false,
+					["text_text_format_p_abbreviate_max"] = 8,
+					["text_text_format_p_big_number_format"] = "AbbreviateNumbers",
+					["text_text_format_p_decimal_precision"] = 1,
+					["text_text_format_p_format"] = "timed",
+					["text_text_format_p_gcd_cast"] = false,
+					["text_text_format_p_gcd_channel"] = false,
+					["text_text_format_p_gcd_gcd"] = true,
+					["text_text_format_p_gcd_hide_zero"] = false,
+					["text_text_format_p_time_dynamic"] = false,
+					["text_text_format_p_time_precision"] = 0,
+					["text_text_format_s_format"] = "none",
+					["text_visible"] = true,
+					["text_wordWrap"] = "WordWrap",
+					["type"] = "subtext",
+				}, -- [1]
+				{
+					["anchorXOffset"] = 0,
+					["anchorYOffset"] = 0,
+					["rotateText"] = "NONE",
+					["text_anchorPoint"] = "INNER_BOTTOM",
+					["text_anchorYOffset"] = -5,
+					["text_automaticWidth"] = "Auto",
+					["text_color"] = {
+						1, -- [1]
+						1, -- [2]
+						1, -- [3]
+						1, -- [4]
+					},
+					["text_fixedWidth"] = 64,
+					["text_font"] = "Expressway",
+					["text_fontSize"] = 12,
+					["text_fontType"] = "OUTLINE",
+					["text_justify"] = "CENTER",
+					["text_selfPoint"] = "AUTO",
+					["text_shadowColor"] = {
+						0, -- [1]
+						0, -- [2]
+						0, -- [3]
+						1, -- [4]
+					},
+					["text_shadowXOffset"] = 0,
+					["text_shadowYOffset"] = 0,
+					["text_text"] = "Mastery",
+					["text_text_format_p_abbreviate"] = false,
+					["text_text_format_p_abbreviate_max"] = 8,
+					["text_text_format_p_big_number_format"] = "AbbreviateNumbers",
+					["text_text_format_p_decimal_precision"] = 1,
+					["text_text_format_p_format"] = "timed",
+					["text_text_format_p_gcd_cast"] = false,
+					["text_text_format_p_gcd_channel"] = false,
+					["text_text_format_p_gcd_gcd"] = true,
+					["text_text_format_p_gcd_hide_zero"] = false,
+					["text_text_format_p_time_dynamic"] = false,
+					["text_text_format_p_time_precision"] = 0,
+					["text_text_format_s_format"] = "none",
+					["text_visible"] = true,
+					["text_wordWrap"] = "WordWrap",
+					["type"] = "subtext",
+				}, -- [2]
+				{
+					["glow"] = true,
+					["glowBorder"] = false,
+					["glowColor"] = {
+						1, -- [1]
+						1, -- [2]
+						1, -- [3]
+						1, -- [4]
+					},
+					["glowFrequency"] = 0.25,
+					["glowLength"] = 10,
+					["glowLines"] = 8,
+					["glowScale"] = 1,
+					["glowThickness"] = 1,
+					["glowType"] = "ACShine",
+					["glowXOffset"] = 0,
+					["glowYOffset"] = 0,
+					["type"] = "subglow",
+					["useGlowColor"] = false,
+				}, -- [3]
+			},
+			["tocversion"] = 90002,
+			["triggers"] = {
+				[1] = {
+					["trigger"] = {
+						["auraspellids"] = {
+							"330380", -- [1]
+						},
+						["debuffType"] = "HELPFUL",
+						["event"] = "Health",
+						["names"] = {
+						},
+						["spellIds"] = {
+						},
+						["subeventPrefix"] = "SPELL",
+						["subeventSuffix"] = "_CAST_START",
+						["type"] = "aura2",
+						["unit"] = "player",
+						["useExactSpellId"] = true,
+					},
+					["untrigger"] = {
+					},
+				},
+				["activeTriggerMode"] = -10,
+			},
+			["uid"] = "48WM0a(EnH9",
+			["url"] = "https://wago.io/G_ZnwseH-/6",
+			["version"] = 6,
+			["width"] = 40,
+			["xOffset"] = 105,
+			["yOffset"] = -25,
+			["zoom"] = 0.32,
+		},
+		["Inscrutable Quantum Device Versa"] = {
+			["actions"] = {
+				["finish"] = {
+				},
+				["init"] = {
+				},
+				["start"] = {
+				},
+			},
+			["alpha"] = 1,
+			["anchorFrameType"] = "SCREEN",
+			["anchorPoint"] = "CENTER",
+			["animation"] = {
+				["finish"] = {
+					["duration_type"] = "seconds",
+					["easeStrength"] = 3,
+					["easeType"] = "none",
+					["type"] = "none",
+				},
+				["main"] = {
+					["duration_type"] = "seconds",
+					["easeStrength"] = 3,
+					["easeType"] = "none",
+					["type"] = "none",
+				},
+				["start"] = {
+					["duration_type"] = "seconds",
+					["easeStrength"] = 3,
+					["easeType"] = "none",
+					["type"] = "none",
+				},
+			},
+			["authorOptions"] = {
+			},
+			["color"] = {
+				1, -- [1]
+				1, -- [2]
+				1, -- [3]
+				1, -- [4]
+			},
+			["conditions"] = {
+			},
+			["config"] = {
+			},
+			["cooldown"] = true,
+			["cooldownEdge"] = false,
+			["cooldownSwipe"] = true,
+			["cooldownTextDisabled"] = false,
+			["desaturate"] = false,
+			["frameStrata"] = 3,
+			["height"] = 40,
+			["icon"] = true,
+			["iconSource"] = -1,
+			["id"] = "Inscrutable Quantum Device Versa",
+			["information"] = {
+			},
+			["internalVersion"] = 40,
+			["inverse"] = false,
+			["keepAspectRatio"] = false,
+			["load"] = {
+				["class"] = {
+					["multi"] = {
+					},
+				},
+				["item_bonusid_equipped"] = "Inscrutable Quantum Device",
+				["itemequiped"] = 179350,
+				["itemtypeequipped"] = {
+				},
+				["size"] = {
+					["multi"] = {
+					},
+				},
+				["spec"] = {
+					["multi"] = {
+					},
+				},
+				["talent"] = {
+					["multi"] = {
+					},
+				},
+				["use_item_bonusid_equipped"] = false,
+				["use_itemequiped"] = true,
+			},
+			["parent"] = "Inscrutable Quantum Device",
+			["preferToUpdate"] = false,
+			["regionType"] = "icon",
+			["selfPoint"] = "CENTER",
+			["semver"] = "1.0.5",
+			["subRegions"] = {
+				{
+					["anchorXOffset"] = 0,
+					["anchorYOffset"] = 0,
+					["rotateText"] = "NONE",
+					["text_anchorPoint"] = "CENTER",
+					["text_automaticWidth"] = "Auto",
+					["text_color"] = {
+						1, -- [1]
+						1, -- [2]
+						1, -- [3]
+						1, -- [4]
+					},
+					["text_fixedWidth"] = 64,
+					["text_font"] = "Expressway",
+					["text_fontSize"] = 30,
+					["text_fontType"] = "OUTLINE",
+					["text_justify"] = "CENTER",
+					["text_selfPoint"] = "AUTO",
+					["text_shadowColor"] = {
+						0, -- [1]
+						0, -- [2]
+						0, -- [3]
+						1, -- [4]
+					},
+					["text_shadowXOffset"] = 0,
+					["text_shadowYOffset"] = 0,
+					["text_text"] = "%p",
+					["text_text_format_p_abbreviate"] = false,
+					["text_text_format_p_abbreviate_max"] = 8,
+					["text_text_format_p_big_number_format"] = "AbbreviateNumbers",
+					["text_text_format_p_decimal_precision"] = 1,
+					["text_text_format_p_format"] = "timed",
+					["text_text_format_p_gcd_cast"] = false,
+					["text_text_format_p_gcd_channel"] = false,
+					["text_text_format_p_gcd_gcd"] = true,
+					["text_text_format_p_gcd_hide_zero"] = false,
+					["text_text_format_p_time_dynamic"] = false,
+					["text_text_format_p_time_precision"] = 0,
+					["text_text_format_s_format"] = "none",
+					["text_visible"] = true,
+					["text_wordWrap"] = "WordWrap",
+					["type"] = "subtext",
+				}, -- [1]
+				{
+					["anchorXOffset"] = 0,
+					["anchorYOffset"] = 0,
+					["rotateText"] = "NONE",
+					["text_anchorPoint"] = "INNER_BOTTOM",
+					["text_anchorYOffset"] = -5,
+					["text_automaticWidth"] = "Auto",
+					["text_color"] = {
+						1, -- [1]
+						1, -- [2]
+						1, -- [3]
+						1, -- [4]
+					},
+					["text_fixedWidth"] = 64,
+					["text_font"] = "Expressway",
+					["text_fontSize"] = 12,
+					["text_fontType"] = "OUTLINE",
+					["text_justify"] = "CENTER",
+					["text_selfPoint"] = "AUTO",
+					["text_shadowColor"] = {
+						0, -- [1]
+						0, -- [2]
+						0, -- [3]
+						1, -- [4]
+					},
+					["text_shadowXOffset"] = 0,
+					["text_shadowYOffset"] = 0,
+					["text_text"] = "Versa",
+					["text_text_format_p_abbreviate"] = false,
+					["text_text_format_p_abbreviate_max"] = 8,
+					["text_text_format_p_big_number_format"] = "AbbreviateNumbers",
+					["text_text_format_p_decimal_precision"] = 1,
+					["text_text_format_p_format"] = "timed",
+					["text_text_format_p_gcd_cast"] = false,
+					["text_text_format_p_gcd_channel"] = false,
+					["text_text_format_p_gcd_gcd"] = true,
+					["text_text_format_p_gcd_hide_zero"] = false,
+					["text_text_format_p_time_dynamic"] = false,
+					["text_text_format_p_time_precision"] = 0,
+					["text_text_format_s_format"] = "none",
+					["text_visible"] = true,
+					["text_wordWrap"] = "WordWrap",
+					["type"] = "subtext",
+				}, -- [2]
+				{
+					["glow"] = true,
+					["glowBorder"] = false,
+					["glowColor"] = {
+						1, -- [1]
+						1, -- [2]
+						1, -- [3]
+						1, -- [4]
+					},
+					["glowFrequency"] = 0.25,
+					["glowLength"] = 10,
+					["glowLines"] = 8,
+					["glowScale"] = 1,
+					["glowThickness"] = 1,
+					["glowType"] = "ACShine",
+					["glowXOffset"] = 0,
+					["glowYOffset"] = 0,
+					["type"] = "subglow",
+					["useGlowColor"] = false,
+				}, -- [3]
+			},
+			["tocversion"] = 90002,
+			["triggers"] = {
+				[1] = {
+					["trigger"] = {
+						["auraspellids"] = {
+							"330367", -- [1]
+						},
+						["debuffType"] = "HELPFUL",
+						["event"] = "Health",
+						["names"] = {
+						},
+						["spellIds"] = {
+						},
+						["subeventPrefix"] = "SPELL",
+						["subeventSuffix"] = "_CAST_START",
+						["type"] = "aura2",
+						["unit"] = "player",
+						["useExactSpellId"] = true,
+					},
+					["untrigger"] = {
+					},
+				},
+				["activeTriggerMode"] = -10,
+			},
+			["uid"] = "Y18jHqsO7mA",
+			["url"] = "https://wago.io/G_ZnwseH-/6",
+			["version"] = 6,
+			["width"] = 40,
+			["xOffset"] = 105,
+			["yOffset"] = -25,
+			["zoom"] = 0.32,
+		},
 	},
 	["dynamicIconCache"] = {
 	},
@@ -5305,7 +8261,7 @@ WeakAurasSaved = {
 	["lastUpgrade"] = 1611586673,
 	["login_squelch_time"] = 10,
 	["minimap"] = {
-		["hide"] = false,
+		["hide"] = true,
 		["minimapPos"] = 52.97999707674736,
 	},
 	["registered"] = {
