@@ -88,7 +88,11 @@ end
 local GemEnchant = CreateFrame('GameTooltip', 'oilvlgetooltip', UIParent, 'GameTooltipTemplate');
 local GemEnchant2 = CreateFrame('GameTooltip', 'oilvlgetooltip2', UIParent, 'GameTooltipTemplate');
 local enchantID = {
-	6109,6108,6111,6110 -- ring
+  [6211]=true, [6210]=true, [6220]=true, --stat specific pieces
+	[6230]=true, [6214]=true, [6265]=true, [6217]=true, [6213]=true, -- chest
+	[6202]=true, [6204]=true, [6203]=true, [6208]=true,  -- cloak
+	[6166]=true, [6170]=true, [6164]=true, [6168]=true, -- ring
+	[6228]=true, [6229]=true, [6223]=true, [6227]=true, [6226]=true -- weapon
 }
 
 local relictooltip = {}
@@ -254,7 +258,7 @@ function OiLvlPlayer_Update(sw)
 							end
 
               -- added to make sure HOA neck ilevel is visible, changed text color as well
-              if Value == 2 then
+              if false then
                 local ArtifactNeckLevel = _G[Key]:CreateFontString(Key.."ArtifactNeckLevel","OVERLAY")
                 ArtifactNeckLevel:SetFontObject("GameFontNormal");
                 ArtifactNeckLevel:SetTextColor(237, 238, 239);
@@ -282,9 +286,9 @@ function OiLvlPlayer_Update(sw)
 							-- check low enchant
 							if (Value == 11 or Value == 12) and enchant ~= "0" and oilvlbestenchant and oilvlbestenchant:GetChecked() then
 								local function CheckLowEnchant(eID)
-									for mm = 1, #enchantID do
-										if tonumber(eID) == enchantID[mm] then return false end
-									end
+									if enchantID[tonumber(eID)] then
+                    return false
+                  end
 									return true
 								end
 								if CheckLowEnchant(enchant) and _G[Key.."ge"]:GetText() then
@@ -292,7 +296,7 @@ function OiLvlPlayer_Update(sw)
 								end
 							end
 							-- check no enchant
-							if (Value == 11 or Value == 12 or Value == 16) and enchant == "0" then
+							if (Value == 5 or Value == 8 or Value == 9 or Value == 11 or Value == 12 or Value == 15 or Value == 16) and enchant == "0" then
 								_G[Key.."ge"]:SetText(("|TInterface\\MINIMAP\\TRACKING\\OBJECTICONS:0:0:0:0:256:64:43:53:34:61|t" or "")..L["Not enchanted"]);
 							end
 							-- check no gem
@@ -569,16 +573,6 @@ function OiLvLInspect_Update()
 					local _, _, quality, _, _,_,_, _, _, _, _ = GetItemInfo(ItemLink)
 					if OItemAnalysis_CheckILVLGear4("target",Value) ~= 0 then
 						totalilvl[Value], xupgrade[Value] = OItemAnalysis_CheckILVLGear4("target",Value)
-						-- temp fix for ilvl in nether crucible
-						-- if Value == 16 or Value == 17 then
-						-- 	local _,itemID,enchant,gem1,gem2,gem3,gem4,suffixID,uniqueID,level,specializationID,upgradeType,instanceDifficultyID,numBonusIDs,restLink = strsplit(":",ItemLink,15)
-						-- 	local gemactive = 0
-						-- 	if (gem1 and gem1 ~= "") then gemactive = gemactive + 1 end
-						-- 	if (gem2 and gem2 ~= "") then gemactive = gemactive + 1 end
-						-- 	if (gem3 and gem3 ~= "") then gemactive = gemactive + 1 end
-						-- 	totalilvl[Value] = totalilvl[Value] + gemactive*5
-						-- end
-						---------------------------------------------------------------------
 
 						xname2[Value] = itemID
 						if Value == 17 and OTCheckartifactwep(tonumber(itemID)) then
@@ -624,10 +618,10 @@ function OiLvLInspect_Update()
 						-- check low enchant
 						if (Value == 11 or Value == 12) and enchant ~= "0" and oilvlbestenchant and oilvlbestenchant:GetChecked() then
 							local function CheckLowEnchant(eID)
-								for mm = 1, #enchantID do
-									if tonumber(eID) == enchantID[mm] then return false end
-								end
-								return true
+                if enchantID[tonumber(eID)] then
+                  return false
+                end
+                return true
 							end
 							if CheckLowEnchant(enchant) and _G[Key.."ge2"]:GetText() then
 								_G[Key.."ge2"]:SetText(_G[Key.."ge2"]:GetText()..("(|TInterface\\MINIMAP\\TRACKING\\OBJECTICONS:0:0:0:0:256:64:43:53:34:61|t" or "")..L["Low level enchanted"]..")");

@@ -6,9 +6,9 @@ if ns:IsSameLocale("ptBR") then
 	L.LOCALE_NAME = "ptBR"
 
 L["ALLOW_IN_LFD"] = "Permitir no localizador de masmorras."
-L["ALLOW_IN_LFD_DESC"] = "Clique com o botão direito do mouse em grupos ou candidatos do Localizador de Masmorras para copiar a URL do perfil do Raider.IO."
-L["ALLOW_ON_PLAYER_UNITS"] = "Permitir em quadros de unidade de jogador"
-L["ALLOW_ON_PLAYER_UNITS_DESC"] = "Clique com o botão direito do mouse nos quadros da unidade do jogador para copiar o URL do perfil do Raider.IO."
+L["ALLOW_IN_LFD_DESC"] = "Clique-direito em grupos ou candidatos no localizador de masmorras para copiar o URL do perfil Raider.IO."
+L["ALLOW_ON_PLAYER_UNITS"] = "Permitir em retratos de jogador"
+L["ALLOW_ON_PLAYER_UNITS_DESC"] = "Clique-direito no retrato do jogador para copiar a URL do perfil Raider.IO."
 L["ALWAYS_SHOW_EXTENDED_INFO"] = "Sempre mostrar a Pontuação de Função"
 L["ALWAYS_SHOW_EXTENDED_INFO_DESC"] = "Mantenha pressionado um modificador (shift/ctrl/alt) para mostrar as Pontuações de Funções do jogador na dica de ferramenta. Se você habilitar essa opção, as dicas de ferramentas sempre incluirão as pontuações de função."
 L["API_DEPRECATED"] = "|cffFF0000Warning!|r O Addon |cffFFFFFF%s|r está chamando uma função descontinuada do RaiderIO.%s. Esta função será removida em versões futuras. Por favor, incentive o autor de %s a atualizar seu complemento. Pilha de chamadas: %s"
