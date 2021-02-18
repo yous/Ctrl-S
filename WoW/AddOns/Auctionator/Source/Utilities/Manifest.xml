@@ -13,7 +13,6 @@
   <Script file="Slice.lua"/>
   <Script file="CreateCountString.lua"/>
   <Script file="CreateMoneyString.lua"/>
-  <Script file="ApplyThrottlingButton.lua"/>
   <Script file="IsNotLIFOItemKey.lua"/>
   <Script file="RemoveTextColor.lua"/>
   <Script file="ItemKeyString.lua"/>
@@ -25,6 +24,7 @@
   <Script file="GetQualityColorFromLink.lua"/>
   <Script file="ClassicWoWCheck.lua"/>
   <Script file="RoundTime.lua"/>
+  <Script file="StringJoin.lua"/>
 
   <Script file="VerifyListTypes.lua"/>
   <Script file="ValidatePercentage.lua"/>
