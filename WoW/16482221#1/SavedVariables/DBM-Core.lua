@@ -27,7 +27,7 @@ DBM_AllSavedOptions = {
 		["ChatFrame"] = "DEFAULT_CHAT_FRAME",
 		["CheckGear"] = true,
 		["ChosenVoicePack"] = "Mununyu",
-		["CoreSavedRevision"] = 20210127052658,
+		["CoreSavedRevision"] = 20210216220941,
 		["CountdownVoice"] = "Corsica",
 		["CountdownVoice2"] = "Kolt",
 		["CountdownVoice3"] = "Pewsey",
@@ -298,6 +298,7 @@ DBM_AllSavedOptions = {
 		["WhisperStats"] = false,
 		["WorldBossAlert"] = false,
 		["WorldBossNearAlert"] = false,
+		["oRA3AnnounceConsumables"] = false,
 	},
 }
 DBM_MinimapIcon = {

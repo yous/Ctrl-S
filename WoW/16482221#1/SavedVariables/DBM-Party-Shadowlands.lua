@@ -1043,9 +1043,9 @@ DBMPartyShadowlands_AllSavedVars = {
 			{
 				["Enabled"] = true,
 				["RangeFrame"] = true,
-				["SpecWarn325254defensive"] = true,
-				["SpecWarn325254defensiveSWNote"] = true,
-				["SpecWarn325254defensiveSWSound"] = 1,
+				["SpecWarn325254defensive2"] = false,
+				["SpecWarn325254defensive2SWNote"] = true,
+				["SpecWarn325254defensive2SWSound"] = 1,
 				["SpecWarn326039moveaway"] = true,
 				["SpecWarn326039moveawaySWNote"] = true,
 				["SpecWarn326039moveawaySWSound"] = 2,

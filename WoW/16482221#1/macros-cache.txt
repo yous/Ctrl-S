@@ -3,7 +3,11 @@ VER 3 0000000000000001 "Decursive" "INV_MISC_QUESTIONMARK"
 END
 VER 3 0000000000000004 "달빛 봉오리" "3641394"
 /대상 달빛 봉오리
-/script T={1,2,3,4,7} i=GetRaidTargetIndex("target") if i==nil then i=GetRaidTargetIndex("unit") c=i SetRaidTarget("target",T[c]) end
+/script T={1,2,3,4,5,6,7,8} i=GetRaidTargetIndex("target") if i==nil then i=GetRaidTargetIndex("unit") SetRaidTarget("target",T[i]) end
+END
+VER 3 0000000000000009 "도망자 영혼" "135791"
+/대상 도망자 영혼
+/script T={1,2,3,4,5,6,7,8} i=GetRaidTargetIndex("target") if i==nil then i=GetRaidTargetIndex("unit") SetRaidTarget("target",T[i]) end
 END
 VER 3 0000000000000008 "바닥징" "1033477"
 /cwm [btn:2] 0

@@ -587,6 +587,8 @@ MythicDungeonToolsDB = {
 							},
 							[9] = {
 							},
+							[10] = {
+							},
 						},
 						["selection"] = {
 							6, -- [1]
