@@ -327,6 +327,7 @@ L["STACK_TOOLTIP_TOOLTIP_TEXT"] = "При выборе этого парамет
 L["STARTING_FULL_SCAN"] = "Начинаем полное сканирование."
 L["STARTING_FULL_SCAN_ALTERNATE"] = "Запуск полного сканирования (альтернативный режим)."
 L["TEMPORARY_LOWER_CASE"] = "временный"
+L["TIME_LEFT"] = "Время вышло"
 L["TIME_LEFT_H"] = "Оставшееся время"
 L["TO_CRAFT_COLON"] = "Чтобы создать:"
 L["TOO_BIG_PERCENTAGE"] = "%% должно быть <= 100 (при условии %s)"

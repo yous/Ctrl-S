@@ -330,6 +330,8 @@ L["STACK_TOOLTIP_TOOLTIP_TEXT"] = "启用时，必须按住 Shift 键才能看�
 L["STARTING_FULL_SCAN"] = "开始完整扫描。"
 L["STARTING_FULL_SCAN_ALTERNATE"] = "开始完整扫描 (替代模式)。"
 L["TEMPORARY_LOWER_CASE"] = "暂时"
+--[[Translation missing --]]
+L["TIME_LEFT"] = "Time Left"
 L["TIME_LEFT_H"] = "剩余时间 (小时)"
 --[[Translation missing --]]
 L["TO_CRAFT_COLON"] = "To Craft:"

@@ -344,6 +344,8 @@ L["STACK_TOOLTIP_TOOLTIP_TEXT"] = "Cuando se selecciona, la tecla ''shift'' debe
 L["STARTING_FULL_SCAN"] = "Iniciando escaneo completo"
 L["STARTING_FULL_SCAN_ALTERNATE"] = "Inicio de escaneo completo (modo alternativo)."
 L["TEMPORARY_LOWER_CASE"] = "temporal"
+--[[Translation missing --]]
+L["TIME_LEFT"] = "Time Left"
 L["TIME_LEFT_H"] = "Tiempo restante (h)"
 L["TO_CRAFT_COLON"] = "Fabricar:"
 L["TOO_BIG_PERCENTAGE"] = "%% debe ser <= 100 (proporcionado %s)"

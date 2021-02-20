@@ -288,13 +288,12 @@ AUCTIONATOR_LOCALES.enUS = function()
 
   L["UNDERCUT_SCAN"] = "Undercut Scan"
   L["CANCEL_UNDERCUT"] = "Cancel Undercut"
-  L["CANCEL_UNDERCUT_BUTTON_MACRO"] = "Cancel Undercut Button Macro"
   L["NAME"] = "Name"
   L["QUANTITY"] = "Quantity"
   L["MAX"] = "Max"
   L["UNIT_PRICE"] = "Unit Price"
   L["UPPER_UNIT_PRICE"] = "Upper Unit Price"
-  L["TIME_LEFT_H"] = "Time Left (h)"
+  L["TIME_LEFT"] = "Time Left"
   L["IS_UNDERCUT"] = "Undercut?"
   L["UNDERCUT_YES"] ="Yes"
   L["UNDERCUT_NO"] = "No"
@@ -334,7 +333,6 @@ AUCTIONATOR_LOCALES.enUS = function()
   L["BIDDER"] = "Bidder"
   L["DURATION"] = "Duration"
   L["POST"] = "Post"
-  L["POST_BUTTON_MACRO"] = "Post Button Macro"
   L["DEPOSIT"] = "Deposit:"
   L["TOTAL_PRICE"] = "Total Price:"
 

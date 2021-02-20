@@ -327,6 +327,7 @@ L["STACK_TOOLTIP_TOOLTIP_TEXT"] = "Wenn ausgewählt, muss die Shift Taste gehalt
 L["STARTING_FULL_SCAN"] = "Starte vollständigen Scan."
 L["STARTING_FULL_SCAN_ALTERNATE"] = "Starte vollständigen Scan (alternativer Modus)."
 L["TEMPORARY_LOWER_CASE"] = "temporär"
+L["TIME_LEFT"] = "Übrige Zeit"
 L["TIME_LEFT_H"] = "Restzeit (h)"
 L["TO_CRAFT_COLON"] = "Zum Handwerk:"
 L["TOO_BIG_PERCENTAGE"] = "%% muss <= 100 (eingegeben wurde %s)"

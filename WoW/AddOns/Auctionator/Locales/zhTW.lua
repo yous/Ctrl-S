@@ -328,6 +328,7 @@ L["STACK_TOOLTIP_TOOLTIP_TEXT"] = "啟用時，必須按住 Shift 鍵才能看�
 L["STARTING_FULL_SCAN"] = "開始完整掃描。"
 L["STARTING_FULL_SCAN_ALTERNATE"] = "開始完整掃描 (替代模式)。"
 L["TEMPORARY_LOWER_CASE"] = "暫時"
+L["TIME_LEFT"] = "剩餘時間"
 L["TIME_LEFT_H"] = "剩餘時間 (小時)"
 L["TO_CRAFT_COLON"] = "製作:"
 L["TOO_BIG_PERCENTAGE"] = "%% 必須 <= 100 (目前是 %s)"

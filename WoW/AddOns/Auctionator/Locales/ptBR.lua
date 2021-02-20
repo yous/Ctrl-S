@@ -329,6 +329,8 @@ L["STACK_TOOLTIP_TOOLTIP_TEXT"] = "Quando selecionado, a tecla SHIFT tem que ser
 L["STARTING_FULL_SCAN"] = "Começando varredura completa."
 L["STARTING_FULL_SCAN_ALTERNATE"] = "Começando uma varredura completa (modo alternativo)."
 L["TEMPORARY_LOWER_CASE"] = "temporário"
+--[[Translation missing --]]
+L["TIME_LEFT"] = "Time Left"
 L["TIME_LEFT_H"] = "Tempo restante (h)"
 --[[Translation missing --]]
 L["TO_CRAFT_COLON"] = "To Craft:"
