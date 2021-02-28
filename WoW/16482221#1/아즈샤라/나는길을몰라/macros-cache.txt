@@ -5,6 +5,8 @@ END
 VER 3 0100000000000003 "눈속임" "132180"
 #showtooltip 눈속임
 /시전 [@mouseover,help][help][@pet] 눈속임
+/petautocastoff [group] 포효
+/petautocaston [nogroup] 포효
 END
 VER 3 0100000000000014 "마무리 사격" "INV_MISC_QUESTIONMARK"
 #showtooltip 마무리 사격

@@ -5,9 +5,9 @@ DBT_AllPersistentOptions = {
 			["HugeTimerPoint"] = "CENTER",
 			["HugeTimerX"] = -300,
 			["HugeTimerY"] = -25,
-			["TimerPoint"] = "TOPRIGHT",
-			["TimerX"] = -223.0000457763672,
-			["TimerY"] = -260,
+			["TimerPoint"] = "LEFT",
+			["TimerX"] = 415,
+			["TimerY"] = -25,
 		},
 	},
 }

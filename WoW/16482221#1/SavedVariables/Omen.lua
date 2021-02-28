@@ -43,7 +43,7 @@ Omen3DB = {
 			["CollapseHide"] = true,
 			["Locked"] = true,
 			["MinimapIcon"] = {
-				["minimapPos"] = 355.656738607555,
+				["minimapPos"] = 356.6726331767935,
 			},
 			["PositionH"] = 94,
 			["PositionW"] = 200.0001983642578,

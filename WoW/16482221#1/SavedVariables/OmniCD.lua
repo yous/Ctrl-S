@@ -12,6 +12,7 @@ OmniCDDB = {
 	["profiles"] = {
 		["Default"] = {
 			["Party"] = {
+				["noneZoneSetting"] = "party",
 				["party"] = {
 					["icons"] = {
 						["showTooltip"] = false,
@@ -27,8 +28,11 @@ OmniCDDB = {
 						},
 					},
 				},
+				["scenarioZoneSetting"] = "party",
 				["visibility"] = {
 					["finder"] = false,
+					["none"] = true,
+					["scenario"] = true,
 				},
 			},
 		},

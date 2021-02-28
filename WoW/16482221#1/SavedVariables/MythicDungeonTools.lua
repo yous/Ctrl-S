@@ -74,7 +74,7 @@ MythicDungeonToolsDB = {
 		},
 		["maximized"] = false,
 		["minimap"] = {
-			["minimapPos"] = 338.3177418648536,
+			["minimapPos"] = 338.4287069433028,
 		},
 		["nonFullscreenScale"] = 1,
 		["presets"] = {

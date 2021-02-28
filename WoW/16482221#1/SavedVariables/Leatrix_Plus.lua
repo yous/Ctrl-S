@@ -76,6 +76,7 @@ LeaPlusDB = {
 	["MuteBanLu"] = "Off",
 	["MuteBattleShouts"] = "Off",
 	["MuteBikes"] = "Off",
+	["MuteCreeper"] = "Off",
 	["MuteEvents"] = "Off",
 	["MuteFizzle"] = "Off",
 	["MuteGameSounds"] = "Off",
