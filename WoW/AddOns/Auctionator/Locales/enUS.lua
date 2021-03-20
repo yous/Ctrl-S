@@ -66,6 +66,8 @@ AUCTIONATOR_LOCALES.enUS = function()
   L["CONFIG_UNDERCUT_SCAN_NOT_LIFO"] = "Include gear and pets in undercut scans"
   L["CONFIG_UNDERCUT_SCAN_NOT_LIFO_TOOLTIP_HEADER"] = "Gear/Pets Undercut Scans"
   L["CONFIG_UNDERCUT_SCAN_NOT_LIFO_TOOLTIP_TEXT"] = "Leave this on to include any pets and gear auctions when using the undercut scan. Turn this off to exclude pets and gear."
+  L["CONFIG_CANCEL_UNDERCUT_SHORTCUT"] = "A shortcut to cancel the next undercut item found is"
+  L["CONFIG_CANCEL_UNDERCUT_SHORTCUT_TOOLTIP_TEXT"] = "Click and then press the buttons that you wish to use as the shortcut. This shortcut will only be active in the Cancelling tab and won't affect any other shortcuts bound to the buttons."
 
   L["SALES_PREFERENCE"] = "Sales Preference"
   L["PERCENTAGE"] = "Percentage"
@@ -115,6 +117,7 @@ AUCTIONATOR_LOCALES.enUS = function()
   L["BUYOUT_AUCTION_INFO"] = "%s buyout at %s"
 
   L["STARTING_FULL_SCAN"] = "Starting a full scan."
+  L["FULL_SCAN_IN_PROGRESS"] = "Full scan in progress."
   L["NEXT_SCAN_MESSAGE"] = "A full scan may be started in %s minutes and %s seconds."
   L["FULL_SCAN_FAILED"] = "Full scan failed to complete."
   L["FINISHED_PROCESSING"] = "Finished processing %s items."
@@ -167,6 +170,7 @@ AUCTIONATOR_LOCALES.enUS = function()
   L["RESULTS_AVAILABLE_COLUMN"] = "Available"
   L["ITEM_LEVEL_COLUMN"] = "Item Level"
   L["SELLERS_COLUMN"] = "Seller(s)"
+  L["SELLERS_OVERFLOW_TEXT"] = "%s, and %s more"
   L["OWNED_COLUMN"] = "Owned?"
 
   L["FULL_SCAN_BUTTON"] = "Full Scan"
@@ -254,6 +258,15 @@ AUCTIONATOR_LOCALES.enUS = function()
   L["SPLASH_905_UPDATES_HEADER"] = "Updates"
   L["SPLASH_905_UPDATES_1"] = "Smoother interactions in the Cancelling tab."
 
+  L["SPLASH_907_DESCRIPTION"] = "A few new features and the usual bugfixes."
+  L["SPLASH_907_FEATURES_HEADER"] = "Features"
+  L["SPLASH_907_FEATURES_1"] = "Gear with item levels of at least 168 are now differentiated in tooltip auction prices."
+  L["SPLASH_907_FEATURES_2"] = "A new \"Skip\" button will show to skip posting the current item when the option \"Automatically select the next item in your bag\" is on."
+  L["SPLASH_907_FEATURES_3"] = "New keybinding options added for posting, skipping and cancelling. For example you can now set the space key to post or cancel, without impacting any other bindings. Find them in the \"Selling: Shortcuts\" and \"Cancelling\" options."
+  L["SPLASH_907_FEATURES_4"] = "The Cancelling tab has a new search box."
+  L["SPLASH_907_UNANNOUNCED_HEADER"] = "Unannounced features from 9.0.6"
+  L["SPLASH_907_UNANNOUNCED_1"] = "An optional \"Seller(s)\" column (to see who is selling the auctions) has been added to the Selling tab. To activate it right-click a column header (e.g. \"Owned?\") in the current auctions listings."
+
   L["SPLASH_HIDE_MESSAGE"] = "Do not show until next update"
 
   L["LIST_ADD_ITEM_HEADER"] = "Add Shopping List Item"
@@ -333,6 +346,7 @@ AUCTIONATOR_LOCALES.enUS = function()
   L["BIDDER"] = "Bidder"
   L["DURATION"] = "Duration"
   L["POST"] = "Post"
+  L["SKIP"] = "Skip"
   L["DEPOSIT"] = "Deposit:"
   L["TOTAL_PRICE"] = "Total Price:"
 
@@ -347,9 +361,15 @@ AUCTIONATOR_LOCALES.enUS = function()
   L["CONFIG_SELLING_CATEGORY"] = "Selling"
   L["CONFIG_SELLING_TEXT"] = "Options to change the behaviour of the Selling tab"
 
+  L["CONFIG_SELLING_SHORTCUTS_CATEGORY"] = "Selling: Shortcuts"
+  L["CONFIG_SELLING_SHORTCUTS_TEXT"] = "Options for keyboard and mouse shortcuts inside the Selling tab"
+
   L["CONFIG_PRICE_HISTORY"] = "Show historical prices in the selling tab (reload required)"
   L["CONFIG_PRICE_HISTORY_TOOLTIP_HEADER"] = "Price History"
   L["CONFIG_PRICE_HISTORY_TOOLTIP_TEXT"] = "If this option is off the price history pane in the Selling tab will be hidden."
+  L["CONFIG_SELLING_SHOW_BID_PRICE"] = "Show bid price option when listing an item (reload required)"
+  L["CONFIG_SELLING_SHOW_BID_PRICE_TOOLTIP_HEADER"] = "Bid Options"
+  L["CONFIG_SELLING_SHOW_BID_PRICE_TOOLTIP_TEXT"] = "Controls whether the bid price option appears when posting an item."
   L["CONFIG_BAG_COLLAPSED"] = "Bag sections start collapsed (reload required)"
   L["CONFIG_BAG_COLLAPSED_TOOLTIP_HEADER"] = "Bag collapsing on start"
   L["CONFIG_BAG_COLLAPSED_TOOLTIP_TEXT"] = "If this option is on the bag sections will start closed, instead of open."
@@ -368,10 +388,15 @@ AUCTIONATOR_LOCALES.enUS = function()
   L["CONFIG_SELLING_MISSING_FAVOURITES"] = "Always show favourite items, including when not in your bag."
   L["CONFIG_SELLING_MISSING_FAVOURITES_TOOLTIP_HEADER"] = "Missing favourites visible"
   L["CONFIG_SELLING_MISSING_FAVOURITES_TOOLTIP_TEXT"] = "Show favourite items in the bag view even when they aren't in your bag."
+  L["CONFIG_SELLING_POST_SHORTCUT"] = "A keyboard/mouse shortcut to post the current item is"
+  L["CUSTOM_KEYBOARD_SHORTCUTS"] = "Custom keyboard shortcuts"
+  L["CONFIG_SELLING_POST_SHORTCUT_TOOLTIP_TEXT"] = "Click and then press the buttons that you wish to use as the shortcut. This shortcut will only be active in the Selling tab and won't affect any other shortcuts bound to the buttons."
+  L["CONFIG_SELLING_SKIP_SHORTCUT"] = "A shortcut to skip posting the currently selected item is"
   L["CONFIG_BAG"] = "Bag"
 
   L["HIDE"] = "Hide"
-  L["RESTORE_ALL"] = "Restore All"
+  L["UNHIDE"] = "Unhide"
+  L["UNHIDE_ALL"] = "Unhide All"
   L["UNHIDE_ALL_HIDDEN_ITEMS"] = "Unhide all hidden items"
   L["FAVOURITES"] = "Favourites"
   L["ADD_FAVOURITE"] = "Add Favourite"
@@ -395,9 +420,9 @@ AUCTIONATOR_LOCALES.enUS = function()
   L["CONFIG_SELLING_GEAR_VENDOR_PRICE_MULTIPLIER_SUFFIX"] = "Set to 0 for no price"
   L["CONFIG_SELLING_GEAR_VENDOR_PRICE_MULTIPLIER_TOOLTIP_HEADER"] = "Gear Vendor Price Default"
   L["CONFIG_SELLING_GEAR_VENDOR_PRICE_MULTIPLIER_TOOLTIP_TEXT"] = "This lets you set a default price for gear as a multiple of the vendor price. This is used for any gear Auctionator doesn't have a price for. Set this to 0 to not set a price."
-  L["CONFIG_SELLING_GEAR_USE_ILVL"] = "For gear, use item level when selecting the price to compete with"
-  L["CONFIG_SELLING_GEAR_USE_ILVL_TOOLTIP_HEADER"] = "Use Item Level"
-  L["CONFIG_SELLING_GEAR_USE_ILVL_TOOLTIP_TEXT"] = "Normally gear is compared with any other gear that is similar, but without taking item level into account. This will make the item level be taken into account."
+  L["CONFIG_SELLING_GEAR_USE_ILVL_VARIANTS"] = "For gear, use item level and title when selecting the price to compete with"
+  L["CONFIG_SELLING_GEAR_USE_ILVL_VARIANTS_TOOLTIP_HEADER"] = "Use Item Level and Title"
+  L["CONFIG_SELLING_GEAR_USE_ILVL_VARIANTS_TOOLTIP_TEXT"] = "Normally gear is compared with any other gear that is similar, but without taking item level and the \"of the\" titles into account. This will make them be taken into account."
 
   L["CLASSIC_SUPPORT_ERROR"] = "This version of Auctionator DOES NOT support Classic. Stuff may break and not work."
 

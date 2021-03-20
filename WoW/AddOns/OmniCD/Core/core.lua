@@ -31,18 +31,18 @@ E.IsTableExact = function(a, b)
 	return true
 end
 
-E.RemoveTableDuplicates = function(dest, src)
+E.RemoveEmptyDuplicateTables = function(dest, src)
 	local copy = {}
 	for k, v in pairs(dest) do
 		local srcV = src[k]
 		if type(v) == 'table' and type(srcV) == 'table' then
-			copy[k] = E.RemoveTableDuplicates(v, srcV)
+			copy[k] = E.RemoveEmptyDuplicateTables(v, srcV)
 		elseif v ~= srcV then
 			copy[k] = v
 		end
 	end
 
-	return copy
+	return next(copy) and copy
 end
 
 E.GetModuleEnabled = function(k)
@@ -129,7 +129,7 @@ function OmniCD_AnchorOnMouseUp(self)
 	local bar = self:GetParent()
 	bar:StopMovingOrSizing()
 	SavePosition(bar)
-	LibStub("AceConfigRegistry-3.0"):NotifyChange("OmniCD")
+	E.Libs.ACR:NotifyChange("OmniCD")
 end
 
 E.SetWidth = function(anchor)
@@ -239,4 +239,79 @@ E.UnregisterEvents = function(f, t)
 	end
 end
 
-E.noop = function() end
+E.Noop = function() end
+
+do
+	local backdropFrames = {}
+	local backdropStyle = {}
+	local textureUVs = {
+		"TopLeftCorner",
+		"TopRightCorner",
+		"BottomLeftCorner",
+		"BottomRightCorner",
+		"TopEdge",
+		"BottomEdge",
+		"LeftEdge",
+		"RightEdge",
+		"Center"
+	}
+
+	E.DisablePixelSnap = function(obj)
+		obj:SetTexelSnappingBias(0.0)
+		obj:SetSnapToPixelGrid(false)
+	end
+
+	E.BackdropTemplate = function(frame, style, bgFile, edgeFile, edgeSize, update)
+		style = style or "default"
+		bgFile = bgFile or E.TEXTURES.White8x8
+		edgeFile = edgeFile or E.TEXTURES.White8x8
+		edgeSize = edgeSize or 1
+
+		local backdrop = backdropStyle[style]
+		if not backdrop or update then
+			backdrop = {
+				bgFile = bgFile,
+				edgeFile = edgeFile,
+				edgeSize = edgeSize * E.PixelMult,
+			}
+			backdropStyle[style] = backdrop
+		end
+
+		backdropFrames[frame] = backdrop
+
+		frame:SetBackdrop(backdrop)
+
+		for _, pieceName in ipairs(textureUVs) do
+			local region = frame[pieceName];
+			if region then
+				E.DisablePixelSnap(region)
+			end
+		end
+	end
+
+	E.UpdateBackdrops = function()
+		for frame in pairs(backdropFrames) do
+			E.BackdropTemplate(frame)
+		end
+	end
+end
+
+E.SortHashToArray = function(src, db)
+	local t = {}
+	for k in pairs(src) do
+		t[#t + 1] = {db[k], k}
+	end
+
+	table.sort(t, function(a, b)
+		return a[1] > b[1]
+	end)
+
+	local sorted = {}
+	for i = 1, #t do
+		local v = t[i][2]
+		sorted[i] = v
+	end
+	t = nil
+
+	return sorted
+end

@@ -24,7 +24,12 @@ function AuctionatorUndercutScanMixin:OnLoad()
   self:SetCancel()
 end
 
+function AuctionatorUndercutScanMixin:OnShow()
+  SetOverrideBinding(self, false, Auctionator.Config.Get(Auctionator.Config.Options.CANCEL_UNDERCUT_SHORTCUT), "CLICK AuctionatorCancelUndercutButton:LeftButton")
+end
+
 function AuctionatorUndercutScanMixin:OnHide()
+  ClearOverrideBindings(self)
   FrameUtil.UnregisterFrameForEvents(self, CANCELLING_EVENTS)
 end
 
@@ -83,6 +88,7 @@ function AuctionatorUndercutScanMixin:NextStep()
 
   if (self.currentAuction.status == 1 or
       self.currentAuction.bidder ~= nil or
+      self.currentAuction.itemKey.itemID == Auctionator.Constants.WOW_TOKEN_ID or
       not ShouldInclude(self.currentAuction.itemKey)) then
     Auctionator.Debug.Message("undercut scan skip")
 

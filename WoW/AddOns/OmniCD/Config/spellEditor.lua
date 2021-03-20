@@ -1,7 +1,6 @@
 local E, L, C = select(2, ...):unpack()
 
 local spell_db = E.spell_db
-local AceDialog = LibStub("AceConfigDialog-3.0")
 local title = L["Spell Editor"]
 
 local defaultBackup = {}
@@ -29,27 +28,28 @@ local function GetClassIndexBySpellID(id)
 	end
 end
 
+-- TODO: clean this up. gives me a headache everytime.
 function E:UpdateSpell(id, isInit, oldClass, oldType) -- [39]
 	local class, i = GetClassIndexBySpellID(id)
 	local v = OmniCDDB.cooldowns[id]
 	local vclass, vtype, force
 	if v then
 		vclass, vtype = v.class, v.type
-		if class ~= vclass then
-			if class then
+		if class ~= vclass then -- custom spell
+			if class then -- class change custom
 				tremove(spell_db[class], i)
-			else
+			else -- add new custom
 				force = true
 			end
 			spell_db[vclass][#spell_db[vclass] + 1] = v
-		elseif not v.custom and not defaultBackup[id] then
+		elseif not v.custom and not defaultBackup[id] then -- add new default spell
 			defaultBackup[id] = self.DeepCopy(spell_db[class][i])
 			spell_db[class][i] = v
 			if E.L_HIGHLIGHTS[vtype] then
 				self.Cooldowns:RegisterRemoveHighlightByCLEU(v.buff or id)
 			end
 			return
-		else
+		else -- type change etc for default/custom
 			spell_db[class][i] = v
 		end
 
@@ -58,10 +58,10 @@ function E:UpdateSpell(id, isInit, oldClass, oldType) -- [39]
 		end
 	else
 		v = defaultBackup[id]
-		if v then
+		if v then -- delete default
 			vclass, vtype = v.class, v.type
 			spell_db[class][i] = self.DeepCopy(v)
-		else
+		else -- delete custom
 			tremove(spell_db[class], i)
 		end
 	end
@@ -172,7 +172,7 @@ local customSpellInfo = {
 			end
 			OmniCDDB.cooldowns[id] = nil
 			E.DB.profile.Party.customPriority[id] = nil
-			E.options.args.spellEditor.args.editor.args[sId] = nil
+			E.options.args.SpellEditor.args.editor.args[sId] = nil
 
 			E:UpdateSpell(id, nil, oldClass, oldType)
 		end,
@@ -492,7 +492,7 @@ E.EditSpell = function(_, value)
 	end
 
 	if OmniCDDB.cooldowns[id] then
-		return AceDialog:SelectGroup(E.AddOn, "spellEditor", "editor", value)
+		return E.Libs.ACD:SelectGroup(E.AddOn, "SpellEditor", "editor", value)
 	end
 
 	local class, i = GetClassIndexBySpellID(id)
@@ -522,22 +522,17 @@ E.EditSpell = function(_, value)
 			["buff"] = id,
 			["name"] = name,
 		}
-
-		local spell = Spell:CreateFromSpellID(id)
-		spell:ContinueOnSpellLoad(function()
-			OmniCDDB.cooldowns[id]["desc"] = spell:GetSpellDescription()
-		end)
 	end
 
-	E.options.args.spellEditor.args.editor.args[value] = customSpellGroup
+	E.options.args.SpellEditor.args.editor.args[value] = customSpellGroup
 
 	E:UpdateSpell(id)
-	AceDialog:SelectGroup(E.AddOn, "spellEditor", "editor", value)
+	E.Libs.ACD:SelectGroup(E.AddOn, "SpellEditor", "editor", value)
 end
 
-local spellEditor = {
+local SpellEditor = {
 	name = title,
-	order = 1000,
+	order = 900,
 	type = "group",
 	childGroups = "tab",
 	get = function(info)
@@ -611,11 +606,11 @@ function E:AddSpellEditor()
 			--E.Write("Removing Invalid ID (User Added): |cffffd200" .. id)
 		else
 			id = tostring(id)
-			spellEditor.args.editor.args[id] = customSpellGroup
+			SpellEditor.args.editor.args[id] = customSpellGroup
 		end
 	end
 
-	self.options.args["spellEditor"] = spellEditor
+	self.options.args["SpellEditor"] = SpellEditor
 
 	self:AddSpellPickers()
 end

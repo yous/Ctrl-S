@@ -51,23 +51,16 @@ function P:SetOffset(f)
 	f.container:ClearAllPoints()
 	--f.container:SetPoint(self.point, f, self.containerOfsX, self.containerOfsY)
 	f.container:SetPoint("TOPLEFT", f, self.containerOfsX, self.containerOfsY)
-
-	--[[ xml
-	if self.doubleRow and E.db.icons.modRowEnabled then
-		f.bottomRow:ClearAllPoints()
-		f.bottomRow:SetPoint("TOPLEFT", f.container, self.modRowOfsX, self.modRowOfsY)
-	end
-	--]]
 end
 
 function P:UpdatePosition()
-	if self.disabled then
+	if P.disabled then
 		return
 	end
 
-	self:HideBars() -- [63]
+	P:HideBars() -- [63]
 
-	for guid, info in pairs(self.groupInfo) do
+	for guid, info in pairs(P.groupInfo) do
 		local f = info.bar
 		if E.db.position.detached then
 			E.LoadPosition(f)
@@ -76,13 +69,13 @@ function P:UpdatePosition()
 			local frame = FindAnchorFrame(guid)
 			if frame then
 				f:ClearAllPoints()
-				f:SetPoint(self.point, frame, self.relativePoint)
+				f:SetPoint(P.point, frame, P.relativePoint)
 				f:Show()
 			end
 		end
 
-		self:SetAnchorPosition(f)
-		self:SetOffset(f)
+		P:SetAnchorPosition(f)
+		P:SetOffset(f)
 	end
 end
 

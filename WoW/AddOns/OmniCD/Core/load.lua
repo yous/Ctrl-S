@@ -1,5 +1,6 @@
 local E, L, C = select(2, ...):unpack()
 
+local ACD_Tooltip = E.Libs.ACD.tooltip
 local DB_VERSION = 2.51
 
 function E:OnInitialize()
@@ -35,6 +36,7 @@ function E:OnInitialize()
 	self.profile = self.DB.profile
 	self.db = self.DB.profile.Party.arena
 
+	self:CreateFontObjects()
 	self:UpdateSpellList(true)
 	self:SetupOptions()
 	self:EnableVersionCheck()
@@ -43,6 +45,15 @@ end
 function E:OnEnable()
 	--[AC] C_ChatInfo.RegisterAddonMessagePrefix("OmniCD")
 	E.Comms:RegisterComm("OmniCD", "CHAT_MSG_ADDON")
+
+	-- dummy lines to set font (2 doublelines exists as default)
+	for i = 1, 13 do
+		if i > 3 then
+			ACD_Tooltip:AddLine(".")
+		else
+			ACD_Tooltip:AddDoubleLine(".", ".")
+		end
+	end
 
 	self:LoadAddOns()
 	self:Refresh()
@@ -57,6 +68,8 @@ end
 function E:Refresh(arg)
 	self.profile = self.DB.profile
 
+	E:UpdateFontObjects()
+
 	for k in pairs(self.moduleOptions) do
 		local module = self[k]
 		local enabled = self.GetModuleEnabled(k) -- [36]
@@ -69,17 +82,12 @@ function E:Refresh(arg)
 		else
 			module:Disable()
 		end
-
-		local func = module.UpdateExecuteNames
-		if func then
-			func()
-		end
 	end
 
 	self.TooltipID:SetHooks()
 
 	if arg == "OnProfileReset" then
-		--self.global.disableElvMsg = nil
+		self.global.disableElvMsg = nil
 	end
 end
 
@@ -118,7 +126,8 @@ do
 
 			local ver = tonumber(message)
 			if ver and ver > version then
-				local text = ver - version > 999 and L["Major update"] or (ver - version > 99 and L["Minor update"]) or L["Hotfix"]
+				local diff = ver - version
+				local text = diff > 10 and L["Major update"] or (diff > 1 and L["Minor update"]) or L["Hotfix"]
 				text = format("|cfff16436 " .. L["A new update is available. (%s)"], text)
 				if E.DB.profile.notifyNew then
 					E.Write(text)
@@ -201,4 +210,40 @@ do
 	local f = CreateFrame("Frame")
 	f:RegisterEvent("PET_BATTLE_OPENING_START")
 	f:SetScript("OnEvent", ShowHideAllBars_OnEvent)
+
+	E.dummyFrame = f
+end
+
+function E:CreateFontObjects()
+	self.GameFontNormal = CreateFont("GameFontNormal-OmniCD")
+	self.GameFontNormal:CopyFontObject("GameFontNormal")
+	self.GameFontHighlight = CreateFont("GameFontHighlight-OmniCD")
+	self.GameFontHighlight:CopyFontObject("GameFontHighlight")
+	self.GameFontDisabled = CreateFont("GameFontDisable-OmniCD")
+	self.GameFontDisabled:CopyFontObject("GameFontDisable")
+	self.GameFontNormalSmall = CreateFont("GameFontNormalSmall-OmniCD")
+	self.GameFontNormalSmall:CopyFontObject("GameFontNormalSmall")
+	self.GameFontHighlightSmall = CreateFont("GameFontHighlightSmall-OmniCD")
+	self.GameFontHighlightSmall:CopyFontObject("GameFontHighlightSmall")
+end
+
+function E:UpdateFontObjects()
+	-- Update tooltip font
+	local optionFont = self.profile.General.fonts.option
+
+	for i = 1, select("#", ACD_Tooltip:GetRegions()) do
+		local region = select(i, ACD_Tooltip:GetRegions())
+		if region and region:GetObjectType() == "FontString" then
+			self.SetFont(region, optionFont)
+		end
+	end
+
+	-- Update our fontobjects
+	self.SetFont(self.GameFontNormal, optionFont)
+	self.SetFont(self.GameFontHighlight, optionFont)
+	self.SetFont(self.GameFontDisabled, optionFont)
+
+	local optionFontSmall = self.profile.General.fonts.optionSmall
+	self.SetFont(self.GameFontNormalSmall, optionFontSmall)
+	self.SetFont(self.GameFontHighlightSmall, optionFontSmall)
 end

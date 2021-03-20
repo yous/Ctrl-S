@@ -1,7 +1,13 @@
+---------------------------------------------------------------------------------
+
+-- Customized for OmniCD by permission of the copyright owner.
+
+---------------------------------------------------------------------------------
+
 --[[-----------------------------------------------------------------------------
 Checkbox Widget
 -------------------------------------------------------------------------------]]
-local Type, Version = "CheckBox", 26
+local Type, Version = "CheckBox-OmniCD", 26
 local AceGUI = LibStub and LibStub("AceGUI-3.0", true)
 if not AceGUI or (AceGUI:GetWidgetVersion(Type) or 0) >= Version then return end
 
@@ -16,6 +22,11 @@ local CreateFrame, UIParent = CreateFrame, UIParent
 -- List them here for Mikk's FindGlobals script
 -- GLOBALS: SetDesaturation, GameFontHighlight
 
+local IMAGED_CHECKBOX_SIZE = 14
+local DEFAULT_ICON_SIZE = 21 -- 1.5 crop
+local USE_ICON_BACKDROP = true
+local USE_ICON_CROP = true
+
 --[[-----------------------------------------------------------------------------
 Support functions
 -------------------------------------------------------------------------------]]
@@ -23,11 +34,22 @@ local function AlignImage(self)
 	local img = self.image:GetTexture()
 	self.text:ClearAllPoints()
 	if not img then
-		self.text:SetPoint("LEFT", self.checkbg, "RIGHT")
+		self.text:SetPoint("LEFT", self.checkbg, "RIGHT", 5, 0)
 		self.text:SetPoint("RIGHT")
+
+		if USE_ICON_BACKDROP then
+			self.imagebg:Hide()
+		end
 	else
-		self.text:SetPoint("LEFT", self.image, "RIGHT", 1, 0)
+		self.text:SetPoint("LEFT", USE_ICON_BACKDROP and self.imagebg or self.image, "RIGHT", 5, 0)
 		self.text:SetPoint("RIGHT")
+
+		if USE_ICON_BACKDROP then
+			self.imagebg:Show()
+		end
+		if self.type ~= "radio" then
+			self.checkbg:SetSize(IMAGED_CHECKBOX_SIZE, IMAGED_CHECKBOX_SIZE)
+		end
 	end
 end
 
@@ -36,20 +58,28 @@ Scripts
 -------------------------------------------------------------------------------]]
 local function Control_OnEnter(frame)
 	frame.obj:Fire("OnEnter")
+	frame.obj.checkbg:SetBackdropBorderColor(0.5, 0.5, 0.5)
 end
 
 local function Control_OnLeave(frame)
 	frame.obj:Fire("OnLeave")
+	frame.obj.checkbg:SetBackdropBorderColor(0.2, 0.2, 0.25)
 end
+
+local mouseOverFrame
+local cursorArg
 
 local function CheckBox_OnMouseDown(frame)
 	local self = frame.obj
 	if not self.disabled then
 		if self.image:GetTexture() then
-			self.text:SetPoint("LEFT", self.image,"RIGHT", 2, -1)
+			self.text:SetPoint("LEFT", USE_ICON_BACKDROP and self.imagebg or self.image,"RIGHT", 6, -1)
 		else
-			self.text:SetPoint("LEFT", self.checkbg, "RIGHT", 1, -1)
+			self.text:SetPoint("LEFT", self.checkbg, "RIGHT", 6, -1)
 		end
+
+		mouseOverFrame = GetMouseFocus();
+		cursorArg = self.arg
 	end
 	AceGUI:ClearFocus()
 end
@@ -57,17 +87,22 @@ end
 local function CheckBox_OnMouseUp(frame)
 	local self = frame.obj
 	if not self.disabled then
-		self:ToggleChecked()
+		if mouseOverFrame == GetMouseFocus() then
+			self:ToggleChecked()
 
-		if self.checked then
-			PlaySound(856) -- SOUNDKIT.IG_MAINMENU_OPTION_CHECKBOX_ON
-		else -- for both nil and false (tristate)
-			PlaySound(857) -- SOUNDKIT.IG_MAINMENU_OPTION_CHECKBOX_OFF
+			if self.checked then
+				PlaySound(856) -- SOUNDKIT.IG_MAINMENU_OPTION_CHECKBOX_ON
+			else -- for both nil and false (tristate)
+				PlaySound(857) -- SOUNDKIT.IG_MAINMENU_OPTION_CHECKBOX_OFF
+			end
+
+			self:Fire("OnValueChanged", self.checked)
+			AlignImage(self)
 		end
-
-		self:Fire("OnValueChanged", self.checked)
-		AlignImage(self)
 	end
+
+	mouseOverFrame = nil
+	cursorArg = nil
 end
 
 --[[-----------------------------------------------------------------------------
@@ -83,6 +118,7 @@ local methods = {
 		self:SetImage()
 		self:SetDisabled(nil)
 		self:SetDescription(nil)
+		self:SetArg(nil)
 	end,
 
 	-- ["OnRelease"] = nil,
@@ -105,6 +141,7 @@ local methods = {
 			if self.desc then
 				self.desc:SetTextColor(0.5, 0.5, 0.5)
 			end
+			self.checkbg:SetBackdropColor(0.5, 0.5, 0.5)
 		else
 			self.frame:Enable()
 			self.text:SetTextColor(1, 1, 1)
@@ -116,12 +153,13 @@ local methods = {
 			if self.desc then
 				self.desc:SetTextColor(1, 1, 1)
 			end
+			self.checkbg:SetBackdropColor(0, 0, 0)
 		end
 	end,
 
 	["SetValue"] = function(self, value)
-		local check = self.check
 		self.checked = value
+		local check = self.check
 		if value then
 			SetDesaturation(check, false)
 			check:Show()
@@ -135,6 +173,7 @@ local methods = {
 				check:Hide()
 			end
 		end
+
 		self:SetDisabled(self.disabled)
 	end,
 
@@ -150,7 +189,7 @@ local methods = {
 	["SetType"] = function(self, type)
 		local checkbg = self.checkbg
 		local check = self.check
-		local highlight = self.highlight
+		--local highlight = self.highlight -- s -r
 
 		local size
 		if type == "radio" then
@@ -160,9 +199,12 @@ local methods = {
 			check:SetTexture(130843) -- Interface\\Buttons\\UI-RadioButton
 			check:SetTexCoord(0.25, 0.5, 0, 1)
 			check:SetBlendMode("ADD")
+			--[[ s -r
 			highlight:SetTexture(130843) -- Interface\\Buttons\\UI-RadioButton
 			highlight:SetTexCoord(0.5, 0.75, 0, 1)
+			]]
 		else
+			--[[ s r
 			size = 24
 			checkbg:SetTexture(130755) -- Interface\\Buttons\\UI-CheckBox-Up
 			checkbg:SetTexCoord(0, 1, 0, 1)
@@ -171,7 +213,14 @@ local methods = {
 			check:SetBlendMode("BLEND")
 			highlight:SetTexture(130753) -- Interface\\Buttons\\UI-CheckBox-Highlight
 			highlight:SetTexCoord(0, 1, 0, 1)
+			]]
+			size = 14 -- No img info yet, set box size on SetImage
+			check:SetTexture(130751) -- Interface\\Buttons\\UI-CheckBox-Check
+			check:SetTexCoord(0, 1, 0, 1)
+			check:SetBlendMode("BLEND")
+			-- e
 		end
+
 		checkbg:SetHeight(size)
 		checkbg:SetWidth(size)
 	end,
@@ -199,7 +248,7 @@ local methods = {
 	["SetDescription"] = function(self, desc)
 		if desc then
 			if not self.desc then
-				local desc = self.frame:CreateFontString(nil, "OVERLAY", "GameFontHighlightSmall")
+				local desc = self.frame:CreateFontString(nil, "OVERLAY", "GameFontHighlightSmall-OmniCD")
 				desc:ClearAllPoints()
 				desc:SetPoint("TOPLEFT", self.checkbg, "TOPRIGHT", 5, -21)
 				desc:SetWidth(self.frame.width - 30)
@@ -229,12 +278,26 @@ local methods = {
 		if image:GetTexture() then
 			local n = select("#", ...)
 			if n == 4 or n == 8 then
-				image:SetTexCoord(...)
+				if USE_ICON_BACKDROP then -- override
+					if USE_ICON_CROP then
+						self.imagebg:SetHeight(DEFAULT_ICON_SIZE/1.5)
+						image:SetTexCoord(0.05, 0.95, 0.1, 0.6)
+					else
+						self.imagebg:SetHeight(DEFAULT_ICON_SIZE)
+						image:SetTexCoord(0.07, 0.93, 0.07, 0.93)
+					end
+				else
+					image:SetTexCoord(...)
+				end
 			else
 				image:SetTexCoord(0, 1, 0, 1)
 			end
 		end
 		AlignImage(self)
+	end,
+
+	["SetArg"] = function(self, arg)
+		self.arg = arg
 	end
 }
 
@@ -251,41 +314,60 @@ local function Constructor()
 	frame:SetScript("OnMouseDown", CheckBox_OnMouseDown)
 	frame:SetScript("OnMouseUp", CheckBox_OnMouseUp)
 
-	local checkbg = frame:CreateTexture(nil, "ARTWORK")
-	checkbg:SetWidth(24)
-	checkbg:SetHeight(24)
-	checkbg:SetPoint("TOPLEFT")
-	checkbg:SetTexture(130755) -- Interface\\Buttons\\UI-CheckBox-Up
+	frame:SetHitRectInsets(0, 20, 0, 0)
 
-	local check = frame:CreateTexture(nil, "OVERLAY")
-	check:SetAllPoints(checkbg)
+	local checkbg = CreateFrame("Frame", nil, frame, "BackdropTemplate")
+	checkbg:SetWidth(14)
+	checkbg:SetHeight(14)
+	checkbg:SetPoint("LEFT")
+	OmniCD[1].BackdropTemplate(checkbg)
+	checkbg:SetBackdropColor(0, 0, 0)
+	checkbg:SetBackdropBorderColor(0.2, 0.2, 0.25)
+
+	local check = checkbg:CreateTexture(nil, "OVERLAY")
+	check:SetPoint("TOPLEFT", -5, 5)
+	check:SetPoint("BOTTOMRIGHT", 5, -5)
 	check:SetTexture(130751) -- Interface\\Buttons\\UI-CheckBox-Check
 
-	local text = frame:CreateFontString(nil, "OVERLAY", "GameFontHighlight")
+	local text = frame:CreateFontString(nil, "OVERLAY", "GameFontHighlight-OmniCD")
 	text:SetJustifyH("LEFT")
 	text:SetHeight(18)
 	text:SetPoint("LEFT", checkbg, "RIGHT")
 	text:SetPoint("RIGHT")
 
-	local highlight = frame:CreateTexture(nil, "HIGHLIGHT")
-	highlight:SetTexture(130753) -- Interface\\Buttons\\UI-CheckBox-Highlight
-	highlight:SetBlendMode("ADD")
-	highlight:SetAllPoints(checkbg)
-
-	local image = frame:CreateTexture(nil, "OVERLAY")
-	image:SetHeight(16)
-	image:SetWidth(16)
-	image:SetPoint("LEFT", checkbg, "RIGHT", 1, 0)
+	local imagebg, image
+	if USE_ICON_BACKDROP then
+		imagebg = CreateFrame("Frame", nil, frame, "BackdropTemplate")
+		imagebg:SetHeight(DEFAULT_ICON_SIZE) -- 24 is frames full height
+		imagebg:SetWidth(DEFAULT_ICON_SIZE)
+		imagebg:SetPoint("LEFT", checkbg, "RIGHT", 2, 0)
+		OmniCD[1].BackdropTemplate(imagebg)
+		imagebg:SetBackdropBorderColor(0.2, 0.2, 0.05)
+		image = imagebg:CreateTexture(nil, "OVERLAY")
+		OmniCD[1].DisablePixelSnap(image)
+		image:SetPoint("TOPLEFT", imagebg.TopEdge, "BOTTOMLEFT")
+		image:SetPoint("BOTTOMRIGHT", imagebg.BottomEdge, "TOPRIGHT")
+	else
+		image = frame:CreateTexture(nil, "OVERLAY")
+		image:SetHeight(DEFAULT_ICON_SIZE)
+		image:SetWidth(DEFAULT_ICON_SIZE)
+		image:SetPoint("LEFT", checkbg, "RIGHT", 2, 0)
+	end
 
 	local widget = {
 		checkbg   = checkbg,
 		check     = check,
 		text      = text,
-		highlight = highlight,
+		--highlight = highlight, -- s -r
 		image     = image,
 		frame     = frame,
-		type      = Type
+		type      = Type,
 	}
+
+	if USE_ICON_BACKDROP then
+		widget.imagebg = imagebg
+	end
+
 	for method, func in pairs(methods) do
 		widget[method] = func
 	end

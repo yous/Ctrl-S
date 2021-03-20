@@ -833,7 +833,7 @@ do
     ---@param anchor string @`ANCHOR_TOPLEFT`, `ANCHOR_NONE`, `ANCHOR_CURSOR`, etc.
     ---@param offsetX number @Optional offset X for some of the anchors.
     ---@param offsetY number @Optional offset Y for some of the anchors.
-    ---@return boolean, boolean @If owner was set arg1 is true. If owner was updated arg2 is true. Otherwise both will be set to face to indicate we did not update the Owner of the widget.
+    ---@return boolean, boolean, boolean @If owner was set arg1 is true. If owner was updated arg2 is true. Otherwise both will be set to face to indicate we did not update the Owner of the widget. If the owner is set to the preferred owner arg3 is true.
     function util:SetOwnerSafely(object, owner, anchor, offsetX, offsetY)
         if type(object) ~= "table" or type(object.GetOwner) ~= "function" then
             return
@@ -841,16 +841,16 @@ do
         local currentOwner = object:GetOwner()
         if not currentOwner then
             object:SetOwner(owner, anchor, offsetX, offsetY)
-            return true
+            return true, false, true
         end
         offsetX, offsetY = offsetX or 0, offsetY or 0
         local currentAnchor, currentOffsetX, currentOffsetY = object:GetAnchorType()
         currentOffsetX, currentOffsetY = currentOffsetX or 0, currentOffsetY or 0
         if currentAnchor ~= anchor or (currentOffsetX ~= offsetX and abs(currentOffsetX - offsetX) > 0.01) or (currentOffsetY ~= offsetY and abs(currentOffsetY - offsetY) > 0.01) then
             object:SetOwner(owner, anchor, offsetX, offsetY)
-            return true
+            return true, true, true
         end
-        return false, true
+        return false, true, currentOwner == owner
     end
 
     ---@param text string @The format string like "Greetings %s! How are you?"
@@ -2274,16 +2274,18 @@ do
         local maxDungeonIndex = 0
         local maxDungeonTime = 999
         local maxDungeonLevel = 0
+        local maxDungeonScore = 0
         local maxDungeonUpgrades = 0
         for i = 1, #keystoneData.all.runs do
             local run = keystoneData.all.runs[i]
             results.dungeons[i] = run.level
             results.dungeonUpgrades[i] = run.upgrades
             results.dungeonTimes[i] = run.fraction
-            if run.level > maxDungeonLevel or (run.level == maxDungeonLevel and run.fraction < maxDungeonTime) then
+            if run.score > maxDungeonScore or (run.score == maxDungeonScore and run.fraction < maxDungeonTime) then
                 maxDungeonIndex = i
                 maxDungeonTime = run.fraction
                 maxDungeonLevel = run.level
+                maxDungeonScore = run.score
                 maxDungeonUpgrades = run.upgrades
             end
         end
@@ -3773,11 +3775,18 @@ do
         if not fullName or not util:IsMaxLevel(level) then
             return
         end
-        local ownerSet, ownerExisted = util:SetOwnerSafely(GameTooltip, FriendsTooltip, "ANCHOR_BOTTOMRIGHT", -FriendsTooltip:GetWidth(), -4)
+        local ownerSet, ownerExisted, ownerSetSame = util:SetOwnerSafely(GameTooltip, FriendsTooltip, "ANCHOR_BOTTOMRIGHT", -FriendsTooltip:GetWidth(), -4)
+        -- HOTFIX: attempt to fix the issue with a bnet friend with a notification causes the update to be called each frame without a proper hide event and this makes it so we append an empty line due to the smart padding check
+        do
+            local firstText = GameTooltipTextLeft1:GetText()
+            if not firstText or firstText == "" or firstText == " " then
+                ownerExisted = false
+            end
+        end
         if render:ShowProfile(GameTooltip, fullName, faction, render.Preset.UnitSmartPadding(ownerExisted)) then
             return
         end
-        if ownerSet then
+        if ownerSet and not ownerExisted and ownerSetSame then
             GameTooltip:Hide()
         end
     end
@@ -3815,11 +3824,11 @@ do
         if not info or not info.fullName or not util:IsMaxLevel(info.level) then
             return
         end
-        local ownerSet, ownerExisted = util:SetOwnerSafely(GameTooltip, self, "ANCHOR_LEFT")
+        local ownerSet, ownerExisted, ownerSetSame = util:SetOwnerSafely(GameTooltip, self, "ANCHOR_LEFT")
         if render:ShowProfile(GameTooltip, info.fullName, ns.PLAYER_FACTION, render.Preset.UnitSmartPadding(ownerExisted)) then
             return
         end
-        if ownerSet then
+        if ownerSet and not ownerExisted and ownerSetSame then
             GameTooltip:Hide()
         end
     end
@@ -4604,11 +4613,11 @@ do
         if not fullName then
             return false
         end
-        local ownerSet, ownerExisted = util:SetOwnerSafely(GameTooltip, parent, "ANCHOR_NONE", 0, 0)
+        local ownerSet, ownerExisted, ownerSetSame = util:SetOwnerSafely(GameTooltip, parent, "ANCHOR_NONE", 0, 0)
         if render:ShowProfile(GameTooltip, fullName, ns.PLAYER_FACTION, render.Preset.Unit(render.Flags.MOD_STICKY), currentResult) then
             return true, fullName
         end
-        if ownerSet then
+        if ownerSet and not ownerExisted and ownerSetSame then
             GameTooltip:Hide()
         end
         return false
@@ -4686,11 +4695,11 @@ do
         if not fullName or not util:IsMaxLevel(level) then
             return
         end
-        local ownerSet, ownerExisted = util:SetOwnerSafely(GameTooltip, self, "ANCHOR_TOPLEFT", 0, 0)
+        local ownerSet, ownerExisted, ownerSetSame = util:SetOwnerSafely(GameTooltip, self, "ANCHOR_TOPLEFT", 0, 0)
         if render:ShowProfile(GameTooltip, fullName, ns.PLAYER_FACTION, render.Preset.UnitSmartPadding(ownerExisted)) then
             return
         end
-        if ownerSet then
+        if ownerSet and not ownerExisted and ownerSetSame then
             GameTooltip:Hide()
         end
     end
@@ -4769,11 +4778,11 @@ do
         if (clubType and clubType ~= Enum.ClubType.Guild and clubType ~= Enum.ClubType.Character) or not nameAndRealm or not util:IsMaxLevel(level, true) then
             return
         end
-        local ownerSet, ownerExisted = util:SetOwnerSafely(GameTooltip, self, "ANCHOR_LEFT", 0, 0)
+        local ownerSet, ownerExisted, ownerSetSame = util:SetOwnerSafely(GameTooltip, self, "ANCHOR_LEFT", 0, 0)
         if render:ShowProfile(GameTooltip, nameAndRealm, faction, render.Preset.UnitSmartPadding(ownerExisted)) then
             return
         end
-        if ownerSet then
+        if ownerSet and not ownerExisted and ownerSetSame then
             GameTooltip:Hide()
         end
     end
@@ -5221,7 +5230,7 @@ do
 
     local function CreateGuildWeeklyFrame()
         ---@type GuildWeeklyFrame
-        local frame = CreateFrame("Frame", nil, ChallengesFrame, BackdropTemplateMixin and "BackdropTemplate")
+        local frame = CreateFrame("Frame", "RaiderIO_GuildWeeklyFrame", ChallengesFrame, BackdropTemplateMixin and "BackdropTemplate")
         frame.maxVisible = 5
         -- inherit from the mixin
         for k, v in pairs(GuildWeeklyFrameMixin) do

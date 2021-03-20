@@ -35,7 +35,7 @@ local visibility = {
 			type = "multiselect",
 			width = "full",
 			values = E.L_ZONE,
-			descStyle = "inline",
+			--descStyle = "inline",
 			get = function(_, k) return E.DB.profile.Party.visibility[k] end,
 			set = function(_, k, value)
 				E.DB.profile.Party.visibility[k] = value
@@ -69,7 +69,7 @@ local visibility = {
 					width = "double",
 					type = "range",
 					min = 2, max = 40, step = 1,
-					descStyle = "inline",
+					--descStyle = "inline",
 					set = ConfigGroupSize,
 				},
 			}

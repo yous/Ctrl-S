@@ -8,16 +8,10 @@ local setScale = function(info, value)
 	E.DB.profile.Party[key].icons[option] = value
 
 	P:ConfigSize(key, true)
-	--[[ xml
-	P:ConfigSize(key, option == "scale" or option == "modRowScale")
-	--]]
 end
 
 local icons = {
 	name = L["Icons"],
-	--[[ xml
-	name = "|TInterface\\OptionsFrame\\UI-OptionsFrame-NewFeatureIcon:0:0:0:-1|t" .. L["Icons"],
-	--]]
 	order = 30,
 	type = "group",
 	get = P.getIcons,
@@ -109,6 +103,7 @@ local icons = {
 					name = L["Border Color"],
 					order = 1,
 					type = "color",
+					dialogControl = "ColorPicker-OmniCD",
 					get = function(info)
 						local key = info[2]
 						return E.DB.profile.Party[key].icons.borderColor.r, E.DB.profile.Party[key].icons.borderColor.g, E.DB.profile.Party[key].icons.borderColor.b
@@ -121,7 +116,7 @@ local icons = {
 
 						P:ConfigIcons(key, "borderColor")
 					end,
-					descStyle = "inline",
+					--descStyle = "inline",
 				},
 				borderPixels = {
 					name = L["Border Thickness"],

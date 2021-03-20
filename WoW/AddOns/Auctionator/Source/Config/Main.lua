@@ -26,6 +26,9 @@ Auctionator.Config.Options = {
   SELLING_FAVOURITE_KEYS = "selling_favourite_keys_2",
   SELLING_AUTO_SELECT_NEXT = "selling_auto_select_next",
   SELLING_MISSING_FAVOURITES = "selling_missing_favourites",
+  SELLING_POST_SHORTCUT = "selling_post_shortcut",
+  SELLING_SKIP_SHORTCUT = "selling_skip_shortcut",
+  SHOW_SELLING_BID_PRICE = "show_selling_bid_price",
 
   NOT_LIFO_AUCTION_DURATION = "not_lifo_auction_duration",
   NOT_LIFO_AUCTION_SALES_PREFERENCE = "not_lifo_auction_sales_preference",
@@ -50,6 +53,7 @@ Auctionator.Config.Options = {
   HIDE_SPLASH_SCREEN = "hide_splash_screen",
 
   UNDERCUT_SCAN_NOT_LIFO = "undercut_scan_not_lifo",
+  CANCEL_UNDERCUT_SHORTCUT = "cancel_undercut_shortcut",
 
   SILENCE_AUCTION_ERRORS = "silence_auction_errors",
 
@@ -100,6 +104,9 @@ local defaults = {
   [Auctionator.Config.Options.SELLING_FAVOURITE_KEYS] = {},
   [Auctionator.Config.Options.SELLING_AUTO_SELECT_NEXT] = false,
   [Auctionator.Config.Options.SELLING_MISSING_FAVOURITES] = true,
+  [Auctionator.Config.Options.SELLING_POST_SHORTCUT] = "",
+  [Auctionator.Config.Options.SELLING_SKIP_SHORTCUT] = "",
+  [Auctionator.Config.Options.SHOW_SELLING_BID_PRICE] = false,
 
   [Auctionator.Config.Options.NOT_LIFO_AUCTION_DURATION] = 48,
   [Auctionator.Config.Options.NOT_LIFO_AUCTION_SALES_PREFERENCE] = Auctionator.Config.SalesTypes.PERCENTAGE,
@@ -123,6 +130,7 @@ local defaults = {
   [Auctionator.Config.Options.HIDE_SPLASH_SCREEN] = false,
 
   [Auctionator.Config.Options.UNDERCUT_SCAN_NOT_LIFO] = true,
+  [Auctionator.Config.Options.CANCEL_UNDERCUT_SHORTCUT] = "",
 
   [Auctionator.Config.Options.SILENCE_AUCTION_ERRORS] = true,
   [Auctionator.Config.Options.DEFAULT_TAB] = 0,

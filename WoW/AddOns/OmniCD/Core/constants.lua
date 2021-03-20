@@ -105,6 +105,9 @@ E.L_LAYOUT = {
 	["horizontal"] = L["Horizontal"],
 	["vertical"] = L["Vertical"],
 	["doubleRow"] = L["Use Double Row"],
+	["doubleColumn"] = L["Use Double Column"],
+	["tripleRow"] = L["Use Triple Row"],
+	["tripleColumn"] = L["Use Triple Column"],
 }
 
 E.L_ALIGN = {
@@ -132,10 +135,12 @@ E.L_PRIORITY = {
 	["cc"] = L["Crowd Control"],
 	["disarm"] = DISARMROOTSILENCE,
 	["immunity"] = L["Immunity"],
+	["externalDefensive"] = L["External Defensive"],
 	["defensive"] = L["Defensive"],
 	["raidDefensive"] = L["Raid Defensive"],
 	["offensive"] = L["Offensive"],
 	["counterCC"] = L["Counter CC"],
+	["raidMovement"] = L["Raid Movement"],
 	["other"] = OTHER,
 }
 
@@ -150,10 +155,12 @@ E.L_GLOW_ATLAS ={
 
 E.L_HIGHLIGHTS = {
 	["immunity"] = L["Immunity"],
+	["externalDefensive"] = L["External Defensive"],
 	["defensive"] = L["Defensive"],
 	["raidDefensive"] = L["Raid Defensive"],
 	["offensive"] = L["Offensive"],
 	["counterCC"] = L["Counter CC"],
+	["raidMovement"] = L["Raid Movement"],
 	["other"] = OTHER,
 }
 
@@ -187,7 +194,8 @@ E.L_CATAGORY_OTHER = {
 }
 
 E.ICO = {
-	["CLASS"] = "Interface\\Glues\\CharacterCreate\\UI-CharacterCreate-Classes",
+	--["CLASS"] = "Interface\\Glues\\CharacterCreate\\UI-CharacterCreate-Classes",
+	["CLASS"] = "Interface\\Icons\\classicon_", -- individual icons if we're cropping tree icons
 	["PVPTRINKET"] = "Interface\\Icons\\ability_pvp_gladiatormedallion",
 	["RACIAL"] = "Interface\\Icons\\Achievement_character_human_female",
 	["TRINKET"] = "Interface\\Icons\\inv_60pvp_trinket2d",
@@ -249,6 +257,7 @@ E.POWER_TYPE_IDS = {
 	["SOUL_SHARDS"] = Enum.PowerType.SoulShards,    -- 7
 }
 
+--[[
 E.COVENANT_HEX_COLOR = {
 	[321076] = "|cff2aa2ff",    -- KYRIAN_BLUE_COLOR
 	[321079] = "|cffe40d0d",    -- VENTHYR_RED_COLOR
@@ -256,10 +265,21 @@ E.COVENANT_HEX_COLOR = {
 	[321078] = "|cff17c864",    -- NECROLORD_GREEN_COLOR
 }
 --> Desc
+]]
 
 E.HEX_C = {
-	CURSE_ORANGE = "|cfff16436",
-	TWITCH_PURPLE = "|cff9146ff",
-	PERFORMANCE_BLUE = "|cff99cdff",
-	OMNICD_RED = "|cffc10003",
+	CURSE_ORANGE = "|cfff16436", -- 0.945, 0.392, 0.212
+	TWITCH_PURPLE = "|cff9146ff", -- 0.569, 0.275, 1.0
+	PERFORMANCE_BLUE = "|cff99cdff", -- 0.596, 0.808, 1.0
+	OMNICD_RED = "|cffc10003", -- 0.757, 0.0, 0.012
+	OMNICD_MAROON = "|cff69000b", -- 0.412, 0.0, 0.043
 }
+
+-- tree/tab maroon  0.412, 0.0, 0.043
+-- checkbox maroon  0.536, 0.0, 0.056
+-- checkbox red     0.725, 0.008, 0.008
+-- checkbox green   0.008, 0.725, 0.008
+-- checkbox yellow  0.8, 0.624, 0
+-- flash btn green  0, 0.6, 0.4
+-- flash btn red    0.725, 0.008, 0.008
+-- slider knob yellow   1, 0.824, 0

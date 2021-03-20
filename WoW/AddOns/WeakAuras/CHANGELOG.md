@@ -1,20 +1,34 @@
-# [3.1.9](https://github.com/WeakAuras/WeakAuras2/tree/3.1.9) (2021-01-26)
+# [3.2.2](https://github.com/WeakAuras/WeakAuras2/tree/3.2.2) (2021-03-14)
 
-[Full Changelog](https://github.com/WeakAuras/WeakAuras2/compare/3.1.8...3.1.9)
+[Full Changelog](https://github.com/WeakAuras/WeakAuras2/compare/3.2.1...3.2.2)
 
 ## Highlights
 
- - bug fixes 
+ - DBM triggers rework
+- Bug fixes 
 
 ## Commits
 
 InfusOnWoW (2):
 
-- Fix oversight in 7a3d5c762 breaking remaining time check for
-- Clamp tooltips to the screen
+- Fix aura_env being unavailable in some condition checks
+- Fix Legendary ID mapping
 
-Stanzilla (2):
+Stanzilla (5):
 
-- master -> main
-- Create CODE_OF_CONDUCT.md
+- Publish Classic to Wago Addons as well
+- Publish Retail to Wago Addons as well
+- Update WeakAurasModelPaths from wow.tools
+- Update WeakAurasModelPaths from wow.tools
+- Update WeakAurasModelPaths from wow.tools
+
+mrbuds (7):
+
+- fix nameFunc for "Cooldown Ready (Equipment Slot)" trigger fixes #2976
+- set tocversion as an internal field for import diff
+- add DBT (DBM options) to .luacheckrc
+- DBM bars options table was moved
+- handle BigWigs_PauseBar and BigWigs_ResumeBar events
+- handle DBM_TimerPause & DBM_TimerResume callbacks fixes #2951
+- add state.paused support for timed progress auras
 

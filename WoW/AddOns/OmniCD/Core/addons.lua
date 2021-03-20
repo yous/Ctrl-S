@@ -15,27 +15,27 @@ local unitFrameData = {
 	{   [1] = "VuhDo",
 		[2] = "Vd1H",
 		[3] = "raidid",
-		[4] = 2, -- idc if it doesn't work. needs an insane amount of delay on reload
+		[4] = 1,
 	},
 	{   [1] = "VuhDo-Panel2",
 		[2] = "Vd2H",
 		[3] = "raidid",
-		[4] = 2,
+		[4] = 1,
 	},
 	{   [1] = "VuhDo-Panel3",
 		[2] = "Vd3H",
 		[3] = "raidid",
-		[4] = 2,
+		[4] = 1,
 	},
 	{   [1] = "VuhDo-Panel4",
 		[2] = "Vd4H",
 		[3] = "raidid",
-		[4] = 2,
+		[4] = 1,
 	},
 	{   [1] = "VuhDo-Panel5",
 		[2] = "Vd5H",
 		[3] = "raidid",
-		[4] = 2,
+		[4] = 1,
 	},
 	{   [1] = "Grid2",
 		[2] = "Grid2LayoutHeader1UnitButton",
@@ -47,8 +47,13 @@ local unitFrameData = {
 		[3] = "unit",
 		[4] = 1,
 	},
-	{   [1] = "InvenRaidFrame3",
-		[2] = "InvenRaidFrame3Group0UnitButton",
+	{   [1] = "InvenRaidFrames3",
+		[2] = "InvenRaidFrames3Group0UnitButton",
+		[3] = "unit",
+		[4] = 1,
+	},
+	{   [1] = "Lime",
+		[2] = "LimeGroup0UnitButton",
 		[3] = "unit",
 		[4] = 1,
 	},
@@ -113,6 +118,18 @@ local unitFrameData = {
 		[3] = "unit",
 		[4] = 1,
 	},
+	{
+		[1] = "ShestakUI",
+		[2] = "oUF_PartyUnitButton",
+		[3] = "unit",
+		[4] = 1,
+	},
+	{
+		[1] = "ShestakUI-DPS",
+		[2] = "oUF_PartyDPSUnitButton",
+		[3] = "unit",
+		[4] = 1,
+	},
 }
 
 function E:SetActiveUnitFrameData()
@@ -168,10 +185,10 @@ function E:UnitFrames()
 		self:SetActiveUnitFrameData()
 
 		if not self.DB.global.disableElvMsg then
-			StaticPopup_Show("OMNICD_Elv_MSG")
+			E.StaticPopup_Show("OMNICD_Elv_MSG")
 		end
 
-		self:SetNumPixels() -- set after UFs load
+		self:SetPixelMult() -- set after addon load
 	end
 end
 

@@ -1,5 +1,5 @@
 ----------------------------------------------------------------------
--- 	Leatrix Plus 9.0.17 (24th February 2021)
+-- 	Leatrix Plus 9.0.20 (17th March 2021)
 ----------------------------------------------------------------------
 
 --	01:Functions	20:Live			50:RunOnce		70:Logout			
@@ -20,7 +20,7 @@
 	local void
 
 	-- Version
-	LeaPlusLC["AddonVer"] = "9.0.17"
+	LeaPlusLC["AddonVer"] = "9.0.20"
 
 	-- Get locale table
 	local void, Leatrix_Plus = ...
@@ -10506,7 +10506,7 @@
 					frame:SetScript("OnDragStart", frame.StartMoving)
 					frame:SetScript("OnDragStop", function() frame:StopMovingOrSizing() frame:SetUserPlaced(false) end)
 					frame:Hide()
-					LeaPlusLC:CreateBar("HelpPanelMainTexture", frame, 570, 380, "TOPRIGHT", 0.7, 0.7, 0.7, 0.7,  "Interface\\ACHIEVEMENTFRAME\\UI-GuildAchievement-Parchment-Horizontal-Desaturated.png")
+					LeaPlusLC:CreateBar("HelpPanelMainTexture", frame, 570, 400, "TOPRIGHT", 0.7, 0.7, 0.7, 0.7,  "Interface\\ACHIEVEMENTFRAME\\UI-GuildAchievement-Parchment-Horizontal-Desaturated.png")
 					-- Panel contents
 					local col1, col2, color1 = 10, 120, "|cffffffaa"
 					LeaPlusLC:MakeTx(frame, "Leatrix Plus Help", col1, -10)
@@ -10648,6 +10648,16 @@
 					local p = StaticPopup_Visible("CAMP")
 					_G[p .. "Button1"]:Click()
 				end)
+				return
+
+			elseif str == "ach" then
+				-- Set Instance Achievement Tracker window properties
+				if AchievementTracker then
+					AchievementTracker:SetScale(1.4)
+					AchievementTracker:SetClampRectInsets(500, -500, -10, 300)
+					table.insert(UISpecialFrames, "AchievementTracker")
+					LeaPlusLC:Print("IAT scale set and window can now be closed with escape.")
+				end
 				return
 			elseif str == "admin" then
 				-- Preset profile (used for testing)

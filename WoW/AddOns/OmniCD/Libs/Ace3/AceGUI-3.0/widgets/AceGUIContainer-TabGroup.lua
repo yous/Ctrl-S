@@ -1,8 +1,14 @@
+---------------------------------------------------------------------------------
+
+-- Customized for OmniCD by permission of the copyright owner.
+
+---------------------------------------------------------------------------------
+
 --[[-----------------------------------------------------------------------------
 TabGroup Container
 Container that uses tabs on top to switch between groups.
 -------------------------------------------------------------------------------]]
-local Type, Version = "TabGroup", 37
+local Type, Version = "TabGroup-OmniCD", 37
 local AceGUI = LibStub and LibStub("AceGUI-3.0", true)
 if not AceGUI or (AceGUI:GetWidgetVersion(Type) or 0) >= Version then return end
 
@@ -29,10 +35,15 @@ Support functions
 local function UpdateTabLook(frame)
 	if frame.disabled then
 		PanelTemplates_SetDisabledTabState(frame)
+		frame.bg:Hide()
+		frame:SetDisabledFontObject("GameFontDisable-OmniCD") -- override blizzard setting font obj in PanelTemplates_
 	elseif frame.selected then
 		PanelTemplates_SelectTab(frame)
+		frame.bg:Show()
+		frame:SetDisabledFontObject("GameFontHighlight-OmniCD")
 	else
 		PanelTemplates_DeselectTab(frame)
+		frame.bg:Hide()
 	end
 end
 
@@ -65,21 +76,35 @@ local function Tab_OnClick(frame)
 	if not (frame.selected or frame.disabled) then
 		PlaySound(841) -- SOUNDKIT.IG_CHARACTER_INFO_TAB
 		frame.obj:SelectTab(frame.value)
+		frame.bg:Show()
 	end
 end
 
 local function Tab_OnEnter(frame)
 	local self = frame.obj
 	self:Fire("OnTabEnter", self.tabs[frame.id].value, frame)
+
+	if not frame.selected then
+		--PlaySound(1217)
+		local fadeOut = frame.fadeOut
+		if fadeOut:IsPlaying() then
+			fadeOut:Stop()
+		end
+		frame.fadeIn:Play()
+	end
 end
 
 local function Tab_OnLeave(frame)
 	local self = frame.obj
 	self:Fire("OnTabLeave", self.tabs[frame.id].value, frame)
-end
 
-local function Tab_OnShow(frame)
-	_G[frame:GetName().."HighlightTexture"]:SetWidth(frame:GetTextWidth() + 30)
+	if not frame.selected then
+		local fadeIn = frame.fadeIn
+		if fadeIn:IsPlaying() then
+			fadeIn:Stop()
+		end
+		frame.fadeOut:Play()
+	end
 end
 
 --[[-----------------------------------------------------------------------------
@@ -102,20 +127,59 @@ local methods = {
 	end,
 
 	["CreateTab"] = function(self, id)
-		local tabname = ("AceGUITabGroup%dTab%d"):format(self.num, id)
+		local tabname = ("AceGUITabGroup%dTab%d-OmniCD"):format(self.num, id)
 		local tab = CreateFrame("Button", tabname, self.border, "OptionsFrameTabButtonTemplate")
 		tab.obj = self
 		tab.id = id
 
+		Mixin(tab, BackdropTemplateMixin)
+		OmniCD[1].BackdropTemplate(tab)
+		tab:SetBackdropColor(0.1, 0.1, 0.1, 0.5) -- BDR (tab btn) - match tree nav btn
+		tab:SetBackdropBorderColor(0, 0, 0)
+		tab:SetHighlightTexture(nil)
+
+		tab.bg = tab:CreateTexture(nil, "BORDER")
+		OmniCD[1].DisablePixelSnap(tab.bg)
+		tab.bg:SetPoint("TOPLEFT", tab.TopEdge, "BOTTOMLEFT")
+		tab.bg:SetPoint("BOTTOMRIGHT", tab.BottomEdge, "TOPRIGHT")
+		tab.bg:SetColorTexture(0.412, 0.0, 0.043)
+		tab.bg:Hide()
+
+		tab.fadeIn = tab.bg:CreateAnimationGroup()
+		tab.fadeIn:SetScript("OnPlay", function() tab.bg:Show() end)
+		local fadeIn = tab.fadeIn:CreateAnimation("Alpha")
+		fadeIn:SetFromAlpha(0)
+		fadeIn:SetToAlpha(1)
+		fadeIn:SetDuration(0.4)
+		fadeIn:SetSmoothing("OUT")
+
+		tab.fadeOut = tab.bg:CreateAnimationGroup()
+		tab.fadeOut:SetScript("OnFinished", function() tab.bg:Hide() end)
+		local fadeOut = tab.fadeOut:CreateAnimation("Alpha")
+		fadeOut:SetFromAlpha(1)
+		fadeOut:SetToAlpha(0)
+		fadeOut:SetDuration(0.3)
+		fadeOut:SetSmoothing("OUT")
+
+		_G[tabname .. "LeftDisabled"]:SetTexture(nil)
+		_G[tabname .. "MiddleDisabled"]:SetTexture(nil)
+		_G[tabname .. "RightDisabled"]:SetTexture(nil)
+		_G[tabname .. "Left"]:SetTexture(nil)
+		_G[tabname .. "Middle"]:SetTexture(nil)
+		_G[tabname .. "Right"]:SetTexture(nil)
+
 		tab.text = _G[tabname .. "Text"]
 		tab.text:ClearAllPoints()
-		tab.text:SetPoint("LEFT", 14, -3)
-		tab.text:SetPoint("RIGHT", -12, -3)
+		tab.text:SetPoint("LEFT", 14, 0)
+		tab.text:SetPoint("RIGHT", -12, 0)
+
+		tab:SetNormalFontObject("GameFontNormal-OmniCD")
+		tab:SetHighlightFontObject("GameFontHighlight-OmniCD")
+		tab:SetDisabledFontObject("GameFontHighlight-OmniCD")
 
 		tab:SetScript("OnClick", Tab_OnClick)
 		tab:SetScript("OnEnter", Tab_OnEnter)
 		tab:SetScript("OnLeave", Tab_OnLeave)
-		tab:SetScript("OnShow", Tab_OnShow)
 
 		tab._SetText = tab.SetText
 		tab.SetText = Tab_SetText
@@ -189,7 +253,7 @@ local methods = {
 			tab:SetDisabled(v.disabled)
 			tab.value = v.value
 
-			widths[i] = tab:GetWidth() - 6 --tabs are anchored 10 pixels from the right side of the previous one to reduce spacing, but add a fixed 4px padding for the text
+			widths[i] = tab:GetWidth() + 6
 		end
 
 		for i = (#tablist)+1, #tabs, 1 do
@@ -230,6 +294,8 @@ local methods = {
 			end
 		end
 
+		local PixelMult = OmniCD[1].PixelMult
+
 		--anchor the rows as defined and resize tabs to fill thier row
 		local starttab = 1
 		for row, endtab in ipairs(rowends) do
@@ -238,10 +304,10 @@ local methods = {
 				local tab = tabs[tabno]
 				tab:ClearAllPoints()
 				if first then
-					tab:SetPoint("TOPLEFT", self.frame, "TOPLEFT", 0, -(hastitle and 14 or 7)-(row-1)*20 )
+					tab:SetPoint("TOPLEFT", self.frame, "TOPLEFT", 0, -(hastitle and 14 or 7)-(row-1)*(24 - PixelMult) )
 					first = false
 				else
-					tab:SetPoint("LEFT", tabs[tabno-1], "RIGHT", -10, 0)
+					tab:SetPoint("LEFT", tabs[tabno-1], "RIGHT", 2, 0)
 				end
 			end
 
@@ -260,8 +326,8 @@ local methods = {
 			starttab = endtab + 1
 		end
 
-		self.borderoffset = (hastitle and 17 or 10)+((numrows)*20)
-		self.border:SetPoint("TOPLEFT", 1, -self.borderoffset)
+		self.borderoffset = (hastitle and 14 or 7)+((numrows)*(24 - PixelMult))
+		self.border:SetPoint("TOPLEFT", 0, -self.borderoffset)
 	end,
 
 	["OnWidthSet"] = function(self, width)
@@ -295,12 +361,6 @@ local methods = {
 --[[-----------------------------------------------------------------------------
 Constructor
 -------------------------------------------------------------------------------]]
-local PaneBackdrop  = {
-	bgFile = "Interface\\ChatFrame\\ChatFrameBackground",
-	edgeFile = "Interface\\Tooltips\\UI-Tooltip-Border",
-	tile = true, tileSize = 16, edgeSize = 16,
-	insets = { left = 3, right = 3, top = 5, bottom = 3 }
-}
 
 local function Constructor()
 	local num = AceGUI:GetNextWidgetNum(Type)
@@ -317,11 +377,11 @@ local function Constructor()
 	titletext:SetText("")
 
 	local border = CreateFrame("Frame", nil, frame, BackdropTemplateMixin and "BackdropTemplate" or nil)
-	border:SetPoint("TOPLEFT", 1, -27)
-	border:SetPoint("BOTTOMRIGHT", -1, 3)
-	border:SetBackdrop(PaneBackdrop)
-	border:SetBackdropColor(0.1, 0.1, 0.1, 0.5)
-	border:SetBackdropBorderColor(0.4, 0.4, 0.4)
+	border:SetPoint("TOPLEFT", 0, -27)
+	border:SetPoint("BOTTOMRIGHT", 0, 3)
+	OmniCD[1].BackdropTemplate(border)
+	border:SetBackdropColor(0.1, 0.1, 0.1, 0.5) -- BDR (tab content bg)
+	border:SetBackdropBorderColor(0, 0, 0)
 
 	local content = CreateFrame("Frame", nil, border)
 	content:SetPoint("TOPLEFT", 10, -7)

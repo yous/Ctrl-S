@@ -26,8 +26,6 @@ L["BUYOUT_AUCTION_INFO"] = "%s를 %s에 즉시구매가로 올렸습니다."
 L["BUYOUT_PRICE"] = "즉시구매가"
 L["CANCEL"] = "취소"
 L["CANCEL_UNDERCUT"] = "최저가 경매취소"
---[[Translation missing --]]
-L["CANCEL_UNDERCUT_BUTTON_MACRO"] = "Cancel Undercut Button Macro"
 L["CANCELLING_TAB"] = "취소하기"
 L["CANCELLING_TAB_HEADER"] = "옥셔네이터 - 취소하기"
 L["CANNOT_AUCTION"] = "경매 불가"
@@ -62,6 +60,10 @@ L["CONFIG_BAG_SHOW_SELLING_BAG_TOOLTIP_HEADER"] = "아이템 패널 표시"
 L["CONFIG_BAG_SHOW_SELLING_BAG_TOOLTIP_TEXT"] = "이 설정을 끄면 판매하기 탭의 아이템 패널이 숨겨집니다."
 L["CONFIG_BASIC_OPTIONS_CATEGORY"] = "기본설정"
 L["CONFIG_BASIC_OPTIONS_TEXT"] = "옥셔네이터의 기본설정"
+--[[Translation missing --]]
+L["CONFIG_CANCEL_UNDERCUT_SHORTCUT"] = "A shortcut to cancel the next undercut item found is"
+--[[Translation missing --]]
+L["CONFIG_CANCEL_UNDERCUT_SHORTCUT_TOOLTIP_TEXT"] = "Click and then press the buttons that you wish to use as the shortcut. This shortcut will only be active in the Cancelling tab and won't affect any other shortcuts bound to the buttons."
 L["CONFIG_CANCELLING_CATEGORY"] = "취소하기"
 L["CONFIG_CANCELLING_TEXT"] = "취소하기 탭의 설정을 변경합니다."
 L["CONFIG_CHAT_LOG"] = "경매를 시작할 때 채팅창에 표시"
@@ -96,10 +98,11 @@ L["CONFIG_SELLING_DEFAULT_QUANTITY_SUFFIX"] = "판매 갯수 설정"
 L["CONFIG_SELLING_DEFAULT_QUANTITY_TOOLTIP_HEADER"] = "판매 갯수 설정"
 L["CONFIG_SELLING_DEFAULT_QUANTITY_TOOLTIP_TEXT"] = "경매장에 물건을 판매할 때 기본 갯수를 설정합니다. (ex. 현재 가진 영약이 40개일 경우 4를 입력하면 경매장에 올릴 때 4개를 자동으로 올립니다, 0일 경우 40개 모두 판매합니다.)"
 --[[Translation missing --]]
-L["CONFIG_SELLING_GEAR_USE_ILVL"] = "For gear, use item level when selecting the price to compete with"
-L["CONFIG_SELLING_GEAR_USE_ILVL_TOOLTIP_HEADER"] = "아이템 레벨 사용"
+L["CONFIG_SELLING_GEAR_USE_ILVL_VARIANTS"] = "For gear, use item level and title when selecting the price to compete with"
 --[[Translation missing --]]
-L["CONFIG_SELLING_GEAR_USE_ILVL_TOOLTIP_TEXT"] = "Normally gear is compared with any other gear that is similar, but without taking item level into account. This will make the item level be taken into account."
+L["CONFIG_SELLING_GEAR_USE_ILVL_VARIANTS_TOOLTIP_HEADER"] = "Use Item Level and Title"
+--[[Translation missing --]]
+L["CONFIG_SELLING_GEAR_USE_ILVL_VARIANTS_TOOLTIP_TEXT"] = "Normally gear is compared with any other gear that is similar, but without taking item level and the \"of the\" titles into account. This will make them be taken into account."
 L["CONFIG_SELLING_GEAR_VENDOR_PRICE_MULTIPLIER_SUFFIX"] = "장비 판매의 배수 설정"
 L["CONFIG_SELLING_GEAR_VENDOR_PRICE_MULTIPLIER_TOOLTIP_HEADER"] = "장비 판매의 배수 설정"
 L["CONFIG_SELLING_GEAR_VENDOR_PRICE_MULTIPLIER_TOOLTIP_TEXT"] = "해당 장비를 상점에 팔때의 배수를 입력하여 경매가격을 책정합니다. (ex. 2를 입력하면 상점판매가 33골드인 장비의 2배인 66골드로 경매장 가격이 자동등록됩니다.)"
@@ -114,6 +117,22 @@ L["CONFIG_SELLING_MISSING_FAVOURITES_TOOLTIP_HEADER"] = "누락된 즐겨찾기 
 L["CONFIG_SELLING_MISSING_FAVOURITES_TOOLTIP_TEXT"] = "Show favourite items in the bag view even when they aren't in your bag."
 L["CONFIG_SELLING_NOT_LIFO_HEADER"] = "판매: 장비/펫"
 L["CONFIG_SELLING_NOT_LIFO_TEXT"] = "장비/펫의 최저가를 %로 계산할 지 골드로 계산할 지 설정합니다. 해당 카테고리는 목록이 개인화되며 최저가를 설정할 수 있습니다."
+--[[Translation missing --]]
+L["CONFIG_SELLING_POST_SHORTCUT"] = "A keyboard/mouse shortcut to post the current item is"
+--[[Translation missing --]]
+L["CONFIG_SELLING_POST_SHORTCUT_TOOLTIP_TEXT"] = "Click and then press the buttons that you wish to use as the shortcut. This shortcut will only be active in the Selling tab and won't affect any other shortcuts bound to the buttons."
+--[[Translation missing --]]
+L["CONFIG_SELLING_SHORTCUTS_CATEGORY"] = "Selling: Shortcuts"
+--[[Translation missing --]]
+L["CONFIG_SELLING_SHORTCUTS_TEXT"] = "Options for keyboard and mouse shortcuts inside the Selling tab"
+--[[Translation missing --]]
+L["CONFIG_SELLING_SHOW_BID_PRICE"] = "Show bid price option when listing an item (reload required)"
+--[[Translation missing --]]
+L["CONFIG_SELLING_SHOW_BID_PRICE_TOOLTIP_HEADER"] = "Bid Options"
+--[[Translation missing --]]
+L["CONFIG_SELLING_SHOW_BID_PRICE_TOOLTIP_TEXT"] = "Controls whether the bid price option appears when posting an item."
+--[[Translation missing --]]
+L["CONFIG_SELLING_SKIP_SHORTCUT"] = "A shortcut to skip posting the currently selected item is"
 L["CONFIG_SELLING_TEXT"] = "판매하기 탭의 설정을 변경합니다."
 L["CONFIG_SHOPPING_CATEGORY"] = "구매목록"
 L["CONFIG_SHOPPING_LIST"] = "구매목록 설정"
@@ -134,6 +153,8 @@ L["COPY_TEXT_HEADER"] = "글 복사하기"
 L["CRAFTED_LEVEL"] = "제작 레벨"
 L["CREATE"] = "목록 생성"
 L["CREATE_LIST_DIALOG"] = "새로운 목록을 생성합니다."
+--[[Translation missing --]]
+L["CUSTOM_KEYBOARD_SHORTCUTS"] = "Custom keyboard shortcuts"
 L["DATE"] = "날짜"
 L["DAY_1"] = "일요일"
 L["DAY_2"] = "월요일"
@@ -174,6 +195,8 @@ L["FINISHED_PROCESSING"] = "불러오기 완료"
 L["FULL_SCAN_ALTERNATE_FAILED"] = "일반 검색 실패"
 L["FULL_SCAN_BUTTON"] = "전체 검색"
 L["FULL_SCAN_FAILED"] = "전체 검색 실패"
+--[[Translation missing --]]
+L["FULL_SCAN_IN_PROGRESS"] = "Full scan in progress."
 L["GEAR_VENDOR_PRICE_MULTIPLIER"] = "상점에 판매하는 가격의 배수로 장비를 판매"
 L["HIDE"] = "숨기기"
 L["IMPORT"] = "가져오기"
@@ -226,7 +249,6 @@ L["PERCENTAGE_TOOLTIP_TEXT"] = "최저가를 자동으로 계산하여 경매를
 L["PET_TOOLTIP_TOOLTIP_HEADER"] = "펫 툴팁"
 L["PET_TOOLTIP_TOOLTIP_TEXT"] = "우리에 담긴 펫의 경매장 가격을 표시합니다."
 L["POST"] = "경매 시작"
-L["POST_BUTTON_MACRO"] = "경매 시작 매크로"
 L["PRICE"] = "가격"
 L["PROFILE_TOGGLE_TOOLTIP_HEADER"] = "캐릭터 별 설정"
 L["PROFILE_TOGGLE_TOOLTIP_TEXT"] = "캐릭터 별 옥셔네이터 설정을 적용합니다."
@@ -258,6 +280,8 @@ L["SHIFT_LEFT_CLICK"] = "쉬프트 + 클릭"
 L["SHIFT_RIGHT_CLICK"] = "쉬프트 + 우클릭"
 L["SHOPPING_TAB"] = "구매목록"
 L["SHOPPING_TAB_HEADER"] = "옥셔네이터 - 구매목록"
+--[[Translation missing --]]
+L["SKIP"] = "Skip"
 L["SPLASH_830_BUGS_1"] = "옥셔네이터 디스코드 서버에 참가하세요. %s"
 L["SPLASH_830_BUGS_2"] = "오류가 발생하면 깃헙으로 알려주세요. %s"
 L["SPLASH_830_BUGS_3"] = "디스코드가 활성화되어 있으니 curseforge 혹은 옥셔네이터 포럼에 오류를 올리지 말아주세요."
@@ -348,6 +372,22 @@ L["SPLASH_905_DESCRIPTION"] = "Bugfixes and minor visual changes"
 --[[Translation missing --]]
 L["SPLASH_905_UPDATES_1"] = "Smoother interactions in the Cancelling tab."
 L["SPLASH_905_UPDATES_HEADER"] = "업데이트"
+--[[Translation missing --]]
+L["SPLASH_907_DESCRIPTION"] = "A few new features and the usual bugfixes."
+--[[Translation missing --]]
+L["SPLASH_907_FEATURES_1"] = "Gear with item levels of at least 168 are now differentiated in tooltip auction prices."
+--[[Translation missing --]]
+L["SPLASH_907_FEATURES_2"] = "A new \"Skip\" button will show to skip posting the current item when the option \"Automatically select the next item in your bag\" is on."
+--[[Translation missing --]]
+L["SPLASH_907_FEATURES_3"] = "New keybinding options added for posting, skipping and cancelling. For example you can now set the space key to post or cancel, without impacting any other bindings. Find them in the \"Selling: Shortcuts\" and \"Cancelling\" options."
+--[[Translation missing --]]
+L["SPLASH_907_FEATURES_4"] = "The Cancelling tab has a new search box."
+--[[Translation missing --]]
+L["SPLASH_907_FEATURES_HEADER"] = "Features"
+--[[Translation missing --]]
+L["SPLASH_907_UNANNOUNCED_1"] = "An optional \"Seller(s)\" column (to see who is selling the auctions) has been added to the Selling tab. To activate it right-click a column header (e.g. \"Owned?\") in the current auctions listings."
+--[[Translation missing --]]
+L["SPLASH_907_UNANNOUNCED_HEADER"] = "Unannounced features from 9.0.6"
 L["SPLASH_HIDE_MESSAGE"] = "다음 업데이트까지 보이지 않기"
 L["SPLASH_SCREEN_HEADER"] = "옥셔네이터에 오신걸 환영합니다!"
 L["STACK_AUCTION_INFO"] = "%s  (전체 %s, 각 %s)"
@@ -384,6 +424,10 @@ L["UNDERCUT_TOOLTIP_HEADER"] = "최저가 설정"
 L["UNDERCUT_TOOLTIP_TEXT"] = "판매에 적합한 최저가를 설정합니다. (ex. 1골드를 입력하면 경매장에 등록할 물건의 최저가 -1골드가 됩니다.)"
 L["UNDERCUT_UNKNOWN"] = "?"
 L["UNDERCUT_YES"] = "O"
+--[[Translation missing --]]
+L["UNHIDE"] = "Unhide"
+--[[Translation missing --]]
+L["UNHIDE_ALL"] = "Unhide All"
 L["UNHIDE_ALL_HIDDEN_ITEMS"] = "숨김 아이템 숨김 취소"
 L["UNIT_PRICE"] = "가격"
 L["UNKNOWN"] = "모름"

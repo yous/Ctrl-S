@@ -26,7 +26,6 @@ L["BUYOUT_AUCTION_INFO"] = "%s rachat à %s"
 L["BUYOUT_PRICE"] = "Prix de rachat"
 L["CANCEL"] = "Annuler"
 L["CANCEL_UNDERCUT"] = "Annuler l'undercut"
-L["CANCEL_UNDERCUT_BUTTON_MACRO"] = "Annuler la macro du bouton Undercut"
 L["CANCELLING_TAB"] = "Annulation"
 L["CANCELLING_TAB_HEADER"] = "Auctionator - Annulation"
 L["CANNOT_AUCTION"] = "Vente aux enchères impossible"
@@ -57,6 +56,10 @@ L["CONFIG_BAG_SHOW_SELLING_BAG_TOOLTIP_HEADER"] = "Liste des objets du sac"
 L["CONFIG_BAG_SHOW_SELLING_BAG_TOOLTIP_TEXT"] = "Si cette option est désactivée, le volet des objets du sac sera masqué."
 L["CONFIG_BASIC_OPTIONS_CATEGORY"] = "Options de base"
 L["CONFIG_BASIC_OPTIONS_TEXT"] = "Options de base pour activer des fonctions dans Auctionator."
+--[[Translation missing --]]
+L["CONFIG_CANCEL_UNDERCUT_SHORTCUT"] = "A shortcut to cancel the next undercut item found is"
+--[[Translation missing --]]
+L["CONFIG_CANCEL_UNDERCUT_SHORTCUT_TOOLTIP_TEXT"] = "Click and then press the buttons that you wish to use as the shortcut. This shortcut will only be active in the Cancelling tab and won't affect any other shortcuts bound to the buttons."
 L["CONFIG_CANCELLING_CATEGORY"] = "Annulation"
 L["CONFIG_CANCELLING_TEXT"] = "Options permettant de modifier le comportement de l'onglet Annulation"
 L["CONFIG_CHAT_LOG"] = "Affiche vos nouvelles enchères dans le chat"
@@ -90,9 +93,12 @@ L["CONFIG_SELLING_CATEGORY"] = "Vente"
 L["CONFIG_SELLING_DEFAULT_QUANTITY_SUFFIX"] = "Fixé à 0 pour le montant maximum"
 L["CONFIG_SELLING_DEFAULT_QUANTITY_TOOLTIP_HEADER"] = "Quantité d'affichage par défaut"
 L["CONFIG_SELLING_DEFAULT_QUANTITY_TOOLTIP_TEXT"] = "Cela vous permet de modifier le montant par défaut utilisé lors de la comptabilisation d'un article. Réglez ce paramètre sur 0 pour utiliser le montant maximum possible."
-L["CONFIG_SELLING_GEAR_USE_ILVL"] = "Pour l'équipement, utilisez le niveau de l'objet lors de la sélection du prix avec lequel rivaliser"
-L["CONFIG_SELLING_GEAR_USE_ILVL_TOOLTIP_HEADER"] = "Utiliser le niveau d'objet"
-L["CONFIG_SELLING_GEAR_USE_ILVL_TOOLTIP_TEXT"] = "Normalement, l'équipement est comparé à tout autre équipement similaire, mais sans prendre en compte le niveau de l'objet. Le niveau de l'article sera donc pris en compte."
+--[[Translation missing --]]
+L["CONFIG_SELLING_GEAR_USE_ILVL_VARIANTS"] = "For gear, use item level and title when selecting the price to compete with"
+--[[Translation missing --]]
+L["CONFIG_SELLING_GEAR_USE_ILVL_VARIANTS_TOOLTIP_HEADER"] = "Use Item Level and Title"
+--[[Translation missing --]]
+L["CONFIG_SELLING_GEAR_USE_ILVL_VARIANTS_TOOLTIP_TEXT"] = "Normally gear is compared with any other gear that is similar, but without taking item level and the \"of the\" titles into account. This will make them be taken into account."
 L["CONFIG_SELLING_GEAR_VENDOR_PRICE_MULTIPLIER_SUFFIX"] = "Fixé à 0 pour aucun prix"
 L["CONFIG_SELLING_GEAR_VENDOR_PRICE_MULTIPLIER_TOOLTIP_HEADER"] = "Prix par défaut du fournisseur d'équipement"
 L["CONFIG_SELLING_GEAR_VENDOR_PRICE_MULTIPLIER_TOOLTIP_TEXT"] = "Cela vous permet de définir un prix par défaut pour l'équipement comme un multiple du prix du fournisseur. Ceci est utilisé pour tout équipement pour lequel Auctionator n'a pas de prix. Réglez ceci sur 0 pour ne pas définir de prix."
@@ -106,6 +112,22 @@ L["CONFIG_SELLING_MISSING_FAVOURITES_TOOLTIP_HEADER"] = "Les favoris manquants s
 L["CONFIG_SELLING_MISSING_FAVOURITES_TOOLTIP_TEXT"] = "Affichez vos objets préférés dans la vue du sac même lorsqu'ils ne sont pas dans votre sac."
 L["CONFIG_SELLING_NOT_LIFO_HEADER"] = "Vente de l'Équipement /Mascottes"
 L["CONFIG_SELLING_NOT_LIFO_TEXT"] = "Options permettant de fixer le pourcentage de sous-cotation ou les valeurs et la durée des articles et des mascottes en cage. Ces catégories d'articles sont répertoriées individuellement et l'acheteur peut choisir celle qu'il souhaite. La sous-cotation peut être utile."
+--[[Translation missing --]]
+L["CONFIG_SELLING_POST_SHORTCUT"] = "A keyboard/mouse shortcut to post the current item is"
+--[[Translation missing --]]
+L["CONFIG_SELLING_POST_SHORTCUT_TOOLTIP_TEXT"] = "Click and then press the buttons that you wish to use as the shortcut. This shortcut will only be active in the Selling tab and won't affect any other shortcuts bound to the buttons."
+--[[Translation missing --]]
+L["CONFIG_SELLING_SHORTCUTS_CATEGORY"] = "Selling: Shortcuts"
+--[[Translation missing --]]
+L["CONFIG_SELLING_SHORTCUTS_TEXT"] = "Options for keyboard and mouse shortcuts inside the Selling tab"
+--[[Translation missing --]]
+L["CONFIG_SELLING_SHOW_BID_PRICE"] = "Show bid price option when listing an item (reload required)"
+--[[Translation missing --]]
+L["CONFIG_SELLING_SHOW_BID_PRICE_TOOLTIP_HEADER"] = "Bid Options"
+--[[Translation missing --]]
+L["CONFIG_SELLING_SHOW_BID_PRICE_TOOLTIP_TEXT"] = "Controls whether the bid price option appears when posting an item."
+--[[Translation missing --]]
+L["CONFIG_SELLING_SKIP_SHORTCUT"] = "A shortcut to skip posting the currently selected item is"
 L["CONFIG_SELLING_TEXT"] = "Options pour modifier le comportement de l'onglet Vente"
 L["CONFIG_SHOPPING_CATEGORY"] = "Achats"
 L["CONFIG_SHOPPING_LIST"] = "Paramètres des listes d'achats"
@@ -126,6 +148,8 @@ L["COPY_TEXT_HEADER"] = "Copier le texte"
 L["CRAFTED_LEVEL"] = "Niveau du métier"
 L["CREATE"] = "Créer"
 L["CREATE_LIST_DIALOG"] = "Entrez le nom de la nouvelle liste d'achats :"
+--[[Translation missing --]]
+L["CUSTOM_KEYBOARD_SHORTCUTS"] = "Custom keyboard shortcuts"
 L["DATE"] = "Date"
 L["DAY_1"] = "Dimanche"
 L["DAY_2"] = "Lundi"
@@ -165,6 +189,8 @@ L["FINISHED_PROCESSING"] = "Traitement fini avec %s articles."
 L["FULL_SCAN_ALTERNATE_FAILED"] = "Le balayage complet (mode alternatif) n'a pas été effectué."
 L["FULL_SCAN_BUTTON"] = "Analyse complète"
 L["FULL_SCAN_FAILED"] = "Le scan complet n'a pas été effectué."
+--[[Translation missing --]]
+L["FULL_SCAN_IN_PROGRESS"] = "Full scan in progress."
 L["GEAR_VENDOR_PRICE_MULTIPLIER"] = "Multiplicateur de prix du vendeur'équipement"
 L["HIDE"] = "Cacher"
 L["IMPORT"] = "Importer"
@@ -217,7 +243,6 @@ L["PERCENTAGE_TOOLTIP_TEXT"] = [=[Le pourcentage de l'undercut (vendre moins che
 L["PET_TOOLTIP_TOOLTIP_HEADER"] = "Info-bulles des mascottes"
 L["PET_TOOLTIP_TOOLTIP_TEXT"] = "Affiche les informations de l'enchère pour les mascottes en cage."
 L["POST"] = "Poster"
-L["POST_BUTTON_MACRO"] = "Macro du bouton Poster"
 L["PRICE"] = "Prix"
 L["PROFILE_TOGGLE_TOOLTIP_HEADER"] = "Activer les paramètres pour ce personnage"
 L["PROFILE_TOGGLE_TOOLTIP_TEXT"] = "Les modifications apportées aux paramètres d'Auctionator n'affectent que ce personnage."
@@ -249,6 +274,8 @@ L["SHIFT_LEFT_CLICK"] = "Shift Clic gauche"
 L["SHIFT_RIGHT_CLICK"] = "Shift clic droit"
 L["SHOPPING_TAB"] = "Achats"
 L["SHOPPING_TAB_HEADER"] = "Auctionator - Listes d'achats"
+--[[Translation missing --]]
+L["SKIP"] = "Skip"
 L["SPLASH_830_BUGS_1"] = "Veuillez nous rejoindre sur le serveur Discord d'Auctionator %s"
 L["SPLASH_830_BUGS_2"] = "Veuillez signaler les bugs sur Github %s"
 L["SPLASH_830_BUGS_3"] = "Nous sommes surtout actifs sur Discord, et ne prenons pas les rapports de bugs sur les forums de Curseforge ou Auctionator"
@@ -322,6 +349,22 @@ L["SPLASH_904_FEATURES_HEADER"] = "Fonctionnalités"
 L["SPLASH_905_DESCRIPTION"] = "Corrections de bugs et changements visuels mineurs"
 L["SPLASH_905_UPDATES_1"] = "Interactions plus fluides dans l'onglet Annulation."
 L["SPLASH_905_UPDATES_HEADER"] = "Mises à jour"
+--[[Translation missing --]]
+L["SPLASH_907_DESCRIPTION"] = "A few new features and the usual bugfixes."
+--[[Translation missing --]]
+L["SPLASH_907_FEATURES_1"] = "Gear with item levels of at least 168 are now differentiated in tooltip auction prices."
+--[[Translation missing --]]
+L["SPLASH_907_FEATURES_2"] = "A new \"Skip\" button will show to skip posting the current item when the option \"Automatically select the next item in your bag\" is on."
+--[[Translation missing --]]
+L["SPLASH_907_FEATURES_3"] = "New keybinding options added for posting, skipping and cancelling. For example you can now set the space key to post or cancel, without impacting any other bindings. Find them in the \"Selling: Shortcuts\" and \"Cancelling\" options."
+--[[Translation missing --]]
+L["SPLASH_907_FEATURES_4"] = "The Cancelling tab has a new search box."
+--[[Translation missing --]]
+L["SPLASH_907_FEATURES_HEADER"] = "Features"
+--[[Translation missing --]]
+L["SPLASH_907_UNANNOUNCED_1"] = "An optional \"Seller(s)\" column (to see who is selling the auctions) has been added to the Selling tab. To activate it right-click a column header (e.g. \"Owned?\") in the current auctions listings."
+--[[Translation missing --]]
+L["SPLASH_907_UNANNOUNCED_HEADER"] = "Unannounced features from 9.0.6"
 L["SPLASH_HIDE_MESSAGE"] = "Ne pas afficher avant la prochaine mise à jour"
 L["SPLASH_SCREEN_HEADER"] = "Bienvenue sur Auctionator"
 L["STACK_AUCTION_INFO"] = "%s pour %s (à %s chacun)"
@@ -358,6 +401,10 @@ L["UNDERCUT_TOOLTIP_HEADER"] = "Valeur de l'undercut"
 L["UNDERCUT_TOOLTIP_TEXT"] = "La valeur de l'undercut (vendre moins cher) sera utilisée pour calculer le prix de vente."
 L["UNDERCUT_UNKNOWN"] = "?"
 L["UNDERCUT_YES"] = "Oui"
+--[[Translation missing --]]
+L["UNHIDE"] = "Unhide"
+--[[Translation missing --]]
+L["UNHIDE_ALL"] = "Unhide All"
 L["UNHIDE_ALL_HIDDEN_ITEMS"] = "Afficher tous les éléments masqués"
 L["UNIT_PRICE"] = "Prix à l'unité"
 L["UNKNOWN"] = "inconnu"

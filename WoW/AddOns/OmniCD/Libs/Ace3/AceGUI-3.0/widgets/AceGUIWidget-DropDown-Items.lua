@@ -1,3 +1,9 @@
+---------------------------------------------------------------------------------
+
+-- Customized for OmniCD by permission of the copyright owner.
+
+---------------------------------------------------------------------------------
+
 --[[ $Id: AceGUIWidget-DropDown-Items.lua 1202 2019-05-15 23:11:22Z nevcairiel $ ]]--
 
 local AceGUI = LibStub("AceGUI-3.0")
@@ -170,6 +176,7 @@ function ItemBase.Create(type)
 
 	local highlight = frame:CreateTexture(nil, "OVERLAY")
 	highlight:SetTexture(136810) -- Interface\\QuestFrame\\UI-QuestTitleHighlight
+	highlight:SetTexCoord(0.5, 1, 0, 1)
 	highlight:SetBlendMode("ADD")
 	highlight:SetHeight(14)
 	highlight:ClearAllPoints()
@@ -294,7 +301,7 @@ end
 -- Item: Execute
 -- A simple button
 do
-	local widgetType = "Dropdown-Item-Execute"
+	local widgetType = "Dropdown-Item-Execute-OmniCD"
 	local widgetVersion = 1
 
 	local function Frame_OnClick(this, button)
@@ -309,6 +316,8 @@ do
 	local function Constructor()
 		local self = ItemBase.Create(widgetType)
 
+		self.text:SetFontObject("GameFontNormalSmall-OmniCD")
+
 		self.frame:SetScript("OnClick", Frame_OnClick)
 
 		AceGUI:RegisterAsWidget(self)
@@ -321,8 +330,9 @@ end
 -- Item: Toggle
 -- Some sort of checkbox for dropdown menus.
 -- Does not close the pullout on click.
+
 do
-	local widgetType = "Dropdown-Item-Toggle"
+	local widgetType = "Dropdown-Item-Toggle-OmniCD"
 	local widgetVersion = 4
 
 	local function UpdateToggle(self)
@@ -364,6 +374,8 @@ do
 
 	local function Constructor()
 		local self = ItemBase.Create(widgetType)
+
+		self.text:SetFontObject("GameFontNormalSmall-OmniCD")
 
 		self.frame:SetScript("OnClick", Frame_OnClick)
 

@@ -1,3 +1,12 @@
+---------------------------------------------------------------------------------
+
+-- Customized for OmniCD by permission of the copyright owner.
+
+-- Parameter to add tooltip line (ID:#) to hyperlinks:
+-- arg = spellID,
+
+---------------------------------------------------------------------------------
+
 --- AceConfigDialog-3.0 generates AceGUI-3.0 based windows based on option tables.
 -- @class file
 -- @name AceConfigDialog-3.0
@@ -7,7 +16,7 @@ local LibStub = LibStub
 local gui = LibStub("AceGUI-3.0")
 local reg = LibStub("AceConfigRegistry-3.0")
 
-local MAJOR, MINOR = "AceConfigDialog-3.0", 79
+local MAJOR, MINOR = "AceConfigDialog-3.0-OmniCD", 79
 local AceConfigDialog, oldminor = LibStub:NewLibrary(MAJOR, MINOR)
 
 if not AceConfigDialog then return end
@@ -15,7 +24,44 @@ if not AceConfigDialog then return end
 AceConfigDialog.OpenFrames = AceConfigDialog.OpenFrames or {}
 AceConfigDialog.Status = AceConfigDialog.Status or {}
 AceConfigDialog.frame = AceConfigDialog.frame or CreateFrame("Frame")
-AceConfigDialog.tooltip = AceConfigDialog.tooltip or CreateFrame("GameTooltip", "AceConfigDialogTooltip", UIParent, "GameTooltipTemplate")
+
+local function GameTooltip_OnHide(self)
+	self.needsReset = true;
+	self.waitingForData = false;
+	--SharedTooltip_SetBackdropStyle(self, self.IsEmbedded and GAME_TOOLTIP_BACKDROP_STYLE_EMBEDDED or TOOLTIP_BACKDROP_STYLE_DEFAULT);
+	GameTooltip_ClearMoney(self);
+	GameTooltip_ClearStatusBars(self);
+	GameTooltip_ClearProgressBars(self);
+	GameTooltip_ClearWidgetSet(self);
+	if ( self.shoppingTooltips ) then
+		for _, frame in pairs(self.shoppingTooltips) do
+			frame:Hide();
+		end
+	end
+	self.comparing = false;
+
+	ShoppingTooltip1:Hide();
+	ShoppingTooltip2:Hide();
+	if (BattlePetTooltip) then
+		BattlePetTooltip:Hide();
+	end
+
+	if self.ItemTooltip then
+		self.ItemTooltip:Hide();
+	end
+	self:SetPadding(0, 0, 0, 0);
+end
+AceConfigDialog.tooltip = AceConfigDialog.tooltip or CreateFrame("GameTooltip", "AceConfigDialogTooltip-OmniCD", UIParent, "GameTooltipTemplate")
+AceConfigDialog.tooltip:SetScript("OnHide", GameTooltip_OnHide)
+
+local isTooltipBackropUpdated
+local function UpdateTooltipBackdrop()
+	local tooltip = AceConfigDialog.tooltip
+	OmniCD[1].BackdropTemplate(tooltip)
+	tooltip:SetBackdropColor(0, 0, 0)
+	tooltip:SetBackdropBorderColor(0.3, 0.3, 0.3)
+	isTooltipBackropUpdated = true
+end
 
 AceConfigDialog.frame.apps = AceConfigDialog.frame.apps or {}
 AceConfigDialog.frame.closing = AceConfigDialog.frame.closing or {}
@@ -56,19 +102,19 @@ local width_multiplier = 170
 
 --[[
 Group Types
-  Tree 	- All Descendant Groups will all become nodes on the tree, direct child options will appear above the tree
-        - Descendant Groups with inline=true and thier children will not become nodes
+  Tree  - All Descendant Groups will all become nodes on the tree, direct child options will appear above the tree
+		- Descendant Groups with inline=true and thier children will not become nodes
 
-  Tab	- Direct Child Groups will become tabs, direct child options will appear above the tab control
-        - Grandchild groups will default to inline unless specified otherwise
+  Tab   - Direct Child Groups will become tabs, direct child options will appear above the tab control
+		- Grandchild groups will default to inline unless specified otherwise
 
   Select- Same as Tab but with entries in a dropdown rather than tabs
 
 
   Inline Groups
-    - Will not become nodes of a select group, they will be effectivly part of thier parent group seperated by a border
-    - If declared on a direct child of a root node of a select group, they will appear above the group container control
-    - When a group is displayed inline, all descendants will also be inline members of the group
+	- Will not become nodes of a select group, they will be effectivly part of thier parent group seperated by a border
+	- If declared on a direct child of a root node of a select group, they will appear above the group container control
+	- When a group is displayed inline, all descendants will also be inline members of the group
 
 ]]
 
@@ -100,21 +146,21 @@ do
 		wipe(t)
 		pool[t] = true
 	end
---	function cached()
---		local n = 0
---		for k in pairs(pool) do
---			n = n + 1
---		end
---		return n
---	end
+--  function cached()
+--      local n = 0
+--      for k in pairs(pool) do
+--          n = n + 1
+--      end
+--      return n
+--  end
 end
 
 -- picks the first non-nil value and returns it
 local function pickfirstset(...)
   for i=1,select("#",...) do
-    if select(i,...)~=nil then
-      return select(i,...)
-    end
+	if select(i,...)~=nil then
+	  return select(i,...)
+	end
   end
 end
 
@@ -370,7 +416,7 @@ local function CleanUserData(widget, event)
 		del(user.path)
 	end
 
-	if widget.type == "TreeGroup" then
+	if widget.type == "TreeGroup-OmniCD" then
 		local tree = user.tree
 		widget:SetTree(nil)
 		if tree then
@@ -382,7 +428,7 @@ local function CleanUserData(widget, event)
 		end
 	end
 
-	if widget.type == "TabGroup" then
+	if widget.type == "TabGroup-OmniCD" then
 		widget:SetTabs(nil)
 		if user.tablist then
 			del(user.tablist)
@@ -507,6 +553,10 @@ local function OptionOnMouseOver(widget, event)
 	local appName = user.appName
 	local tooltip = AceConfigDialog.tooltip
 
+	if not isTooltipBackropUpdated then
+		UpdateTooltipBackdrop()
+	end
+
 	tooltip:SetOwner(widget.frame, "ANCHOR_TOPRIGHT")
 	local name = GetOptionsMemberValue("name", opt, options, path, appName)
 	local desc = GetOptionsMemberValue("desc", opt, options, path, appName)
@@ -520,9 +570,21 @@ local function OptionOnMouseOver(widget, event)
 	if opt.type == "multiselect" then
 		tooltip:AddLine(user.text, 0.5, 0.5, 0.8, true)
 	end
+
 	if type(desc) == "string" then
-		tooltip:AddLine(desc, 1, 1, 1, true)
+		local linktype = desc:match(".*|H(%a+):.+|h.+|h.*")
+		if linktype then
+			tooltip:SetHyperlink(desc)
+			--local spellID = strmatch(desc, "spell:(%d+):")
+			local spellID = opt.arg -- == GetOptionsMemberValue("arg", opt, options, path, appName)
+			if spellID then
+				tooltip:AddLine("\nID: " .. spellID, 1, 1, 1, true)
+			end
+		else
+			tooltip:AddLine(desc, 1, 1, 1, true)
+		end
 	end
+
 	if type(usage) == "string" then
 		tooltip:AddLine("Usage: "..usage, NORMAL_FONT_COLOR.r, NORMAL_FONT_COLOR.g, NORMAL_FONT_COLOR.b, true)
 	end
@@ -542,73 +604,14 @@ local function GetFuncName(option)
 		return "set"
 	end
 end
-do
-	local frame = AceConfigDialog.popup
-	if not frame then
-		frame = CreateFrame("Frame", nil, UIParent)
-		AceConfigDialog.popup = frame
-		frame:Hide()
-		frame:SetPoint("CENTER", UIParent, "CENTER")
-		frame:SetSize(320, 72)
-		frame:SetFrameStrata("TOOLTIP")
-		frame:SetScript("OnKeyDown", function(self, key)
-			if key == "ESCAPE" then
-				self:SetPropagateKeyboardInput(false)
-				if self.cancel:IsShown() then
-					self.cancel:Click()
-				else -- Showing a validation error
-					self:Hide()
-				end
-			else
-				self:SetPropagateKeyboardInput(true)
-			end
-		end)
 
-		if WOW_PROJECT_ID == WOW_PROJECT_CLASSIC then
-			frame:SetBackdrop({
-				bgFile = [[Interface\DialogFrame\UI-DialogBox-Background-Dark]],
-				edgeFile = [[Interface\DialogFrame\UI-DialogBox-Border]],
-				tile = true,
-				tileSize = 32,
-				edgeSize = 32,
-				insets = { left = 11, right = 11, top = 11, bottom = 11 },
-			})
-		else
-			local border = CreateFrame("Frame", nil, frame, "DialogBorderDarkTemplate")
-			border:SetAllPoints(frame)
-		end
-
-		local text = frame:CreateFontString(nil, "ARTWORK", "GameFontHighlight")
-		text:SetSize(290, 0)
-		text:SetPoint("TOP", 0, -16)
-		frame.text = text
-
-		local function newButton(text)
-			local button = CreateFrame("Button", nil, frame)
-			button:SetSize(128, 21)
-			button:SetNormalFontObject(GameFontNormal)
-			button:SetHighlightFontObject(GameFontHighlight)
-			button:SetNormalTexture(130763) -- "Interface\\Buttons\\UI-DialogBox-Button-Up"
-			button:GetNormalTexture():SetTexCoord(0.0, 1.0, 0.0, 0.71875)
-			button:SetPushedTexture(130761) -- "Interface\\Buttons\\UI-DialogBox-Button-Down"
-			button:GetPushedTexture():SetTexCoord(0.0, 1.0, 0.0, 0.71875)
-			button:SetHighlightTexture(130762) -- "Interface\\Buttons\\UI-DialogBox-Button-Highlight"
-			button:GetHighlightTexture():SetTexCoord(0.0, 1.0, 0.0, 0.71875)
-			button:SetText(text)
-			return button
-		end
-
-		local accept = newButton(ACCEPT)
-		accept:SetPoint("BOTTOMRIGHT", frame, "BOTTOM", -6, 16)
-		frame.accept = accept
-
-		local cancel = newButton(CANCEL)
-		cancel:SetPoint("LEFT", accept, "RIGHT", 13, 0)
-		frame.cancel = cancel
-	end
-end
 local function confirmPopup(appName, rootframe, basepath, info, message, func, ...)
 	local frame = AceConfigDialog.popup
+	if not frame then
+		frame = OmniCD[1].GetStaticPopup()
+		AceConfigDialog.popup = frame
+	end
+
 	frame:Show()
 	frame.text:SetText(message)
 	-- From StaticPopup.lua
@@ -1132,10 +1135,10 @@ local function FeedOptions(appName, options,container,rootframe,path,group,inlin
 					--Inline group
 					local GroupContainer
 					if name and name ~= "" then
-						GroupContainer = gui:Create("InlineGroup")
+						GroupContainer = gui:Create("InlineGroup-OmniCD")
 						GroupContainer:SetTitle(name or "")
 					else
-						GroupContainer = gui:Create("SimpleGroup")
+						GroupContainer = gui:Create("SimpleGroup-OmniCD")
 					end
 
 					GroupContainer.width = "fill"
@@ -1155,7 +1158,7 @@ local function FeedOptions(appName, options,container,rootframe,path,group,inlin
 					local image, width, height = GetOptionsMemberValue("image",v, options, path, appName)
 
 					local iconControl = type(image) == "string" or type(image) == "number"
-					control = CreateControl(v.dialogControl or v.control, iconControl and "Icon" or "Button")
+					control = CreateControl(v.dialogControl or v.control, iconControl and "Icon" or "Button-OmniCD") -- for 'Profiles'
 					if iconControl then
 						if not width then
 							width = GetOptionsMemberValue("imageWidth",v, options, path, appName)
@@ -1182,7 +1185,7 @@ local function FeedOptions(appName, options,container,rootframe,path,group,inlin
 					control:SetCallback("OnClick",ActivateControl)
 
 				elseif v.type == "input" then
-					control = CreateControl(v.dialogControl or v.control, v.multiline and "MultiLineEditBox" or "EditBox")
+					control = CreateControl(v.dialogControl or v.control, v.multiline and "MultiLineEditBox" or "EditBox-OmniCD") -- for 'Profiles'
 
 					if v.multiline and control.SetNumLines then
 						control:SetNumLines(tonumber(v.multiline) or 4)
@@ -1196,7 +1199,7 @@ local function FeedOptions(appName, options,container,rootframe,path,group,inlin
 					control:SetText(text)
 
 				elseif v.type == "toggle" then
-					control = CreateControl(v.dialogControl or v.control, "CheckBox")
+					control = CreateControl(v.dialogControl or v.control, "CheckBox-OmniCD") -- for 'Profiles'
 					control:SetLabel(name)
 					control:SetTriState(v.tristate)
 					local value = GetOptionsMemberValue("get",v, options, path, appName)
@@ -1218,8 +1221,13 @@ local function FeedOptions(appName, options,container,rootframe,path,group,inlin
 							control:SetImage(image)
 						end
 					end
+
+					local arg = GetOptionsMemberValue("arg", v, options, path, appName)
+					if arg and GetSpellInfo(arg) then
+						control:SetArg(arg)
+					end
 				elseif v.type == "range" then
-					control = CreateControl(v.dialogControl or v.control, "Slider")
+					control = CreateControl(v.dialogControl or v.control, "Slider-OmniCD")
 					control:SetLabel(name)
 					control:SetSliderValues(v.softMin or v.min or 0, v.softMax or v.max or 100, v.bigStep or v.step or 0)
 					control:SetIsPercent(v.isPercent)
@@ -1237,7 +1245,7 @@ local function FeedOptions(appName, options,container,rootframe,path,group,inlin
 					if v.style == "radio" then
 						local disabled = CheckOptionDisabled(v, options, path, appName)
 						local width = GetOptionsMemberValue("width",v,options,path,appName)
-						control = gui:Create("InlineGroup")
+						control = gui:Create("InlineGroup-OmniCD")
 						control:SetLayout("Flow")
 						control:SetTitle(name)
 						control.width = "fill"
@@ -1253,7 +1261,7 @@ local function FeedOptions(appName, options,container,rootframe,path,group,inlin
 						end
 						for k, value in ipairs(sorting) do
 							local text = values[value]
-							local radio = gui:Create("CheckBox")
+							local radio = gui:Create("CheckBox-OmniCD")
 							radio:SetLabel(text)
 							radio:SetUserData("value", value)
 							radio:SetUserData("text", text)
@@ -1278,7 +1286,7 @@ local function FeedOptions(appName, options,container,rootframe,path,group,inlin
 						control:ResumeLayout()
 						control:DoLayout()
 					else
-						control = CreateControl(v.dialogControl or v.control, "Dropdown")
+						control = CreateControl(v.dialogControl or v.control, "Dropdown-OmniCD") -- for 'Profiles'
 						local itemType = v.itemControl
 						if itemType and not gui:GetWidgetVersion(itemType) then
 							geterrorhandler()(("Invalid Custom Item Type - %s"):format(tostring(itemType)))
@@ -1292,6 +1300,11 @@ local function FeedOptions(appName, options,container,rootframe,path,group,inlin
 						end
 						control:SetValue(value)
 						control:SetCallback("OnValueChanged", ActivateControl)
+
+						local item = GetOptionsMemberValue("disabledItem", v, options, path, appName)
+						if item then
+							control:SetItemDisabled(item, true)
+						end
 					end
 
 				elseif v.type == "multiselect" then
@@ -1318,6 +1331,10 @@ local function FeedOptions(appName, options,container,rootframe,path,group,inlin
 						control:SetLabel(name)
 						control:SetList(values)
 						control:SetDisabled(disabled)
+						local item = GetOptionsMemberValue("disabledItem", v, options, path, appName)
+						if item then
+							control:SetItemDisabled(item, true)
+						end
 						control:SetCallback("OnValueChanged",ActivateControl)
 						control:SetCallback("OnClosed", MultiControlOnClosed)
 						local width = GetOptionsMemberValue("width",v,options,path,appName)
@@ -1339,7 +1356,8 @@ local function FeedOptions(appName, options,container,rootframe,path,group,inlin
 							control:SetItemValue(key,value)
 						end
 					else
-						control = gui:Create("InlineGroup")
+
+						control = gui:Create("InlineGroup-OmniCD")
 						control:SetLayout("Flow")
 						control:SetTitle(name)
 						control.width = "fill"
@@ -1349,7 +1367,7 @@ local function FeedOptions(appName, options,container,rootframe,path,group,inlin
 						for i = 1, #valuesort do
 							local value = valuesort[i]
 							local text = values[value]
-							local check = gui:Create("CheckBox")
+							local check = gui:Create("CheckBox-OmniCD")
 							check:SetLabel(text)
 							check:SetUserData("value", value)
 							check:SetUserData("text", text)
@@ -1404,11 +1422,11 @@ local function FeedOptions(appName, options,container,rootframe,path,group,inlin
 
 					local fontSize = GetOptionsMemberValue("fontSize",v, options, path, appName)
 					if fontSize == "medium" then
-						control:SetFontObject(GameFontHighlight)
+						control:SetFontObject(_G["GameFontHighlight-OmniCD"])
 					elseif fontSize == "large" then
-						control:SetFontObject(GameFontHighlightLarge)
+						control:SetFontObject(GameFontHighlightLarge) -- TODO:
 					else -- small or invalid
-						control:SetFontObject(GameFontHighlightSmall)
+						control:SetFontObject(_G["GameFontHighlightSmall-OmniCD"])
 					end
 
 					local imageCoords = GetOptionsMemberValue("imageCoords",v, options, path, appName)
@@ -1489,6 +1507,10 @@ local function TreeOnButtonEnter(widget, event, uniquevalue, button)
 	local appName = user.appName
 	local tooltip = AceConfigDialog.tooltip
 
+	if not isTooltipBackropUpdated then
+		UpdateTooltipBackdrop()
+	end
+
 	local feedpath = new()
 	for i = 1, #path do
 		feedpath[i] = path[i]
@@ -1506,7 +1528,7 @@ local function TreeOnButtonEnter(widget, event, uniquevalue, button)
 
 	tooltip:SetOwner(button, "ANCHOR_NONE")
 	tooltip:ClearAllPoints()
-	if widget.type == "TabGroup" then
+	if widget.type == "TabGroup-OmniCD" then
 		tooltip:SetPoint("BOTTOM",button,"TOP")
 	else
 		tooltip:SetPoint("LEFT",button,"RIGHT")
@@ -1514,7 +1536,7 @@ local function TreeOnButtonEnter(widget, event, uniquevalue, button)
 
 	tooltip:SetText(name, 1, .82, 0, true)
 
-	if type(desc) == "string" then
+	if type(desc) == "string" then -- we don't need hyperlink here
 		tooltip:AddLine(desc, 1, 1, 1, true)
 	end
 
@@ -1634,8 +1656,8 @@ function AceConfigDialog:FeedGroup(appName,options,container,rootframe,path, isR
 
 	--Add a scrollframe if we are not going to add a group control, this is the inverse of the conditions for that later on
 	if (not (hasChildGroups and not inline)) or (grouptype ~= "tab" and grouptype ~= "select" and (parenttype == "tree" and not isRoot)) then
-		if container.type ~= "InlineGroup" and container.type ~= "SimpleGroup" then
-			scroll = gui:Create("ScrollFrame")
+		if container.type ~= "InlineGroup-OmniCD" and container.type ~= "SimpleGroup-OmniCD" then
+			scroll = gui:Create("ScrollFrame-OmniCD")
 			scroll:SetLayout("flow")
 			scroll.width = "fill"
 			scroll.height = "fill"
@@ -1660,7 +1682,7 @@ function AceConfigDialog:FeedGroup(appName,options,container,rootframe,path, isR
 		local name = GetOptionsMemberValue("name", group, options, path, appName)
 		if grouptype == "tab" then
 
-			local tab = gui:Create("TabGroup")
+			local tab = gui:Create("TabGroup-OmniCD")
 			InjectInfo(tab, options, group, path, rootframe, appName)
 			tab:SetCallback("OnGroupSelected", GroupSelected)
 			tab:SetCallback("OnTabEnter", TreeOnButtonEnter)
@@ -1717,7 +1739,7 @@ function AceConfigDialog:FeedGroup(appName,options,container,rootframe,path, isR
 		--assume tree group by default
 		--if parenttype is tree then this group is already a node on that tree
 		elseif (parenttype ~= "tree") or isRoot then
-			local tree = gui:Create("TreeGroup")
+			local tree = gui:Create("TreeGroup-OmniCD")
 			InjectInfo(tree, options, group, path, rootframe, appName)
 			tree:EnableButtonTooltips(false)
 
@@ -1909,7 +1931,7 @@ function AceConfigDialog:Open(appName, container, ...)
 		end
 	else
 		if not self.OpenFrames[appName] then
-			f = gui:Create("Frame")
+			f = gui:Create("Frame-OmniCD")
 			self.OpenFrames[appName] = f
 		else
 			f = self.OpenFrames[appName]

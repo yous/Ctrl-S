@@ -101,10 +101,10 @@ function P:ResetCooldown(icon)
 	end
 end
 
-function P:ResetAllIcons(isEncounterEnd)
+function P:ResetAllIcons(reason)
 	for _, info in pairs(self.groupInfo) do
 		for spellID, icon in pairs(info.spellIcons) do -- [70]
-			if not isEncounterEnd or (not E.spell_noReset[spellID] and icon.duration >= 180) then
+			if reason ~= "encounterEnd" or (not E.spell_noReset[spellID] and icon.duration >= 180) then
 				local statusBar = icon.statusBar
 				if icon.active then
 					local maxcharges = icon.maxcharges
@@ -131,16 +131,25 @@ function P:ResetAllIcons(isEncounterEnd)
 				end
 
 				if info.preActiveIcons[spellID] then
+					if spellID == 323436 and info.bar.timer_inCombatTicker then
+						info.bar.timer_inCombatTicker:Cancel()
+					end
+
 					info.preActiveIcons[spellID] = nil
 					if statusBar then
 						self:SetExStatusBarColor(icon, statusBar.key)
 					end
 					icon.icon:SetVertexColor(1, 1, 1)
 				end
+
+				if reason == "joinedPvP" and spellID == 323436 then
+					info.auras.purifySoulStacks = nil
+					icon.Count:SetText("")
+				end
 			end
 		end
 
-		if not self.displayInactive then -- isEncounterEnd can have active icons
+		if not self.displayInactive then -- [71]
 			self:SetIconLayout(info.bar)
 		end
 	end
@@ -332,9 +341,6 @@ function P:StartCooldown(icon, cd, recharge, noGlow)
 		end
 	end
 
-	--[[ xml
-	noGlow = noGlow or icon.isCropped
-	--]]
 	if E.OmniCC and not icon.isHighlighted or (not E.OmniCC and not self:HighlightIcon(icon)) then
 		if not recharge and not noGlow then
 			self:SetGlow(icon)

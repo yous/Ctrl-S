@@ -165,8 +165,20 @@ end
 
 function AuctionatorCancellingDataProviderMixin:IsValidAuction(auctionInfo)
   return
+    --We don't handle WoW Tokens (can't cancel and no time left)
+    auctionInfo.itemKey.itemID ~= Auctionator.Constants.WOW_TOKEN_ID and
     auctionInfo.status == 0 and
     tIndexOf(self.beenCancelled, auctionInfo.auctionID) == nil
+end
+
+function AuctionatorCancellingDataProviderMixin:FilterAuction(auctionInfo)
+  local searchString = self:GetParent().SearchFilter:GetText()
+  if searchString ~= "" then
+    --Uses that the item link for an auction contains its name
+    return string.match(string.lower(auctionInfo.itemLink), string.lower(searchString))
+  else
+    return true
+  end
 end
 
 function AuctionatorCancellingDataProviderMixin:PopulateAuctions()
@@ -179,7 +191,7 @@ function AuctionatorCancellingDataProviderMixin:PopulateAuctions()
     local info = C_AuctionHouse.GetOwnedAuctionInfo(index)
 
     --Only look at unsold and uncancelled (yet) auctions
-    if self:IsValidAuction(info) then
+    if self:IsValidAuction(info) and self:FilterAuction(info) then
       local price = info.buyoutAmount or info.bidAmount
       total = total + price * info.quantity
       table.insert(results, {

@@ -1,8 +1,14 @@
+---------------------------------------------------------------------------------
+
+-- Customized for OmniCD by permission of the copyright owner.
+
+---------------------------------------------------------------------------------
+
 --[[-----------------------------------------------------------------------------
 ScrollFrame Container
 Plain container that scrolls its content and doesn't grow in height.
 -------------------------------------------------------------------------------]]
-local Type, Version = "ScrollFrame", 26
+local Type, Version = "ScrollFrame-OmniCD", 26
 local AceGUI = LibStub and LibStub("AceGUI-3.0", true)
 if not AceGUI or (AceGUI:GetWidgetVersion(Type) or 0) >= Version then return end
 
@@ -34,6 +40,24 @@ end
 
 local function ScrollBar_OnScrollValueChanged(frame, value)
 	frame.obj:SetScroll(value)
+end
+
+local function Thumb_OnEnter(frame)
+	frame.ThumbTexture:SetColorTexture(0.5, 0.5, 0.5)
+end
+local function Thumb_OnLeave(frame)
+	if not frame.isMouseDown then
+		frame.ThumbTexture:SetColorTexture(0.3, 0.3, 0.3)
+	end
+end
+local function Thumb_OnMouseDown(frame)
+	frame.isMouseDown = true
+end
+local function Thumb_OnMouseUp(frame)
+	if frame.isMouseDown then
+		frame.isMouseDown = nil
+		frame.ThumbTexture:SetColorTexture(0.3, 0.3, 0.3)
+	end
 end
 
 --[[-----------------------------------------------------------------------------
@@ -117,6 +141,12 @@ local methods = {
 				end
 				self:DoLayout()
 			end
+
+			if height > 0 then
+				local thumbHeight = min( height*0.8, (height^2) / viewheight )
+				self.scrollbar.ThumbTexture:SetHeight(thumbHeight)
+			end
+
 			local value = (offset / (viewheight - height) * 1000)
 			if value > 1000 then value = 1000 end
 			self.scrollbar:SetValue(value)
@@ -128,6 +158,7 @@ local methods = {
 				status.offset = offset
 			end
 		end
+
 		self.updateLock = nil
 	end,
 
@@ -174,9 +205,18 @@ local function Constructor()
 	scrollframe:SetScript("OnMouseWheel", ScrollFrame_OnMouseWheel)
 	scrollframe:SetScript("OnSizeChanged", ScrollFrame_OnSizeChanged)
 
-	local scrollbar = CreateFrame("Slider", ("AceConfigDialogScrollFrame%dScrollBar"):format(num), scrollframe, "UIPanelScrollBarTemplate")
-	scrollbar:SetPoint("TOPLEFT", scrollframe, "TOPRIGHT", 4, -16)
-	scrollbar:SetPoint("BOTTOMLEFT", scrollframe, "BOTTOMRIGHT", 4, 16)
+	local scrollbar = CreateFrame("Slider", ("AceConfigDialogScrollFrame%dScrollBar-OmniCD"):format(num), scrollframe, "UIPanelScrollBarTemplate")
+	scrollbar:SetPoint("TOPLEFT", scrollframe, "TOPRIGHT", 4, 0)
+	scrollbar:SetPoint("BOTTOMLEFT", scrollframe, "BOTTOMRIGHT", 4, 0)
+	scrollbar.ScrollUpButton:Hide()
+	scrollbar.ScrollDownButton:Hide()
+	scrollbar.ThumbTexture:SetTexture([[Interface\BUTTONS\White8x8]])
+	scrollbar.ThumbTexture:SetSize(16, 32)
+	scrollbar.ThumbTexture:SetColorTexture(0.3, 0.3, 0.3) -- red is too much
+	scrollbar:SetScript("OnEnter", Thumb_OnEnter)
+	scrollbar:SetScript("OnLeave", Thumb_OnLeave)
+	scrollbar:SetScript("OnMouseDown", Thumb_OnMouseDown)
+	scrollbar:SetScript("OnMouseUp", Thumb_OnMouseUp)
 	scrollbar:SetMinMaxValues(0, 1000)
 	scrollbar:SetValueStep(1)
 	scrollbar:SetValue(0)
