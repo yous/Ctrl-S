@@ -1459,7 +1459,7 @@ _detalhes_global = {
 			["memory_ram"] = 64,
 			["memory_threshold"] = 3,
 			["minimap"] = {
-				["hide"] = false,
+				["hide"] = true,
 				["minimapPos"] = 149.697290028058,
 				["onclick_what_todo"] = 1,
 				["radius"] = 160,
@@ -1506,8 +1506,8 @@ _detalhes_global = {
 				0.2, -- [2]
 			},
 			["scroll_speed"] = 2,
-			["segments_amount"] = 18,
-			["segments_amount_to_save"] = 18,
+			["segments_amount"] = 40,
+			["segments_amount_to_save"] = 40,
 			["segments_auto_erase"] = 1,
 			["segments_panic_mode"] = false,
 			["show_arena_role_icon"] = false,
@@ -3904,20 +3904,6 @@ _detalhes_global = {
 		{
 			["attribute"] = false,
 			["author"] = "Details!",
-			["desc"] = "Show overall damage done on the fly.",
-			["icon"] = "Interface\\Buttons\\Spell-Reset",
-			["name"] = "유동적 종합 피해",
-			["script"] = "\t\t\t\t--init:\n\t\t\t\tlocal combat, instance_container, instance = ...\n\t\t\t\tlocal total, top, amount = 0, 0, 0\n\n\t\t\t\t--get the overall combat\n\t\t\t\tlocal OverallCombat = Details:GetCombat (-1)\n\t\t\t\t--get the current combat\n\t\t\t\tlocal CurrentCombat = Details:GetCombat (0)\n\n\t\t\t\tif (not OverallCombat.GetActorList or not CurrentCombat.GetActorList) then\n\t\t\t\t    return 0, 0, 0\n\t\t\t\tend\n\n\t\t\t\t--get the damage actor container for overall\n\t\t\t\tlocal damage_container_overall = OverallCombat:GetActorList ( DETAILS_ATTRIBUTE_DAMAGE )\n\t\t\t\t--get the damage actor container for current\n\t\t\t\tlocal damage_container_current = CurrentCombat:GetActorList ( DETAILS_ATTRIBUTE_DAMAGE )\n\n\t\t\t\t--do the loop:\n\t\t\t\tfor _, player in ipairs ( damage_container_overall ) do \n\t\t\t\t    --only player in group\n\t\t\t\t    if (player:IsGroupPlayer()) then\n\t\t\t\t\tinstance_container:AddValue (player, player.total)\n\t\t\t\t    end\n\t\t\t\tend\n\n\t\t\t\tif (Details.in_combat) then\n\t\t\t\t    for _, player in ipairs ( damage_container_current ) do \n\t\t\t\t\t--only player in group\n\t\t\t\t\tif (player:IsGroupPlayer()) then\n\t\t\t\t\t    instance_container:AddValue (player, player.total)        \n\t\t\t\t\tend\n\t\t\t\t    end\n\t\t\t\tend\n\n\t\t\t\ttotal, top =  instance_container:GetTotalAndHighestValue()\n\t\t\t\tamount =  instance_container:GetNumActors()\n\n\t\t\t\t--return:\n\t\t\t\treturn total, top, amount\n\t\t\t",
-			["script_version"] = 5,
-			["source"] = false,
-			["spellid"] = false,
-			["target"] = false,
-			["tooltip"] = "\t\t\t\t--get the parameters passed\n\t\t\t\tlocal actor, combat, instance = ...\n\n\t\t\t\t--get the cooltip object (we dont use the convencional GameTooltip here)\n\t\t\t\tlocal GameCooltip = GameCooltip2\n\n\t\t\t\t--Cooltip code\n\t\t\t\t--get the overall combat\n\t\t\t\tlocal OverallCombat = Details:GetCombat (-1)\n\t\t\t\t--get the current combat\n\t\t\t\tlocal CurrentCombat = Details:GetCombat (0)\n\n\t\t\t\tlocal AllSpells = {}\n\n\t\t\t\t--overall\n\t\t\t\tlocal player = OverallCombat [1]:GetActor (actor.nome)\n\t\t\t\tlocal playerSpells = player:GetSpellList()\n\t\t\t\tfor spellID, spellTable in pairs (playerSpells) do\n\t\t\t\t    AllSpells [spellID] = spellTable.total\n\t\t\t\tend\n\n\t\t\t\t--current\n\t\t\t\tlocal player = CurrentCombat [1]:GetActor (actor.nome)\n\t\t\t\tif (player) then\n\t\t\t\t\tlocal playerSpells = player:GetSpellList()\n\t\t\t\t\tfor spellID, spellTable in pairs (playerSpells) do\n\t\t\t\t\t\tAllSpells [spellID] = (AllSpells [spellID] or 0) + (spellTable.total or 0)\n\t\t\t\t\tend\n\t\t\t\tend\n\n\t\t\t\tlocal sortedList = {}\n\t\t\t\tfor spellID, total in pairs (AllSpells) do\n\t\t\t\t    tinsert (sortedList, {spellID, total})\n\t\t\t\tend\n\t\t\t\ttable.sort (sortedList, Details.Sort2)\n\n\t\t\t\tlocal format_func = Details:GetCurrentToKFunction()\n\n\t\t\t\t--build the tooltip\n\t\t\t\tfor i, t in ipairs (sortedList) do\n\t\t\t\t    local spellID, total = unpack (t)\n\t\t\t\t    if (total > 1) then\n\t\t\t\t\tlocal spellName, _, spellIcon = Details.GetSpellInfo (spellID)\n\t\t\t\t\t\n\t\t\t\t\tGameCooltip:AddLine (spellName, format_func (_, total))\n\t\t\t\t\tDetails:AddTooltipBackgroundStatusbar()\n\t\t\t\t\tGameCooltip:AddIcon (spellIcon, 1, 1, _detalhes.tooltip.line_height, _detalhes.tooltip.line_height)\n\t\t\t\t    end\n\t\t\t\tend\n\t\t\t",
-			["total_script"] = "\t\t\t\tlocal value, top, total, combat, instance = ...\n\n\t\t\t\t--get the time of overall combat\n\t\t\t\tlocal OverallCombatTime = Details:GetCombat (-1):GetCombatTime()\n\n\t\t\t\t--get the time of current combat if the player is in combat\n\t\t\t\tif (Details.in_combat) then\n\t\t\t\t    local CurrentCombatTime = Details:GetCombat (0):GetCombatTime()\n\t\t\t\t    OverallCombatTime = OverallCombatTime + CurrentCombatTime\n\t\t\t\tend\n\n\t\t\t\t--build the string\n\t\t\t\tlocal ToK = Details:GetCurrentToKFunction()\n\t\t\t\tlocal s = ToK (_, value / OverallCombatTime)\n\t\t\t\t\n\t\t\t\tif (instance.row_info.textR_show_data[3]) then\n\t\t\t\t    s = ToK (_, value) .. \" (\" .. s .. \", \"\n\t\t\t\telse\n\t\t\t\t    s = ToK (_, value) .. \" (\" .. s\n\t\t\t\tend\n\n\t\t\t\treturn s\n\t\t\t",
-		}, -- [10]
-		{
-			["attribute"] = false,
-			["author"] = "Details!",
 			["desc"] = "Damage done to shields",
 			["icon"] = "Interface\\ICONS\\Spell_Holy_PowerWordShield",
 			["name"] = "보호막에 준 피해",
@@ -3927,6 +3913,21 @@ _detalhes_global = {
 			["spellid"] = false,
 			["target"] = false,
 			["tooltip"] = "\t\t\t\t--get the parameters passed\n\t\t\t\tlocal actor, Combat, instance = ...\n\n\t\t\t\t--get the cooltip object (we dont use the convencional GameTooltip here)\n\t\t\t\tlocal GameCooltip = GameCooltip\n\n\t\t\t\t--Cooltip code\n\t\t\t\t--get the actor total damage absorbed\n\t\t\t\tlocal totalAbsorb = actor.totalabsorbed\n\t\t\t\tlocal format_func = Details:GetCurrentToKFunction()\n\n\t\t\t\t--get the damage absorbed by all the actor pets\n\t\t\t\tfor petIndex, petName in ipairs (actor.pets) do\n\t\t\t\t    local pet = Combat :GetActor (1, petName)\n\t\t\t\t    if (pet) then\n\t\t\t\t\ttotalAbsorb = totalAbsorb + pet.totalabsorbed\n\t\t\t\t    end\n\t\t\t\tend\n\n\t\t\t\tGameCooltip:AddLine (actor:Name(), format_func (_, actor.totalabsorbed))\n\t\t\t\tDetails:AddTooltipBackgroundStatusbar()\n\n\t\t\t\tfor petIndex, petName in ipairs (actor.pets) do\n\t\t\t\t    local pet = Combat :GetActor (1, petName)\n\t\t\t\t    if (pet) then\n\t\t\t\t\ttotalAbsorb = totalAbsorb + pet.totalabsorbed\n\t\t\t\t\t\n\t\t\t\t\tGameCooltip:AddLine (petName, format_func (_, pet.totalabsorbed))\n\t\t\t\t\tDetails:AddTooltipBackgroundStatusbar()        \n\t\t\t\t\t\n\t\t\t\t    end\n\t\t\t\tend\n\t\t\t",
+		}, -- [10]
+		{
+			["attribute"] = false,
+			["author"] = "Details!",
+			["desc"] = "Show overall damage done on the fly.",
+			["icon"] = "Interface\\Buttons\\Spell-Reset",
+			["name"] = "유동적 종합 피해",
+			["percent_script"] = "\t\t\t\tlocal value, top, total, combat, instance = ...\n\n\t\t\t\t--get the time of overall combat\n\t\t\t\tlocal OverallCombatTime = Details:GetCombat (-1):GetCombatTime()\n\t\t\t\t\n\t\t\t\t--get the time of current combat if the player is in combat\n\t\t\t\tif (Details.in_combat) then\n\t\t\t\t\tlocal CurrentCombatTime = Details:GetCombat (0):GetCombatTime()\n\t\t\t\t\tOverallCombatTime = OverallCombatTime + CurrentCombatTime\n\t\t\t\tend\n\t\t\t\t\n\t\t\t\t--calculate the DPS and return it as percent\n\t\t\t\tlocal totalValue = value\n\t\t\t\t\n\t\t\t\t--build the string\n\t\t\t\tlocal ToK = Details:GetCurrentToKFunction()\n\t\t\t\tlocal s = ToK (_, value / OverallCombatTime)\n\t\t\t\t\n\t\t\t\treturn s\n\t\t\t",
+			["script"] = "\t\t\t\t--init:\n\t\t\t\tlocal combat, instance_container, instance = ...\n\t\t\t\tlocal total, top, amount = 0, 0, 0\n\t\t\t\t\n\t\t\t\t--get the overall combat\n\t\t\t\tlocal OverallCombat = Details:GetCombat (-1)\n\t\t\t\t--get the current combat\n\t\t\t\tlocal CurrentCombat = Details:GetCombat (0)\n\t\t\t\t\n\t\t\t\tif (not OverallCombat.GetActorList or not CurrentCombat.GetActorList) then\n\t\t\t\t\treturn 0, 0, 0\n\t\t\t\tend\n\t\t\t\t\n\t\t\t\t--get the damage actor container for overall\n\t\t\t\tlocal damage_container_overall = OverallCombat:GetActorList ( DETAILS_ATTRIBUTE_DAMAGE )\n\t\t\t\t--get the damage actor container for current\n\t\t\t\tlocal damage_container_current = CurrentCombat:GetActorList ( DETAILS_ATTRIBUTE_DAMAGE )\n\t\t\t\t\n\t\t\t\t--do the loop:\n\t\t\t\tfor _, player in ipairs ( damage_container_overall ) do \n\t\t\t\t\t--only player in group\n\t\t\t\t\tif (player:IsGroupPlayer()) then\n\t\t\t\t\t\tinstance_container:AddValue (player, player.total)\n\t\t\t\t\tend\n\t\t\t\tend\n\t\t\t\t\n\t\t\t\tif (Details.in_combat) then\n\t\t\t\t\tfor _, player in ipairs ( damage_container_current ) do \n\t\t\t\t\t\t--only player in group\n\t\t\t\t\t\tif (player:IsGroupPlayer()) then\n\t\t\t\t\t\t\tinstance_container:AddValue (player, player.total)        \n\t\t\t\t\t\tend\n\t\t\t\t\tend\n\t\t\t\tend\n\t\t\t\t\n\t\t\t\ttotal, top =  instance_container:GetTotalAndHighestValue()\n\t\t\t\tamount =  instance_container:GetNumActors()\n\t\t\t\t\n\t\t\t\t--return:\n\t\t\t\treturn total, top, amount\n\t\t\t",
+			["script_version"] = 6,
+			["source"] = false,
+			["spellid"] = false,
+			["target"] = false,
+			["tooltip"] = "\t\t\t\t--get the parameters passed\n\t\t\t\tlocal actor, combat, instance = ...\n\n\t\t\t\t--get the cooltip object (we dont use the convencional GameTooltip here)\n\t\t\t\tlocal GameCooltip = GameCooltip2\n\n\t\t\t\t--Cooltip code\n\t\t\t\t--get the overall combat\n\t\t\t\tlocal OverallCombat = Details:GetCombat (-1)\n\t\t\t\t--get the current combat\n\t\t\t\tlocal CurrentCombat = Details:GetCombat (0)\n\n\t\t\t\tlocal AllSpells = {}\n\n\t\t\t\tlocal playerTotal = 0\n\n\t\t\t\t--overall\n\t\t\t\tlocal player = OverallCombat [1]:GetActor (actor.nome)\n\t\t\t\tplayerTotal = playerTotal + player.total\n\t\t\t\tlocal playerSpells = player:GetSpellList()\n\t\t\t\tfor spellID, spellTable in pairs (playerSpells) do\n\t\t\t\t\tAllSpells [spellID] = spellTable.total\n\t\t\t\tend\n\n\t\t\t\t--current\n\t\t\t\tlocal player = CurrentCombat [1]:GetActor (actor.nome)\n\t\t\t\tif (player) then\n\t\t\t\t\tplayerTotal = playerTotal + player.total\n\t\t\t\t\tlocal playerSpells = player:GetSpellList()\n\t\t\t\t\tfor spellID, spellTable in pairs (playerSpells) do\n\t\t\t\t\t\tAllSpells [spellID] = (AllSpells [spellID] or 0) + (spellTable.total or 0)\n\t\t\t\t\tend\n\t\t\t\tend\n\n\t\t\t\tlocal sortedList = {}\n\t\t\t\tfor spellID, total in pairs (AllSpells) do\n\t\t\t\t\ttinsert (sortedList, {spellID, total})\n\t\t\t\tend\n\t\t\t\ttable.sort (sortedList, Details.Sort2)\n\n\t\t\t\tlocal format_func = Details:GetCurrentToKFunction()\n\n\t\t\t\t--build the tooltip\n\n\t\t\t\tlocal topSpellTotal = sortedList and sortedList[1] and sortedList[1][2] or 0\n\n\t\t\t\tfor i, t in ipairs (sortedList) do\n\t\t\t\t\tlocal spellID, total = unpack (t)\n\t\t\t\t\tif (total > 1) then\n\t\t\t\t\t\tlocal spellName, _, spellIcon = Details.GetSpellInfo (spellID)\n\t\t\t\t\t\t\n\t\t\t\t\t\tlocal spellPercent = total / playerTotal * 100\n\t\t\t\t\t\tlocal formatedSpellPercent = format(\"%.1f\", spellPercent)\n\t\t\t\t\t\t\n\t\t\t\t\t\tif (string.len(formatedSpellPercent) < 4) then\n\t\t\t\t\t\t\tformatedSpellPercent = formatedSpellPercent  .. \"0\"\n\t\t\t\t\t\tend\n\t\t\t\t\t\t\n\t\t\t\t\t\tGameCooltip:AddLine (spellName, format_func (_, total) .. \"    \" .. formatedSpellPercent  .. \"%\")\n\t\t\t\t\t\t\n\t\t\t\t\t\tDetails:AddTooltipBackgroundStatusbar(false, total / topSpellTotal * 100)\n\t\t\t\t\t\tGameCooltip:AddIcon (spellIcon, 1, 1, _detalhes.tooltip.line_height, _detalhes.tooltip.line_height, 0.078125, 0.921875, 0.078125, 0.921875)\n\t\t\t\t\t\t\n\t\t\t\t\tend\n\t\t\t\tend\n\t\t\t",
+			["total_script"] = "\t\t\t\tlocal value, top, total, combat, instance = ...\n\t\t\t\treturn value\n\t\t\t",
 		}, -- [11]
 	},
 	["damage_scroll_auto_open"] = true,
@@ -3975,6 +3976,10 @@ _detalhes_global = {
 			1895, -- [1]
 			"속박의 토템 <아포코>", -- [2]
 		},
+		[3609] = {
+			608, -- [1]
+			"일리다리 암살자", -- [2]
+		},
 		[8599] = {
 			725, -- [1]
 			"에테리얼 납골당 침입자", -- [2]
@@ -3982,6 +3987,10 @@ _detalhes_global = {
 		[12540] = {
 			1895, -- [1]
 			"카가니 나이트스트라이크", -- [2]
+		},
+		[13005] = {
+			608, -- [1]
+			"일리다리 혈군주", -- [2]
 		},
 		[13323] = {
 			1895, -- [1]
@@ -4403,9 +4412,221 @@ _detalhes_global = {
 			1914, -- [1]
 			"선구자 스키리스", -- [2]
 		},
+		[39544] = {
+			607, -- [1]
+			"성난해골 약탈자", -- [2]
+		},
+		[39635] = {
+			609, -- [1]
+			"일리단 스톰레이지", -- [2]
+		},
+		[39849] = {
+			609, -- [1]
+			"일리단 스톰레이지", -- [2]
+		},
+		[39855] = {
+			609, -- [1]
+			"아지노스의 칼날", -- [2]
+		},
 		[40504] = {
 			1940, -- [1]
 			"쿠아그미란", -- [2]
+		},
+		[40598] = {
+			609, -- [1]
+			"일리단 스톰레이지", -- [2]
+		},
+		[40647] = {
+			609, -- [1]
+			"일리단 스톰레이지", -- [2]
+		},
+		[40810] = {
+			607, -- [1]
+			"대모 샤라즈", -- [2]
+		},
+		[41068] = {
+			607, -- [1]
+			"어둠달 혈법사", -- [2]
+		},
+		[41069] = {
+			607, -- [1]
+			"어둠달 죽음의 창조자", -- [2]
+		},
+		[41085] = {
+			607, -- [1]
+			"어둠달 사냥개조련사", -- [2]
+		},
+		[41093] = {
+			607, -- [1]
+			"어둠달 사냥개조련사", -- [2]
+		},
+		[41151] = {
+			606, -- [1]
+			"잿빛혓바닥 폭풍소환사", -- [2]
+		},
+		[41170] = {
+			606, -- [1]
+			"일리다리 심장추적자", -- [2]
+		},
+		[41172] = {
+			606, -- [1]
+			"일리다리 심장추적자", -- [2]
+		},
+		[41173] = {
+			606, -- [1]
+			"일리다리 심장추적자", -- [2]
+		},
+		[41184] = {
+			606, -- [1]
+			"잿빛혓바닥 폭풍소환사", -- [2]
+		},
+		[41193] = {
+			606, -- [1]
+			"돌연변이 전투사냥개", -- [2]
+		},
+		[41248] = {
+			606, -- [1]
+			"굶주린 영혼의 파편", -- [2]
+		},
+		[41337] = {
+			606, -- [1]
+			"격노의 정수", -- [2]
+		},
+		[41338] = {
+			607, -- [1]
+			"사원의 무희", -- [2]
+		},
+		[41346] = {
+			607, -- [1]
+			"매력적인 무희", -- [2]
+		},
+		[41349] = {
+			608, -- [1]
+			"비전 폭발물", -- [2]
+		},
+		[41351] = {
+			607, -- [1]
+			"환희의 여사제", -- [2]
+		},
+		[41353] = {
+			607, -- [1]
+			"고통의 자매", -- [2]
+		},
+		[41355] = {
+			607, -- [1]
+			"고통의 자매", -- [2]
+		},
+		[41357] = {
+			608, -- [1]
+			"순찰 중인 파수병", -- [2]
+		},
+		[41368] = {
+			608, -- [1]
+			"일리다리 혈군주", -- [2]
+		},
+		[41371] = {
+			607, -- [1]
+			"고통의 자매", -- [2]
+		},
+		[41374] = {
+			608, -- [1]
+			"일리다리 집정관", -- [2]
+		},
+		[41375] = {
+			608, -- [1]
+			"일리다리 집정관", -- [2]
+		},
+		[41379] = {
+			608, -- [1]
+			"일리다리 전투마법사", -- [2]
+		},
+		[41380] = {
+			607, -- [1]
+			"쾌락의 자매", -- [2]
+		},
+		[41383] = {
+			608, -- [1]
+			"일리다리 전투마법사", -- [2]
+		},
+		[41384] = {
+			608, -- [1]
+			"일리다리 전투마법사", -- [2]
+		},
+		[41388] = {
+			607, -- [1]
+			"지배당한 하인", -- [2]
+		},
+		[41389] = {
+			607, -- [1]
+			"지배당한 하인", -- [2]
+		},
+		[41396] = {
+			607, -- [1]
+			"주문에 구속된 수행원", -- [2]
+		},
+		[41397] = {
+			607, -- [1]
+			"광기의 여사제", -- [2]
+		},
+		[41400] = {
+			607, -- [1]
+			"광기의 환영", -- [2]
+		},
+		[41459] = {
+			608, -- [1]
+			"파괴자 가디오스", -- [2]
+		},
+		[41469] = {
+			608, -- [1]
+			"파괴자 가디오스", -- [2]
+		},
+		[41471] = {
+			608, -- [1]
+			"여군주 말란데", -- [2]
+		},
+		[41472] = {
+			608, -- [1]
+			"여군주 말란데", -- [2]
+		},
+		[41476] = {
+			608, -- [1]
+			"베라스 다크섀도", -- [2]
+		},
+		[41478] = {
+			606, -- [1]
+			"고위 황천술사 제레보르", -- [2]
+		},
+		[41481] = {
+			608, -- [1]
+			"고위 황천술사 제레보르", -- [2]
+		},
+		[41482] = {
+			608, -- [1]
+			"고위 황천술사 제레보르", -- [2]
+		},
+		[41483] = {
+			608, -- [1]
+			"고위 황천술사 제레보르", -- [2]
+		},
+		[41524] = {
+			608, -- [1]
+			"[*] 신비한 폭발", -- [2]
+		},
+		[41541] = {
+			608, -- [1]
+			"파괴자 가디오스", -- [2]
+		},
+		[41542] = {
+			606, -- [1]
+			"사로잡힌 영혼", -- [2]
+		},
+		[42023] = {
+			603, -- [1]
+			"잿빛혓바닥 정령술사", -- [2]
+		},
+		[42058] = {
+			608, -- [1]
+			"파괴자 가디오스", -- [2]
 		},
 		[44177] = {
 			1895, -- [1]
@@ -4487,6 +4708,10 @@ _detalhes_global = {
 			729, -- [1]
 			"킬제덴", -- [2]
 		},
+		[46008] = {
+			728, -- [1]
+			"므우루", -- [2]
+		},
 		[46026] = {
 			1895, -- [1]
 			"아포코", -- [2]
@@ -4543,6 +4768,10 @@ _detalhes_global = {
 			1895, -- [1]
 			"야자이", -- [2]
 		},
+		[46480] = {
+			724, -- [1]
+			"태양칼날단 파수병", -- [2]
+		},
 		[46544] = {
 			724, -- [1]
 			"태양칼날단 밀사", -- [2]
@@ -4562,6 +4791,10 @@ _detalhes_global = {
 		[46562] = {
 			724, -- [1]
 			"태양칼날단 황혼의 사제", -- [2]
+		},
+		[46563] = {
+			724, -- [1]
+			"태양칼날단 여명의 사제", -- [2]
 		},
 		[46573] = {
 			724, -- [1]
@@ -4583,9 +4816,17 @@ _detalhes_global = {
 			2405, -- [1]
 			"꽃피우기 <나하늘바라기-듀로탄>", -- [2]
 		},
+		[90361] = {
+			2407, -- [1]
+			"부르빈켈", -- [2]
+		},
 		[100780] = {
 			2396, -- [1]
 			"대지의 정령 <Manyreason-가로나>", -- [2]
+		},
+		[100784] = {
+			2390, -- [1]
+			10, -- [2]
 		},
 		[102572] = {
 			1303, -- [1]
@@ -4759,6 +5000,10 @@ _detalhes_global = {
 			1397, -- [1]
 			"파괴자 키프틸락", -- [2]
 		},
+		[107270] = {
+			2390, -- [1]
+			10, -- [2]
+		},
 		[107275] = {
 			1419, -- [1]
 			"크릭티크 휘몰이", -- [2]
@@ -4883,6 +5128,10 @@ _detalhes_global = {
 			1406, -- [1]
 			"크릭티크 파괴자", -- [2]
 		},
+		[117418] = {
+			2390, -- [1]
+			10, -- [2]
+		},
 		[117570] = {
 			1439, -- [1]
 			"의심의 산물", -- [2]
@@ -4975,6 +5224,10 @@ _detalhes_global = {
 			2366, -- [1]
 			"불의 정령", -- [2]
 		},
+		[158221] = {
+			2390, -- [1]
+			10, -- [2]
+		},
 		[181089] = {
 			2405, -- [1]
 			"기술자 자이목스", -- [2]
@@ -4987,6 +5240,26 @@ _detalhes_global = {
 			2396, -- [1]
 			"대지의 정령 <Manyreason-가로나>", -- [2]
 		},
+		[191401] = {
+			1806, -- [1]
+			"발라리아르 명사수", -- [2]
+		},
+		[191508] = {
+			1806, -- [1]
+			"발라리아르 지원자", -- [2]
+		},
+		[192563] = {
+			1806, -- [1]
+			"발라리아르 정화자", -- [2]
+		},
+		[192565] = {
+			1806, -- [1]
+			"발라리아르 정화자", -- [2]
+		},
+		[196543] = {
+			1807, -- [1]
+			"펜리르", -- [2]
+		},
 		[198533] = {
 			2405, -- [1]
 			"옥룡 조각상 <마루치-데스윙>", -- [2]
@@ -4995,13 +5268,153 @@ _detalhes_global = {
 			2405, -- [1]
 			"기술자 자이목스", -- [2]
 		},
+		[198595] = {
+			1806, -- [1]
+			"발라리아르 천둥술사", -- [2]
+		},
+		[198934] = {
+			1806, -- [1]
+			"발라리아르 비술사", -- [2]
+		},
+		[198944] = {
+			1806, -- [1]
+			"발라리아르 방패여전사", -- [2]
+		},
+		[198959] = {
+			1806, -- [1]
+			"발라리아르 룬조각사", -- [2]
+		},
+		[198962] = {
+			1806, -- [1]
+			"발라리아르 룬조각사", -- [2]
+		},
+		[199033] = {
+			1806, -- [1]
+			"발라리아르 지원자", -- [2]
+		},
+		[199034] = {
+			1806, -- [1]
+			"발라리아르 지원자", -- [2]
+		},
+		[199050] = {
+			1806, -- [1]
+			"발라리아르 방패여전사", -- [2]
+		},
+		[199179] = {
+			1807, -- [1]
+			"흑단발톱 검은늑대", -- [2]
+		},
+		[199182] = {
+			1807, -- [1]
+			"흑단발톱 검은늑대", -- [2]
+		},
+		[199772] = {
+			1806, -- [1]
+			"발라리아르 용사", -- [2]
+		},
+		[199805] = {
+			1806, -- [1]
+			"폭풍벼림 파수병", -- [2]
+		},
+		[199818] = {
+			1806, -- [1]
+			"[*] 파지직", -- [2]
+		},
+		[200901] = {
+			1806, -- [1]
+			"솔스텐", -- [2]
+		},
+		[207707] = {
+			1807, -- [1]
+			"무엇인가", -- [2]
+		},
 		[209858] = {
 			2357, -- [1]
 			"킨타라", -- [2]
 		},
+		[209862] = {
+			2357, -- [1]
+			"[*] 화산 분출", -- [2]
+		},
+		[215429] = {
+			1806, -- [1]
+			"발라리아르 천둥술사", -- [2]
+		},
+		[215430] = {
+			1806, -- [1]
+			"발라리아르 천둥술사", -- [2]
+		},
 		[224729] = {
 			2388, -- [1]
 			"되살아난 마법사 <아마스>", -- [2]
+		},
+		[227514] = {
+			1962, -- [1]
+			"구아름", -- [2]
+		},
+		[227642] = {
+			1962, -- [1]
+			"구아름", -- [2]
+		},
+		[228003] = {
+			1958, -- [1]
+			"하임달", -- [2]
+		},
+		[228004] = {
+			1958, -- [1]
+			"하임달", -- [2]
+		},
+		[228007] = {
+			1958, -- [1]
+			"[*] 춤추는 칼날", -- [2]
+		},
+		[228012] = {
+			1958, -- [1]
+			"하임달", -- [2]
+		},
+		[228028] = {
+			1958, -- [1]
+			"히리아", -- [2]
+		},
+		[228030] = {
+			1958, -- [1]
+			"히리아", -- [2]
+		},
+		[228055] = {
+			2008, -- [1]
+			"헬리아", -- [2]
+		},
+		[228127] = {
+			2008, -- [1]
+			"헬리아", -- [2]
+		},
+		[228162] = {
+			1958, -- [1]
+			"히리아", -- [2]
+		},
+		[228171] = {
+			1958, -- [1]
+			"히리아", -- [2]
+		},
+		[228300] = {
+			2008, -- [1]
+			"헬리아", -- [2]
+		},
+		[228514] = {
+			2008, -- [1]
+			"헬리아", -- [2]
+		},
+		[228633] = {
+			2008, -- [1]
+			"어둠의 순찰대 갑판원", -- [2]
+		},
+		[230197] = {
+			2008, -- [1]
+			"[*] 검은 물", -- [2]
+		},
+		[232408] = {
+			2008, -- [1]
+			"[*] 악취 나는 부패", -- [2]
 		},
 		[240446] = {
 			2392, -- [1]
@@ -5010,6 +5423,10 @@ _detalhes_global = {
 		[240559] = {
 			2360, -- [1]
 			"[*] 치명상", -- [2]
+		},
+		[243237] = {
+			2357, -- [1]
+			"[*] 파열", -- [2]
 		},
 		[271788] = {
 			2405, -- [1]
@@ -5043,7 +5460,15 @@ _detalhes_global = {
 			2365, -- [1]
 			"선혈토막", -- [2]
 		},
+		[318949] = {
+			2384, -- [1]
+			"역병 걸린 척추파괴자", -- [2]
+		},
 		[319521] = {
+			2364, -- [1]
+			"쿨타로크", -- [2]
+		},
+		[319531] = {
 			2364, -- [1]
 			"쿨타로크", -- [2]
 		},
@@ -5115,6 +5540,10 @@ _detalhes_global = {
 			2382, -- [1]
 			"점액살거수", -- [2]
 		},
+		[319897] = {
+			2388, -- [1]
+			"아마스", -- [2]
+		},
 		[319902] = {
 			2388, -- [1]
 			"아마스", -- [2]
@@ -5146,6 +5575,10 @@ _detalhes_global = {
 		[320069] = {
 			2391, -- [1]
 			"참수자 데시아", -- [2]
+		},
+		[320103] = {
+			2384, -- [1]
+			"미끈미끈한 수액", -- [2]
 		},
 		[320114] = {
 			2366, -- [1]
@@ -5258,6 +5691,10 @@ _detalhes_global = {
 		[320376] = {
 			2389, -- [1]
 			"스티치플레시의 피조물", -- [2]
+		},
+		[320517] = {
+			2384, -- [1]
+			"역병 걸린 척추파괴자", -- [2]
 		},
 		[320580] = {
 			2388, -- [1]
@@ -5540,6 +5977,10 @@ _detalhes_global = {
 			"트레도바", -- [2]
 		},
 		[322655] = {
+			2393, -- [1]
+			"트레도바", -- [2]
+		},
+		[322658] = {
 			2393, -- [1]
 			"트레도바", -- [2]
 		},
@@ -5871,6 +6312,10 @@ _detalhes_global = {
 			2356, -- [1]
 			"벤투낙스", -- [2]
 		},
+		[324307] = {
+			2358, -- [1]
+			"응축된 령", -- [2]
+		},
 		[324368] = {
 			2357, -- [1]
 			"에줄스", -- [2]
@@ -6147,6 +6592,10 @@ _detalhes_global = {
 			2407, -- [1]
 			"대영주 데나트리우스", -- [2]
 		},
+		[326771] = {
+			2401, -- [1]
+			"돌숨결 난도질꾼", -- [2]
+		},
 		[326824] = {
 			2407, -- [1]
 			"죄악의 메아리", -- [2]
@@ -6179,6 +6628,10 @@ _detalhes_global = {
 			2407, -- [1]
 			"대영주 데나트리우스", -- [2]
 		},
+		[327100] = {
+			2389, -- [1]
+			"[*] 맹독 안개", -- [2]
+		},
 		[327122] = {
 			2407, -- [1]
 			"레모르니아", -- [2]
@@ -6194,6 +6647,18 @@ _detalhes_global = {
 		[327233] = {
 			2385, -- [1]
 			"역병트림꾼", -- [2]
+		},
+		[327331] = {
+			2357, -- [1]
+			"이탈자 치유사", -- [2]
+		},
+		[327332] = {
+			2357, -- [1]
+			"이탈자 치유사", -- [2]
+		},
+		[327411] = {
+			2380, -- [1]
+			"에첼론", -- [2]
 		},
 		[327414] = {
 			2405, -- [1]
@@ -6222,6 +6687,14 @@ _detalhes_global = {
 		[327503] = {
 			2412, -- [1]
 			"스타브로스 경", -- [2]
+		},
+		[327584] = {
+			2382, -- [1]
+			"역병트림꾼", -- [2]
+		},
+		[327590] = {
+			2382, -- [1]
+			"역병트림꾼", -- [2]
 		},
 		[327610] = {
 			2412, -- [1]
@@ -6254,6 +6727,10 @@ _detalhes_global = {
 		[327992] = {
 			2407, -- [1]
 			"레모르니아", -- [2]
+		},
+		[328094] = {
+			2384, -- [1]
+			"역병결속자", -- [2]
 		},
 		[328098] = {
 			2407, -- [1]
@@ -6307,6 +6784,14 @@ _detalhes_global = {
 			2380, -- [1]
 			"불멸의 돌마귀 <에첼론>", -- [2]
 		},
+		[328343] = {
+			2385, -- [1]
+			"맹독송곳니 <맹독 저격수>", -- [2]
+		},
+		[328365] = {
+			2385, -- [1]
+			"맹독 저격수", -- [2]
+		},
 		[328424] = {
 			2361, -- [1]
 			"죄악에 물든 령", -- [2]
@@ -6323,6 +6808,10 @@ _detalhes_global = {
 			2412, -- [1]
 			"[*] 죽음의 무도", -- [2]
 		},
+		[328533] = {
+			2385, -- [1]
+			"수많은 눈의 수호병", -- [2]
+		},
 		[328545] = {
 			2405, -- [1]
 			"[*] 차원 균열", -- [2]
@@ -6338,6 +6827,10 @@ _detalhes_global = {
 		[328662] = {
 			2384, -- [1]
 			"무엇인가", -- [2]
+		},
+		[328664] = {
+			2388, -- [1]
+			"되살아난 마법사 <아마스>", -- [2]
 		},
 		[328667] = {
 			2388, -- [1]
@@ -6535,6 +7028,10 @@ _detalhes_global = {
 			2407, -- [1]
 			"레모르니아", -- [2]
 		},
+		[330423] = {
+			2382, -- [1]
+			"버섯 번개술사", -- [2]
+		},
 		[330468] = {
 			2360, -- [1]
 			"탐식자 크릭시스", -- [2]
@@ -6598,6 +7095,10 @@ _detalhes_global = {
 		[330978] = {
 			2412, -- [1]
 			"성주 니클라우스", -- [2]
+		},
+		[331172] = {
+			2393, -- [1]
+			"[*] 정신의 연결", -- [2]
 		},
 		[331217] = {
 			2393, -- [1]
@@ -6699,6 +7200,10 @@ _detalhes_global = {
 			2407, -- [1]
 			"대영주 데나트리우스", -- [2]
 		},
+		[332629] = {
+			2365, -- [1]
+			"선혈토막", -- [2]
+		},
 		[332668] = {
 			2406, -- [1]
 			"귀부인 이네르바 다크베인", -- [2]
@@ -6751,6 +7256,14 @@ _detalhes_global = {
 			2391, -- [1]
 			"저주받은 자 사델", -- [2]
 		},
+		[333241] = {
+			2391, -- [1]
+			"분노의 핏빛뿔", -- [2]
+		},
+		[333242] = {
+			2391, -- [1]
+			"분노의 핏빛뿔", -- [2]
+		},
 		[333292] = {
 			2391, -- [1]
 			"저주받은 자 사델", -- [2]
@@ -6782,6 +7295,10 @@ _detalhes_global = {
 		[333540] = {
 			2391, -- [1]
 			"비열한 자 시라", -- [2]
+		},
+		[333627] = {
+			2388, -- [1]
+			"아마스", -- [2]
 		},
 		[333629] = {
 			2388, -- [1]
@@ -7247,6 +7764,10 @@ _detalhes_global = {
 			2402, -- [1]
 			"돌갑옷 제압자", -- [2]
 		},
+		[341442] = {
+			2384, -- [1]
+			"분출하는 수액", -- [2]
+		},
 		[341443] = {
 			2384, -- [1]
 			"무엇인가", -- [2]
@@ -7295,9 +7816,17 @@ _detalhes_global = {
 			2406, -- [1]
 			"귀부인 이네르바 다크베인", -- [2]
 		},
+		[342332] = {
+			2386, -- [1]
+			"교만의 현신", -- [2]
+		},
 		[342425] = {
 			2417, -- [1]
 			"장군 그라샤알", -- [2]
+		},
+		[342494] = {
+			2386, -- [1]
+			"교만의 현신", -- [2]
 		},
 		[342544] = {
 			2417, -- [1]
@@ -7382,6 +7911,10 @@ _detalhes_global = {
 		[343520] = {
 			2395, -- [1]
 			"[*] 폭풍", -- [2]
+		},
+		[343553] = {
+			2358, -- [1]
+			"원한의 망령", -- [2]
 		},
 		[343556] = {
 			2389, -- [1]
@@ -7515,6 +8048,10 @@ _detalhes_global = {
 			2412, -- [1]
 			"정예 바위수호자", -- [2]
 		},
+		[346866] = {
+			2403, -- [1]
+			"충직한 돌숨결", -- [2]
+		},
 		[346989] = {
 			2384, -- [1]
 			"무엇인가", -- [2]
@@ -7526,6 +8063,10 @@ _detalhes_global = {
 		[347425] = {
 			2412, -- [1]
 			"스타브로스 경", -- [2]
+		},
+		[350163] = {
+			2387, -- [1]
+			"원한의 망령", -- [2]
 		},
 	},
 	["exit_log"] = {
@@ -7552,230 +8093,65 @@ _detalhes_global = {
 	["immersion_special_units"] = true,
 	["immersion_unit_special_icons"] = true,
 	["item_level_pool"] = {
-		["Player-205-05614291"] = {
-			["ilvl"] = 198.0666666666667,
-			["name"] = "피맛골",
-			["time"] = 1614506332,
+		["Player-205-0689661D"] = {
+			["ilvl"] = 210.6875,
+			["name"] = "둔지",
+			["time"] = 1616183193,
 		},
-		["Player-205-05718493"] = {
-			["ilvl"] = 225.1875,
-			["name"] = "로젤리얀느",
-			["time"] = 1614452139,
+		["Player-205-0742DEA9"] = {
+			["ilvl"] = 221.875,
+			["name"] = "여왕딩디링",
+			["time"] = 1616256069,
 		},
-		["Player-205-06443F3F"] = {
-			["ilvl"] = 214.125,
-			["name"] = "자상한앨리스",
-			["time"] = 1614516351,
+		["Player-205-0841CABE"] = {
+			["ilvl"] = 222.625,
+			["name"] = "앨리스증후군",
+			["time"] = 1616253500,
 		},
-		["Player-205-06628582"] = {
-			["ilvl"] = 217.1875,
-			["name"] = "너꽤잘하는구나",
-			["time"] = 1614516490,
-		},
-		["Player-205-0689350E"] = {
-			["ilvl"] = 203.6875,
-			["name"] = "라삐이",
-			["time"] = 1614536955,
-		},
-		["Player-205-06C54A80"] = {
-			["ilvl"] = 221.9375,
-			["name"] = "신사뉨",
-			["time"] = 1614536919,
-		},
-		["Player-205-06D92022"] = {
-			["ilvl"] = 206.125,
-			["name"] = "순한맛",
-			["time"] = 1614452139,
-		},
-		["Player-205-06F74833"] = {
-			["ilvl"] = 212.25,
-			["name"] = "찌노야",
-			["time"] = 1614530722,
-		},
-		["Player-205-0721FFE5"] = {
-			["ilvl"] = 219.1875,
-			["name"] = "내롱",
-			["time"] = 1614516197,
-		},
-		["Player-205-07748660"] = {
-			["ilvl"] = 207.4375,
-			["name"] = "무정한사람아",
-			["time"] = 1614516533,
-		},
-		["Player-205-07A871E0"] = {
-			["ilvl"] = 194.0625,
-			["name"] = "호러돌이",
-			["time"] = 1614516533,
-		},
-		["Player-205-092582F0"] = {
-			["ilvl"] = 208.0625,
-			["name"] = "핑크타우렌",
-			["time"] = 1614530654,
-		},
-		["Player-205-0930DA8F"] = {
-			["ilvl"] = 219.625,
-			["name"] = "바람별혜",
-			["time"] = 1614506400,
-		},
-		["Player-205-0931594C"] = {
-			["ilvl"] = 213.2,
-			["name"] = "김귤이",
-			["time"] = 1614506403,
-		},
-		["Player-205-094B99D8"] = {
-			["ilvl"] = 220.25,
-			["name"] = "아놔쏴",
-			["time"] = 1614516416,
-		},
-		["Player-205-094DA569"] = {
-			["ilvl"] = 193.6875,
-			["name"] = "테라진어딨어",
-			["time"] = 1614516533,
-		},
-		["Player-205-09512F8A"] = {
-			["ilvl"] = 211.375,
-			["name"] = "타우렌젓갈",
-			["time"] = 1614516502,
+		["Player-205-095EA968"] = {
+			["ilvl"] = 210.875,
+			["name"] = "예민해",
+			["time"] = 1616259798,
 		},
 		["Player-205-09645494"] = {
-			["ilvl"] = 213.5,
+			["ilvl"] = 219.8125,
 			["name"] = "Yukariko",
-			["time"] = 1614540479,
+			["time"] = 1616259797,
 		},
 		["Player-205-096462FB"] = {
-			["ilvl"] = 207.75,
+			["ilvl"] = 217.8125,
 			["name"] = "나는길을몰라",
-			["time"] = 1614540479,
+			["time"] = 1616259798,
 		},
-		["Player-205-0967B07C"] = {
-			["ilvl"] = 194.25,
-			["name"] = "악샤라",
-			["time"] = 1614516379,
-		},
-		["Player-205-0969A09C"] = {
-			["ilvl"] = 198.375,
-			["name"] = "드루우와형",
-			["time"] = 1614516533,
-		},
-		["Player-205-096B4FA7"] = {
-			["ilvl"] = 207.625,
-			["name"] = "죠낸또이또이",
-			["time"] = 1614516333,
-		},
-		["Player-205-096E3877"] = {
-			["ilvl"] = 193.75,
-			["name"] = "수니웅",
-			["time"] = 1614536955,
-		},
-		["Player-205-0971C346"] = {
-			["ilvl"] = 204,
-			["name"] = "헬리이너스",
-			["time"] = 1614540479,
-		},
-		["Player-205-0972C0D1"] = {
-			["ilvl"] = 203.4375,
-			["name"] = "샤형",
-			["time"] = 1614534655,
-		},
-		["Player-205-09730E9E"] = {
-			["ilvl"] = 204.0625,
-			["name"] = "쪼쪼파파",
-			["time"] = 1614528516,
-		},
-		["Player-205-0977E6AB"] = {
-			["ilvl"] = 210,
-			["name"] = "양념게장",
-			["time"] = 1614506000,
-		},
-		["Player-205-097FC97F"] = {
-			["ilvl"] = 196.3125,
-			["name"] = "자힐불가",
-			["time"] = 1614516432,
-		},
-		["Player-205-098222FF"] = {
-			["ilvl"] = 199.9375,
-			["name"] = "살임",
-			["time"] = 1614516490,
-		},
-		["Player-205-09825E3F"] = {
-			["ilvl"] = 204.375,
-			["name"] = "웃어요그대",
-			["time"] = 1614450424,
+		["Player-205-0981296E"] = {
+			["ilvl"] = 212.5625,
+			["name"] = "산미치광이",
+			["time"] = 1616183193,
 		},
 		["Player-205-0982E3B9"] = {
-			["ilvl"] = 199.4375,
+			["ilvl"] = 211.875,
 			["name"] = "역정의아이콘",
-			["time"] = 1614518727,
+			["time"] = 1616259018,
 		},
-		["Player-205-0984FA67"] = {
-			["ilvl"] = 199.125,
-			["name"] = "쪼쪼엉클",
-			["time"] = 1614530719,
+		["Player-205-0985FEAD"] = {
+			["ilvl"] = 214.1875,
+			["name"] = "알아서도적",
+			["time"] = 1616259797,
 		},
-		["Player-205-098705AF"] = {
-			["ilvl"] = 200.375,
-			["name"] = "허니카레여왕",
-			["time"] = 1614516432,
+		["Player-2116-0450EC8C"] = {
+			["ilvl"] = 214.5,
+			["name"] = "한가한이유-줄진",
+			["time"] = 1616185550,
 		},
-		["Player-205-098A2068"] = {
-			["ilvl"] = 191.375,
-			["name"] = "기쁘미",
-			["time"] = 1614516447,
-		},
-		["Player-2116-04F00758"] = {
-			["ilvl"] = 207.375,
-			["name"] = "루이궁디-줄진",
-			["time"] = 1614540491,
-		},
-		["Player-2116-087EFCD1"] = {
-			["ilvl"] = 206.0625,
-			["name"] = "단란주점도적왕-세나리우스",
-			["time"] = 1614534655,
-		},
-		["Player-2116-08E6121F"] = {
-			["ilvl"] = 201.375,
-			["name"] = "빠삐용-세나리우스",
-			["time"] = 1614516533,
-		},
-		["Player-2116-08ECBD1B"] = {
-			["ilvl"] = 193.9375,
-			["name"] = "내턱내노라고-헬스크림",
-			["time"] = 1614516333,
-		},
-		["Player-2116-0939DD8B"] = {
-			["ilvl"] = 205.25,
-			["name"] = "새벽섬노예-세나리우스",
-			["time"] = 1614516447,
-		},
-		["Player-2116-09416B83"] = {
-			["ilvl"] = 211.375,
-			["name"] = "김치피자탕수육-세나리우스",
-			["time"] = 1614516432,
-		},
-		["Player-2116-0953BF41"] = {
-			["ilvl"] = 201.9375,
-			["name"] = "제로법-세나리우스",
-			["time"] = 1614516366,
-		},
-		["Player-2116-0962F996"] = {
-			["ilvl"] = 209.75,
-			["name"] = "도윤아빠지-헬스크림",
-			["time"] = 1614452139,
-		},
-		["Player-2116-09690842"] = {
-			["ilvl"] = 198.625,
-			["name"] = "자드가자-세나리우스",
-			["time"] = 1614516502,
-		},
-		["Player-2116-09805629"] = {
-			["ilvl"] = 218.1875,
-			["name"] = "소영-줄진",
-			["time"] = 1614537993,
+		["Player-2116-096B890C"] = {
+			["ilvl"] = 209.4375,
+			["name"] = "Manyreason-가로나",
+			["time"] = 1616185785,
 		},
 	},
 	["lastUpdateWarning"] = 1611990891,
-	["last_changelog_size"] = 5455,
-	["latest_news_saw"] = "v9.0.2.8246",
+	["last_changelog_size"] = 6382,
+	["latest_news_saw"] = "v9.0.5.8357",
 	["latest_report_table"] = {
 	},
 	["mythic_plus"] = {
@@ -7805,8 +8181,10 @@ _detalhes_global = {
 	["npcid_pool"] = {
 		[0] = "약화된 영혼",
 		[416] = "Volkin <넌이미유령>",
+		[417] = "크자눔",
 		[1167] = "가루바위 채굴꾼",
 		[1860] = "토그타크",
+		[2385] = "구릉지 추적자",
 		[2630] = "속박의 토템 <아포코>",
 		[3527] = "치유의 토템",
 		[5856] = "유리그물거미",
@@ -7940,14 +8318,105 @@ _detalhes_global = {
 		[21126] = "갈퀴송곳니 치유사",
 		[21127] = "갈퀴송곳니 폭풍우전사",
 		[21128] = "갈퀴송곳니 가오리",
+		[21166] = "일리다리 공포의 군주",
 		[21290] = "신비한 폭발",
 		[21303] = "파수병 시체",
 		[21304] = "보초병 시체",
 		[21346] = "무엇인가 <영혼 포식자>",
 		[21395] = "돌연변이괴물 유충",
+		[21419] = "무엇인가",
 		[21702] = "에테리움 생명술사",
 		[21761] = "무엇인가",
+		[22844] = "잿빛혓바닥 전투군주",
+		[22845] = "잿빛혓바닥 비술사",
+		[22846] = "잿빛혓바닥 폭풍소환사",
+		[22847] = "잿빛혓바닥 원시술사",
+		[22848] = "맹렬한 폭풍",
+		[22849] = "잿빛혓바닥 야수 정령",
+		[22853] = "일리다리 파멸자",
+		[22855] = "일리다리 밤의 군주",
+		[22857] = "일리다리 약탈자",
+		[22858] = "그림자발굽의 암살자",
+		[22859] = "그림자발굽의 소환사",
+		[22860] = "일리다리 서큐버스",
+		[22869] = "일리다리 뼈절단자",
+		[22871] = "테론 고어핀드",
+		[22873] = "갈퀴흉터 지휘관",
+		[22875] = "갈퀴흉터 바다소환사",
+		[22876] = "갈퀴흉터 예언자",
+		[22877] = "갈퀴흉터 조련사",
+		[22878] = "물의 군주",
+		[22879] = "어둠달 약탈자",
+		[22880] = "어둠달 용사",
+		[22881] = "굽이치는 물의 정령",
+		[22882] = "어둠달 죽음의 창조자",
+		[22883] = "물의 피조물",
+		[22884] = "거대괴수",
+		[22887] = "대장군 나젠투스",
 		[22897] = "소환된 질풍의 토템 <아포코>",
+		[22898] = "궁극의 심연",
+		[22917] = "일리단 스톰레이지",
+		[22939] = "사원의 무희",
+		[22945] = "어둠달 혈법사",
+		[22946] = "어둠달 전투사냥개",
+		[22947] = "대모 샤라즈",
+		[22948] = "구르토그 블러드보일",
+		[22949] = "파괴자 가디오스",
+		[22950] = "고위 황천술사 제레보르",
+		[22951] = "여군주 말란데",
+		[22952] = "베라스 다크섀도",
+		[22953] = "성난해골 약탈자",
+		[22954] = "일리다리 공포술사",
+		[22955] = "매력적인 무희",
+		[22956] = "고통의 자매",
+		[22957] = "광기의 여사제",
+		[22959] = "주문에 구속된 수행원",
+		[22960] = "용아귀 용술사",
+		[22962] = "환희의 여사제",
+		[22964] = "쾌락의 자매",
+		[22965] = "지배당한 하인",
+		[22996] = "아지노스의 칼날",
+		[22997] = "아지노스의 불꽃 <아지노스의 칼날>",
+		[23018] = "어둠달 사냥개조련사",
+		[23030] = "용아귀 하늘추적자",
+		[23047] = "어둠달 병사",
+		[23049] = "어둠달 훈련교관",
+		[23083] = "무엇인가 <어둠달 사냥개조련사>",
+		[23147] = "어둠달 그런트",
+		[23172] = "고어핀드의 심복",
+		[23196] = "해골이빨 거수",
+		[23215] = "잿빛혓바닥 사술사",
+		[23216] = "잿빛혓바닥 수호병",
+		[23222] = "해골이빨 싸움꾼",
+		[23223] = "해골이빨 구경꾼",
+		[23232] = "돌연변이 전투사냥개",
+		[23235] = "해골이빨 격노의 검사",
+		[23236] = "해골이빨 방패 신도",
+		[23237] = "해골이빨 피의 예언자",
+		[23239] = "해골이빨 전투원",
+		[23318] = "잿빛혓바닥 도적",
+		[23330] = "용아귀 하늘약탈자",
+		[23337] = "일리다리 백인대장",
+		[23339] = "일리다리 심장추적자",
+		[23374] = "잿빛혓바닥 추적자",
+		[23394] = "순찰 중인 파수병",
+		[23397] = "일리다리 혈군주",
+		[23398] = "격노한 영혼의 파편",
+		[23399] = "괴로워하는 영혼의 파편",
+		[23400] = "일리다리 집정관",
+		[23401] = "굶주린 영혼의 파편",
+		[23402] = "일리다리 전투마법사",
+		[23403] = "일리다리 암살자",
+		[23418] = "고뇌의 정수",
+		[23419] = "욕망의 정수",
+		[23420] = "격노의 정수",
+		[23421] = "잿빛혓바닥 봉인술사",
+		[23429] = "비전 폭발물",
+		[23436] = "무엇인가",
+		[23469] = "사로잡힌 영혼",
+		[23523] = "잿빛혓바닥 정령술사",
+		[23524] = "잿빛혓바닥 영혼결속자",
+		[24207] = "사자의 군대 <혈죽짱>",
 		[24553] = "아포코",
 		[24556] = "젤판",
 		[24557] = "카가니 나이트스트라이크",
@@ -8012,15 +8481,32 @@ _detalhes_global = {
 		[25851] = "변덕스러운 악령",
 		[25867] = "태양칼날단 용매",
 		[26101] = "불꽃 악령 <태양칼날단 밀사>",
+		[26125] = "이빨탈취자 <혈죽짱>",
+		[29264] = "랩터 정령 <Exprore>",
+		[29724] = "도서관 수호병",
+		[30333] = "망각의 심연 학살자",
 		[31216] = "쌀살하늘이 <쌀살하늘이>",
 		[31233] = "튼튼한 늑대",
+		[33236] = "무력화",
+		[33237] = "울두아르 거대괴수",
+		[33264] = "무쇠주물 대포",
 		[33422] = "해방된 예언자",
+		[33572] = "강철로 벼려낸 수호병",
+		[34161] = "기계전투기 54-A",
+		[34164] = "기계노움 전투전차",
+		[34234] = "룬으로 벼려낸 파수병",
 		[36272] = "연금술사 프라이",
 		[36296] = "연금술사 훔멜",
 		[36530] = "은은한 매력의 향수 농축액 쏟기",
 		[36565] = "연금술사 백스터",
 		[45748] = "황혼의 고룡사냥꾼",
 		[47649] = "꽃피우기 <나하늘바라기-듀로탄>",
+		[47789] = "서기관 호레이스 화이트스티드",
+		[47791] = "민간인 윌키스",
+		[47793] = "레이-게츠-칼라바 누더기괴물",
+		[47859] = "되살아난 언덕마루 농부",
+		[47861] = "되살아난 언덕마루 소작농",
+		[48017] = "감염된 진흙 농장 경비병",
 		[56395] = "음영파 신입생",
 		[56439] = "의심의 샤",
 		[56448] = "현명한 마리",
@@ -8068,7 +8554,9 @@ _detalhes_global = {
 		[58810] = "증오의 조각",
 		[58812] = "증오의 정수",
 		[58959] = "핍리크",
+		[58960] = "킬시크",
 		[58964] = "흐로그코르",
+		[58965] = "메크아라드",
 		[59051] = "불화",
 		[59102] = "어미 숲호랑이",
 		[59426] = "퍽퍽이",
@@ -8134,6 +8622,7 @@ _detalhes_global = {
 		[88087] = "증오갈퀴 폭풍소환사",
 		[88089] = "증오갈퀴 요술사",
 		[88100] = "소금눈 해안질주자",
+		[91459] = "나가 투사",
 		[92898] = "무엇인가 <되살아난 족장>",
 		[93619] = "지옥불 야만전사",
 		[94097] = "푸른촛농 쥐잡이꾼",
@@ -8146,6 +8635,7 @@ _detalhes_global = {
 		[94694] = "모라슈",
 		[94983] = "크롤리악 하늘마녀",
 		[95013] = "드로그바 벌레걸이",
+		[95072] = "상급 대지의 정령 <Exprore>",
 		[95194] = "사술사 라기",
 		[95195] = "아가라 데스송",
 		[95265] = "크롤리악 죽음비명",
@@ -8155,28 +8645,71 @@ _detalhes_global = {
 		[95290] = "지옥토템 전사",
 		[95310] = "마녀림 마녀",
 		[95311] = "숲의 마녀",
+		[95674] = "펜리르",
+		[95675] = "신왕 스코발드",
+		[95676] = "오딘",
+		[95832] = "발라리아르 방패여전사",
+		[95833] = "히리아",
+		[95834] = "발라리아르 비술사",
+		[95842] = "발라리아르 천둥술사",
+		[95843] = "왕 할도르",
 		[95872] = "해골모자",
 		[95873] = "하늘수염 싸움꾼",
 		[95937] = "언덕 거인",
 		[96268] = "산 배회자",
 		[96361] = "지옥토템 덫",
 		[96423] = "지옥토템 피노래꾼",
+		[96574] = "폭풍벼림 파수병",
+		[96608] = "흑단발톱 검은늑대",
+		[96611] = "화난발굽 황소",
+		[96640] = "발라리아르 명사수",
+		[96664] = "발라리아르 룬조각사",
+		[96677] = "강철무쇠 회색곰",
 		[96774] = "푸른촛농 도굴꾼",
 		[96878] = "지하묘지 눈무지",
 		[96986] = "푸른촛농 동굴수염",
 		[96989] = "지하묘지 쥐",
 		[97013] = "지스트",
+		[97081] = "왕 비요른",
+		[97083] = "왕 라눌프",
+		[97084] = "왕 토르",
+		[97087] = "발라리아르 용사",
+		[97197] = "발라리아르 정화자",
+		[97202] = "깨달은 자 올미르",
+		[97219] = "솔스텐",
+		[97816] = "펠스코른 광전사",
+		[97822] = "가르자레스",
 		[98003] = "무엇인가",
+		[98555] = "비틀거리는 메마른 자",
 		[98884] = "마법에 걸린 늙은뿔 순록",
 		[98890] = "잠탱이",
+		[98943] = "메마른 자",
+		[98946] = "목마른 메마른 자",
+		[99088] = "고대 수호자",
+		[99213] = "에라스무스 문블레이드",
 		[99214] = "공성 벌레",
+		[99267] = "나이트본 후예",
+		[99524] = "파수꾼 셀렌시아",
+		[99541] = "되살아난 잠복꾼 <평화동전쟁군주-하이잘>",
 		[99791] = "코랄룬 거인",
+		[99802] = "아르스파엘",
+		[99868] = "무엇인가",
+		[99891] = "폭풍 비룡",
+		[99922] = "무엇인가",
 		[100230] = "\"명사수\" 아르니",
 		[100231] = "다르고크 썬더루인",
 		[100232] = "라이엘 돈드리프터",
+		[100394] = "지옥수호병 살피라",
+		[100748] = "지옥아귀 포식자",
+		[100749] = "여조련사 토르비스",
+		[100836] = "전령 자르비줄드",
 		[101077] = "세칸",
 		[101085] = "곰 덫",
+		[101269] = "심문관 코르말라돈",
+		[101514] = "에레다르 차원문 군주",
 		[101616] = "보라",
+		[101637] = "발라리아르 지원자",
+		[101752] = "지옥칼날 수호병",
 		[101784] = "나이트본 침입자",
 		[101808] = "지옥살이 망령",
 		[101826] = "고룡혓바닥 죽음탐색자",
@@ -8186,14 +8719,45 @@ _detalhes_global = {
 		[102773] = "화난 타우렌 영혼",
 		[102886] = "언덕 거인",
 		[103656] = "실성한 고르노스",
+		[104014] = "비열한 도둑",
+		[104016] = "탐욕스러운 강탈자",
+		[104272] = "새끼 임프 추격자",
+		[104372] = "에레다르 차원문 군주",
+		[104373] = "코르말라돈의 싸늘한 눈알",
+		[104374] = "코르말라돈의 뜨거운 눈알",
 		[105623] = "팔도레이 절단자",
 		[105885] = "굶주린 껍데기",
 		[108185] = "찬비늘 눈무지",
 		[108710] = "수호 구체",
 		[109154] = "증오갈퀴 거한",
 		[109448] = "대지술사",
+		[114263] = "오딘",
+		[114323] = "구아름",
+		[114360] = "히리아",
+		[114361] = "하임달",
+		[114532] = "뼈예언자 영혼술사",
+		[114534] = "지옥개",
+		[114537] = "헬리아",
+		[114538] = "크발디르 영혼분리자",
+		[114539] = "크발디르 암초소환사",
+		[114546] = "되살아난 해골노예",
+		[114547] = "고대의 해골노예",
+		[114548] = "썩은영혼 거인",
+		[114568] = "부식된 하수인",
+		[114709] = "악취 나는 부패",
+		[114809] = "어둠의 순찰대 갑판원",
+		[114811] = "크발디르 산호 여전사",
+		[114813] = "크발디르 바다마녀",
+		[114900] = "옭아매는 촉수",
+		[114922] = "어둠의 천사",
+		[114923] = "조각뼈다귀 해골",
+		[114932] = "깊은염수 흉물",
+		[116362] = "에리아 돈스베인",
+		[119869] = "이피실",
+		[119872] = "얼리아",
 		[119881] = "무엇인가",
 		[120651] = "폭발물",
+		[132999] = "연합군주 아샤알",
 		[150958] = "나락살이 경비병",
 		[150959] = "나락살이 요격병",
 		[150965] = "나락살이 속박병",
@@ -8269,6 +8833,7 @@ _detalhes_global = {
 		[156134] = "음산한 존재",
 		[156142] = "영혼을 쫓는 자",
 		[156157] = "얼음심장 승천자",
+		[156158] = "부관 펠리포스",
 		[156159] = "얼음심장 투창병",
 		[156203] = "저승의 소각자",
 		[156212] = "얼음심장 요원",
@@ -8317,6 +8882,7 @@ _detalhes_global = {
 		[157037] = "강탈자 가쇼크",
 		[157054] = "탈선한 열망자",
 		[157083] = "돌날개 약탈자",
+		[157094] = "궁정 관리인",
 		[157099] = "궁정 검열관",
 		[157102] = "궁정 집정관",
 		[157109] = "흡혈 박쥐",
@@ -8372,6 +8938,7 @@ _detalhes_global = {
 		[157820] = "용암의 불꽃술사",
 		[157824] = "불길의 수호병",
 		[157833] = "보르게트",
+		[157872] = "선택받은 육체속박자",
 		[157883] = "지배된 실바르",
 		[157885] = "지배된 보르카이",
 		[158025] = "어둠군주 타락시스",
@@ -8380,8 +8947,13 @@ _detalhes_global = {
 		[158054] = "령에 굶주린 고룡",
 		[158098] = "가면 쓴 침략자",
 		[158110] = "령에 굶주린 구름깃털",
+		[158160] = "끓어오르는 공허학살자",
+		[158161] = "공허수호병 침략자",
+		[158162] = "불결한 수액덩어리",
 		[158165] = "코스텔",
+		[158177] = "공허 덩굴손",
 		[158179] = "굶주린 바이엄",
+		[158256] = "타락한 구름깃털",
 		[158259] = "로즈보일",
 		[158278] = "태초의 포식자",
 		[158314] = "표류하는 비애",
@@ -8390,6 +8962,7 @@ _detalhes_global = {
 		[158439] = "장막단 비전술사",
 		[158442] = "골수 진드기",
 		[158473] = "장막단 수정배열자",
+		[158610] = "공허수호병 침략자",
 		[158617] = "장막단 습격자",
 		[158622] = "장막단 비전술사",
 		[158623] = "장막단 습격자",
@@ -8410,6 +8983,7 @@ _detalhes_global = {
 		[158924] = "절박함의 정수",
 		[158927] = "타락한 사도",
 		[158928] = "타락한 증인",
+		[158930] = "고르불",
 		[158976] = "절규하는 밤살이박쥐",
 		[158978] = "거대 화강암가죽",
 		[158979] = "침묵의 감독관",
@@ -8448,6 +9022,7 @@ _detalhes_global = {
 		[159458] = "조각된 시종",
 		[159460] = "공포의 밤과부거미",
 		[159495] = "수렁 허드레꾼",
+		[159503] = "돌주먹",
 		[159504] = "훈련하는 열망자",
 		[159505] = "훈련하는 열망자",
 		[159575] = "투박한 수호병",
@@ -8459,18 +9034,22 @@ _detalhes_global = {
 		[159664] = "안드레이 경",
 		[159676] = "령 진드기",
 		[159677] = "영혼약탈자 파타",
+		[159693] = "속박된 게걸충",
 		[159714] = "뼈골뚫이 말벌",
+		[159727] = "레델라브 집사",
 		[159729] = "레델라브 수행원",
 		[159730] = "레델라브 보병",
 		[159737] = "뼈매듭 잠복꾼",
 		[159747] = "뼈골뚫이 여왕벌",
 		[159755] = "대망치장이",
 		[159757] = "강령술 수행사제",
+		[159766] = "레델라브 상인",
 		[159856] = "치명적인 해충",
 		[159916] = "뼈매듭 파괴자",
 		[159951] = "안개 외눈박이",
 		[159961] = "실비우 경",
 		[159977] = "조프리 경",
+		[159997] = "라즈반 경",
 		[160009] = "태사 부인",
 		[160048] = "역병에 젖은 유해",
 		[160075] = "게걸충 분출자",
@@ -8486,15 +9065,20 @@ _detalhes_global = {
 		[160287] = "난드루 경",
 		[160288] = "공작 블라드",
 		[160289] = "레델라브 관리인",
+		[160290] = "가면 쓴 실바르",
+		[160293] = "가면 쓴 페어리",
 		[160296] = "타락한 공증인",
 		[160297] = "타락한 영혼수집가",
+		[160345] = "타오르는 심문관",
 		[160348] = "길들인 가르곤",
 		[160351] = "레델라브 집사",
 		[160355] = "전향한 발톱경비병",
 		[160356] = "천무관 기술병",
 		[160357] = "이탈자 응징자",
 		[160359] = "이탈자 감독관",
+		[160375] = "떠도는 의식술사",
 		[160385] = "영혼추적자 도이나",
+		[160388] = "바실리 경",
 		[160392] = "영혼추적자 도이나",
 		[160393] = "영혼추적자 도이나",
 		[160401] = "그레니치",
@@ -8512,11 +9096,13 @@ _detalhes_global = {
 		[160535] = "잿빛 부랑자",
 		[160537] = "타오르는 부랑자",
 		[160569] = "날쌘날개 깃사자",
+		[160570] = "이글거리는 우두머리",
 		[160602] = "바위 군주",
 		[160604] = "고삐풀린 빛의 정령",
 		[160613] = "굶주린 무리벌레",
 		[160629] = "베도스",
 		[160632] = "여우 추적자",
+		[160641] = "광기의 의식술사",
 		[160675] = "서기관 레누아",
 		[160716] = "죄악석 파괴자",
 		[160747] = "아른가지 의식술사",
@@ -8526,10 +9112,12 @@ _detalhes_global = {
 		[160811] = "잠식하는 진드기",
 		[160812] = "잠식하는 진드기",
 		[160815] = "잠식하는 먹보",
+		[160821] = "세계끝자락 먹보",
 		[160837] = "나락살이 속박병",
 		[160842] = "사악한 수집가",
 		[160844] = "사악한 폭력배",
 		[160845] = "발굴현장 집행자",
+		[161016] = "느림보 잘락스",
 		[161083] = "나락살이 보초병",
 		[161105] = "불굴의 슈미츠",
 		[161178] = "고용된 밀매자",
@@ -8539,7 +9127,9 @@ _detalhes_global = {
 		[161195] = "성배 구역 주민",
 		[161207] = "새끼 송곳니",
 		[161211] = "길들인 가르곤",
+		[161240] = "강탈자 시모나",
 		[161246] = "묵직이",
+		[161261] = "혹사당하는 영혼",
 		[161274] = "성배 구역 귀족",
 		[161279] = "훈련하는 열망자",
 		[161333] = "어둠벽 배반자",
@@ -8565,11 +9155,14 @@ _detalhes_global = {
 		[161599] = "부글거리는 응고액",
 		[161608] = "여공작 반다",
 		[161611] = "태사 부인",
+		[161614] = "빌헬름 경",
+		[161617] = "공작 오모르",
 		[161620] = "다리온 경",
 		[161624] = "여공작 미노도라",
 		[161625] = "공작 그리고어",
 		[161626] = "귀부인 오아나",
 		[161627] = "렐리아 부인",
+		[161631] = "미리아나 부인",
 		[161634] = "여공작 이오아나",
 		[161635] = "레누타 부인",
 		[161638] = "귀부인 일린",
@@ -8608,8 +9201,10 @@ _detalhes_global = {
 		[162100] = "탐식자 크릭시스",
 		[162102] = "대감독관 베릴리아",
 		[162103] = "집행관 타르볼드",
+		[162109] = "공작 비엘",
 		[162133] = "장군 카알",
 		[162158] = "굶주린 포로",
+		[162258] = "게걸스러운 돌풍비명꾼",
 		[162267] = "령진드기 무리벌레",
 		[162268] = "발빠른 령진드기",
 		[162271] = "거신 세계포식자",
@@ -8627,6 +9222,7 @@ _detalhes_global = {
 		[162588] = "오돌뼈부리",
 		[162611] = "어둠서약 신병",
 		[162612] = "이탈자 전투대장",
+		[162613] = "전략가 팔라디아",
 		[162614] = "교관 헤루스",
 		[162636] = "살아 움직이는 배회자",
 		[162657] = "무엇인가",
@@ -8656,6 +9252,7 @@ _detalhes_global = {
 		[162994] = "지배된 관리인",
 		[162996] = "지배된 뜰지기",
 		[163058] = "안개장막 수호병",
+		[163059] = "황혼공포",
 		[163077] = "에줄스",
 		[163083] = "평가관 말루스",
 		[163084] = "시험관 사하리",
@@ -8715,11 +9312,14 @@ _detalhes_global = {
 		[163994] = "시들가루 먹보",
 		[163995] = "미끼의 안개",
 		[164021] = "어둠망토 검사",
+		[164029] = "죄악의 예언자",
 		[164047] = "시련지 경비병",
+		[164048] = "트루울락스",
 		[164049] = "격노 착취자",
 		[164084] = "분노의 현신 <분노하는 영혼>",
 		[164107] = "게걸충조련사 티조",
 		[164110] = "와작이",
+		[164113] = "돌숨결 수호자",
 		[164147] = "사후꿈틀 <꿈틀거리는 촉수>",
 		[164184] = "야심찬 결투사",
 		[164185] = "에첼론",
@@ -8747,6 +9347,7 @@ _detalhes_global = {
 		[164461] = "저주받은 자 사델",
 		[164463] = "맹독의 파세란",
 		[164464] = "비열한 자 시라",
+		[164492] = "투기장 구경꾼",
 		[164501] = "미스트콜러",
 		[164506] = "고대의 대장",
 		[164508] = "투기장 구경꾼",
@@ -8790,12 +9391,14 @@ _detalhes_global = {
 		[164836] = "피조물 일꾼",
 		[164838] = "야생가죽",
 		[164845] = "선택받은 보급관",
+		[164847] = "보급관 하이에나",
 		[164848] = "샤메트",
 		[164857] = "스프리건 상처잡이",
 		[164861] = "스프리건 껍질술사",
 		[164862] = "숲 아른나방",
 		[164864] = "선택받은 정찰병",
 		[164873] = "늙은뿔 룬수사슴",
+		[164879] = "가죽뜯깃 조련사",
 		[164884] = "선택받은 분노인도자",
 		[164886] = "의식 룬마술사",
 		[164897] = "안개 외눈박이",
@@ -8834,6 +9437,7 @@ _detalhes_global = {
 		[165189] = "챈님",
 		[165197] = "해골 흉물",
 		[165222] = "조르라무스 뼈치유사",
+		[165224] = "탐식날이",
 		[165251] = "환영 여우 <미스트콜러>",
 		[165260] = "진물 찌꺼기",
 		[165265] = "명예로운 결투사",
@@ -8845,7 +9449,9 @@ _detalhes_global = {
 		[165344] = "간악한 스프리건",
 		[165345] = "거대 나락쥐",
 		[165346] = "흉포한 스프리건",
+		[165388] = "거만한 미지크",
 		[165400] = "알지기 블룸",
+		[165404] = "싸늘붕이",
 		[165408] = "할키아스",
 		[165410] = "대심판관 알리즈",
 		[165414] = "타락한 절멸자",
@@ -8873,6 +9479,8 @@ _detalhes_global = {
 		[165594] = "얼음심장 매복병",
 		[165597] = "패치워크 병사",
 		[165646] = "게걸충 애벌레",
+		[165677] = "서슬송곳니의 환영",
+		[165687] = "빛의 결속 소각꾼",
 		[165706] = "파멸의 응집체",
 		[165720] = "응결된 분노",
 		[165737] = "죄악석 석상",
@@ -8903,6 +9511,8 @@ _detalhes_global = {
 		[166071] = "유령",
 		[166079] = "불완전뼈 석궁수 <조르라무스 강령술사>",
 		[166111] = "파멸의 바랜칼날",
+		[166120] = "공허결속단 수호병",
+		[166135] = "아즈샤라 역의 아스트라",
 		[166138] = "사멸자 아르거스 역의 미카이",
 		[166140] = "굴단 역의 센티이",
 		[166142] = "제이나 역의 글리머더스트",
@@ -8949,6 +9559,7 @@ _detalhes_global = {
 		[166735] = "광기 어린 수호자",
 		[166736] = "뾰족방울 공포",
 		[166741] = "카라아지",
+		[166754] = "알렉산드로스의 고뇌",
 		[166766] = "과거의 죄악",
 		[166813] = "어둠분신 추적자",
 		[166819] = "의기양양한 프랜시스",
@@ -8957,6 +9568,8 @@ _detalhes_global = {
 		[166867] = "전향한 천무관",
 		[166869] = "어둠 거수",
 		[166872] = "암영 스라수호기",
+		[166873] = "이탈자 연구원",
+		[166875] = "어둠 석실추적자",
 		[166908] = "말리피스",
 		[166925] = "썩어가는 유기물",
 		[166926] = "괴저 소환사",
@@ -8968,6 +9581,7 @@ _detalhes_global = {
 		[166936] = "서슬눈 궁수",
 		[166941] = "전쟁의 망령",
 		[166942] = "조르라무스의 눈",
+		[166949] = "츠지 <종록박-헬스크림>",
 		[166969] = "남작 프리에다",
 		[166970] = "스타브로스 경",
 		[166971] = "성주 니클라우스",
@@ -8994,6 +9608,7 @@ _detalhes_global = {
 		[167404] = "담대한 용사 <조르라무스의 눈>",
 		[167406] = "대영주 데나트리우스",
 		[167451] = "돌숨결 유괴자",
+		[167458] = "뼛조각 돌격병",
 		[167493] = "맹독 저격수",
 		[167497] = "조각된 위협자",
 		[167501] = "조각된 추적자",
@@ -9025,6 +9640,7 @@ _detalhes_global = {
 		[167908] = "돌 군단 감시자",
 		[167923] = "감염된 잔해",
 		[167948] = "전염성 거대괴수",
+		[167949] = "역병에 잠식당한 생존자",
 		[167955] = "핏빛 생도",
 		[167956] = "어둠의 수행사제",
 		[167962] = "사용 중지된 치과용 천공기",
@@ -9060,6 +9676,8 @@ _detalhes_global = {
 		[168112] = "장군 카알",
 		[168113] = "장군 그라샤알",
 		[168135] = "몽마",
+		[168147] = "파골검객 사브리엘",
+		[168148] = "드롤크라드",
 		[168153] = "역병대괴조",
 		[168155] = "역병결속자",
 		[168156] = "황폐화",
@@ -9099,6 +9717,7 @@ _detalhes_global = {
 		[168418] = "이탈자 재판관",
 		[168420] = "이탈자 용사",
 		[168457] = "돌담 가르곤",
+		[168490] = "바스락껍질 말썽꾸러기",
 		[168512] = "환상의 수정",
 		[168515] = "잿불 미늘벌레 <나는길을몰라>",
 		[168522] = "칠흑사냥단 보초병",
@@ -9109,6 +9728,7 @@ _detalhes_global = {
 		[168578] = "곰팡이술사",
 		[168579] = "수렁 새끼벌",
 		[168580] = "역병빈대",
+		[168594] = "묘실의 파수병",
 		[168620] = "굶주린 그림자추적자",
 		[168627] = "역병결속자",
 		[168647] = "무자비한 발피르",
@@ -9140,6 +9760,7 @@ _detalhes_global = {
 		[168886] = "비럴랙스 블라이트위버",
 		[168890] = "황금등 순록",
 		[168891] = "폭발 준비된 역병빈대",
+		[168907] = "점액 촉수",
 		[168918] = "돌 군단 망꾼",
 		[168934] = "격노한 영혼",
 		[168942] = "죽음예언자",
@@ -9179,7 +9800,9 @@ _detalhes_global = {
 		[169270] = "성난 악몽",
 		[169271] = "균열 폭발 차원문",
 		[169286] = "영혼강철 거신",
+		[169313] = "은빛날개 사냥꾼",
 		[169330] = "무엇인가 <어둠벽 파괴자>",
+		[169390] = "구리빛털 여우",
 		[169447] = "공포의 보주 <지배의 영혼왜곡사>",
 		[169456] = "요술쟁이 마귀 <탈주자 크지크티>",
 		[169457] = "바르가스트",
@@ -9201,6 +9824,7 @@ _detalhes_global = {
 		[169780] = "공명하는 고통",
 		[169813] = "파괴의 손",
 		[169819] = "게걸스러운 덩굴손",
+		[169827] = "고뇌의 전령 에크포라스",
 		[169836] = "공격적인 공포",
 		[169838] = "피어나는 덩굴손",
 		[169848] = "파멸의 잠복꾼",
@@ -9224,6 +9848,10 @@ _detalhes_global = {
 		[169966] = "부덕서약 경보병",
 		[169980] = "황혼강철 스라수호기",
 		[169981] = "두려움의 현신",
+		[169983] = "어둠깃털 사냥꾼",
+		[170031] = "실바르 초원발굽",
+		[170037] = "희망찬 열망자",
+		[170048] = "격노의 현신",
 		[170049] = "추적자",
 		[170067] = "흉포날개 테로발톱",
 		[170070] = "옅은빛털 굴지기",
@@ -9234,6 +9862,7 @@ _detalhes_global = {
 		[170147] = "불안정한 기억",
 		[170157] = "저승 룬대장장이",
 		[170160] = "폭발 준비된 보관통 <어둠살이 정비사>",
+		[170164] = "찬란한 검",
 		[170184] = "해질녘의 깃사자",
 		[170199] = "구속된 망령",
 		[170202] = "화염 쐐기",
@@ -9242,14 +9871,20 @@ _detalhes_global = {
 		[170228] = "해골 보초병",
 		[170234] = "압제의 깃발 <몰락하지 않은 자 자브>",
 		[170241] = "공포털 여우",
+		[170302] = "고통의 전령 탈라포라스",
+		[170303] = "정복의 전령 엑소스",
 		[170325] = "은빛날개 깃사자",
 		[170333] = "황금발 배회자",
+		[170338] = "굶주린 침략자",
 		[170385] = "꿈틀대는 고통",
+		[170386] = "은빛날개 어미",
 		[170414] = "울부짖는 망령",
 		[170417] = "살아 움직이는 저승석",
+		[170418] = "포식자 곡술",
 		[170434] = "죄악의 융합체",
 		[170448] = "무성히 자란 히드라",
 		[170449] = "잠복한 덩굴손",
+		[170452] = "무엇인가",
 		[170474] = "혈족 암살자 <암살자 추적자>",
 		[170478] = "암살자 추적자",
 		[170480] = "아탈라이 죽음방랑자",
@@ -9263,7 +9898,12 @@ _detalhes_global = {
 		[170518] = "나락살이 파괴자",
 		[170527] = "복수의 망령",
 		[170553] = "창백해골 일꾼",
+		[170562] = "제련장인 잉고",
+		[170563] = "룬예언자 페이튼",
 		[170572] = "아탈라이 어둠마법 사술사",
+		[170573] = "제련장인 테오",
+		[170583] = "선택받은 전쟁살이",
+		[170599] = "이탈자 수호자",
 		[170602] = "이탈자 거수",
 		[170603] = "거수 분쇄자",
 		[170628] = "나락살이 미르미돈",
@@ -9284,6 +9924,7 @@ _detalhes_global = {
 		[170766] = "게걸충 분출자",
 		[170767] = "게걸스러운 구멍뚫이",
 		[170768] = "포식한 부식벌",
+		[170787] = "아크로스",
 		[170800] = "얼음심장 매복병",
 		[170803] = "유령 증오술사",
 		[170820] = "골소 용사",
@@ -9305,6 +9946,7 @@ _detalhes_global = {
 		[170891] = "선택받은 공성기술자",
 		[170893] = "가죽뜯깃 비명꾼",
 		[170927] = "분출하는 수액",
+		[170932] = "구름깃털 수호자",
 		[170933] = "전쟁 게걸충",
 		[170936] = "뾰족방울 약탈병",
 		[170937] = "파멸의 마술사",
@@ -9314,6 +9956,7 @@ _detalhes_global = {
 		[170951] = "허드레꾼 진흙주먹",
 		[170952] = "흠뻑 젖은 허드레꾼",
 		[170953] = "싸움꾼 수장",
+		[170956] = "불꽃지기",
 		[170969] = "분노기수 전투뿔",
 		[170973] = "꾸러미 날치기",
 		[170974] = "뒤적이는 시종",
@@ -9322,6 +9965,7 @@ _detalhes_global = {
 		[170981] = "거만한 승부사",
 		[170986] = "돌 싸움꾼",
 		[170992] = "카사라 녹스",
+		[170996] = "리크라스",
 		[171013] = "무엇인가",
 		[171142] = "거대한 재생명체",
 		[171171] = "나락살이 궁수",
@@ -9331,10 +9975,12 @@ _detalhes_global = {
 		[171181] = "영토 칼날부리",
 		[171184] = "하늘의 발톱 미스레쉬",
 		[171188] = "역병결합 헌신자 <후작 스트라다마>",
+		[171218] = "응결된 고뇌",
 		[171245] = "떠돌이 지옥개",
 		[171255] = "에일라의 환영",
 		[171287] = "반향의 도약 추적자",
 		[171289] = "격동의 체액",
+		[171300] = "고장난 발톱경비병",
 		[171307] = "그라탈락스",
 		[171313] = "의지파괴자 수행사제",
 		[171316] = "극악무도한 저승석",
@@ -9359,6 +10005,7 @@ _detalhes_global = {
 		[171581] = "그을린 거수",
 		[171596] = "역병결합 거한",
 		[171597] = "해골의 형적",
+		[171612] = "나락살이 고문관",
 		[171622] = "드러스트의 광기에 물든 뜰지기",
 		[171626] = "무엇인가",
 		[171635] = "드러스트의 광기에 물든 관리인",
@@ -9389,6 +10036,7 @@ _detalhes_global = {
 		[172079] = "나무심장 밤비명꾼",
 		[172080] = "나무의 분쇄자",
 		[172082] = "난타척추",
+		[172084] = "카론 루즈",
 		[172112] = "변화무쌍한 생명탐식자",
 		[172191] = "숲 분열자",
 		[172192] = "가면 쓴 사냥꾼",
@@ -9404,6 +10052,7 @@ _detalhes_global = {
 		[172397] = "룬칼날 수확자",
 		[172398] = "선택받은 공성일꾼",
 		[172401] = "킬마조르",
+		[172406] = "나락살이 수호자",
 		[172516] = "굶주린 무리벌레",
 		[172521] = "고문관 산그로르",
 		[172523] = "사냥개조련사 바사노크",
@@ -9412,24 +10061,37 @@ _detalhes_global = {
 		[172557] = "리치서약 수호자",
 		[172567] = "잔투스의 죽음그늘",
 		[172590] = "리치서약 용사",
+		[172591] = "잔투스의 죽음그늘",
 		[172601] = "괴저의 마술사",
 		[172607] = "잔투스의 죽음그늘",
 		[172608] = "잔투스의 죽음그늘",
 		[172609] = "잔투스의 죽음그늘",
+		[172630] = "무엇인가",
 		[172633] = "화산 추적기",
 		[172635] = "저승석 파편벌레",
 		[172636] = "결정화된 저승석",
 		[172637] = "저승석 파편",
 		[172639] = "농밀한 저승석",
+		[172674] = "룬예언자 말코른",
+		[172675] = "룬예언자 조르그",
 		[172703] = "수척한 에테르고룡",
+		[172704] = "만족을 모르는 에테르고룡",
 		[172713] = "진흙 웅덩이 파괴자",
 		[172715] = "진흙 웅덩이 수사관",
+		[172785] = "미완성 화강암가죽",
 		[172858] = "돌 군단 거수",
+		[172862] = "변덕의 예로",
 		[172888] = "잠복한 우두머리",
 		[172909] = "끔찍한 회상",
+		[172912] = "되찾는 자 올리시온",
+		[172913] = "해방된 자 이리스티아",
 		[172914] = "깨어난 자 시비곤",
+		[172928] = "굳은 저승석",
 		[172932] = "무엇인가 <휘도는 저승석>",
 		[172933] = "키잡이 칼리룩스",
+		[172947] = "나락 바퀴벌레",
+		[172948] = "허둥대는 나락쥐",
+		[172950] = "거대 나락쥐",
 		[172958] = "휘도는 저승석",
 		[172960] = "응고된 저승석",
 		[172961] = "마력 깃든 저승석",
@@ -9437,6 +10099,7 @@ _detalhes_global = {
 		[172970] = "게걸스러운 그늘사냥개",
 		[172972] = "나락살이 영혼먹이꾼",
 		[172981] = "키리안 누더기괴물",
+		[172988] = "버려진 기억",
 		[172991] = "드러스트 영혼절단자",
 		[173016] = "시체 수집꾼",
 		[173018] = "선택받은 궁병",
@@ -9446,9 +10109,12 @@ _detalhes_global = {
 		[173051] = "억압자 젤로스",
 		[173052] = "공포만개 난초",
 		[173054] = "죽음꽃 봉오리",
+		[173080] = "떠도는 죽음",
 		[173083] = "쫓겨난 영혼의 포식자",
+		[173086] = "잔혹한 발리스",
 		[173111] = "나락살이 고문관",
 		[173114] = "공격적인 부식벌",
+		[173125] = "잔혹발톱",
 		[173138] = "나락살이 척후병",
 		[173142] = "공포의 탐식자",
 		[173145] = "탐식의 진드기",
@@ -9502,6 +10168,7 @@ _detalhes_global = {
 		[173840] = "역병결합 헌신자",
 		[173864] = "굴단의 눈",
 		[173943] = "선택받은 문지기",
+		[173948] = "선택받은 수습생",
 		[173949] = "나스리아 병사",
 		[173953] = "충직한 가르곤",
 		[173973] = "나스리아 추적자",
@@ -9544,12 +10211,14 @@ _detalhes_global = {
 		[174730] = "무엇인가",
 		[174731] = "지배된 숲지기",
 		[174732] = "잉그라 크라지크",
+		[174773] = "원한의 망령",
 		[174783] = "어둠 손아귀",
 		[174802] = "맹독 저격수",
 		[174842] = "공격적인 종업원",
 		[174843] = "돌숨결 청지기",
 		[174861] = "배부른 그늘사냥개",
 		[175012] = "포식자 이크라스",
+		[175038] = "령에 굶주린 고룡",
 		[175079] = "악에 물든 망령 <암흑술사 제리스>",
 		[175089] = "리치서약 잡병",
 		[175102] = "무엇인가",
@@ -9558,10 +10227,13 @@ _detalhes_global = {
 		[175198] = "정신 불태우기 <알아서사제>",
 		[175243] = "나락살이 성가대",
 		[175246] = "고통의 망령",
+		[175316] = "농축된 고통",
 		[175347] = "석회",
 		[175425] = "나락살이 암흑술사",
 		[175511] = "징그러운 벌레",
 		[175519] = "부글거리는 고름",
+		[175543] = "공포의 뼈유린늑대",
+		[175544] = "뼈유린늑대 우두머리",
 		[175566] = "침벌레 무리",
 		[175652] = "비통의 군주",
 		[175695] = "저승 불씨",
@@ -9573,18 +10245,22 @@ _detalhes_global = {
 		[175704] = "응축된 고통",
 		[175707] = "나락살이 교관",
 		[175708] = "나락살이 평가관",
+		[175711] = "베브락스",
 		[175719] = "나락살이 현장감독",
 		[175734] = "저승 불씨 <저승의 소각자>",
 		[175768] = "악에 물든 망령",
 		[175790] = "메마른 어스름야수",
 		[175792] = "추적하는 어스름야수",
 		[175801] = "기괴한 영혼파괴자",
+		[175811] = "포식하는 나락쥐",
 		[175818] = "속박 풀린 암흑사냥개",
 		[175819] = "속박 풀린 그늘혼종견",
+		[175821] = "쥐솟음꾼",
 		[175826] = "솟구치는 나락쥐",
 		[175830] = "농축된 저승석",
 		[175833] = "발 빠른 착취자",
 		[175834] = "나락살이 사냥개구속자",
+		[175846] = "사자 다스레인",
 		[175849] = "령 포식자",
 		[175851] = "령 포식자 우두머리",
 		[175857] = "수정 번뇌골렘",
@@ -9595,9 +10271,11 @@ _detalhes_global = {
 		[175882] = "나락살이 척후병",
 		[175891] = "고통받는 영혼",
 		[175930] = "나락살이 괴저결속사",
+		[175972] = "저승석 비석",
 		[175974] = "나락살이 수렵꾼",
 		[175976] = "덜걱거리는 망자",
 		[175992] = "충직한 수행원",
+		[176008] = "빈 껍데기",
 		[176010] = "저승석 납치범",
 		[176014] = "날개 달린 포식자",
 		[176025] = "고통받는 망령",
@@ -9628,6 +10306,8 @@ _detalhes_global = {
 		[176132] = "타락한 영혼약탈자",
 		[176170] = "나락살이 미르미돈",
 		[176173] = "조그라토스",
+		[176176] = "파멸의 투사",
+		[176179] = "파멸의 땅마귀",
 		[176198] = "나락살이 속박병",
 		[176251] = "고통의 감시관",
 		[176252] = "용광로 감독관",
@@ -10111,6 +10791,7 @@ _detalhes_global = {
 		[1462] = 3,
 		[1464] = 1,
 		[1490] = 12,
+		[1515] = 3,
 		[1543] = 3,
 		[1604] = 3,
 		[1680] = 1,
@@ -10118,6 +10799,7 @@ _detalhes_global = {
 		[1714] = 9,
 		[1715] = 1,
 		[1719] = 1,
+		[1725] = 4,
 		[1766] = 4,
 		[1776] = 4,
 		[1784] = 4,
@@ -10129,6 +10811,7 @@ _detalhes_global = {
 		[1953] = 8,
 		[1966] = 4,
 		[2006] = 5,
+		[2008] = 7,
 		[2050] = 5,
 		[2060] = 5,
 		[2061] = 5,
@@ -10160,6 +10843,7 @@ _detalhes_global = {
 		[3409] = 4,
 		[3411] = 1,
 		[3600] = "속박의 토템 <마늘물>",
+		[3609] = "일리다리 암살자",
 		[3714] = 6,
 		[3716] = "자그도크 <환상적이다>",
 		[4987] = 2,
@@ -10182,6 +10866,7 @@ _detalhes_global = {
 		[5484] = 9,
 		[5487] = 11,
 		[5672] = "치유의 토템 <솔로의샤-불타는군단>",
+		[5697] = 9,
 		[5740] = 9,
 		[5760] = 4,
 		[5761] = 4,
@@ -10200,6 +10885,8 @@ _detalhes_global = {
 		[6795] = 11,
 		[6807] = 11,
 		[6940] = 2,
+		[6945] = 12,
+		[6962] = 10,
 		[7268] = 8,
 		[7328] = 2,
 		[7353] = 2,
@@ -10223,6 +10910,7 @@ _detalhes_global = {
 		[8690] = 6,
 		[8921] = 11,
 		[8936] = 11,
+		[9053] = "상급 마법학자",
 		[9080] = "갈퀴송곳니 노예감독",
 		[10060] = 5,
 		[10326] = 2,
@@ -10243,13 +10931,17 @@ _detalhes_global = {
 		[12675] = "거친황야 노예",
 		[12782] = "으스러진 손 용사",
 		[12975] = 1,
+		[13005] = "일리다리 혈군주",
 		[13323] = "야자이",
 		[13341] = "밀하우스 마나스톰",
 		[13445] = "심장추적자",
+		[13481] = 3,
 		[13584] = "육중한 창조물",
 		[13737] = "검은날개 드라코나르",
 		[13750] = 4,
+		[13787] = "어둠달 죽음의 창조자",
 		[13877] = 4,
+		[13903] = "빛을 섬기는 구원자",
 		[14034] = "밀하우스 마나스톰",
 		[14514] = "야자이",
 		[14914] = 5,
@@ -10285,6 +10977,7 @@ _detalhes_global = {
 		[16591] = 2,
 		[16593] = 2,
 		[16595] = 3,
+		[16739] = 3,
 		[16827] = 3,
 		[16856] = "으스러진 손 검투사",
 		[16870] = 11,
@@ -10294,6 +10987,7 @@ _detalhes_global = {
 		[17290] = "검은날개 마법사",
 		[17364] = 7,
 		[17735] = "칼고어 <블랙아르>",
+		[17877] = 9,
 		[17962] = 9,
 		[18499] = 1,
 		[18562] = 11,
@@ -10301,16 +10995,19 @@ _detalhes_global = {
 		[19236] = 5,
 		[19434] = 3,
 		[19483] = "지옥불정령 <김꼼팡>",
+		[19505] = "소르골론 <콤퓨타도트>",
 		[19574] = 3,
 		[19577] = 3,
 		[19632] = "폭군 서슬송곳니 <나는길을몰라>",
 		[19647] = "카아곤 <환상적이다>",
+		[19658] = "소르골론 <콤퓨타도트>",
 		[19714] = "아키리스 번개술사",
 		[19750] = 2,
 		[19801] = 3,
 		[19832] = 3,
 		[19872] = "폭군 서슬송곳니 <나는길을몰라>",
 		[19873] = "폭군 서슬송곳니 <나는길을몰라>",
+		[20066] = 2,
 		[20153] = "지옥불정령 <김꼼팡>",
 		[20243] = 1,
 		[20271] = 2,
@@ -10349,6 +11046,7 @@ _detalhes_global = {
 		[23242] = 3,
 		[23461] = "타락한 밸라스트라즈",
 		[23462] = "타락한 밸라스트라즈",
+		[23509] = 8,
 		[23601] = "살게론 궁수",
 		[23881] = 1,
 		[23920] = 1,
@@ -10357,6 +11055,7 @@ _detalhes_global = {
 		[24275] = 2,
 		[24394] = "지진발굽 <맨발이시킨다-데스윙>",
 		[24450] = "살쾡이 <Havina>",
+		[24698] = "일리다리 뼈절단자",
 		[24858] = 11,
 		[24869] = 11,
 		[24870] = 12,
@@ -10387,6 +11086,9 @@ _detalhes_global = {
 		[29722] = 9,
 		[29893] = 9,
 		[30146] = 9,
+		[30151] = "크렌모울 <고통닭-헬스크림>",
+		[30153] = "크렌모울 <고통닭-헬스크림>",
+		[30213] = "플라룬 <샤에릴-알렉스트라자>",
 		[30283] = 9,
 		[30449] = 8,
 		[30451] = 8,
@@ -10427,6 +11129,7 @@ _detalhes_global = {
 		[31981] = "배반자 멘누",
 		[31985] = "배반자 멘누",
 		[31991] = "배반자 멘누",
+		[32009] = "일리다리 약탈자",
 		[32055] = "쿠아그미란",
 		[32216] = 1,
 		[32223] = 2,
@@ -10442,6 +11145,7 @@ _detalhes_global = {
 		[32379] = 5,
 		[32390] = 9,
 		[32409] = "[*] 어둠의 권능: 죽음",
+		[32546] = 5,
 		[32587] = "으스러진 손 용사",
 		[32588] = "으스러진 손 용사",
 		[32592] = 5,
@@ -10477,6 +11181,7 @@ _detalhes_global = {
 		[34433] = 5,
 		[34477] = 3,
 		[34605] = "연합왕자 샤파르",
+		[34767] = 2,
 		[34861] = 5,
 		[34880] = "거친황야 노예",
 		[34896] = 1,
@@ -10610,10 +11315,86 @@ _detalhes_global = {
 		[39367] = "속박 풀린 제레케스",
 		[39376] = "갈퀴송곳니 기술병",
 		[39415] = "선구자 스키리스",
+		[39544] = "성난해골 약탈자",
+		[39635] = "일리단 스톰레이지",
+		[39671] = "일리다리 파멸자",
+		[39800] = 2,
+		[39849] = "일리단 스톰레이지",
+		[39855] = "아지노스의 칼날",
 		[39897] = 5,
+		[39906] = "어둠달 사냥개조련사",
+		[40096] = "갈퀴흉터 예언자",
+		[40102] = "물의 피조물",
+		[40192] = 9,
 		[40504] = "쿠아그미란",
+		[40598] = "일리단 스톰레이지",
+		[40647] = "일리단 스톰레이지",
+		[40810] = "대모 샤라즈",
+		[40872] = "용아귀 하늘추적자",
+		[40873] = "용아귀 하늘추적자",
+		[40875] = "용아귀 하늘약탈자",
+		[40876] = "용아귀 하늘약탈자",
+		[40877] = "용아귀 하늘약탈자",
+		[41065] = "어둠달 혈법사",
+		[41068] = "어둠달 혈법사",
+		[41069] = "어둠달 죽음의 창조자",
+		[41072] = "어둠달 혈법사",
+		[41085] = "어둠달 사냥개조련사",
+		[41092] = "어둠달 전투늑대 <어둠달 사냥개조련사>",
+		[41093] = "어둠달 사냥개조련사",
+		[41115] = "잿빛혓바닥 비술사",
+		[41151] = "잿빛혓바닥 폭풍소환사",
+		[41168] = "일리다리 백인대장",
+		[41169] = "일리다리 심장추적자",
+		[41170] = "일리다리 심장추적자",
+		[41172] = "일리다리 심장추적자",
+		[41173] = "일리다리 심장추적자",
+		[41184] = "잿빛혓바닥 폭풍소환사",
+		[41187] = "잿빛혓바닥 원시술사",
+		[41188] = "잿빛혓바닥 원시술사",
+		[41193] = "돌연변이 전투사냥개",
+		[41248] = "굶주린 영혼의 파편",
+		[41295] = 12,
+		[41334] = "사원의 무희",
+		[41337] = "격노의 정수",
+		[41338] = "사원의 무희",
+		[41346] = "매력적인 무희",
+		[41349] = "비전 폭발물",
+		[41351] = "환희의 여사제",
+		[41353] = "고통의 자매",
+		[41355] = "고통의 자매",
+		[41357] = "순찰 중인 파수병",
+		[41362] = "고통의 자매",
+		[41363] = "쾌락의 자매",
+		[41368] = "일리다리 혈군주",
+		[41371] = "고통의 자매",
+		[41374] = "일리다리 집정관",
+		[41375] = "일리다리 집정관",
+		[41379] = "일리다리 전투마법사",
+		[41380] = "쾌락의 자매",
+		[41383] = "일리다리 전투마법사",
+		[41384] = "일리다리 전투마법사",
+		[41388] = "지배당한 하인",
+		[41389] = "지배당한 하인",
+		[41396] = "주문에 구속된 수행원",
+		[41397] = "광기의 여사제",
+		[41400] = "광기의 환영",
 		[41425] = 8,
+		[41459] = "파괴자 가디오스",
+		[41469] = "파괴자 가디오스",
+		[41471] = "여군주 말란데",
+		[41472] = "여군주 말란데",
+		[41476] = "베라스 다크섀도",
+		[41478] = "고위 황천술사 제레보르",
+		[41481] = "고위 황천술사 제레보르",
+		[41482] = "고위 황천술사 제레보르",
+		[41483] = "고위 황천술사 제레보르",
+		[41524] = "[*] 신비한 폭발",
+		[41541] = "파괴자 가디오스",
+		[41542] = "사로잡힌 영혼",
 		[41635] = 5,
+		[42023] = "잿빛혓바닥 정령술사",
+		[42058] = "파괴자 가디오스",
 		[42223] = 9,
 		[42650] = 6,
 		[43265] = 6,
@@ -10650,10 +11431,13 @@ _detalhes_global = {
 		[44604] = "태양칼날단 마법학자",
 		[44614] = 8,
 		[44640] = "고난의 자매",
+		[44843] = "마드리고사",
 		[44867] = 3,
+		[44949] = 1,
 		[45026] = "칼렉고스",
 		[45027] = "칼렉고스",
 		[45031] = "타락의 사스로바르",
+		[45065] = "마드리고사",
 		[45181] = 4,
 		[45182] = 4,
 		[45242] = 5,
@@ -10666,6 +11450,7 @@ _detalhes_global = {
 		[45779] = "변덕스러운 악령",
 		[45859] = "수도자 엘바돈",
 		[45892] = "킬제덴",
+		[46008] = "므우루",
 		[46021] = 3,
 		[46026] = "아포코",
 		[46028] = "태양칼날단 마법수호병",
@@ -10703,6 +11488,7 @@ _detalhes_global = {
 		[46442] = "어둠비수 영혼술사",
 		[46453] = "어둠비수 마나마귀",
 		[46460] = "어둠비수 암살자",
+		[46468] = "어둠비수 제압자",
 		[46469] = "어둠비수 제압자",
 		[46480] = "태양칼날단 파수병",
 		[46544] = "태양칼날단 밀사",
@@ -10713,11 +11499,14 @@ _detalhes_global = {
 		[46559] = "태양칼날단 근위기사",
 		[46560] = "태양칼날단 황혼의 사제",
 		[46562] = "태양칼날단 황혼의 사제",
+		[46563] = "태양칼날단 여명의 사제",
 		[46564] = "태양칼날단 여명의 사제",
 		[46565] = "태양칼날단 여명의 사제",
 		[46573] = "태양칼날단 대마법사",
 		[46585] = 6,
 		[46628] = 3,
+		[46762] = "어둠비수 사령관",
+		[46763] = "어둠비수 사령관",
 		[46924] = 1,
 		[46968] = 1,
 		[47001] = "태양칼날단 학살자",
@@ -10769,6 +11558,7 @@ _detalhes_global = {
 		[50401] = 6,
 		[50613] = 6,
 		[50622] = 1,
+		[50769] = 11,
 		[50842] = 6,
 		[50977] = 6,
 		[51052] = 6,
@@ -10776,6 +11566,7 @@ _detalhes_global = {
 		[51271] = 6,
 		[51399] = 6,
 		[51460] = 6,
+		[51485] = 7,
 		[51490] = 7,
 		[51505] = 7,
 		[51514] = 7,
@@ -10804,6 +11595,7 @@ _detalhes_global = {
 		[54149] = 2,
 		[54644] = "공포날개 <맨발이시킨다-데스윙>",
 		[54680] = "운다스타 <보테로>",
+		[54753] = 8,
 		[54861] = 1,
 		[55078] = 6,
 		[55090] = 6,
@@ -10826,13 +11618,17 @@ _detalhes_global = {
 		[58180] = 11,
 		[58460] = "태양칼날단 근위기사",
 		[58506] = "무너진 태양 명사수",
+		[58615] = 5,
 		[58867] = "영혼 늑대 <냥펀치보름>",
 		[58875] = 7,
+		[58983] = 2,
 		[59052] = 6,
 		[59628] = 4,
 		[59638] = "멘션온세단어-줄진 <멘션온세단어-줄진>",
 		[59913] = 10,
+		[60025] = 7,
 		[60103] = 7,
+		[60116] = 7,
 		[60307] = 3,
 		[61295] = 7,
 		[61305] = 8,
@@ -10849,6 +11645,7 @@ _detalhes_global = {
 		[63619] = "어둠의 마귀 <알아서사제>",
 		[64044] = 5,
 		[64382] = 1,
+		[64695] = 7,
 		[64707] = 5,
 		[64790] = 3,
 		[64800] = 3,
@@ -10863,6 +11660,8 @@ _detalhes_global = {
 		[66196] = 6,
 		[66198] = 6,
 		[66235] = 2,
+		[67826] = 2,
+		[68054] = "지브스 <예민해>",
 		[68530] = 3,
 		[68607] = "연금술사 훔멜",
 		[68641] = "연금술사 훔멜",
@@ -10877,6 +11676,7 @@ _detalhes_global = {
 		[69070] = 3,
 		[69179] = 1,
 		[69369] = 11,
+		[69395] = 3,
 		[70233] = 3,
 		[70234] = 9,
 		[70235] = 1,
@@ -10902,6 +11702,7 @@ _detalhes_global = {
 		[73921] = 7,
 		[74589] = 2,
 		[75002] = "살아 움직이는 배회자",
+		[75532] = 3,
 		[75614] = 3,
 		[75973] = 6,
 		[77130] = 7,
@@ -10958,12 +11759,16 @@ _detalhes_global = {
 		[86949] = 8,
 		[87023] = 8,
 		[87024] = 8,
+		[87091] = 2,
 		[88023] = "황금 딱정벌레",
 		[88263] = 2,
 		[88423] = 11,
 		[88625] = 5,
 		[88749] = 1,
 		[88990] = 4,
+		[89751] = "플라룬 <샤에릴-알렉스트라자>",
+		[89753] = "플라룬 <샤에릴-알렉스트라자>",
+		[89766] = "지옥수호병 <고통닭-헬스크림>",
 		[89792] = "피즈티프 <환상적이다>",
 		[89808] = "사르나르 <사일루인-세나리우스>",
 		[90328] = "나한테죽음개쪽 <멍키뒤루피>",
@@ -10985,6 +11790,7 @@ _detalhes_global = {
 		[93347] = 2,
 		[93402] = 11,
 		[93622] = 11,
+		[93644] = 9,
 		[93825] = 8,
 		[93827] = 4,
 		[93828] = 3,
@@ -11001,6 +11807,7 @@ _detalhes_global = {
 		[96231] = 2,
 		[96312] = 11,
 		[96891] = 8,
+		[96966] = 5,
 		[96979] = 11,
 		[97340] = 9,
 		[97341] = 8,
@@ -11010,6 +11817,7 @@ _detalhes_global = {
 		[98008] = 7,
 		[98021] = "정신의 고리 토템 <술사흑심>",
 		[98440] = 4,
+		[98444] = 1,
 		[100780] = 10,
 		[100784] = 10,
 		[101033] = 7,
@@ -11018,6 +11826,8 @@ _detalhes_global = {
 		[101568] = 6,
 		[101643] = 10,
 		[102342] = 11,
+		[102346] = 2,
+		[102350] = 2,
 		[102351] = 11,
 		[102352] = 11,
 		[102359] = 11,
@@ -11029,7 +11839,11 @@ _detalhes_global = {
 		[102573] = "하늘색 운룡",
 		[102793] = 11,
 		[103081] = 2,
+		[104264] = 5,
+		[104271] = 2,
+		[104273] = 3,
 		[104316] = 9,
+		[104318] = "날뛰는 임프 <고통닭-헬스크림>",
 		[104773] = 9,
 		[105174] = 9,
 		[105421] = 2,
@@ -11117,6 +11931,7 @@ _detalhes_global = {
 		[108238] = 11,
 		[108271] = 7,
 		[108280] = 7,
+		[108281] = 7,
 		[108291] = 11,
 		[108294] = 11,
 		[108366] = 9,
@@ -11210,6 +12025,7 @@ _detalhes_global = {
 		[114852] = 2,
 		[114871] = 2,
 		[114908] = 5,
+		[114911] = 7,
 		[114919] = 2,
 		[114923] = 8,
 		[114942] = "치유의 해일 토템 <술사흑심>",
@@ -11280,6 +12096,7 @@ _detalhes_global = {
 		[117418] = 10,
 		[117526] = 3,
 		[117570] = "의심의 산물",
+		[117588] = "원시 불의 정령 <호두같은넘>",
 		[117665] = "의심의 샤",
 		[117679] = 11,
 		[117828] = 9,
@@ -11309,6 +12126,8 @@ _detalhes_global = {
 		[119840] = "시크티크 병사",
 		[119905] = 9,
 		[119907] = 9,
+		[119910] = 9,
+		[119914] = 9,
 		[119952] = 2,
 		[119996] = 10,
 		[120043] = 2,
@@ -11320,6 +12139,7 @@ _detalhes_global = {
 		[120692] = 5,
 		[120696] = 5,
 		[120954] = 10,
+		[121147] = 6,
 		[121253] = 10,
 		[121282] = "편대사령관 네르오노크",
 		[121284] = "편대사령관 네르오노크",
@@ -11334,6 +12154,7 @@ _detalhes_global = {
 		[121536] = 5,
 		[121557] = 5,
 		[121762] = "편대사령관 네르오노크",
+		[121820] = 3,
 		[121838] = 1,
 		[122128] = 5,
 		[122278] = 10,
@@ -11355,6 +12176,7 @@ _detalhes_global = {
 		[124036] = 2,
 		[124218] = 10,
 		[124219] = 11,
+		[124220] = 2,
 		[124253] = "시크티크 칼춤꾼",
 		[124273] = 10,
 		[124274] = 10,
@@ -11366,6 +12188,7 @@ _detalhes_global = {
 		[124503] = 10,
 		[124506] = 10,
 		[124507] = 10,
+		[124659] = 7,
 		[124682] = 10,
 		[125050] = 3,
 		[125174] = 10,
@@ -11380,6 +12203,7 @@ _detalhes_global = {
 		[126664] = 1,
 		[126896] = 10,
 		[127140] = 8,
+		[127165] = 2,
 		[127230] = 1,
 		[127271] = 2,
 		[127315] = 12,
@@ -11398,10 +12222,12 @@ _detalhes_global = {
 		[129253] = 5,
 		[129597] = 10,
 		[129934] = 6,
+		[130092] = 7,
 		[130654] = 10,
 		[131241] = "음영파 화염 궁수",
 		[131347] = 12,
 		[131474] = 8,
+		[131476] = 2,
 		[131784] = 8,
 		[131894] = 3,
 		[131900] = 3,
@@ -11428,9 +12254,13 @@ _detalhes_global = {
 		[137639] = 10,
 		[138130] = 10,
 		[138213] = 4,
+		[138425] = 2,
+		[138642] = 2,
 		[139068] = 11,
 		[139546] = 4,
 		[142073] = 3,
+		[142910] = 1,
+		[143625] = 9,
 		[143924] = 3,
 		[145109] = 11,
 		[145110] = 11,
@@ -11473,12 +12303,14 @@ _detalhes_global = {
 		[155625] = 11,
 		[155722] = 11,
 		[155777] = 11,
+		[156064] = 4,
 		[156070] = 11,
 		[156073] = 3,
 		[156077] = 11,
 		[156080] = 1,
 		[156132] = 1,
 		[156287] = 1,
+		[156423] = 4,
 		[156426] = 8,
 		[156779] = 2,
 		[157122] = 2,
@@ -11486,6 +12318,8 @@ _detalhes_global = {
 		[157131] = 2,
 		[157153] = 7,
 		[157228] = 11,
+		[157331] = "상급 폭풍의 정령 <슈라알>",
+		[157348] = "상급 폭풍의 정령 <슈라알>",
 		[157503] = 7,
 		[157504] = 7,
 		[157644] = 8,
@@ -11497,6 +12331,7 @@ _detalhes_global = {
 		[158188] = 4,
 		[158221] = 10,
 		[160029] = 6,
+		[160331] = 11,
 		[160688] = 1,
 		[162243] = 12,
 		[162264] = 12,
@@ -11510,9 +12345,11 @@ _detalhes_global = {
 		[163212] = 10,
 		[163505] = 11,
 		[164273] = 3,
+		[164729] = 4,
 		[164812] = 11,
 		[164815] = 11,
 		[164862] = 11,
+		[165185] = 2,
 		[165961] = 11,
 		[166592] = 2,
 		[166646] = 10,
@@ -11523,20 +12360,30 @@ _detalhes_global = {
 		[167130] = "공격적인 부식벌",
 		[167152] = 7,
 		[167898] = 1,
+		[168657] = 2,
 		[169291] = 5,
 		[170347] = 2,
 		[170379] = 7,
+		[170751] = "부관 펠리포스",
 		[170869] = 5,
 		[171454] = 3,
 		[171457] = 3,
 		[171554] = 12,
+		[171616] = 2,
 		[171627] = 6,
+		[171628] = 2,
+		[171825] = 2,
+		[171827] = 6,
+		[171832] = 2,
 		[171841] = 1,
 		[171845] = 2,
 		[171848] = 2,
+		[171849] = 2,
 		[171850] = 2,
+		[171851] = 8,
 		[173183] = 7,
 		[173184] = 7,
+		[173266] = 1,
 		[173751] = "페이잎새 감시관",
 		[173757] = "페이잎새 감시관",
 		[173762] = "페이잎새 감시관",
@@ -11548,11 +12395,14 @@ _detalhes_global = {
 		[176151] = 4,
 		[176179] = 1,
 		[176180] = 2,
+		[176438] = 2,
 		[176890] = 10,
 		[176898] = 8,
 		[178173] = 10,
 		[178963] = 12,
 		[179057] = 12,
+		[179091] = "나르탈라스 마법학자",
+		[179244] = 2,
 		[180612] = 6,
 		[180748] = 9,
 		[180750] = 7,
@@ -11562,7 +12412,9 @@ _detalhes_global = {
 		[182104] = 2,
 		[182512] = 1,
 		[182912] = 2,
+		[183117] = 6,
 		[183197] = "페이잎새 뜰지기",
+		[183218] = 2,
 		[183263] = "게걸충 살포자",
 		[183347] = "영혼추적자 브이라라",
 		[183435] = 2,
@@ -11587,6 +12439,7 @@ _detalhes_global = {
 		[185313] = 4,
 		[185358] = 3,
 		[185422] = 4,
+		[185425] = "강철무쇠 회색곰",
 		[185438] = 4,
 		[185482] = 8,
 		[185493] = "궁정 기록관",
@@ -11597,6 +12450,7 @@ _detalhes_global = {
 		[186263] = 5,
 		[186265] = 3,
 		[186270] = 3,
+		[186289] = 3,
 		[186380] = "영혼추적자 브이라라",
 		[186387] = 3,
 		[186401] = 3,
@@ -11615,6 +12469,7 @@ _detalhes_global = {
 		[187878] = 7,
 		[188016] = 10,
 		[188031] = 2,
+		[188034] = 2,
 		[188089] = 7,
 		[188172] = 2,
 		[188196] = 7,
@@ -11629,6 +12484,7 @@ _detalhes_global = {
 		[189200] = "날개 달린 전투기계",
 		[189216] = "[*] 되돌아오는 칼날",
 		[189877] = 11,
+		[189999] = 2,
 		[190319] = 8,
 		[190336] = 8,
 		[190356] = 8,
@@ -11637,10 +12493,13 @@ _detalhes_global = {
 		[190446] = 8,
 		[190456] = 1,
 		[190784] = 2,
+		[190831] = 6,
 		[190925] = 3,
 		[190984] = 11,
 		[191034] = 11,
 		[191037] = 11,
+		[191401] = "발라리아르 명사수",
+		[191508] = "발라리아르 지원자",
 		[191587] = 6,
 		[191634] = 7,
 		[191685] = 6,
@@ -11656,6 +12515,9 @@ _detalhes_global = {
 		[192109] = 7,
 		[192222] = 7,
 		[192225] = 2,
+		[192249] = 7,
+		[192563] = "발라리아르 정화자",
+		[192565] = "발라리아르 정화자",
 		[192611] = 12,
 		[192999] = 2,
 		[193315] = 4,
@@ -11672,6 +12534,7 @@ _detalhes_global = {
 		[193534] = 3,
 		[193538] = 4,
 		[193635] = "공허의 촉수 <알아서사제>",
+		[193641] = 4,
 		[194153] = 11,
 		[194223] = 11,
 		[194249] = 5,
@@ -11682,6 +12545,7 @@ _detalhes_global = {
 		[194509] = 5,
 		[194524] = 3,
 		[194594] = 3,
+		[194638] = 1,
 		[194679] = 6,
 		[194844] = 6,
 		[194913] = 6,
@@ -11711,6 +12575,7 @@ _detalhes_global = {
 		[196447] = 9,
 		[196448] = 9,
 		[196528] = 6,
+		[196543] = "펜리르",
 		[196545] = 6,
 		[196555] = 12,
 		[196608] = 10,
@@ -11728,6 +12593,7 @@ _detalhes_global = {
 		[196881] = 7,
 		[196884] = 7,
 		[196911] = 4,
+		[196917] = 2,
 		[196941] = 2,
 		[196980] = 4,
 		[197214] = 7,
@@ -11754,12 +12620,25 @@ _detalhes_global = {
 		[198533] = "옥룡 조각상 <용염-불타는군단>",
 		[198589] = 12,
 		[198590] = 9,
+		[198595] = "발라리아르 천둥술사",
+		[198745] = "폭풍벼림 파수병",
 		[198793] = 12,
 		[198813] = 12,
 		[198832] = "되살아난 잠복꾼 <와똘>",
 		[198837] = "되살아난 잠복꾼 <죽저울>",
 		[198838] = 7,
 		[198839] = "대지의 벽 토템 <정기의라썬>",
+		[198934] = "발라리아르 비술사",
+		[198944] = "발라리아르 방패여전사",
+		[198959] = "발라리아르 룬조각사",
+		[198962] = "발라리아르 룬조각사",
+		[199033] = "발라리아르 지원자",
+		[199034] = "발라리아르 지원자",
+		[199050] = "발라리아르 방패여전사",
+		[199109] = 12,
+		[199177] = "흑단발톱 검은늑대",
+		[199179] = "흑단발톱 검은늑대",
+		[199182] = "흑단발톱 검은늑대",
 		[199337] = "곰 덫",
 		[199373] = "사자의 군대 <래오칸>",
 		[199483] = 3,
@@ -11770,7 +12649,10 @@ _detalhes_global = {
 		[199603] = 4,
 		[199658] = 1,
 		[199667] = 1,
+		[199772] = "발라리아르 용사",
 		[199786] = 8,
+		[199805] = "폭풍벼림 파수병",
+		[199818] = "[*] 파지직",
 		[199844] = 8,
 		[199850] = 1,
 		[199851] = 1,
@@ -11778,14 +12660,18 @@ _detalhes_global = {
 		[199854] = 1,
 		[200015] = 1,
 		[200025] = 2,
+		[200061] = 2,
 		[200166] = 12,
 		[200174] = 5,
+		[200175] = 12,
 		[200183] = 5,
 		[200196] = 5,
 		[200200] = 5,
 		[200389] = 11,
+		[200561] = "무엇인가",
 		[200685] = 12,
 		[200806] = 4,
+		[200901] = "솔스텐",
 		[201363] = 1,
 		[201364] = 1,
 		[201427] = 12,
@@ -11803,9 +12689,11 @@ _detalhes_global = {
 		[202138] = 12,
 		[202140] = 12,
 		[202147] = 1,
+		[202160] = 12,
 		[202164] = 1,
 		[202166] = 1,
 		[202168] = 1,
+		[202285] = 3,
 		[202347] = 11,
 		[202497] = 11,
 		[202602] = 1,
@@ -11824,6 +12712,7 @@ _detalhes_global = {
 		[203808] = 5,
 		[203814] = 11,
 		[203819] = 12,
+		[203843] = 1,
 		[203850] = 6,
 		[203953] = 11,
 		[203958] = 11,
@@ -11851,6 +12740,7 @@ _detalhes_global = {
 		[204883] = 5,
 		[205021] = 8,
 		[205025] = 8,
+		[205146] = 9,
 		[205179] = 9,
 		[205180] = 9,
 		[205231] = "암흑시선 <흑마법사알루>",
@@ -11867,7 +12757,11 @@ _detalhes_global = {
 		[205644] = "나무정령 <로드사이클-데스윙>",
 		[205648] = 7,
 		[205708] = 8,
+		[205760] = "베리사 윈드러너",
+		[205784] = "베리사 윈드러너",
 		[206151] = 5,
+		[206564] = "에레다르 차원문 군주",
+		[206569] = "코르말라돈의 싸늘한 눈알",
 		[206930] = 6,
 		[206931] = 6,
 		[206967] = 6,
@@ -11879,6 +12773,7 @@ _detalhes_global = {
 		[207311] = 6,
 		[207317] = 6,
 		[207386] = 11,
+		[207399] = 7,
 		[207400] = 7,
 		[207640] = 11,
 		[207665] = 12,
@@ -11887,18 +12782,22 @@ _detalhes_global = {
 		[207685] = 12,
 		[207693] = 12,
 		[207700] = 6,
+		[207707] = "무엇인가",
 		[207760] = 12,
 		[207771] = 12,
 		[207778] = 7,
 		[208086] = 1,
+		[208628] = 12,
 		[208771] = 5,
 		[208772] = 5,
 		[209258] = 12,
 		[209261] = 12,
 		[209426] = 12,
 		[209693] = 12,
+		[209785] = 2,
 		[209788] = 12,
 		[209858] = "이탈자 치유사",
+		[209862] = "[*] 화산 분출",
 		[210042] = 12,
 		[210053] = 11,
 		[210126] = 8,
@@ -11911,6 +12810,7 @@ _detalhes_global = {
 		[210833] = 8,
 		[210837] = 3,
 		[211161] = 10,
+		[211319] = 5,
 		[211545] = 11,
 		[211793] = 6,
 		[211805] = 6,
@@ -11949,12 +12849,16 @@ _detalhes_global = {
 		[214202] = 2,
 		[214222] = 2,
 		[214621] = 5,
+		[215429] = "발라리아르 천둥술사",
+		[215430] = "발라리아르 천둥술사",
 		[215479] = 10,
 		[215572] = 1,
 		[215661] = 2,
 		[215785] = 7,
 		[215802] = 7,
 		[216251] = 7,
+		[216331] = 2,
+		[216371] = 2,
 		[216521] = 10,
 		[217200] = 3,
 		[217597] = 5,
@@ -11962,6 +12866,7 @@ _detalhes_global = {
 		[217832] = 12,
 		[217979] = 9,
 		[218164] = 10,
+		[218609] = "코르말라돈의 뜨거운 눈알",
 		[218617] = 1,
 		[219271] = 7,
 		[219589] = 8,
@@ -11981,6 +12886,7 @@ _detalhes_global = {
 		[222202] = 2,
 		[222256] = 12,
 		[222695] = 11,
+		[222952] = 12,
 		[223143] = 1,
 		[223306] = 2,
 		[223499] = 11,
@@ -11999,6 +12905,7 @@ _detalhes_global = {
 		[225311] = 2,
 		[225604] = 9,
 		[225787] = 3,
+		[225788] = 3,
 		[225822] = 12,
 		[225919] = 12,
 		[225921] = 12,
@@ -12010,20 +12917,43 @@ _detalhes_global = {
 		[227151] = 4,
 		[227255] = 12,
 		[227291] = "니우짜오 <Motovun>",
+		[227514] = "구아름",
 		[227518] = 12,
+		[227642] = "구아름",
 		[227723] = 3,
 		[227847] = 1,
 		[227956] = 1,
+		[228003] = "하임달",
+		[228004] = "하임달",
+		[228007] = "[*] 춤추는 칼날",
+		[228012] = "하임달",
+		[228028] = "히리아",
+		[228030] = "히리아",
+		[228055] = "헬리아",
+		[228127] = "헬리아",
 		[228128] = 2,
 		[228140] = 2,
+		[228162] = "히리아",
+		[228171] = "히리아",
 		[228260] = 5,
 		[228287] = 10,
+		[228300] = "헬리아",
+		[228321] = "크발디르 영혼분리자",
+		[228325] = "크발디르 영혼분리자",
 		[228354] = 8,
 		[228358] = 8,
 		[228360] = 5,
 		[228361] = 5,
+		[228363] = "크발디르 영혼분리자",
+		[228368] = "지옥개",
+		[228373] = "크발디르 암초소환사",
+		[228374] = "크발디르 암초소환사",
+		[228388] = "썩은영혼 거인",
+		[228391] = "뼈예언자 영혼술사",
+		[228395] = "뼈예언자 영혼술사",
 		[228477] = 12,
 		[228478] = 12,
+		[228514] = "헬리아",
 		[228532] = 12,
 		[228537] = 12,
 		[228596] = 8,
@@ -12031,23 +12961,32 @@ _detalhes_global = {
 		[228598] = 8,
 		[228600] = 8,
 		[228626] = 3,
+		[228633] = "어둠의 순찰대 갑판원",
 		[228645] = 6,
 		[228649] = 10,
+		[228853] = "크발디르 바다마녀",
+		[228868] = "크발디르 바다마녀",
+		[228869] = "[*] 밀어닥치는 파도",
+		[228883] = "어둠의 천사",
 		[228920] = 1,
 		[229206] = 2,
 		[229376] = 8,
 		[229388] = 1,
 		[229837] = 10,
+		[229872] = 10,
 		[229976] = 2,
+		[230197] = "[*] 검은 물",
 		[230987] = 2,
 		[231390] = 3,
 		[231428] = 9,
 		[231435] = 2,
+		[231442] = 7,
 		[231588] = 2,
 		[231589] = 2,
 		[231843] = 2,
 		[231895] = 2,
 		[232405] = 3,
+		[232408] = "[*] 악취 나는 부패",
 		[232633] = 5,
 		[232698] = 5,
 		[232893] = 12,
@@ -12072,6 +13011,8 @@ _detalhes_global = {
 		[242014] = 3,
 		[242391] = "얼음심장 요원",
 		[242551] = 1,
+		[242875] = 7,
+		[242897] = 10,
 		[243237] = "[*] 파열",
 		[243241] = 5,
 		[243435] = 10,
@@ -12080,6 +13021,7 @@ _detalhes_global = {
 		[245686] = 2,
 		[245725] = 1,
 		[246152] = 3,
+		[246287] = 5,
 		[246851] = 3,
 		[246852] = 3,
 		[246853] = 3,
@@ -12097,6 +13039,7 @@ _detalhes_global = {
 		[253595] = 6,
 		[253597] = 6,
 		[253784] = 5,
+		[254471] = 2,
 		[254473] = 2,
 		[254474] = 2,
 		[255546] = 4,
@@ -12108,6 +13051,8 @@ _detalhes_global = {
 		[255937] = 2,
 		[255941] = 2,
 		[255974] = 1,
+		[256123] = 7,
+		[256148] = 4,
 		[256522] = 4,
 		[256735] = 4,
 		[256821] = 10,
@@ -12138,6 +13083,7 @@ _detalhes_global = {
 		[258925] = 12,
 		[258926] = 12,
 		[259220] = "얼음심장 투창병",
+		[259387] = 3,
 		[259391] = 3,
 		[259395] = 2,
 		[259489] = 3,
@@ -12171,12 +13117,15 @@ _detalhes_global = {
 		[263344] = "강화된 궁정 관리인",
 		[263642] = 12,
 		[263725] = 8,
+		[263806] = 7,
 		[263840] = "늑대 <대머리민두노총-헬스크림>",
 		[263858] = "벌집 어미 <살임>",
 		[263865] = "알라치아 <나는길을몰라>",
 		[263892] = "살쾡이 <Havina>",
+		[264057] = 9,
 		[264119] = 9,
 		[264130] = 9,
+		[264173] = 9,
 		[264178] = 9,
 		[264220] = 4,
 		[264250] = 4,
@@ -12192,13 +13141,18 @@ _detalhes_global = {
 		[265144] = 5,
 		[265157] = 3,
 		[265187] = 9,
+		[265189] = 3,
 		[265202] = 5,
 		[265258] = 5,
+		[265273] = 9,
 		[265931] = 9,
 		[266030] = 9,
+		[266058] = 2,
 		[266087] = 9,
 		[266136] = 9,
 		[266144] = "부패예언자",
+		[266779] = 3,
+		[266925] = 1,
 		[267171] = 9,
 		[267179] = 10,
 		[267274] = 1,
@@ -12210,6 +13164,8 @@ _detalhes_global = {
 		[267331] = 10,
 		[267611] = 2,
 		[267612] = 1,
+		[267997] = "썩은마귀 <고통닭-헬스크림>",
+		[267999] = "썩은마귀 <고통닭-헬스크림>",
 		[268062] = 12,
 		[268068] = 12,
 		[268178] = 12,
@@ -12221,6 +13177,7 @@ _detalhes_global = {
 		[268854] = 12,
 		[268856] = 12,
 		[268877] = 3,
+		[268887] = 2,
 		[268953] = 12,
 		[268954] = 12,
 		[268955] = 1,
@@ -12243,11 +13200,15 @@ _detalhes_global = {
 		[270246] = "이글거리는 정령",
 		[270248] = "불타는 잿불수호자",
 		[270323] = 3,
+		[270329] = 3,
+		[270332] = 3,
 		[270335] = 3,
 		[270338] = 3,
 		[270339] = 3,
 		[270343] = 3,
 		[270404] = "페이잎새 덩굴손",
+		[270481] = "악마 폭군 <고통닭-헬스크림>",
+		[270501] = 5,
 		[270576] = 2,
 		[270657] = 2,
 		[270661] = 5,
@@ -12271,12 +13232,15 @@ _detalhes_global = {
 		[271896] = 4,
 		[271920] = 7,
 		[271924] = 7,
+		[271971] = "공포사냥개 <고통닭-헬스크림>",
 		[272016] = "사로잡힌 밀사",
+		[272071] = 11,
 		[272126] = 12,
 		[272382] = "부패예언자",
 		[272678] = 3,
 		[272679] = 3,
 		[272741] = 6,
+		[272770] = 7,
 		[272790] = 3,
 		[272903] = 2,
 		[272934] = 8,
@@ -12290,6 +13254,8 @@ _detalhes_global = {
 		[273992] = 7,
 		[274009] = 6,
 		[274062] = 10,
+		[274281] = 11,
+		[274282] = 11,
 		[274283] = 11,
 		[274598] = 8,
 		[274738] = 7,
@@ -12371,6 +13337,7 @@ _detalhes_global = {
 		[281210] = 6,
 		[281265] = 5,
 		[281298] = 1,
+		[281465] = 2,
 		[281711] = 1,
 		[281713] = 1,
 		[281791] = 8,
@@ -12386,6 +13353,7 @@ _detalhes_global = {
 		[285470] = 12,
 		[285472] = 1,
 		[285496] = 7,
+		[285514] = 7,
 		[285594] = 10,
 		[286031] = 7,
 		[286232] = 2,
@@ -12398,6 +13366,7 @@ _detalhes_global = {
 		[288330] = 12,
 		[288333] = 12,
 		[288455] = 1,
+		[288503] = 9,
 		[288613] = 3,
 		[288675] = 7,
 		[289184] = 8,
@@ -12406,6 +13375,7 @@ _detalhes_global = {
 		[289577] = 5,
 		[289982] = 11,
 		[290133] = 5,
+		[290365] = 2,
 		[290464] = 1,
 		[290467] = 11,
 		[290468] = 8,
@@ -12415,12 +13385,14 @@ _detalhes_global = {
 		[290945] = 5,
 		[291012] = 5,
 		[291045] = 2,
+		[291538] = 7,
 		[291643] = 8,
 		[291646] = 12,
 		[291662] = 3,
 		[291673] = 3,
 		[291679] = 8,
 		[291944] = 2,
+		[292360] = 11,
 		[292361] = 3,
 		[292362] = 11,
 		[292364] = 2,
@@ -12435,6 +13407,7 @@ _detalhes_global = {
 		[293025] = 12,
 		[293063] = "감방 파수병",
 		[294020] = 7,
+		[294038] = 1,
 		[294133] = 2,
 		[294165] = "나락살이 경비병",
 		[294171] = "나락살이 요격병",
@@ -12500,6 +13473,7 @@ _detalhes_global = {
 		[296447] = "저승영혼 떠돌이",
 		[296454] = "저승영혼 추적자",
 		[296523] = "나락살이 추적자",
+		[296651] = "저승영혼 추적자",
 		[296748] = "미트볼의 심문관",
 		[296839] = "저승영혼 비명망령",
 		[296847] = "[*] 위압의 오라",
@@ -12510,7 +13484,9 @@ _detalhes_global = {
 		[297018] = "영혼 감시관",
 		[297034] = 11,
 		[297035] = 12,
+		[297037] = 12,
 		[297039] = 11,
+		[297098] = 11,
 		[297108] = 7,
 		[297126] = 7,
 		[297162] = 7,
@@ -12521,6 +13497,7 @@ _detalhes_global = {
 		[297412] = 7,
 		[297413] = 12,
 		[297722] = 3,
+		[297833] = 3,
 		[297871] = 1,
 		[297966] = "나락의 아귀",
 		[297982] = "나락의 아귀",
@@ -12540,9 +13517,12 @@ _detalhes_global = {
 		[298837] = 5,
 		[298841] = 1,
 		[298844] = "저승영혼 비틀망령",
+		[299158] = 1,
 		[299624] = 7,
 		[300155] = "티르넨 주민",
 		[300174] = 1,
+		[300714] = 2,
+		[300717] = 2,
 		[300728] = 6,
 		[301075] = "멘션온세단어-줄진 <멘션온세단어-줄진>",
 		[301308] = 4,
@@ -12561,6 +13541,7 @@ _detalhes_global = {
 		[304075] = "나락살이 의식술사",
 		[304093] = "죽음예언자",
 		[304254] = "속박된 자 게루스",
+		[304372] = 7,
 		[304479] = "꿈틀대는 영혼덩어리",
 		[304510] = 3,
 		[304831] = "영혼을 쫓는 자",
@@ -12577,6 +13558,7 @@ _detalhes_global = {
 		[305003] = 5,
 		[305005] = 2,
 		[305007] = 3,
+		[305042] = 3,
 		[305043] = 3,
 		[305044] = 3,
 		[305045] = 12,
@@ -12584,6 +13566,7 @@ _detalhes_global = {
 		[305049] = 5,
 		[305050] = 2,
 		[305051] = 5,
+		[305052] = 3,
 		[305053] = 3,
 		[305054] = 12,
 		[305055] = 12,
@@ -12598,6 +13581,7 @@ _detalhes_global = {
 		[305752] = 3,
 		[305753] = 3,
 		[306272] = 3,
+		[306423] = 1,
 		[306563] = 3,
 		[306565] = 3,
 		[306571] = 3,
@@ -12606,6 +13590,7 @@ _detalhes_global = {
 		[306574] = 5,
 		[306575] = 3,
 		[306577] = 4,
+		[306604] = 3,
 		[306625] = 12,
 		[306630] = 3,
 		[306670] = "[*] 영혼의 발산물",
@@ -12614,6 +13599,7 @@ _detalhes_global = {
 		[307023] = "[*] 영혼 대폭발",
 		[307046] = 12,
 		[307115] = "[*] 화염 분출",
+		[307159] = 3,
 		[307161] = 5,
 		[307162] = 9,
 		[307164] = 1,
@@ -12624,8 +13610,10 @@ _detalhes_global = {
 		[307193] = 5,
 		[307194] = 9,
 		[307195] = 12,
+		[307263] = 2,
 		[307354] = 3,
 		[307479] = 3,
+		[307494] = 4,
 		[307495] = 12,
 		[307865] = 1,
 		[307871] = 1,
@@ -12655,6 +13643,7 @@ _detalhes_global = {
 		[308742] = 2,
 		[308899] = 7,
 		[309617] = 5,
+		[309658] = 12,
 		[309822] = 4,
 		[310143] = 3,
 		[310240] = 3,
@@ -12678,6 +13667,12 @@ _detalhes_global = {
 		[311201] = 10,
 		[311444] = 12,
 		[311446] = 4,
+		[311447] = 5,
+		[311448] = 11,
+		[311449] = 11,
+		[311450] = 9,
+		[311451] = 7,
+		[311458] = 2,
 		[311459] = 2,
 		[311464] = 7,
 		[311465] = 7,
@@ -12724,9 +13719,12 @@ _detalhes_global = {
 		[312645] = 3,
 		[312761] = 11,
 		[312762] = 3,
+		[312763] = 2,
+		[312765] = 2,
 		[312767] = 3,
 		[313053] = 3,
 		[313056] = 3,
+		[313058] = 3,
 		[313064] = 3,
 		[313108] = 10,
 		[313174] = 3,
@@ -12739,21 +13737,28 @@ _detalhes_global = {
 		[313819] = 12,
 		[313820] = 12,
 		[313821] = 12,
+		[313840] = 2,
 		[313867] = 8,
 		[313884] = 3,
+		[313885] = 3,
 		[313889] = 5,
 		[314236] = 12,
 		[314237] = 12,
 		[314238] = 12,
 		[314239] = 12,
+		[314241] = 12,
 		[314260] = 2,
+		[314262] = 2,
 		[314422] = 6,
 		[314590] = 2,
 		[314646] = 11,
+		[314648] = 9,
 		[314732] = 12,
+		[314768] = 2,
 		[314791] = 8,
 		[314793] = 8,
 		[314815] = 7,
+		[314867] = 5,
 		[314988] = 1,
 		[315300] = 3,
 		[315341] = 4,
@@ -12770,9 +13775,11 @@ _detalhes_global = {
 		[316099] = 9,
 		[316220] = 4,
 		[316244] = "돌갑옷 마귀",
+		[316493] = 7,
 		[316531] = 1,
 		[316599] = "[*] 정화자의 불꽃",
 		[316643] = 1,
+		[316802] = 4,
 		[316836] = "돌숨결 청지기",
 		[316850] = 3,
 		[316859] = "돌숨결 청지기",
@@ -12835,7 +13842,9 @@ _detalhes_global = {
 		[319281] = 12,
 		[319287] = 2,
 		[319447] = "강화된 궁정 관리인",
+		[319504] = 4,
 		[319521] = "쿨타로크",
+		[319531] = "쿨타로크",
 		[319539] = "쿨타로크",
 		[319544] = 3,
 		[319556] = 6,
@@ -12868,6 +13877,7 @@ _detalhes_global = {
 		[319938] = "[*] 질병 구름",
 		[319941] = "에첼론",
 		[319952] = 5,
+		[319957] = "노련한 해골방패",
 		[319997] = "휘청이는 석궁병",
 		[320008] = "밀하우스 마나스톰",
 		[320009] = 11,
@@ -12911,6 +13921,7 @@ _detalhes_global = {
 		[320334] = 12,
 		[320336] = "불완전뼈 마법사",
 		[320338] = 12,
+		[320341] = 12,
 		[320358] = "의사 스티치플레시",
 		[320359] = "의사 스티치플레시",
 		[320365] = "의사 스티치플레시",
@@ -12938,6 +13949,7 @@ _detalhes_global = {
 		[320674] = 7,
 		[320679] = "불굴의 경쟁자",
 		[320696] = "누더기 선봉대",
+		[320707] = 3,
 		[320717] = "오물 구더기",
 		[320723] = "[*] 어긋난 파장",
 		[320727] = "[*] 어긋난 파장",
@@ -12964,10 +13976,12 @@ _detalhes_global = {
 		[320861] = "굶주린 진드기",
 		[320910] = 8,
 		[320911] = 8,
+		[320917] = 8,
 		[320966] = "킨타라",
 		[320976] = 3,
 		[320991] = "제왕의 안개춤꾼",
 		[320999] = "제왕의 안개춤꾼",
+		[321000] = "노련한 해골방패",
 		[321005] = "잉그라 말로크",
 		[321009] = "킨타라",
 		[321011] = "밀리피센트 마나스톰",
@@ -12985,6 +13999,8 @@ _detalhes_global = {
 		[321253] = "[*] 마지막 수확",
 		[321258] = "[*] 마지막 수확",
 		[321264] = "돌갑옷 마귀",
+		[321329] = 8,
+		[321349] = "스프리건 상처잡이",
 		[321379] = 5,
 		[321388] = 8,
 		[321390] = 8,
@@ -12997,7 +14013,9 @@ _detalhes_global = {
 		[321444] = 4,
 		[321445] = 8,
 		[321461] = 3,
+		[321470] = 2,
 		[321507] = 8,
+		[321510] = 11,
 		[321516] = 10,
 		[321519] = 8,
 		[321524] = 3,
@@ -13037,11 +14055,14 @@ _detalhes_global = {
 		[321975] = "역병 점액",
 		[321999] = "역병 점액",
 		[322013] = 3,
+		[322015] = 4,
 		[322088] = "쿨타로크",
 		[322098] = 5,
 		[322101] = 10,
+		[322105] = 5,
 		[322109] = 10,
 		[322118] = 10,
+		[322125] = 3,
 		[322167] = 9,
 		[322169] = "의심의 잔재",
 		[322170] = 9,
@@ -13062,6 +14083,7 @@ _detalhes_global = {
 		[322465] = "트레도바",
 		[322475] = "[*] 역병 붕괴",
 		[322486] = "티르넨 주민",
+		[322487] = "티르넨 주민",
 		[322491] = "후작 스트라다마",
 		[322492] = "후작 스트라다마",
 		[322493] = "불완전뼈 마법사",
@@ -13076,6 +14098,7 @@ _detalhes_global = {
 		[322648] = "[*] 정신의 연결",
 		[322654] = "트레도바",
 		[322655] = "트레도바",
+		[322658] = "트레도바",
 		[322681] = "스티치플레시의 피조물",
 		[322709] = "트레도바",
 		[322711] = "할키아스",
@@ -13106,6 +14129,7 @@ _detalhes_global = {
 		[322838] = 12,
 		[322839] = 12,
 		[322840] = 12,
+		[322841] = 12,
 		[322844] = 12,
 		[322845] = 12,
 		[322846] = 12,
@@ -13136,6 +14160,7 @@ _detalhes_global = {
 		[323057] = "잉그라 말로크",
 		[323059] = "수풀사령관 울파란",
 		[323064] = "영혼약탈자 학카르",
+		[323070] = 3,
 		[323076] = 12,
 		[323107] = "진물 찌꺼기",
 		[323110] = "진물 찌꺼기",
@@ -13239,9 +14264,11 @@ _detalhes_global = {
 		[323996] = 12,
 		[324010] = "밀리피센트 마나스톰",
 		[324026] = "조르라무스 강령술사",
+		[324031] = 3,
 		[324044] = "할키아스",
 		[324046] = "오리프리온",
 		[324047] = "밀리피센트 마나스톰",
+		[324068] = 12,
 		[324073] = 4,
 		[324079] = "무한의 여제 모르드레타",
 		[324085] = "참수자 데시아",
@@ -13267,6 +14294,7 @@ _detalhes_global = {
 		[324226] = 10,
 		[324260] = 3,
 		[324293] = "해골 약탈자",
+		[324307] = "응축된 령",
 		[324312] = 10,
 		[324323] = "해골 약탈자",
 		[324368] = "에줄스",
@@ -13314,6 +14342,8 @@ _detalhes_global = {
 		[324748] = 10,
 		[324760] = "할키아스의 조각",
 		[324776] = "안개장막 구체자",
+		[324821] = 3,
+		[324822] = 4,
 		[324825] = 3,
 		[324859] = "안개장막 구체자",
 		[324867] = 7,
@@ -13347,6 +14377,7 @@ _detalhes_global = {
 		[325174] = 7,
 		[325184] = "귀부인 이네르바 다크베인",
 		[325189] = 2,
+		[325197] = 10,
 		[325202] = 10,
 		[325203] = 5,
 		[325209] = 10,
@@ -13494,6 +14525,8 @@ _detalhes_global = {
 		[326771] = "돌숨결 난도질꾼",
 		[326794] = "심문관 시가르",
 		[326806] = "심문관 시가르",
+		[326808] = 6,
+		[326809] = 6,
 		[326824] = "죄악의 메아리",
 		[326826] = "고위 감시자",
 		[326827] = "고위 감시자",
@@ -13520,6 +14553,7 @@ _detalhes_global = {
 		[326952] = "마력 깃든 깃펜",
 		[326994] = "대영주 데나트리우스",
 		[326997] = "돌숨결 난도질꾼",
+		[326999] = 6,
 		[327019] = "차원문",
 		[327029] = "휘청이는 석궁병",
 		[327037] = 11,
@@ -13537,6 +14571,8 @@ _detalhes_global = {
 		[327122] = "레모르니아",
 		[327123] = "레모르니아",
 		[327130] = "살점 공예가",
+		[327140] = 7,
+		[327155] = "충직한 피조물",
 		[327158] = 7,
 		[327159] = 7,
 		[327162] = 7,
@@ -13551,8 +14587,10 @@ _detalhes_global = {
 		[327331] = "이탈자 치유사",
 		[327332] = "이탈자 치유사",
 		[327355] = 8,
+		[327371] = 8,
 		[327393] = "조르라무스 강령술사",
 		[327397] = "조르라무스 강령술사",
+		[327411] = "에첼론",
 		[327413] = "이탈자 거수",
 		[327414] = "[*] 빙의",
 		[327416] = "이탈자 거수",
@@ -13648,6 +14686,7 @@ _detalhes_global = {
 		[328306] = 4,
 		[328322] = "불멸의 돌마귀 <에첼론>",
 		[328325] = 3,
+		[328330] = "이탈자 심판관",
 		[328331] = "이탈자 심판관",
 		[328338] = "맹독 저격수",
 		[328342] = "맹독송곳니 <맹독 저격수>",
@@ -13685,6 +14724,7 @@ _detalhes_global = {
 		[328651] = "맹독 저격수",
 		[328660] = "쏟아져 나오는 점액",
 		[328662] = "무엇인가",
+		[328664] = "불완전뼈 마법사",
 		[328667] = "불완전뼈 마법사",
 		[328673] = "제랄리",
 		[328687] = "불완전뼈 석궁수 <조르라무스 강령술사>",
@@ -13697,6 +14737,7 @@ _detalhes_global = {
 		[328757] = 3,
 		[328789] = "파멸의 가장자리",
 		[328791] = "시종장",
+		[328799] = "선택받은 공성일꾼",
 		[328837] = 3,
 		[328857] = "절규날개",
 		[328869] = "귀족 크롬웰",
@@ -13714,6 +14755,7 @@ _detalhes_global = {
 		[328925] = 9,
 		[328928] = 7,
 		[328930] = 7,
+		[328933] = 7,
 		[328936] = "대영주 데나트리우스",
 		[328951] = 12,
 		[328953] = 12,
@@ -13856,6 +14898,7 @@ _detalhes_global = {
 		[330404] = "역병대괴조",
 		[330417] = "진창 병사",
 		[330423] = "버섯 번개술사",
+		[330438] = "죽음의 감시자",
 		[330458] = "감방 파수병",
 		[330468] = "탐식자 크릭시스",
 		[330471] = "죽음의 감시자",
@@ -13869,6 +14912,8 @@ _detalhes_global = {
 		[330537] = "[*] 걸신들린 독기",
 		[330562] = "고대의 대장",
 		[330565] = "고대의 대장",
+		[330569] = "떠도는 죽음",
+		[330574] = "떠도는 죽음",
 		[330580] = "레모르니아",
 		[330586] = "부패의 도살자",
 		[330590] = "[*] 걸신들린 독기",
@@ -13907,6 +14952,7 @@ _detalhes_global = {
 		[330822] = "관찰자 젤가르",
 		[330843] = "관찰자 젤가르",
 		[330848] = "[*] 틀린 안무",
+		[330859] = 10,
 		[330868] = "광기 어린 영혼결속사",
 		[330871] = "대영주 데나트리우스",
 		[330875] = "사악한 암흑예언자",
@@ -13921,6 +14967,7 @@ _detalhes_global = {
 		[330943] = 2,
 		[330945] = 2,
 		[330948] = 3,
+		[330953] = "멜산",
 		[330959] = "스타브로스 경",
 		[330965] = "성주 니클라우스",
 		[330968] = "공격적인 종업원",
@@ -13930,10 +14977,14 @@ _detalhes_global = {
 		[331008] = "실험용 수액괴물",
 		[331016] = 12,
 		[331074] = 5,
+		[331081] = 12,
 		[331087] = 3,
 		[331088] = 3,
 		[331090] = 3,
+		[331096] = 5,
 		[331126] = "추적자",
+		[331133] = "역병에 젖은 유해",
+		[331172] = "[*] 정신의 연결",
 		[331179] = 3,
 		[331181] = 3,
 		[331183] = 3,
@@ -13980,12 +15031,15 @@ _detalhes_global = {
 		[331370] = 3,
 		[331379] = "윤활유 도포기",
 		[331381] = "[*] 미끄러짐",
+		[331390] = 10,
 		[331398] = "불안정한 기억",
 		[331399] = "후작 스트라다마",
 		[331401] = "장군 카알",
 		[331415] = "장군 카알",
 		[331422] = "지각력 있는 석유",
 		[331430] = 3,
+		[331433] = 10,
+		[331446] = 10,
 		[331447] = 12,
 		[331455] = 3,
 		[331462] = 4,
@@ -13994,7 +15048,10 @@ _detalhes_global = {
 		[331493] = 12,
 		[331497] = 12,
 		[331510] = "불굴의 경쟁자",
+		[331511] = 10,
 		[331523] = 3,
+		[331535] = 10,
+		[331536] = 10,
 		[331537] = "어둠손아귀 토템 <실버문경비병-세나리우스>",
 		[331548] = "댕-댕",
 		[331573] = "구속된 망령",
@@ -14004,6 +15061,8 @@ _detalhes_global = {
 		[331624] = 3,
 		[331634] = "스타브로스 경",
 		[331638] = "스타브로스 경",
+		[331649] = 10,
+		[331660] = 10,
 		[331674] = 10,
 		[331692] = 9,
 		[331718] = "안개장막 수호병",
@@ -14022,12 +15081,14 @@ _detalhes_global = {
 		[331935] = "꿈틀대는 고통",
 		[331937] = 2,
 		[331939] = 2,
+		[331974] = 3,
 		[331978] = 11,
 		[331982] = "장군 드레이븐",
 		[331997] = "오리프리온",
 		[332002] = "살아 움직이는 저승석",
 		[332078] = 11,
 		[332084] = "윤활유 도포기",
+		[332121] = 3,
 		[332128] = "길 잃은 허드레꾼",
 		[332156] = "머리 없는 수신로봇",
 		[332157] = "머리 없는 수신로봇",
@@ -14035,16 +15096,21 @@ _detalhes_global = {
 		[332165] = "울부짖는 망령",
 		[332168] = 1,
 		[332169] = 1,
+		[332181] = "포식자 곡술",
 		[332186] = 3,
 		[332196] = "머리 없는 수신로봇",
 		[332232] = "지각력 있는 석유",
 		[332234] = "지각력 있는 석유",
+		[332239] = "포식자 곡술",
 		[332241] = "[*] 기반 붕괴",
+		[332246] = 3,
 		[332252] = 3,
+		[332292] = "포식자 곡술",
 		[332296] = "굶주린 파괴자",
 		[332300] = 12,
 		[332313] = "도미나 베놈블레이드",
 		[332314] = "암살자 추적자",
+		[332315] = 3,
 		[332318] = "진흙주먹",
 		[332329] = "아탈라이 헌신자",
 		[332332] = "학카르의 자손",
@@ -14052,6 +15118,9 @@ _detalhes_global = {
 		[332371] = 2,
 		[332397] = 12,
 		[332398] = 2,
+		[332401] = 2,
+		[332407] = 2,
+		[332409] = 2,
 		[332444] = "[*] 무너지는 기반",
 		[332468] = 1,
 		[332469] = 1,
@@ -14076,6 +15145,7 @@ _detalhes_global = {
 		[332585] = "대영주 데나트리우스",
 		[332592] = 2,
 		[332594] = 12,
+		[332598] = 1,
 		[332605] = "아탈라이 어둠마법 사술사",
 		[332607] = "아탈라이 어둠마법 사술사",
 		[332608] = "아탈라이 어둠마법 사술사",
@@ -14084,6 +15154,9 @@ _detalhes_global = {
 		[332619] = "대영주 데나트리우스",
 		[332620] = "대영주 데나트리우스",
 		[332626] = "대영주 데나트리우스",
+		[332629] = "선혈토막",
+		[332634] = 12,
+		[332642] = 1,
 		[332668] = "쿨란",
 		[332671] = "아탈라이 죽음방랑자",
 		[332672] = "아탈라이 죽음방랑자",
@@ -14101,9 +15174,12 @@ _detalhes_global = {
 		[332734] = "대영주 데나트리우스",
 		[332744] = 12,
 		[332797] = "대영주 데나트리우스",
+		[332799] = 2,
+		[332800] = 2,
 		[332801] = 2,
 		[332803] = 2,
 		[332804] = 2,
+		[332805] = 2,
 		[332836] = "부패의 도살자",
 		[332842] = 8,
 		[332849] = "대영주 데나트리우스",
@@ -14111,6 +15187,7 @@ _detalhes_global = {
 		[332865] = "점액살거수",
 		[332871] = "고위 고문관 다리토스",
 		[332903] = 1,
+		[332922] = 1,
 		[332937] = "사악한 환영",
 		[332939] = 2,
 		[332940] = 2,
@@ -14125,6 +15202,7 @@ _detalhes_global = {
 		[333122] = 2,
 		[333123] = 2,
 		[333145] = "황량날개 암살자",
+		[333218] = 2,
 		[333227] = "되살아난 장군",
 		[333231] = "저주받은 자 사델",
 		[333241] = "분노의 핏빛뿔",
@@ -14148,9 +15226,13 @@ _detalhes_global = {
 		[333488] = "아마스",
 		[333489] = "아마스",
 		[333492] = "아마스",
+		[333501] = 4,
+		[333503] = 4,
+		[333504] = 4,
 		[333506] = 4,
 		[333507] = 4,
 		[333508] = 4,
+		[333510] = 4,
 		[333511] = 4,
 		[333523] = "비열한 자 시라",
 		[333526] = 11,
@@ -14192,6 +15274,8 @@ _detalhes_global = {
 		[334009] = "장군 그라샤알",
 		[334017] = "구속된 망령",
 		[334023] = "피에 굶주린 하루기아",
+		[334025] = "피에 굶주린 하루기아",
+		[334027] = 10,
 		[334051] = "죽음예언자",
 		[334053] = "오리프리온",
 		[334058] = 8,
@@ -14218,12 +15302,15 @@ _detalhes_global = {
 		[334352] = 8,
 		[334353] = 3,
 		[334364] = 3,
+		[334366] = 3,
 		[334377] = "연구 필경사",
 		[334378] = "연구 필경사",
 		[334381] = "연구 필경사",
+		[334391] = 10,
 		[334404] = "사냥꾼 알티모르",
 		[334406] = 12,
 		[334428] = 3,
+		[334443] = 3,
 		[334444] = 11,
 		[334448] = 7,
 		[334476] = "의사 스티치플레시",
@@ -14260,6 +15347,7 @@ _detalhes_global = {
 		[334677] = 9,
 		[334679] = 3,
 		[334684] = "[*] 과업의 창",
+		[334730] = 2,
 		[334731] = 2,
 		[334743] = "[*] 암흑의 발표회",
 		[334747] = "시체 수확자",
@@ -14300,11 +15388,13 @@ _detalhes_global = {
 		[334970] = "무에젤라",
 		[334971] = "마르고어",
 		[334988] = "역병결합 거한",
+		[334992] = 2,
 		[335012] = 3,
 		[335013] = "기술자 자이목스",
 		[335016] = "사냥꾼 알티모르",
 		[335072] = "밀하우스 마나스톰",
 		[335082] = 1,
+		[335088] = 2,
 		[335090] = 10,
 		[335095] = 2,
 		[335096] = 1,
@@ -14312,6 +15402,7 @@ _detalhes_global = {
 		[335098] = 1,
 		[335100] = 1,
 		[335101] = 1,
+		[335102] = 3,
 		[335114] = "사냥꾼 알티모르",
 		[335116] = "사냥꾼 알티모르",
 		[335119] = "사냥꾼 알티모르",
@@ -14321,6 +15412,7 @@ _detalhes_global = {
 		[335143] = "조르라무스 뼈치유사",
 		[335148] = 3,
 		[335151] = 3,
+		[335152] = 3,
 		[335161] = 2,
 		[335164] = "역병자루",
 		[335180] = 6,
@@ -14345,9 +15437,11 @@ _detalhes_global = {
 		[335540] = "성가신 마귀",
 		[335600] = 3,
 		[335608] = 3,
+		[335611] = 3,
 		[335614] = 3,
 		[335680] = "나락살이 영혼술사",
 		[335685] = "나락살이 영혼술사",
+		[335693] = 3,
 		[335694] = "나락살이 종결자",
 		[335720] = "나락살이 의식술사",
 		[335766] = 11,
@@ -14370,6 +15464,7 @@ _detalhes_global = {
 		[336009] = 5,
 		[336026] = 12,
 		[336027] = 3,
+		[336036] = 2,
 		[336038] = 3,
 		[336040] = 3,
 		[336043] = 12,
@@ -14377,6 +15472,7 @@ _detalhes_global = {
 		[336045] = 1,
 		[336065] = 7,
 		[336097] = 8,
+		[336108] = 8,
 		[336118] = 3,
 		[336123] = 3,
 		[336126] = 2,
@@ -14396,6 +15492,8 @@ _detalhes_global = {
 		[336301] = 12,
 		[336306] = "도미나 베놈블레이드",
 		[336372] = 4,
+		[336383] = "떠도는 죽음",
+		[336409] = "떠도는 죽음",
 		[336417] = "불안정한 애벌레",
 		[336420] = "라케시스",
 		[336444] = "아스트로노스",
@@ -14417,6 +15515,7 @@ _detalhes_global = {
 		[336711] = 9,
 		[336714] = 3,
 		[336716] = 6,
+		[336720] = 2,
 		[336722] = 8,
 		[336746] = 3,
 		[336759] = "미스트콜러",
@@ -14432,12 +15531,14 @@ _detalhes_global = {
 		[336874] = 10,
 		[336885] = 8,
 		[336889] = 8,
+		[336891] = 10,
 		[336899] = 3,
 		[336972] = 5,
 		[336996] = "분쇄자 네크타라",
 		[337037] = "분쇄자 네크타라",
 		[337060] = 9,
 		[337090] = 8,
+		[337101] = 10,
 		[337110] = "남작 프리에다",
 		[337113] = 9,
 		[337137] = 8,
@@ -14445,15 +15546,20 @@ _detalhes_global = {
 		[337155] = 1,
 		[337170] = 9,
 		[337178] = "불굴의 경쟁자",
+		[337242] = 10,
 		[337253] = "트레도바",
 		[337255] = "트레도바",
 		[337299] = 8,
 		[337342] = 10,
 		[337470] = 1,
+		[337476] = 10,
 		[337508] = 11,
 		[337510] = 3,
 		[337511] = 3,
 		[337512] = 3,
+		[337516] = 6,
+		[337517] = 3,
+		[337529] = 6,
 		[337567] = 12,
 		[337571] = 10,
 		[337613] = 3,
@@ -14472,6 +15578,7 @@ _detalhes_global = {
 		[337729] = 3,
 		[337749] = 5,
 		[337750] = 12,
+		[337787] = 5,
 		[337815] = 2,
 		[337819] = 12,
 		[337824] = 2,
@@ -14485,6 +15592,7 @@ _detalhes_global = {
 		[337956] = 5,
 		[337960] = 6,
 		[337973] = 6,
+		[337984] = 7,
 		[337989] = 6,
 		[338003] = "타락한 절멸자",
 		[338004] = "느릿느릿한 관리인",
@@ -14515,6 +15623,7 @@ _detalhes_global = {
 		[338456] = "키리안 누더기괴물",
 		[338471] = "탐식자 크릭시스",
 		[338501] = 6,
+		[338512] = 10,
 		[338523] = 6,
 		[338570] = 5,
 		[338606] = "분리 조수 <작업장 차원문>",
@@ -14535,6 +15644,7 @@ _detalhes_global = {
 		[338871] = "영혼추적자 브이라라",
 		[338906] = 12,
 		[338907] = 5,
+		[338912] = 3,
 		[338922] = 12,
 		[338928] = 12,
 		[338948] = 3,
@@ -14574,6 +15684,7 @@ _detalhes_global = {
 		[339430] = "돌 군단 특공대원",
 		[339437] = "돌 군단 특공대원",
 		[339444] = "돌 군단 특공대원",
+		[339461] = 3,
 		[339463] = 1,
 		[339498] = 3,
 		[339525] = "쿨란",
@@ -14589,6 +15700,7 @@ _detalhes_global = {
 		[339560] = 12,
 		[339573] = "무한의 여제 모르드레타",
 		[339588] = 3,
+		[339589] = 12,
 		[339603] = "파라",
 		[339607] = 8,
 		[339609] = "과거의 죄악",
@@ -14599,14 +15711,19 @@ _detalhes_global = {
 		[339654] = 3,
 		[339664] = 2,
 		[339669] = 2,
+		[339672] = 2,
 		[339690] = "장군 그라샤알",
 		[339693] = "[*] 수정 폭발",
 		[339706] = "환영 황소기수",
 		[339728] = "장군 그라샤알",
+		[339736] = 9,
+		[339737] = 3,
+		[339738] = 9,
 		[339744] = 2,
 		[339751] = "환영 황소기수",
 		[339759] = "무한의 여제 모르드레타",
 		[339770] = "령에 미친 일꾼",
+		[339784] = 9,
 		[339825] = 1,
 		[339886] = "[*] 령의 향연",
 		[339894] = 12,
@@ -14634,24 +15751,43 @@ _detalhes_global = {
 		[340159] = 7,
 		[340160] = "안개장막 무리어미",
 		[340162] = 2,
+		[340182] = 12,
 		[340189] = "안개장막 무리어미",
 		[340190] = 3,
 		[340191] = "[*] 원기 회복의 광휘",
 		[340203] = 2,
 		[340208] = "안개장막 무리어미",
+		[340210] = 7,
+		[340211] = 12,
 		[340214] = 2,
+		[340219] = 12,
+		[340225] = 7,
+		[340227] = 5,
 		[340238] = 9,
+		[340271] = 7,
+		[340273] = 5,
 		[340279] = "안개장막 밤만개꽃",
+		[340283] = "안개장막 밤만개꽃",
 		[340284] = 5,
 		[340288] = "안개장막 밤만개꽃",
 		[340289] = "안개장막 밤만개꽃",
 		[340300] = "안개장막 포식귀",
 		[340304] = "안개장막 포식귀",
 		[340305] = "안개장막 포식귀",
+		[340311] = "안개장막 포식귀",
 		[340324] = "[*] 피웅덩이 용액",
 		[340355] = "[*] 신속한 감염",
 		[340356] = "역병 점액",
+		[340378] = 6,
+		[340379] = 6,
+		[340426] = 4,
+		[340431] = 4,
+		[340435] = 3,
+		[340438] = 3,
+		[340445] = 8,
 		[340446] = "시기의 현신 <심문관 시가르>",
+		[340448] = 12,
+		[340451] = 3,
 		[340467] = 8,
 		[340473] = 8,
 		[340477] = "귀부인 이네르바 다크베인",
@@ -14662,7 +15798,10 @@ _detalhes_global = {
 		[340554] = 3,
 		[340556] = 11,
 		[340563] = 9,
+		[340571] = 8,
+		[340573] = 4,
 		[340592] = 3,
+		[340597] = 3,
 		[340600] = 4,
 		[340601] = 4,
 		[340603] = 4,
@@ -14673,14 +15812,32 @@ _detalhes_global = {
 		[340630] = "[*] 부패",
 		[340631] = "하수도 쥐",
 		[340639] = 4,
+		[340643] = 12,
 		[340646] = "조각된 조수",
 		[340647] = "조각된 조수",
+		[340653] = 12,
+		[340672] = 12,
+		[340673] = 8,
+		[340676] = 3,
+		[340677] = 3,
+		[340691] = 3,
+		[340692] = 3,
 		[340702] = "역병결합 헌신자",
+		[340709] = 3,
+		[340742] = 3,
+		[340744] = 3,
+		[340745] = 11,
+		[340747] = 3,
 		[340758] = "기술자 자이목스",
+		[340774] = 3,
 		[340788] = "기술자 자이목스",
+		[340801] = 12,
 		[340807] = "기술자 자이목스",
+		[340823] = 12,
 		[340842] = "환상의 수정",
+		[340850] = 3,
 		[340860] = "멸종의 뿌리",
+		[340861] = 3,
 		[340870] = "파멸의 가장자리",
 		[340872] = "파멸의 가장자리",
 		[340873] = "교만의 현신",
@@ -14688,6 +15845,8 @@ _detalhes_global = {
 		[341022] = "역병결합 헌신자",
 		[341131] = "궁정 집행관",
 		[341133] = "나스리아 신관",
+		[341137] = 3,
+		[341140] = 8,
 		[341145] = "나스리아 신관",
 		[341146] = "궁정 집행관",
 		[341151] = "나스리아 암살자",
@@ -14699,6 +15858,7 @@ _detalhes_global = {
 		[341199] = "나스리아 명사수",
 		[341200] = "나스리아 죄악수호병",
 		[341207] = 5,
+		[341220] = 12,
 		[341250] = "진흙주먹",
 		[341254] = "다시 태어난 불사조",
 		[341260] = 10,
@@ -14714,7 +15874,10 @@ _detalhes_global = {
 		[341340] = 6,
 		[341349] = "나스리아 추적자",
 		[341352] = "나스리아 명사수",
+		[341370] = 8,
+		[341373] = 8,
 		[341374] = 5,
+		[341375] = 8,
 		[341385] = 5,
 		[341390] = "집행관 오필리아",
 		[341395] = "집행관 오필리아",
@@ -14751,6 +15914,7 @@ _detalhes_global = {
 		[341766] = 2,
 		[341770] = 1,
 		[341771] = "해골 학자",
+		[341796] = "규탄자",
 		[341821] = 11,
 		[341826] = 4,
 		[341859] = "궁정 암살자",
@@ -14771,6 +15935,7 @@ _detalhes_global = {
 		[342051] = 3,
 		[342076] = 3,
 		[342103] = "[*] 고약한 담즙",
+		[342122] = 12,
 		[342125] = "야만전사 도키그",
 		[342126] = "야만전사 도키그",
 		[342132] = 5,
@@ -14876,6 +16041,7 @@ _detalhes_global = {
 		[343323] = "몰도바크",
 		[343325] = "신드렐",
 		[343355] = 5,
+		[343382] = 4,
 		[343383] = 4,
 		[343385] = 11,
 		[343386] = 11,
@@ -14883,12 +16049,17 @@ _detalhes_global = {
 		[343391] = 4,
 		[343393] = 2,
 		[343396] = 5,
+		[343439] = 4,
+		[343440] = 1,
 		[343446] = 4,
 		[343448] = 3,
+		[343450] = 4,
+		[343461] = 10,
 		[343470] = "해골 약탈자",
 		[343509] = "오페트",
 		[343520] = "[*] 폭풍",
 		[343527] = 2,
+		[343553] = "원한의 망령",
 		[343556] = "의사 스티치플레시",
 		[343594] = 8,
 		[343648] = 11,
@@ -14898,7 +16069,12 @@ _detalhes_global = {
 		[343724] = 2,
 		[343727] = "어둠의 마귀 <흐르는모래의예복-헬스크림>",
 		[343737] = 10,
+		[343764] = 10,
 		[343782] = 4,
+		[343791] = 10,
+		[343819] = 10,
+		[343820] = 10,
+		[343825] = 10,
 		[343881] = "장군 카알",
 		[343895] = "돌 군단 거수",
 		[343898] = "돌 군단 거수",
@@ -14915,6 +16091,7 @@ _detalhes_global = {
 		[344120] = 3,
 		[344121] = 3,
 		[344128] = 3,
+		[344150] = "수도사의뚝빼기",
 		[344153] = 2,
 		[344154] = 2,
 		[344155] = 2,
@@ -14942,6 +16119,8 @@ _detalhes_global = {
 		[344530] = 5,
 		[344533] = 3,
 		[344548] = 7,
+		[344552] = "대장 칼드레이지",
+		[344567] = "소용돌이 칼날 <대장 칼드레이지>",
 		[344572] = "운다스타 <보테로>",
 		[344576] = 6,
 		[344578] = 2,
@@ -14978,7 +16157,10 @@ _detalhes_global = {
 		[345087] = 3,
 		[345088] = 3,
 		[345094] = 5,
+		[345102] = 6,
+		[345103] = 6,
 		[345108] = 2,
+		[345109] = 2,
 		[345110] = 3,
 		[345111] = 5,
 		[345112] = 8,
@@ -15018,6 +16200,7 @@ _detalhes_global = {
 		[345499] = 5,
 		[345504] = "투명 추적기",
 		[345524] = 8,
+		[345527] = 3,
 		[345530] = 4,
 		[345535] = 1,
 		[345539] = 11,
@@ -15076,12 +16259,14 @@ _detalhes_global = {
 		[346266] = 3,
 		[346267] = 3,
 		[346276] = 12,
+		[346278] = 12,
 		[346310] = 12,
 		[346369] = 1,
 		[346370] = 1,
 		[346379] = 3,
 		[346502] = 12,
 		[346503] = 12,
+		[346505] = 12,
 		[346574] = 1,
 		[346602] = "작고한 수도사 <패트릭비에이라>",
 		[346651] = "남작 프리에다",
@@ -15117,8 +16302,11 @@ _detalhes_global = {
 		[347376] = "무도 제어기",
 		[347404] = "나락살이 사도",
 		[347425] = "스타브로스 경",
+		[347462] = 12,
+		[347565] = 3,
 		[347600] = 3,
 		[347625] = 5,
+		[347645] = "대장 칼드레이지",
 		[347765] = 12,
 		[347788] = 5,
 		[347829] = 1,
@@ -15132,21 +16320,29 @@ _detalhes_global = {
 		[348139] = 11,
 		[348140] = 11,
 		[348141] = 2,
+		[348162] = 3,
 		[348251] = 1,
 		[348252] = 1,
+		[348439] = 4,
 		[348477] = 3,
 		[348511] = 3,
 		[348512] = 3,
 		[348518] = 2,
 		[348541] = 12,
+		[348542] = 12,
 		[348543] = 12,
 		[348545] = 5,
 		[348546] = 5,
+		[348909] = 3,
+		[349857] = 8,
+		[350163] = "원한의 망령",
 		[350549] = 3,
+		[351077] = 1,
 		["DEBUFF"] = 6,
 	},
 	["spell_school_cache"] = {
 		["Corpo-a-Corpo"] = 1,
+		["L1 비전 폭파물"] = 64,
 		["Tiro-Autom�tico"] = 1,
 		["갈퀴 발톱"] = 1,
 		["강철 쐐기"] = 1,
@@ -15156,20 +16352,25 @@ _detalhes_global = {
 		["거인 주먹"] = 1,
 		["거인의 강타"] = 1,
 		["걸신들린 독기"] = 32,
+		["검은 물"] = 32,
 		["격돌"] = 1,
 		["격동의 령"] = 32,
+		["격분"] = 1,
 		["격화"] = 32,
 		["결박"] = 1,
 		["결속의 사슬"] = 1,
 		["경멸"] = 32,
 		["고기 갈고리"] = 1,
+		["고기 갈고리 다지기 강타"] = 1,
 		["고도로 농축된 령"] = 32,
 		["고문의 메아리"] = 32,
 		["고블린 용화포"] = 4,
 		["고성능 양 폭탄"] = 4,
 		["고약한 가스"] = 8,
 		["고통스러운 기억"] = 32,
+		["고통의 채찍"] = 32,
 		["곪아가는 부식"] = 40,
+		["공격적인 허풍"] = 32,
 		["공동의 인식"] = 32,
 		["공중 폭격"] = 32,
 		["공포를 부르는 혼돈"] = 32,
@@ -15184,6 +16385,7 @@ _detalhes_global = {
 		["괴저 수액"] = 32,
 		["괴저 숨결"] = 32,
 		["괴저 화살"] = 32,
+		["교만의 폭발"] = 32,
 		["교만한 분출"] = 32,
 		["국지적 폭파 장치"] = 64,
 		["굴절된 죄악의 빛"] = 32,
@@ -15202,15 +16404,19 @@ _detalhes_global = {
 		["날카로운 사격"] = 1,
 		["노쇠의 물어뜯기"] = 8,
 		["농축된 역병"] = 8,
+		["다수의 머리"] = 1,
 		["대학살"] = 32,
 		["독사 쐐기"] = 8,
 		["돌 가시"] = 1,
 		["돌 파편"] = 8,
 		["돌발 수액"] = 8,
+		["돌의 저주"] = 8,
 		["돌조각"] = 8,
 		["두려움"] = 32,
+		["들끓는 울화통"] = 1,
 		["들붙는 어둠"] = 32,
 		["들쭉날쭉한 상처"] = 1,
+		["령 과충전"] = 64,
 		["령 분수"] = 32,
 		["령 웅덩이"] = 8,
 		["령 축출"] = 8,
@@ -15221,9 +16427,13 @@ _detalhes_global = {
 		["마구잡이 돌진"] = 1,
 		["마무리 강타"] = 1,
 		["마비의 탄환"] = 1,
+		["마취 독"] = 8,
+		["만물을 삼키는 원한"] = 32,
 		["망자의 땅"] = 32,
+		["맹공의 칼날"] = 1,
 		["맹독 가시"] = 8,
 		["맹독 안개"] = 40,
+		["맹독 투척"] = 8,
 		["맹독칼날"] = 8,
 		["먹잇감 살생"] = 1,
 		["메말리는 손길"] = 8,
@@ -15258,9 +16468,11 @@ _detalhes_global = {
 		["부식 역병"] = 8,
 		["부식성 기름찌끼"] = 8,
 		["부식성 독"] = 8,
+		["부패"] = 8,
 		["부패시키는 손길"] = 32,
 		["부패의 산"] = 8,
 		["부패의 손길"] = 32,
+		["부패하는 육신"] = 8,
 		["부패한 역병"] = 40,
 		["분개"] = 1,
 		["분쇄된 영혼"] = 32,
@@ -15269,7 +16481,7 @@ _detalhes_global = {
 		["분쇄의 루비"] = 1,
 		["분쇄의 포옹"] = 1,
 		["분쇄하는 발톱"] = 1,
-		["분출"] = 8,
+		["분출"] = 4,
 		["불가피"] = 1,
 		["불기둥"] = 4,
 		["불꽃 회오리"] = 4,
@@ -15281,6 +16493,7 @@ _detalhes_global = {
 		["비통의 의식"] = 32,
 		["비행 로켓닭 포화"] = 4,
 		["빙의"] = 32,
+		["빛 방출"] = 2,
 		["빛의 자락"] = 2,
 		["사격"] = 8,
 		["사마귀 탄약 폭발"] = 4,
@@ -15288,6 +16501,7 @@ _detalhes_global = {
 		["사신의 손아귀"] = 32,
 		["사악한 베기"] = 32,
 		["사악한 열상"] = 1,
+		["사악한 일격"] = 1,
 		["산산조각"] = 8,
 		["산성 배출"] = 8,
 		["산성 분출"] = 8,
@@ -15304,12 +16518,14 @@ _detalhes_global = {
 		["속박 풀린 우주"] = 32,
 		["속전속결"] = 1,
 		["쇄도하는 령"] = 64,
+		["쇠약의 일격"] = 1,
 		["수력파 진동"] = 16,
 		["수정 폭발"] = 8,
 		["수확의 낫"] = 1,
 		["순간 방출"] = 32,
 		["식사 시간"] = 1,
 		["신성 충격"] = 2,
+		["신속 사격"] = 1,
 		["신속의 베기"] = 1,
 		["신속한 감염"] = 8,
 		["신실한 연대"] = 64,
@@ -15318,14 +16534,17 @@ _detalhes_global = {
 		["썰기"] = 1,
 		["쏟아진 정수"] = 32,
 		["씻어내기"] = 16,
+		["아귀의 격노"] = 16,
 		["아래턱 공격"] = 8,
 		["악마의 파며어어어얼!"] = 32,
 		["악의의 고리"] = 32,
+		["악취 나는 부패"] = 8,
 		["알라르의 조각난 심장"] = 4,
 		["암살"] = 8,
 		["암흑 황폐"] = 32,
 		["암흑 회전"] = 1,
 		["암흑의 발표회"] = 32,
+		["암흑의 추적자"] = 64,
 		["압도적인 힘"] = 64,
 		["압도적인 힘!"] = 64,
 		["압제의 깃발"] = 1,
@@ -15353,12 +16572,14 @@ _detalhes_global = {
 		["영원의 공세"] = 32,
 		["영적 전이"] = 32,
 		["영혼 균열"] = 4,
+		["영혼 끌어내기"] = 32,
 		["영혼 낙인"] = 32,
 		["영혼 분열"] = 32,
 		["영혼 소각"] = 32,
 		["영혼 잃음"] = 32,
 		["영혼 주입"] = 32,
 		["영혼 파멸"] = 32,
+		["영혼 해방"] = 2,
 		["영혼 흡수"] = 32,
 		["영혼오염"] = 1,
 		["영혼의 연결"] = 32,
@@ -15380,6 +16601,7 @@ _detalhes_global = {
 		["유해 포자"] = 40,
 		["육중한 돌격"] = 1,
 		["으스러진 권세"] = 32,
+		["음에너지"] = 32,
 		["응고하는 점액"] = 40,
 		["이글거리는 깃털"] = 4,
 		["이글거리는 잔재"] = 4,
@@ -15402,8 +16624,10 @@ _detalhes_global = {
 		["전염병"] = 32,
 		["전염병의 원천"] = 8,
 		["전염성 비"] = 8,
+		["절개"] = 1,
 		["점성 액체"] = 1,
 		["점액 급습"] = 1,
+		["점액 덩이"] = 1,
 		["점액 흡수"] = 1,
 		["점액의 물결"] = 8,
 		["점액의 손길"] = 8,
@@ -15412,16 +16636,19 @@ _detalhes_global = {
 		["정신 불태우기"] = 32,
 		["정신의 연결"] = 32,
 		["정화 작렬"] = 64,
+		["정화의 불꽃"] = 2,
 		["조르라무스의 분노"] = 32,
 		["죄악에 물든 령"] = 32,
 		["죄악의 무게"] = 32,
 		["죄악의 추적자"] = 32,
+		["주입된 무기"] = 64,
 		["죽음그늘 세례"] = 32,
 		["죽음의 고리"] = 32,
 		["죽음의 발현"] = 32,
 		["죽음의 수의"] = 32,
 		["죽음의 지배자"] = 32,
 		["중력 붕괴"] = 64,
+		["즉발적인 말살"] = 32,
 		["지면 강타"] = 1,
 		["지옥 번개"] = 40,
 		["지옥불"] = 4,
@@ -15431,16 +16658,19 @@ _detalhes_global = {
 		["지진 융기"] = 8,
 		["진홍빛 질풍"] = 1,
 		["진홍빛 합창"] = 32,
-		["질병 구름"] = 8,
+		["질병 구름"] = 40,
 		["집속탄 폭격"] = 32,
 		["집정관의 보루"] = 1,
 		["짓궂은 작렬"] = 1,
 		["쪼개기 강타"] = 1,
+		["찢어발기는 발톱"] = 1,
 		["차원 균열"] = 64,
+		["천둥의 일격"] = 8,
 		["천벌의 망치"] = 2,
 		["최고천의 폭발물"] = 64,
 		["출혈"] = 1,
 		["출혈의 이빨"] = 1,
+		["춤추는 칼날"] = 1,
 		["충전된 령"] = 64,
 		["충전된 창"] = 64,
 		["치명상"] = 1,
@@ -15468,6 +16698,7 @@ _detalhes_global = {
 		["파멸의 고통"] = 32,
 		["파쇄의 유성"] = 8,
 		["파열"] = 32,
+		["파지직"] = 8,
 		["포격 질주"] = 4,
 		["포악한 휘둘러치기"] = 1,
 		["폭발성 양피지"] = 4,
@@ -15479,9 +16710,12 @@ _detalhes_global = {
 		["풍력"] = 8,
 		["피웅덩이 용액"] = 32,
 		["피의 대가"] = 32,
+		["피의 문장"] = 2,
 		["피의 포화"] = 32,
 		["핏빛 결속"] = 1,
 		["핏빛 굶주림"] = 1,
+		["학살의 사격"] = 32,
+		["한기"] = 16,
 		["해방된 령"] = 32,
 		["해방된 어둠"] = 32,
 		["해소"] = 32,
@@ -15492,11 +16726,13 @@ _detalhes_global = {
 		["혼란의 강타"] = 1,
 		["홀로 떨어진 먹잇감"] = 1,
 		["홍당무 숨결"] = 1,
+		["화산 분출"] = 4,
 		["화염 파편"] = 4,
 		["화염구"] = 4,
 		["환상의 기생충"] = 32,
 		["황폐화"] = 32,
 		["황혼의 애가"] = 32,
+		["회전베기"] = 1,
 		["회전톱"] = 1,
 		["회피의 도약"] = 1,
 		["후려갈기기"] = 1,
@@ -15629,8 +16865,8 @@ _detalhes_global = {
 		},
 		["bookmark_tutorial"] = false,
 		["ctrl_click_close_tutorial"] = false,
-		["logons"] = 197,
-		["main_help_button"] = 197,
+		["logons"] = 263,
+		["main_help_button"] = 263,
 		["unlock_button"] = 1,
 		["version_announce"] = 0,
 	},

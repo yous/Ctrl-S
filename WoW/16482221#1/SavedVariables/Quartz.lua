@@ -57,6 +57,9 @@ Quartz3DB = {
 	},
 	["profiles"] = {
 		["Default"] = {
+			["modules"] = {
+				["Mirror"] = false,
+			},
 		},
 	},
 }

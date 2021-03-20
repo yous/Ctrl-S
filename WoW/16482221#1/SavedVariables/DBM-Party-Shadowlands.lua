@@ -338,7 +338,6 @@ DBMPartyShadowlands_AllSavedVars = {
 				["announceother324085target"] = true,
 				["announceother326892target"] = true,
 				["announceother333231target"] = true,
-				["announceother333540target"] = true,
 			}, -- [2]
 		},
 		["2398"] = {
@@ -1129,9 +1128,6 @@ DBMPartyShadowlands_AllSavedVars = {
 			nil, -- [1]
 			{
 				["Enabled"] = true,
-				["SpecWarn257397interrupt"] = true,
-				["SpecWarn257397interruptSWNote"] = true,
-				["SpecWarn257397interruptSWSound"] = 1,
 				["SpecWarn331927moveto"] = true,
 				["SpecWarn331927movetoSWNote"] = true,
 				["SpecWarn331927movetoSWSound"] = 2,
@@ -1144,6 +1140,12 @@ DBMPartyShadowlands_AllSavedVars = {
 				["SpecWarn332612interrupt"] = true,
 				["SpecWarn332612interruptSWNote"] = true,
 				["SpecWarn332612interruptSWSound"] = 1,
+				["SpecWarn332666dispel"] = false,
+				["SpecWarn332666dispelSWNote"] = true,
+				["SpecWarn332666dispelSWSound"] = 1,
+				["SpecWarn332666interrupt"] = true,
+				["SpecWarn332666interruptSWNote"] = true,
+				["SpecWarn332666interruptSWSound"] = 1,
 				["SpecWarn332671run"] = false,
 				["SpecWarn332671runSWNote"] = true,
 				["SpecWarn332671runSWSound"] = 2,
@@ -1266,10 +1268,14 @@ DBMPartyShadowlands_AllSavedVars = {
 				["SpecWarn324103moveto"] = true,
 				["SpecWarn324103movetoSWNote"] = true,
 				["SpecWarn324103movetoSWSound"] = 3,
+				["SpecWarn326827run"] = true,
+				["SpecWarn326827runSWNote"] = true,
+				["SpecWarn326827runSWSound"] = 4,
 				["SpecWarn334673move"] = false,
 				["SpecWarn334673moveSWNote"] = true,
 				["SpecWarn334673moveSWSound"] = 1,
 				["Yell324086"] = true,
+				["announce326827fades"] = true,
 				["announceother324086target"] = true,
 				["announceother324089target"] = true,
 			}, -- [2]

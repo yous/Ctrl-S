@@ -1,6 +1,11 @@
 VER 3 0000000000000001 "Decursive" "INV_MISC_QUESTIONMARK"
 /script DecursiveRootTable.Dcr:Println('유효한 주문 없음')
 END
+VER 3 000000000000000F "거북의 상" "132199"
+#showtooltip 거북의 상
+/시전취소
+/시전 거북의 상
+END
 VER 3 0000000000000004 "달빛 봉오리" "3641394"
 /대상 달빛 봉오리
 /script T={1,2,3,4,5,6,7,8} i=GetRaidTargetIndex("target") if i==nil then i=GetRaidTargetIndex("unit") SetRaidTarget("target",T[i]) end
@@ -9,23 +14,40 @@ VER 3 0000000000000009 "도망자 영혼" "135791"
 /대상 도망자 영혼
 /script T={1,2,3,4,5,6,7,8} i=GetRaidTargetIndex("target") if i==nil then i=GetRaidTargetIndex("unit") SetRaidTarget("target",T[i]) end
 END
+VER 3 000000000000000A "망토" "INV_MISC_QUESTIONMARK"
+#showtooltip 15
+/사용 15
+END
 VER 3 0000000000000008 "바닥징" "1033477"
 /cwm [btn:2] 0
 /stopmacro [btn:2]
 /wm [mod:ctrl] 6; [mod:shift] 2; 8
+END
+VER 3 000000000000000B "원초적 분노" "INV_MISC_QUESTIONMARK"
+#showtooltip 원초적 분노
+/stopmacro [nopet]
+/시전 원초적 분노
+/run for i=1,5 do local a,b,c,d=GetStablePetInfo(i) f="Pet" if b==UnitName(f) and d==UnitCreatureFamily(f) then c="펫 "..i.." 블러드";DBM:CreatePizzaTimer(360, c);end;end
 END
 VER 3 0000000000000002 "응징의 격노" "SPELL_HOLY_AVENGINEWRATH"
 #showtooltip 응징의 격노
 /use 13
 /cast 응징의 격노
 END
-VER 3 0000000000000006 "쿨기" "INV_MISC_QUESTIONMARK"
-#showtooltip 광폭화
-/시전 광폭화
+VER 3 000000000000000D "장신구 1" "INV_MISC_QUESTIONMARK"
+#showtooltip 13
 /사용 13
+END
+VER 3 000000000000000E "장신구 2" "INV_MISC_QUESTIONMARK"
+#showtooltip 14
+/사용 14
 END
 VER 3 0000000000000007 "탈것" "INV_MISC_QUESTIONMARK"
 #showtooltip [mod:ctrl] 여행자의 동토 매머드; 풋내기 가죽뜯깃
 /시전 [mod:ctrl] 여행자의 동토 매머드
 /run local a=C_MountJournal.SummonByID if GetZoneText() == "나락" then b={1304,1442} a(b[random(2)]); else a(0); end
+END
+VER 3 000000000000000C "허리" "INV_MISC_QUESTIONMARK"
+#showtooltip 6
+/사용 6
 END
