@@ -1,5 +1,5 @@
 ----------------------------------------------------------------------
--- 	Leatrix Plus 9.0.20 (17th March 2021)
+-- 	Leatrix Plus 9.0.23 (8th April 2021)
 ----------------------------------------------------------------------
 
 --	01:Functions	20:Live			50:RunOnce		70:Logout			
@@ -20,7 +20,7 @@
 	local void
 
 	-- Version
-	LeaPlusLC["AddonVer"] = "9.0.20"
+	LeaPlusLC["AddonVer"] = "9.0.23"
 
 	-- Get locale table
 	local void, Leatrix_Plus = ...
@@ -29,7 +29,7 @@
 	-- Check Wow version is valid
 	do
 		local gameversion, gamebuild, gamedate, gametocversion = GetBuildInfo()
-		if gametocversion and gametocversion < 19999 then
+		if gametocversion and gametocversion < 90000 then
 			-- Game client is Wow Classic
 			C_Timer.After(2, function()
 				print(L["LEATRIX PLUS: WRONG VERSION INSTALLED!"])
@@ -397,6 +397,7 @@
 		LeaPlusLC:LockOption("ManageBuffs", "ManageBuffsButton", true)				-- Manage buffs
 		LeaPlusLC:LockOption("ManagePowerBar", "ManagePowerBarButton", true)		-- Manage power bar
 		LeaPlusLC:LockOption("ManageWidget", "ManageWidgetButton", true)			-- Manage widget
+		LeaPlusLC:LockOption("ManageFocus", "ManageFocusButton", true)				-- Manage focus
 		LeaPlusLC:LockOption("ClassColFrames", "ClassColFramesBtn", true)			-- Class colored frames
 		LeaPlusLC:LockOption("SetWeatherDensity", "SetWeatherDensityBtn", false)	-- Set weather density
 		LeaPlusLC:LockOption("MuteGameSounds", "MuteGameSoundsBtn", false)			-- Mute game sounds
@@ -448,6 +449,7 @@
 		or	(LeaPlusLC["ManageBuffs"]			~= LeaPlusDB["ManageBuffs"])			-- Manage buffs
 		or	(LeaPlusLC["ManagePowerBar"]		~= LeaPlusDB["ManagePowerBar"])			-- Manage power bar
 		or	(LeaPlusLC["ManageWidget"]			~= LeaPlusDB["ManageWidget"])			-- Manage widget
+		or	(LeaPlusLC["ManageFocus"]			~= LeaPlusDB["ManageFocus"])			-- Manage focus
 		or	(LeaPlusLC["ClassColFrames"]		~= LeaPlusDB["ClassColFrames"])			-- Class colored frames
 		or	(LeaPlusLC["ClassIconPortraits"]	~= LeaPlusDB["ClassIconPortraits"])		-- Class icon portraits
 		or	(LeaPlusLC["NoAlerts"]				~= LeaPlusDB["NoAlerts"])				-- Hide alerts
@@ -869,8 +871,8 @@
 
 				},
 
-				-- Xiwyllag ATV
-				["MuteATV"] = {
+				-- Hovercraft
+				["MuteHovercraft"] = {
 
 					"sound/creature/goblinhovercraft/mon_goblinhovercraft_drive01.ogg#1859976",
 					"sound/creature/goblinhovercraft/mon_goblinhovercraft_enginesputter_pop_01.ogg#1859968", 
@@ -883,8 +885,8 @@
 
 				},
 
-				-- Sky Golem
-				["MuteGolem"] = {
+				-- Mechsuits
+				["MuteMechsuits"] = {
 
 					-- Footsteps (sound/creature/goblinshredder/footstep_goblinshreddermount_general_)
 					"01.ogg#893935", "02.ogg#893937", "03.ogg#893939", "04.ogg#893941", "05.ogg#893943", "06.ogg#893945", "07.ogg#893947", "08.ogg#893949", 
@@ -911,7 +913,10 @@
 					"flightbackward_lp.ogg#898320", "flightend.ogg#899247", "flightidle_lp.ogg#898322", "flightleftright_lp.ogg#898324", "flightrun_lp.ogg#898326", "idlestand_lp.ogg#898328", "swim_lp.ogg#898330", "swimwaterlayer_lp.ogg#901303",
 
 					-- Engine loop (sound/creature/goblinshredder/)
-					"goblinshredderloop.ogg#550824"
+					"goblinshredderloop.ogg#550824",
+
+					-- Felsteel Annihilator (sound/doodad/)
+					"steamtankdrive.ogg#566270",
 
 				},
 
@@ -921,8 +926,8 @@
 				},
 
 
-				-- Aerial Unit R-21X (sound/creature/hunterkiller/)
-				["MuteR21X"] = {
+				-- Jet Aerial Units (sound/creature/hunterkiller/)
+				["MuteAerials"] = {
 					"mon_hunterkiller_creature_exertion_01.ogg#2906076",
 					"mon_hunterkiller_creature_exertion_02.ogg#2906075",
 					"mon_hunterkiller_creature_exertion_03.ogg#2906074",
@@ -995,8 +1000,8 @@
 
 				},
 
-				-- Horned Horses (sound/creature/hornedhorse/)
-				["MuteHorned"] = {
+				-- Unicorns (sound/creature/hornedhorse/)
+				["MuteUnicorns"] = {
 					"mon_hornedhorse_chuff_01.ogg#1489497",
 					"mon_hornedhorse_chuff_02.ogg#1489498",
 					"mon_hornedhorse_chuff_03.ogg#1489499",
@@ -1049,8 +1054,8 @@
 					"rocketmountwalkup.ogg#559351", 
 				},
 
-				-- Corridor Creeper
-				["MuteCreeper"] = {
+				-- Soulseekers (Corridor Creeper, etc)
+				["MuteSoulseekers"] = {
 
 					-- sound/creature/mawsworn
 					"mon_mawsworn_loop_01_171773.ogg#3747229", 
@@ -1116,16 +1121,16 @@
 			LeaPlusLC:MakeTx(SoundPanel, "Mounts", 140, -72)
 			LeaPlusLC:MakeCB(SoundPanel, "MuteBikes", "Bikes", 140, -92, false, "If checked, most of the bike mount sounds will be muted.")
 			LeaPlusLC:MakeCB(SoundPanel, "MuteTravelers", "Travelers", 140, -112, false, "If checked, traveling merchant greetings and farewells will be muted.|n|nThis applies to Traveler's Tundra Mammoth, Grand Expedition Yak and Mighty Caravan Brutosaur.")
-			LeaPlusLC:MakeCB(SoundPanel, "MuteHorned", "Horned", 140, -132, false, "If checked, horned horses will be muted.|n|nThis applies to Lucid Nightmare, Wild Dreamrunner and Pureheart Courser.")
+			LeaPlusLC:MakeCB(SoundPanel, "MuteUnicorns", "Unicorns", 140, -132, false, "If checked, unicorns will be quieter.|n|nThis applies to Lucid Nightmare, Wild Dreamrunner, Pureheart Courser and other unicorn mounts.")
 			LeaPlusLC:MakeCB(SoundPanel, "MuteGyrocopters", "Gyrocopters", 140, -152, false, "If checked, gyrocopters will be muted.|n|nThis applies to Mimiron's Head, Mecha-Mogul MK2 and other gyrocopter mounts.|n|nEnabling this option will also mute airplane gear shift sounds.")
 			LeaPlusLC:MakeCB(SoundPanel, "MuteRockets", "Rockets", 140, -172, false, "If checked, rockets will be muted.")
+			LeaPlusLC:MakeCB(SoundPanel, "MuteMechsuits", "Mechsuits", 140, -192, false, "If checked, mechsuits will be quieter.|n|nThis applies to Felsteel Annihilator, Lightforged Warframe, Sky Golem and other mechsuits.")
+			LeaPlusLC:MakeCB(SoundPanel, "MuteAerials", "Aerials", 140, -212, false, "If checked, jet aerial units will be quieter.|n|nThis applies to Aerial Unit R-21X and Rustbolt Resistor.")
+			LeaPlusLC:MakeCB(SoundPanel, "MuteHovercraft", "Hovercraft", 140, -232, false, "If checked, hovercraft will be quieter.|n|nThis applies to Xiwyllag ATV.")
 
 			LeaPlusLC:MakeTx(SoundPanel, "Mounts", 264, -72)
-			LeaPlusLC:MakeCB(SoundPanel, "MuteCreeper", "Creeper", 264, -92, false, "If checked, the Corridor Creeper mount will be quieter.")
+			LeaPlusLC:MakeCB(SoundPanel, "MuteSoulseekers", "Soulseekers", 264, -92, false, "If checked, soulseekers will be quieter.|n|nThis applies to Corridor Creeper, Mawsworn Soulhunter and Bound Shadehound.")
 			LeaPlusLC:MakeCB(SoundPanel, "MuteBanLu", "Ban-Lu", 264, -112, false, "If checked, Ban-Lu will no longer talk to you.")
-			LeaPlusLC:MakeCB(SoundPanel, "MuteATV", "ATV", 264, -132, false, "If checked, Xiwyllag ATV will be muted.")
-			LeaPlusLC:MakeCB(SoundPanel, "MuteR21X", "R21X", 264, -152, false, "If checked, the Aerial Unit R-21X will be muted.")
-			LeaPlusLC:MakeCB(SoundPanel, "MuteGolem", "Golem", 264, -172, false, "If checked, the Sky Golem mount will be muted.")
 
 			LeaPlusLC:MakeTx(SoundPanel, "Pets", 388, -72)
 			LeaPlusLC:MakeCB(SoundPanel, "MuteSunflower", "Sunflower", 388, -92, false, "If checked, the Singing Sunflower pet will be muted.")
@@ -3659,9 +3664,9 @@
 		----------------------------------------------------------------------
 
 		if LeaPlusLC["NoClassBar"] == "On" then
-			local stancebar = CreateFrame("FRAME")
-			stancebar:Hide();
-			UIPARENT_MANAGED_FRAME_POSITIONS["StanceBarFrame"] = nil;
+			local stancebar = CreateFrame("FRAME", nil, UIParent)
+			stancebar:Hide()
+			StanceBarFrame:UnregisterAllEvents()
 			StanceBarFrame:SetParent(stancebar)
 		end
 
@@ -4894,7 +4899,148 @@
 		end
 
 		----------------------------------------------------------------------
-		-- L44: Manage power bar
+		-- L44: Manage focus
+		----------------------------------------------------------------------
+
+		if LeaPlusLC["ManageFocus"] == "On" then
+
+			-- Remove integrated movement function to avoid conflicts
+			_G.FocusFrame_SetLock = function() end
+			_G.FocusFrame_SetSmallSize = function() end
+
+			-- Allow focus frame to be moved
+			FocusFrame:SetMovable(true)
+			FocusFrame:SetUserPlaced(true)
+			FocusFrame:SetDontSavePosition(true)
+			FocusFrame:SetClampedToScreen(true)
+
+			-- Set focus frame position at startup
+			FocusFrame:ClearAllPoints()
+			FocusFrame:SetPoint(LeaPlusLC["FocusA"], UIParent, LeaPlusLC["FocusR"], LeaPlusLC["FocusX"], LeaPlusLC["FocusY"])
+			FocusFrame:SetScale(LeaPlusLC["FocusScale"])
+
+			-- Create drag frame
+			local dragframe = CreateFrame("FRAME", nil, nil, "BackdropTemplate")
+			dragframe:SetBackdropColor(0.0, 0.5, 1.0)
+			dragframe:SetBackdrop({edgeFile = "Interface/Tooltips/UI-Tooltip-Border", tile = false, tileSize = 0, edgeSize = 16, insets = { left = 0, right = 0, top = 0, bottom = 0}})
+			dragframe:SetToplevel(true)
+			dragframe:Hide()
+			dragframe:SetScale(LeaPlusLC["FocusScale"])
+
+			dragframe.t = dragframe:CreateTexture()
+			dragframe.t:SetAllPoints()
+			dragframe.t:SetColorTexture(0.0, 1.0, 0.0, 0.5)
+			dragframe.t:SetAlpha(0.5)
+
+			dragframe.f = dragframe:CreateFontString(nil, 'ARTWORK', 'GameFontNormalLarge')
+			dragframe.f:SetPoint('CENTER', 0, 0)
+			dragframe.f:SetText(L["Focus"])
+
+			-- Click handler
+			dragframe:SetScript("OnMouseDown", function(self, btn)
+				-- Start dragging if left clicked
+				if btn == "LeftButton" then
+					FocusFrame:StartMoving()
+				end
+			end)
+
+			dragframe:SetScript("OnMouseUp", function()
+				-- Save frame positions
+				FocusFrame:StopMovingOrSizing()
+				LeaPlusLC["FocusA"], void, LeaPlusLC["FocusR"], LeaPlusLC["FocusX"], LeaPlusLC["FocusY"] = FocusFrame:GetPoint()
+				FocusFrame:SetMovable(true)
+				FocusFrame:ClearAllPoints()
+				FocusFrame:SetPoint(LeaPlusLC["FocusA"], UIParent, LeaPlusLC["FocusR"], LeaPlusLC["FocusX"], LeaPlusLC["FocusY"])
+			end)
+
+			-- Create configuration panel
+			local FocusPanel = LeaPlusLC:CreatePanel("Manage focus", "FocusPanel")
+			LeaPlusLC:MakeTx(FocusPanel, "Scale", 16, -72)
+			LeaPlusLC:MakeSL(FocusPanel, "FocusScale", "Drag to set the focus frame scale.", 0.5, 2, 0.05, 16, -92, "%.2f")
+
+			-- Hide panel during combat
+			FocusPanel:RegisterEvent("PLAYER_REGEN_DISABLED")
+			FocusPanel:SetScript("OnEvent", FocusPanel.Hide)
+
+			-- Set scale when slider is changed
+			LeaPlusCB["FocusScale"]:HookScript("OnValueChanged", function()
+				FocusFrame:SetScale(LeaPlusLC["FocusScale"])
+				dragframe:SetScale(LeaPlusLC["FocusScale"])
+				-- Show formatted slider value
+				LeaPlusCB["FocusScale"].f:SetFormattedText("%.0f%%", LeaPlusLC["FocusScale"] * 100)
+			end)
+
+			-- Help button tooltip
+			FocusPanel.h.tiptext = L["Drag the frame overlay to position the frame.|n|nThis panel will close automatically if you enter combat."]
+
+			-- Back button handler
+			FocusPanel.b:SetScript("OnClick", function()
+				FocusPanel:Hide(); LeaPlusLC["PageF"]:Show(); LeaPlusLC["Page6"]:Show()
+				return
+			end)
+
+			-- Reset button handler
+			FocusPanel.r:SetScript("OnClick", function()
+
+				-- Reset position and scale
+				LeaPlusLC["FocusA"] = "CENTER"
+				LeaPlusLC["FocusR"] = "CENTER"
+				LeaPlusLC["FocusX"] = 0
+				LeaPlusLC["FocusY"] = 0
+				LeaPlusLC["FocusScale"] = 1
+				FocusFrame:ClearAllPoints()
+				FocusFrame:SetPoint(LeaPlusLC["FocusA"], UIParent, LeaPlusLC["FocusR"], LeaPlusLC["FocusX"], LeaPlusLC["FocusY"])
+
+				-- Refresh configuration panel
+				FocusPanel:Hide(); FocusPanel:Show()
+				dragframe:Show()
+
+			end)
+
+			-- Show configuration panel when options panel button is clicked
+			LeaPlusCB["ManageFocusButton"]:SetScript("OnClick", function()
+				if LeaPlusLC:PlayerInCombat() then
+					return
+				else
+					if IsShiftKeyDown() and IsControlKeyDown() then
+						-- Preset profile
+						LeaPlusLC["FocusA"] = "TOPLEFT"
+						LeaPlusLC["FocusR"] = "TOPLEFT"
+						LeaPlusLC["FocusX"] = 250
+						LeaPlusLC["FocusY"] = -240
+						LeaPlusLC["FocusScale"] = 1.00
+						FocusFrame:ClearAllPoints()
+						FocusFrame:SetPoint(LeaPlusLC["FocusA"], UIParent, LeaPlusLC["FocusR"], LeaPlusLC["FocusX"], LeaPlusLC["FocusY"])
+						FocusFrame:SetScale(LeaPlusLC["FocusScale"])
+					else
+						-- Find out if the UI has a non-standard scale
+						if GetCVar("useuiscale") == "1" then
+							LeaPlusLC["gscale"] = GetCVar("uiscale")
+						else
+							LeaPlusLC["gscale"] = 1
+						end
+
+						-- Set drag frame size and position according to UI scale
+						dragframe:SetWidth(196 * LeaPlusLC["gscale"])
+						dragframe:SetHeight(76 * LeaPlusLC["gscale"])
+						dragframe:ClearAllPoints()
+						dragframe:SetPoint("CENTER", FocusFrame, "CENTER", -18 * LeaPlusLC["gscale"], 6 * LeaPlusLC["gscale"])
+
+						-- Show configuration panel
+						FocusPanel:Show()
+						LeaPlusLC:HideFrames()
+						dragframe:Show()
+					end
+				end
+			end)
+
+			-- Hide drag frame when configuration panel is closed
+			FocusPanel:HookScript("OnHide", function() dragframe:Hide() end)
+
+		end
+
+		----------------------------------------------------------------------
+		-- L45: Manage power bar
 		----------------------------------------------------------------------
 
 		if LeaPlusLC["ManagePowerBar"] == "On" then
@@ -5380,10 +5526,21 @@
 
 			end
 
+			-- Change cooldown icon scale when player frame scale changes
+			PlayerFrame:HookScript("OnSizeChanged", function()
+				if LeaPlusLC["CooldownsOnPlayer"] == "On" then
+					for i = 1, iCount do
+						icon[i]:SetScale(PlayerFrame:GetScale())
+					end
+				end
+			end)
+
 			-- Change cooldown icon scale when target frame scale changes
 			TargetFrame:HookScript("OnSizeChanged", function()
-				for i = 1, iCount do
-					icon[i]:SetScale(TargetFrame:GetScale())
+				if LeaPlusLC["CooldownsOnPlayer"] == "Off" then
+					for i = 1, iCount do
+						icon[i]:SetScale(TargetFrame:GetScale())
+					end
 				end
 			end)
 
@@ -5501,6 +5658,7 @@
 			LeaPlusLC:MakeTx(CooldownPanel, "Settings", 16, -72)
 			LeaPlusLC:MakeCB(CooldownPanel, "ShowCooldownID", "Show the spell ID in buff icon tooltips", 16, -92, false, "If checked, spell IDs will be shown in buff icon tooltips located in the buff frame and under the target frame.");
 			LeaPlusLC:MakeCB(CooldownPanel, "NoCooldownDuration", "Hide cooldown duration numbers (if enabled)", 16, -112, false, "If checked, cooldown duration numbers will not be shown over the cooldowns.|n|nIf unchecked, cooldown duration numbers will be shown over the cooldowns if they are enabled in the game options panel ('ActionBars' menu).")
+			LeaPlusLC:MakeCB(CooldownPanel, "CooldownsOnPlayer", "Show cooldowns above the player frame", 16, -132, false, "If checked, cooldown icons will be shown above the player frame.|n|nIf unchecked, cooldown icons will be shown above the target frame.")
 
 			-- Function to save the panel control settings and refresh the cooldown icons
 			local function SavePanelControls()
@@ -5508,6 +5666,16 @@
 
 					-- Refresh the cooldown texture
 					icon[i].c:SetCooldown(0,0)
+
+					-- Show icons above target or player frame
+					icon[i]:ClearAllPoints()
+					if LeaPlusLC["CooldownsOnPlayer"] == "On" then
+						icon[i]:SetPoint("TOPLEFT", PlayerFrame, "TOPLEFT", 116 + (22 * (i - 1)), 5)
+						icon[i]:SetScale(PlayerFrame:GetScale())
+					else
+						icon[i]:SetPoint("TOPLEFT", TargetFrame, "TOPLEFT", 6 + (22 * (i - 1)), 5)
+						icon[i]:SetScale(TargetFrame:GetScale())
+					end
 
 					-- Save control states to globals
 					LeaPlusDB["Cooldowns"][PlayerClass]["S" .. activeSpec .. "R" .. i .. "Idn"] = SpellEB[i]:GetText()
@@ -5557,6 +5725,7 @@
 
 			-- Update cooldown icons when checkboxes are clicked
 			LeaPlusCB["NoCooldownDuration"]:HookScript("OnClick", SavePanelControls)
+			LeaPlusCB["CooldownsOnPlayer"]:HookScript("OnClick", SavePanelControls)
 
 			-- Help button tooltip
 			CooldownPanel.h.tiptext = L["Enter the spell IDs for the cooldown icons that you want to see.|n|nIf a cooldown icon normally appears under the pet frame, check the pet checkbox.|n|nCooldown icons are saved to your class and specialisation."]
@@ -5572,6 +5741,7 @@
 				-- Reset the checkboxes
 				LeaPlusLC["ShowCooldownID"] = "On"
 				LeaPlusLC["NoCooldownDuration"] = "On"
+				LeaPlusLC["CooldownsOnPlayer"] = "Off"
 				for i = 1, iCount do
 					-- Reset the panel controls
 					SpellEB[i]:SetText("");
@@ -7272,6 +7442,7 @@
 				"|Cffffffff" .. L["The Negotiation"] .. " |r#3075714#201", -- interface/cinematics/bfa_825_lh.mp3
 				"|Cffffffff" .. L["Reckoning"] .. " |r#3075719#379", -- interface/cinematics/bfa_825_os.mp3
 				"|Cffffffff" .. L["Azshara's Eternal Palace"] .. " |r#3022943#83", -- interface/cinematics/bfa_820_enc_261.mp3
+				"|Cffffffff" .. L["Wrathion's Scene"] .. " |r#3231695#61", -- interface/cinematics/bfa_83_927.mp3
 				"|Cffffffff" .. L["Visions of N'Zoth"] .. " |r#3231690#135", -- interface/cinematics/bfa_83_928.mp3
 
 				-- Cinematic Music: Shadowlands (movie.dbc)
@@ -7291,6 +7462,7 @@
 				"|Cffffffff" .. L["Breaking The Arbiter"] .. " |r#3756093#95", -- interface/cinematics/shadowlands_901_bta.mp3
 				"|Cffffffff" .. L["A Glimpse Into Darkness"] .. " |r#3756092#66", -- interface/cinematics/shadowlands_901_etm.mp3
 				"|Cffffffff" .. L["No More Lies"] .. " |r#3756094#206", -- interface/cinematics/shadowlands_901_pim.mp3
+				"|Cffffffff" .. L["Sylvanas' Choice"] .. " |r#3756097#153", -- interface/cinematics/shadowlands_902_948.mp3
 			})
 			Zn(L["Various"], L["Various"], L["Class Trials"]							, {	"|cffffd800" .. L["Various"] .. ": " .. L["Class Trials"], prefol, "MUS_70_ClassTrial_Horde_BattleWalk#71954", "MUS_70_ClassTrial_Alliance_BattleWalk#71959",})
 			Zn(L["Various"], L["Various"], L["Credits"]									, {	"|cffffd800" .. L["Various"] .. ": " .. L["Credits"], prefol, "Menu-Credits01#10763", "Menu-Credits02#10804", "Menu-Credits03#13822", "Menu-Credits04#23812", "Menu-Credits05#32015", "Menu-Credits06#34020", "Menu-Credits07#56354", "Menu-Credits08#113560"})
@@ -7329,7 +7501,7 @@
 			Zn(L["Movies"], L["Movies"], L["Wrath of the Lich King"]					, {	"|cffffd800" .. L["Movies"] .. ": " .. L["Wrath of the Lich King"], prefol, L["Wrath of the Lich King"] .. " |r(18)", L["Battle of Angrathar the Wrathgate"] .. " |r(14)", L["Fall of the Lich King"] .. " |r(16)"})
 			Zn(L["Movies"], L["Movies"], L["Cataclysm"]									, {	"|cffffd800" .. L["Movies"] .. ": " .. L["Cataclysm"], prefol, L["Cataclysm"] .. " |r(23)", L["Last Stand"] .. " |r(21)", L["Leaving Kezan"] .. " |r(22)", L["The Dragon Soul"] .. " |r(73)", L["Spine of Deathwing"] .. " |r(74)", L["Madness of Deathwing"] .. " |r(75)", L["Fall of Deathwing"] .. " |r(76)"})
 			Zn(L["Movies"], L["Movies"], L["Mists of Pandaria"]							, {	"|cffffd800" .. L["Movies"] .. ": " .. L["Mists of Pandaria"], prefol, L["Mists of Pandaria"] .. " |r(115)", L["Risking It All"] .. " |r(117)", L["Leaving the Wandering Isle"] .. " |r(116)", L["Jade Forest Crash"] .. " |r(121)", L["The King's Command"] .. " |r(119)", L["The Art of War"] .. " |r(120)", L["Battle of Serpent's Heart"] .. " |r(118)", L["The Fleet in Krasarang (Horde)"] .. " |r(128)", L["The Fleet in Krasarang (Alliance)"] .. " |r(127)", L["Hellscream's Downfall (Horde)"] .. " |r(151)", L["Hellscream's Downfall (Alliance)"] .. " |r(152)"})
-			Zn(L["Movies"], L["Movies"], L["Warlords of Draenor"]						, {	"|cffffd800" .. L["Movies"] .. ": " .. L["Warlords of Draenor"], prefol, L["Warlords of Draenor"] .. " |r(195)",	L["Darkness Falls"] .. " |r(167)", L["The Battle of Thunder Pass"] .. " |r(168)", L["And Justice for Thrall"] .. " |r(177)", L["Into the Portal"] .. " |r(185)", L["A Taste of Iron"] .. " |r(187)", L["The Battle for Shattrath"] .. " |r(188)", L["Gul'dan Ascendant"] .. " |r(270)", L["Gul'dan's Plan"] .. "  |r(294)", L["Victory in Draenor!"] .. "  |r(295)", L["Establish Your Garrison (Horde)"] .. " |r(189)", L["Establish Your Garrison (Alliance)"] .. " |r(192)", L["Bigger is Better (Horde)"] .. " |r(190)", L["Bigger is Better (Alliance)"] .. " |r(193)", L["My Very Own Castle (Horde)"] .. " |r(191)", L["My Very Own Castle (Alliance)"] .. " |r(194)", L["Shipyard Construction (Horde)"] .. " |r(292)", L["Shipyard Construction (Alliance)"] .. " |r(293)"})
+			Zn(L["Movies"], L["Movies"], L["Warlords of Draenor"]						, {	"|cffffd800" .. L["Movies"] .. ": " .. L["Warlords of Draenor"], prefol, L["Warlords of Draenor"] .. " |r(195)",	L["Darkness Falls"] .. " |r(167)", L["The Battle of Thunder Pass"] .. " |r(168)", L["And Justice for Thrall"] .. " |r(177)", L["Into the Portal"] .. " |r(185)", L["A Taste of Iron"] .. " |r(187)", L["The Battle for Shattrath"] .. " |r(188)", L["Gul'dan Ascendant"] .. " |r(270)", L["Gul'dan's Plan"] .. " |r(294)", L["Victory in Draenor!"] .. " |r(295)", L["Establish Your Garrison (Horde)"] .. " |r(189)", L["Establish Your Garrison (Alliance)"] .. " |r(192)", L["Bigger is Better (Horde)"] .. " |r(190)", L["Bigger is Better (Alliance)"] .. " |r(193)", L["My Very Own Castle (Horde)"] .. " |r(191)", L["My Very Own Castle (Alliance)"] .. " |r(194)", L["Shipyard Construction (Horde)"] .. " |r(292)", L["Shipyard Construction (Alliance)"] .. " |r(293)"})
 			Zn(L["Movies"], L["Movies"], L["Legion"]									, {	"|cffffd800" .. L["Movies"] .. ": " .. L["Legion"], prefol, L["Legion"] .. " |r(470)", L["The Invasion Begins"] .. " |r(469)", L["Return to the Black Temple"] .. " |r(471)", L["The Demon's Trail"] .. " |r(473)", L["The Fate of Val'sharah"] .. " |r(472)", L["Fate of the Horde"] .. " |r(474)", L["A New Life for Undeath"] .. " |r(475)", L["Harbingers Gul'dan"] .. " |r(476)", L["Harbingers Khadgar"] .. " |r(477)", L["Harbingers Illidan"] .. " |r(478)", L["The Nightborne Pact"] .. " |r(485)", L["Stormheim (Alliance)"] .. " |r(483)", L["Stormheim (Horde)"] .. " |r(484)", L["Tomb of Sargeras"] .. " |r(486)", L["The Battle for Broken Shore"] .. " |r(487)", L["A Falling Star"] .. " |r(489)", L["Destiny Unfulfilled"] .. " |r(490)", L["The Nighthold"] .. " |r(549)", L["Victory at The Nighthold"] .. " |r(635)", L["A Found Memento"] .. " |r(636)", L["Assault on the Broken Shore"] .. " |r(637)", L["Kil'jaeden's Downfall"] .. " |r(656)", L["Arrival on Argus"] .. " |r(677)", L["Rejection of the Gift"] .. " |r(679)", L["Reincarnation of Alleria Windrunner"] .. " |r(682)", L["Rise of Argus"] .. " |r(687)", L["Antorus Ending"] .. " |r(689)", L["Epilogue (Horde)"] .. " |r(717)", L["Epilogue (Alliance)"] .. " |r(716)"})
 			Zn(L["Movies"], L["Movies"], L["Battle for Azeroth"]						, {	"|cffffd800" .. L["Movies"] .. ": " .. L["Battle for Azeroth"], prefol, 
 				L["Battle for Azeroth"] .. " |r(852)", 
@@ -7356,6 +7528,7 @@
 				L["The Negotiation"] .. " |r(903)", 
 				-- L["Reckoning"] .. " |r(904)", 
 				L["Azshara's Eternal Palace"] .. " |r(920)", 
+				L["Wrathion's Scene"] .. " |r(927)",
 				L["Visions of N'Zoth"] .. " |r(928)",
 			})
 			Zn(L["Movies"], L["Movies"], L["Shadowlands"]						, {	"|cffffd800" .. L["Movies"] .. ": " .. L["Shadowlands"], prefol, 
@@ -7374,6 +7547,7 @@
 				L["Breaking The Arbiter"] .. " |r(945)",
 				L["A Glimpse Into Darkness"] .. " |r(946)",
 				L["No More Lies"] .. " |r(947)",
+				L["Sylvanas' Choice"] .. " |r(948)",
 			})
 			-- Give zone table a file level scope so slash command function can access it
 			LeaPlusLC["ZoneList"] = ZoneList
@@ -8511,6 +8685,17 @@
 		if event == "ADDON_LOADED" then
 			if arg1 == "Leatrix_Plus" then
 
+				-- Replace old var names with new ones
+				local function UpdateVars(oldvar, newvar)
+					if LeaPlusDB[oldvar] and not LeaPlusDB[newvar] then LeaPlusDB[newvar] = LeaPlusDB[oldvar]; LeaPlusDB[oldvar] = nil end
+				end
+				
+				UpdateVars("MuteHorned", "MuteUnicorns")					-- 9.0.22 (27th March 2021)
+				UpdateVars("MuteCreeper", "MuteSoulseekers")				-- 9.0.22 (27th March 2021)
+				UpdateVars("MuteATV", "MuteHovercraft")						-- 9.0.22 (27th March 2021)
+				UpdateVars("MuteR21X", "MuteAerials")						-- 9.0.22 (27th March 2021)
+				UpdateVars("MuteGolem", "MuteMechsuits")					-- 9.0.22 (27th March 2021)
+
 				-- Automation
 				LeaPlusLC:LoadVarChk("AutomateQuests", "Off")				-- Automate quests
 				LeaPlusLC:LoadVarChk("AutoQuestShift", "Off")				-- Automate quests requires shift
@@ -8593,6 +8778,7 @@
 				LeaPlusLC:LoadVarChk("ShowCooldowns", "Off")				-- Show cooldowns
 				LeaPlusLC:LoadVarChk("ShowCooldownID", "On")				-- Show cooldown ID in tips
 				LeaPlusLC:LoadVarChk("NoCooldownDuration", "On")			-- Hide cooldown duration
+				LeaPlusLC:LoadVarChk("CooldownsOnPlayer", "Off")			-- Anchor to player
 				LeaPlusLC:LoadVarChk("DurabilityStatus", "Off")				-- Show durability status
 				LeaPlusLC:LoadVarChk("ShowPetSaveBtn", "Off")				-- Show pet save button
 				LeaPlusLC:LoadVarChk("ShowRaidToggle", "Off")				-- Show raid button
@@ -8629,6 +8815,13 @@
 				LeaPlusLC:LoadVarNum("WidgetX", 0, -5000, 5000)				-- Manage widget position X
 				LeaPlusLC:LoadVarNum("WidgetY", -15, -5000, 5000)			-- Manage widget position Y
 				LeaPlusLC:LoadVarNum("WidgetScale", 1, 0.5, 2)				-- Manage widget scale
+
+				LeaPlusLC:LoadVarChk("ManageFocus", "Off")					-- Manage focus
+				LeaPlusLC:LoadVarAnc("FocusA", "CENTER")					-- Manage focus anchor
+				LeaPlusLC:LoadVarAnc("FocusR", "CENTER")					-- Manage focus relative
+				LeaPlusLC:LoadVarNum("FocusX", 0, -5000, 5000)				-- Manage focus position X
+				LeaPlusLC:LoadVarNum("FocusY", 0, -5000, 5000)				-- Manage focus position Y
+				LeaPlusLC:LoadVarNum("FocusScale", 1, 0.5, 2)				-- Manage focus scale
 
 				LeaPlusLC:LoadVarChk("ClassColFrames", "Off")				-- Class colored frames
 				LeaPlusLC:LoadVarChk("ClassColPlayer", "On")				-- Class colored player frame
@@ -8787,6 +8980,7 @@
 			LeaPlusDB["ShowCooldowns"]			= LeaPlusLC["ShowCooldowns"]
 			LeaPlusDB["ShowCooldownID"]			= LeaPlusLC["ShowCooldownID"]
 			LeaPlusDB["NoCooldownDuration"]		= LeaPlusLC["NoCooldownDuration"]
+			LeaPlusDB["CooldownsOnPlayer"]		= LeaPlusLC["CooldownsOnPlayer"]
 			LeaPlusDB["DurabilityStatus"]		= LeaPlusLC["DurabilityStatus"]
 			LeaPlusDB["ShowPetSaveBtn"]			= LeaPlusLC["ShowPetSaveBtn"]
 			LeaPlusDB["ShowRaidToggle"]			= LeaPlusLC["ShowRaidToggle"]
@@ -8822,6 +9016,13 @@
 			LeaPlusDB["WidgetX"]				= LeaPlusLC["WidgetX"]
 			LeaPlusDB["WidgetY"]				= LeaPlusLC["WidgetY"]
 			LeaPlusDB["WidgetScale"]			= LeaPlusLC["WidgetScale"]
+
+			LeaPlusDB["ManageFocus"]			= LeaPlusLC["ManageFocus"]
+			LeaPlusDB["FocusA"]					= LeaPlusLC["FocusA"]
+			LeaPlusDB["FocusR"]					= LeaPlusLC["FocusR"]
+			LeaPlusDB["FocusX"]					= LeaPlusLC["FocusX"]
+			LeaPlusDB["FocusY"]					= LeaPlusLC["FocusY"]
+			LeaPlusDB["FocusScale"]				= LeaPlusLC["FocusScale"]
 
 			LeaPlusDB["ClassColFrames"]			= LeaPlusLC["ClassColFrames"]
 			LeaPlusDB["ClassColPlayer"]			= LeaPlusLC["ClassColPlayer"]
@@ -10494,7 +10695,7 @@
 				-- Help panel
 				if not LeaPlusLC.HelpFrame then
 					local frame = CreateFrame("FRAME", nil, UIParent)
-					frame:SetSize(570, 400); frame:SetFrameStrata("FULLSCREEN_DIALOG"); frame:SetFrameLevel(100)
+					frame:SetSize(570, 380); frame:SetFrameStrata("FULLSCREEN_DIALOG"); frame:SetFrameLevel(100)
 					frame.tex = frame:CreateTexture(nil, "BACKGROUND"); frame.tex:SetAllPoints(); frame.tex:SetColorTexture(0.05, 0.05, 0.05, 0.9)
 					frame.close = CreateFrame("Button", nil, frame, "UIPanelCloseButton"); frame.close:SetSize(30, 30); frame.close:SetPoint("TOPRIGHT", 0, 0); frame.close:SetScript("OnClick", function() frame:Hide() end)
 					frame:ClearAllPoints(); frame:SetPoint("CENTER", UIParent, "CENTER", 0, 0)
@@ -10506,7 +10707,7 @@
 					frame:SetScript("OnDragStart", frame.StartMoving)
 					frame:SetScript("OnDragStop", function() frame:StopMovingOrSizing() frame:SetUserPlaced(false) end)
 					frame:Hide()
-					LeaPlusLC:CreateBar("HelpPanelMainTexture", frame, 570, 400, "TOPRIGHT", 0.7, 0.7, 0.7, 0.7,  "Interface\\ACHIEVEMENTFRAME\\UI-GuildAchievement-Parchment-Horizontal-Desaturated.png")
+					LeaPlusLC:CreateBar("HelpPanelMainTexture", frame, 570, 380, "TOPRIGHT", 0.7, 0.7, 0.7, 0.7,  "Interface\\ACHIEVEMENTFRAME\\UI-GuildAchievement-Parchment-Horizontal-Desaturated.png")
 					-- Panel contents
 					local col1, col2, color1 = 10, 120, "|cffffffaa"
 					LeaPlusLC:MakeTx(frame, "Leatrix Plus Help", col1, -10)
@@ -10536,16 +10737,14 @@
 					LeaPlusLC:MakeWD(frame, "Toggle the Enigmatic quest solver.", col2, -250)
 					LeaPlusLC:MakeWD(frame, color1 .. "/ltp marker", col1, -270)
 					LeaPlusLC:MakeWD(frame, "Block target markers (toggle) (requires assistant or leader in raid).", col2, -270)
-					LeaPlusLC:MakeWD(frame, color1 .. "/ltp af", col1, -290)
-					LeaPlusLC:MakeWD(frame, "Follow your target persistently (toggle).", col2, -290)
-					LeaPlusLC:MakeWD(frame, color1 .. "/ltp rsnd", col1, -310)
-					LeaPlusLC:MakeWD(frame, "Restart the sound system.", col2, -310)
-					LeaPlusLC:MakeWD(frame, color1 .. "/ltp ra", col1, -330)
-					LeaPlusLC:MakeWD(frame, "Announce target in General chat channel (useful for rares).", col2, -330)
-					LeaPlusLC:MakeWD(frame, color1 .. "/ltp con", col1, -350)
-					LeaPlusLC:MakeWD(frame, "Launch the developer console with a large font.", col2, -350)
-					LeaPlusLC:MakeWD(frame, color1 .. "/rl", col1, -370)
-					LeaPlusLC:MakeWD(frame, "Reload the UI.", col2, -370)
+					LeaPlusLC:MakeWD(frame, color1 .. "/ltp rsnd", col1, -290)
+					LeaPlusLC:MakeWD(frame, "Restart the sound system.", col2, -290)
+					LeaPlusLC:MakeWD(frame, color1 .. "/ltp ra", col1, -310)
+					LeaPlusLC:MakeWD(frame, "Announce target in General chat channel (useful for rares).", col2, -310)
+					LeaPlusLC:MakeWD(frame, color1 .. "/ltp con", col1, -330)
+					LeaPlusLC:MakeWD(frame, "Launch the developer console with a large font.", col2, -330)
+					LeaPlusLC:MakeWD(frame, color1 .. "/rl", col1, -350)
+					LeaPlusLC:MakeWD(frame, "Reload the UI.", col2, -350)
 					LeaPlusLC.HelpFrame = frame
 					_G["LeaPlusGlobalHelpPanel"] = frame
 					table.insert(UISpecialFrames, "LeaPlusGlobalHelpPanel")
@@ -10658,6 +10857,24 @@
 					table.insert(UISpecialFrames, "AchievementTracker")
 					LeaPlusLC:Print("IAT scale set and window can now be closed with escape.")
 				end
+				return
+			elseif str == "blanchy" then
+				-- Sound alert when Dead Blanchy emotes nearby
+				LeaPlusLC.BlanchyFrame = LeaPlusLC.BlanchyFrame or CreateFrame("FRAME")
+				if LeaPlusLC.BlanchyFrame:IsEventRegistered("CHAT_MSG_MONSTER_EMOTE") then
+					C_Map.ClearUserWaypoint()
+					LeaPlusLC.BlanchyFrame:UnregisterEvent("CHAT_MSG_MONSTER_EMOTE")
+					LeaPlusLC:Print("Dead Blanchy alert disabled.")
+				else
+					C_Map.SetUserWaypoint(UiMapPoint.CreateFromVector2D(1525, CreateVector2D(63.1/100, 43.0/100)))
+					LeaPlusLC.BlanchyFrame:RegisterEvent("CHAT_MSG_MONSTER_EMOTE")
+					LeaPlusLC:Print("Dead Blanchy alert active.  Spawn point has been pinned to the Revendreth map.  An alert will sound 20 times when Blanchy emotes nearby.")
+				end
+				LeaPlusLC.BlanchyFrame:SetScript("OnEvent", function(self, event, void, pname)
+					if pname == L["Dead Blanchy"] then
+						C_Timer.NewTicker(1, function()	PlaySound(8959, "Master") end, 20)
+					end
+				end)
 				return
 			elseif str == "admin" then
 				-- Preset profile (used for testing)
@@ -10783,6 +11000,13 @@
 				LeaPlusDB["WidgetX"] = 0						-- Manage widget position X
 				LeaPlusDB["WidgetY"] = -432						-- Manage widget position Y
 				LeaPlusDB["WidgetScale"] = 1.25					-- Manage widget scale
+
+				LeaPlusDB["ManageFocus"] = "On"					-- Manage focus
+				LeaPlusDB["FocusA"] = "TOPLEFT"					-- Manage focus anchor
+				LeaPlusDB["FocusR"] = "TOPLEFT"					-- Manage focus relative
+				LeaPlusDB["FocusX"] = 250						-- Manage focus position X
+				LeaPlusDB["FocusY"] = -240						-- Manage focus position Y
+				LeaPlusDB["FocusScale"] = 1.00					-- Manage focus scale
 
 				LeaPlusDB["ClassColFrames"] = "On"				-- Class colored frames
 				LeaPlusDB["ClassIconPortraits"] = "On"			-- Class icon portraits
@@ -11163,8 +11387,9 @@
 	LeaPlusLC:MakeCB(LeaPlusLC[pg], "ManageBuffs"				,	"Manage buffs"					, 	146, -112, 	true,	"If checked, you will be able to change the position and scale of the buffs frame.")
 	LeaPlusLC:MakeCB(LeaPlusLC[pg], "ManagePowerBar"			,	"Manage power bar"				, 	146, -132, 	true,	"If checked, you will be able to change the position and scale of the player alternative power bar.")
 	LeaPlusLC:MakeCB(LeaPlusLC[pg], "ManageWidget"				,	"Manage widget"					, 	146, -152, 	true,	"If checked, you will be able to change the position and scale of the widget frame.|n|nThe widget frame is commonly used for showing PvP scores and tracking objectives.")
-	LeaPlusLC:MakeCB(LeaPlusLC[pg], "ClassColFrames"			, 	"Class colored frames"			,	146, -172, 	true,	"If checked, class coloring will be used in the player frame, target frame and focus frame.")
-	LeaPlusLC:MakeCB(LeaPlusLC[pg], "ClassIconPortraits"		, 	"Class icon portraits"			,	146, -192, 	true,	"If checked, class icons will be shown in the portrait frames.")
+	LeaPlusLC:MakeCB(LeaPlusLC[pg], "ManageFocus"				,	"Manage focus"					, 	146, -172, 	true,	"If checked, you will be able to change the position and scale of the focus frame.")
+	LeaPlusLC:MakeCB(LeaPlusLC[pg], "ClassColFrames"			, 	"Class colored frames"			,	146, -192, 	true,	"If checked, class coloring will be used in the player frame, target frame and focus frame.")
+	LeaPlusLC:MakeCB(LeaPlusLC[pg], "ClassIconPortraits"		, 	"Class icon portraits"			,	146, -212, 	true,	"If checked, class icons will be shown in the portrait frames.")
 
 	LeaPlusLC:MakeTx(LeaPlusLC[pg], "Visibility"				, 	340, -72)
 	LeaPlusLC:MakeCB(LeaPlusLC[pg], "NoAlerts"					,	"Hide alerts"					, 	340, -92, 	true,	"If checked, alert frames will not be shown.")
@@ -11181,6 +11406,7 @@
 	LeaPlusLC:CfgBtn("ManageBuffsButton", LeaPlusCB["ManageBuffs"])
 	LeaPlusLC:CfgBtn("ManagePowerBarButton", LeaPlusCB["ManagePowerBar"])
 	LeaPlusLC:CfgBtn("ManageWidgetButton", LeaPlusCB["ManageWidget"])
+	LeaPlusLC:CfgBtn("ManageFocusButton", LeaPlusCB["ManageFocus"])
 	LeaPlusLC:CfgBtn("ClassColFramesBtn", LeaPlusCB["ClassColFrames"])
 
 ----------------------------------------------------------------------

@@ -970,6 +970,7 @@ local default_profile = {
 		overall_flag = 0x10,
 		overall_clear_newboss = true,
 		overall_clear_newchallenge = true,
+		overall_clear_newtorghast = true,
 		overall_clear_logout = false,
 		data_cleanup_logout = false,
 		close_shields = false,
@@ -1474,7 +1475,7 @@ end
 function _detalhes:RestoreState_CurrentMythicDungeonRun()
 
 	--no need to check for mythic+ if the user is playing on classic wow
-	if (DetailsFramework.IsClassicWow()) then
+	if (DetailsFramework.IsTimewalkWoW()) then
 		return
 	end
 
