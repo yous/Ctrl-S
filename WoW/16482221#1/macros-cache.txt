@@ -44,6 +44,7 @@ VER 3 000000000000000E "장신구 2" "INV_MISC_QUESTIONMARK"
 END
 VER 3 0000000000000007 "탈것" "INV_MISC_QUESTIONMARK"
 #showtooltip [mod:ctrl] 여행자의 동토 매머드; 풋내기 가죽뜯깃
+/시전 천상의 북
 /시전 [mod:ctrl] 여행자의 동토 매머드
 /run local a=C_MountJournal.SummonByID if GetZoneText() == "나락" then b={1304,1442} a(b[random(2)]); else a(0); end
 END

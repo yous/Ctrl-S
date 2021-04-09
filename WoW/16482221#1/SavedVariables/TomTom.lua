@@ -32,6 +32,15 @@ TomTomDB = {
 			["general"] = {
 				["corpse_arrow"] = false,
 			},
+			["minimap"] = {
+				["default_iconsize"] = 12,
+			},
+			["persistence"] = {
+				["cleardistance"] = 0,
+			},
+			["worldmap"] = {
+				["default_iconsize"] = 12,
+			},
 		},
 	},
 }

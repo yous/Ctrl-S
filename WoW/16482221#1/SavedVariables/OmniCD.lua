@@ -1,21 +1,6 @@
 
 OmniCDDB = {
 	["cooldowns"] = {
-		[264667] = {
-			["buff"] = 264667,
-			["charges"] = {
-				["default"] = 1,
-			},
-			["class"] = "HUNTER",
-			["custom"] = true,
-			["duration"] = {
-				["default"] = 360,
-			},
-			["icon"] = 136224,
-			["name"] = "원초적 분노",
-			["spellID"] = 264667,
-			["type"] = "offensive",
-		},
 	},
 	["namespaces"] = {
 		["LibDualSpec-1.0"] = {
@@ -71,7 +56,7 @@ OmniCDDB = {
 						["13750"] = true,
 						["137639"] = true,
 						["194223"] = true,
-						["264667"] = true,
+						["272651"] = true,
 						["2825"] = true,
 						["288613"] = true,
 						["316958"] = true,
