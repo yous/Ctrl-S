@@ -88,8 +88,7 @@ Trigger: EXECUTE no longer procs on targets with 0% hp/dead]=],
       author = [=[EllesmereGaming]=],
       encoded = [=[!TI1)tTTos8)xYm38Gz6ZnbA5rFZ0Fiqcqyco5ImpANJZok2Yo6HJvojzGWD1)TF7kz7Kaj00shntIL0(nT7QpAL8B575tM5tI8jkFYHoTC(e2bgCXG4yft772egGPO6CjvZ8N4t4zXc5mQMlYqc5jzcjBWCSVQ79SmDxPuiv(N4R9jswcmU3I5mGYqGdcnJVK5zuU5FTHGmrg8BeQjy(a7GkgWweyDmQI5TcDyFIwYYs0t9Dpe1MstL6FHYlMNXvt)1jqqK3XyZBRMZc1JqHGouflnEOGNbZEAxxVUJ8jHcrAK4HSUrjwFoOcIixgYmbKhxj4OyZUNj9jTCA6GDZNmY4ZvGz7AIVA2J6aZp2axGQ8Jkd1mhnxlWat4n8iWEjTH(q8tOHWUhqGpXDGBxm(fovi)YkwqPOZ02f)GR963dP0mUAkfwiF9fKZFKfz1K7rFyfz4totYFQy8)mNgbUzAXyVQLWFNR084fl9sMrFqiJUrsN7tUP(lRMx6wBFT3Gv8d(K)ry1c5fwM1GpvKkKwpimJ7bMFp087hWb1vEnJqkvtpx3UJcozGN3GRg178lQm8WvewlJWAzewRveMnvkFI1(mSDpxXNKYGnsRAzB0Zt4pbzgToaefiEqVjPRVg2IArY6ZZykF3JT9qTLRyNxZ)e742y7KCTwKnas4sPlkNykp8oqckuKlxhgzzLF5gGwnT9pbctSA5scPPmdRyVvJgy)V8S(Njz)NCww4cyeNd(ODlv1MfuKtz8KPa9Fa9oIqWqviuJ7NA2S5b(KhSzC4S7qqPsWy6FhUIcbJilcOMjZOP)vL0r5TwMqvgAohqwPpn68EHxE4W(77tQTiyfNltblwRNR(Z3)(hOjchU49hCH8XENp7V7)EGINeIzMfpnD(uQHPyjDgcRa7nm9nOQqqlIRMdbLEyx3do8OwhFmUcYI461qdcNYcVd(axFtPzjS6P0LnsiSrtmZUPpoplefWE7xCzXyBJhxmMcGGbSS7Duiab0pl65d6mKQuxNX1fJ1tzzl5VQLkGGFXy7zefJ)8kcOCSTXcSsrLcCCAGl4pgI9DoNPR7CMqIQEVTys7)srJRQs5UzZTQzTT)80ugv2on1eYv7T)3LbctBODVgwiIgVRuHW)n8gme7xBUqKlMN4uI0VHzkpGEhu7uXdBY6yPk23L5l4rSnYmeUVCTo2rG2Y9nW2T5g4lRjJzF1NC9XMRuJXVdydACFfU7WCGxQGAkdjIhhZdZt1lmLlaFWTjX00uaxHzRYqXZsauKvgwBqXcEcoFRxujMgGdpBcCQhAqPqEWQs0K3RbOOm9lggpT(fdwkzsRJoUjeDAD0FCS9Vpz)7pG9SX4PCRPgaI(W1mzZaMUaa(QRW5qLmlwF1zhYODAy1MAWPXnMSDtlmvvEsca(OWWdSl5)(TIlRNaWocVJfHBdWTlgcA0gw8)gLxmUdJQN(an9oM83a2jZ5sUUbejebLQ4K1k1sjYZa)qpetmMgYUTDu0Gm1T3WO31guP62RyrC6TeKo1TT5YleYmhrsIrMw2pPuobiKugdGfVIQabUwry2yKKNKazj14z5zLdz7WXQAGvLzJ1kmyMfYbOtuc5KRerMeZi2K84y7zBx0T)WZUU)spzn0hKuzqpuqOLHv4c)JAc(ZXXz)6DfRbqAie8TOZ1T9vDdg2VTx3GRD75f0UtNUDASnCgK7CdSPbu1(zX)dfe40ty6kohV9TVRbrBYe(xy8(8R71zpuG7)V)EOCvT6f)lfaMy9AgXZBkajYWLwMdGE7mF2ZPI(zyD5rqFUkMTZ8oxksKqHny6HDtc6i4Hn2bz8TTtYAqNBhpDxZLg19Qb)1oLnTt5mBpA)gtxCEEu8TiR1cRnWBX04NWH)I9TVQJ34T9Uyu32Eb97r8cUEyhikS7o(n32QzxwQtW7cEhkcjGlpmeXCW(bMvo6c6W0uouyQNHccxNBUC6EnWQbzYgLyv7)6X9A5BxSTA2Se9bQPQ6GcRZ3sW2pmz3stGlGck(ZTE3bF8JfJJe7(UYs3sEzOVcQVHJdF3fcUKrtU7JCfu7w((7QDVXGS1LK)kv6URTFHGTBR9ZccVT2BaCEBT1bT)fiW3cs(2AF7hN1nce9Mi(vj6h8GgjtNlZQWMxPCEdiOYNSXQya4LTCIemZwGmTvOPkVeQPARQ3sdt(ZNhH1UvEtvR6xPOoB1AtfknhRk(5L8zQYZmiw1Fwj3A(mwKPu(00ErLQgPCDXEYYx3dkTVw3NAU4qX4(IeZJBygEOKb137tid72V)YHj5XMHdoTnSGjEThv)8HvfwwUKNc3TQYYQRQ)EMNTGvtjQv3mIMRNkKLpYADPVZOpcx1VzZ631aS4j8eIMn389mEgibdb3XwS8YxGBUKcRDjXDWg3rhMkeV(f6v8jF53RyiIftHBMGpfr1lm9JQ8f)Gk)RBw5M(aDKH5AfEgfGbNfXdPA8ef8zeGBSOzX5WzeKPuGwetgdE2ANlgVqKxE2gEcjkdaueV8rX4mHMhJYcCZofx(vKYqufcJPyq3rEXx6b6imcd(kLFhChn0skjPXPMqCX4YqgwKaDIdCBnijCJ3WQy8z8hnp(GBvgzX4EvRSQNx6m8XFSBaiNoQBxx0FCp4n)WbGdfFcPED8j1pHemR)))p]=],
       wagoVersion = [=[1]=],
-      wagoSemver = [=[1.0.0]=],
-      versionNote = [=[]=],
+      wagoSemver = [=[1.0.0-1]=],
     },
     ["bvxv7PceG"] = {
       name = [=[M+ Spiteful - Target on Nameplate]=],
@@ -245,15 +244,5 @@ Trigger: EXECUTE no longer procs on targets with 0% hp/dead]=],
     ["Nameplate HP%"] = [=[vVSx1tdvj]=],
   },
   stash = {
-  },
-  Plater = {
-    slugs = {
-    },
-    uids = {
-    },
-    ids = {
-    },
-    stash = {
-    },
   },
 }
