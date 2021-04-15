@@ -1,34 +1,10 @@
-lightweight tag bc97d279b982419c625dffa212c7f83a9d9205d2 DetailsRetail.9.0.5.8402.144
+tag 062fd2ce6ca848d52cfd1b935777c2314acd57f0 DetailsRetail.9.0.5.8406.144
 Author:	Tercio Jose <terciob19@hotmail.com>
-Date:	Thu Apr 8 13:05:27 2021 -0300
+Date:	Tue Apr 13 18:03:49 2021 -0300
 
-commit bc97d279b982419c625dffa212c7f83a9d9205d2
+commit 4a28c63b4e0d2f9fd74338e6146e15522f3ef3b8
 Author: Tercio Jose <terciob19@hotmail.com>
-Date:   Thu Apr 8 13:05:27 2021 -0300
+Date:   Tue Apr 13 18:02:15 2021 -0300
 
-    version bump
-
-commit ba97deb5632ae1e1220156dd7eddc8a35c173bb5
-Author: Tercio Jose <terciob19@hotmail.com>
-Date:   Thu Apr 8 11:38:44 2021 -0300
-
-    Pets changed
-
-commit 2d243d13b5a25e46184615e7480ee73b77c95616
-Author: Tercio Jose <terciob19@hotmail.com>
-Date:   Thu Apr 8 11:00:16 2021 -0300
-
-    Make sure the arena unit exists before continuing
-
-commit 5a1cef50010d9baa9432385334a4f2484fe3bb78
-Author: Tercio Jose <terciob19@hotmail.com>
-Date:   Sun Apr 4 12:54:27 2021 -0300
-
-    pets
-
-commit 10936adf714627097b0629629d053df98a2a72e7
-Author: Tercio Jose <terciob19@hotmail.com>
-Date:   Sat Apr 3 18:40:01 2021 -0300
-
-    changes
+    Fixed combability issues with the tbc beta version
 
