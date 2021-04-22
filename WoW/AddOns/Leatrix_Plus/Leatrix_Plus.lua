@@ -1,5 +1,5 @@
 ----------------------------------------------------------------------
--- 	Leatrix Plus 9.0.24 (14th April 2021)
+-- 	Leatrix Plus 9.0.25 (21st April 2021)
 ----------------------------------------------------------------------
 
 --	01:Functions	20:Live			50:RunOnce		70:Logout			
@@ -20,7 +20,7 @@
 	local void
 
 	-- Version
-	LeaPlusLC["AddonVer"] = "9.0.24"
+	LeaPlusLC["AddonVer"] = "9.0.25"
 
 	-- Get locale table
 	local void, Leatrix_Plus = ...
@@ -5331,7 +5331,7 @@
 			-- Set frame parameters
 			editFrame:ClearAllPoints()
 			editFrame:SetPoint("BOTTOM", 0, 130)
-			editFrame:SetSize(470, 170)
+			editFrame:SetSize(600, LeaPlusLC["RecentChatSize"])
 			editFrame:SetFrameStrata("MEDIUM")
 			editFrame:SetToplevel(true)
 			editFrame:Hide()
@@ -5349,12 +5349,76 @@
 			editFrame.BottomLeftTex:SetTexture(editFrame.TopRightTex:GetTexture()); editFrame.BottomLeftTex:SetTexCoord(1, 0, 1, 0)
 			editFrame.TopLeftTex:SetTexture(editFrame.TopRightTex:GetTexture()); editFrame.TopLeftTex:SetTexCoord(1, 0, 0, 1)
 
+			-- Create title bar
+			local titleFrame = CreateFrame("ScrollFrame", nil, editFrame, "InputScrollFrameTemplate")
+			titleFrame:ClearAllPoints()
+			titleFrame:SetPoint("TOP", 0, 32)
+			titleFrame:SetSize(600, 24)
+			titleFrame:SetFrameStrata("MEDIUM")
+			titleFrame:SetToplevel(true)
+			titleFrame:SetHitRectInsets(-6, -6, -6, -6)
+			titleFrame.CharCount:Hide()
+			titleFrame.t = titleFrame:CreateTexture(nil, "BACKGROUND")
+			titleFrame.t:SetAllPoints()
+			titleFrame.t:SetColorTexture(0.00, 0.00, 0.0, 0.6)
+			titleFrame.LeftTex:SetTexture(titleFrame.RightTex:GetTexture()); titleFrame.LeftTex:SetTexCoord(1, 0, 0, 1)
+			titleFrame.BottomTex:SetTexture(titleFrame.TopTex:GetTexture()); titleFrame.BottomTex:SetTexCoord(0, 1, 1, 0)
+			titleFrame.BottomRightTex:SetTexture(titleFrame.TopRightTex:GetTexture()); titleFrame.BottomRightTex:SetTexCoord(0, 1, 1, 0)
+			titleFrame.BottomLeftTex:SetTexture(titleFrame.TopRightTex:GetTexture()); titleFrame.BottomLeftTex:SetTexCoord(1, 0, 1, 0)
+			titleFrame.TopLeftTex:SetTexture(titleFrame.TopRightTex:GetTexture()); titleFrame.TopLeftTex:SetTexCoord(1, 0, 0, 1)
+
+			-- Add message count
+			titleFrame.m = titleFrame:CreateFontString(nil, "ARTWORK", "GameFontNormalLarge") 
+			titleFrame.m:SetPoint("LEFT", 4, 0)
+			titleFrame.m:SetText(L["Messages"] .. ": 0")
+			titleFrame.m:SetFont(titleFrame.m:GetFont(), 16, nil)
+
+			-- Add right-click to close message
+			titleFrame.x = titleFrame:CreateFontString(nil, "ARTWORK", "GameFontNormalLarge") 
+			titleFrame.x:SetPoint("RIGHT", -4, 0)
+			titleFrame.x:SetText(L["Drag to size"] .. " | " .. L["Right-click to close"])
+			titleFrame.x:SetFont(titleFrame.x:GetFont(), 16, nil)
+
+			local titleBox = titleFrame.EditBox
+			titleBox:Hide()
+			titleBox:SetEnabled(false)
+
+			-- Drag to resize
+			editFrame:SetResizable(true)
+			editFrame:SetMinResize(600, 170)
+			editFrame:SetMaxResize(600, 560)
+
+			titleFrame:HookScript("OnMouseDown", function(self, btn)
+				if btn == "LeftButton" then
+					editFrame:StartSizing("TOP")
+				end
+			end)
+			titleFrame:HookScript("OnMouseUp", function(self, btn)
+				if btn == "LeftButton" then
+					editFrame:StopMovingOrSizing()
+					LeaPlusLC["RecentChatSize"] = editFrame:GetHeight()
+				elseif btn == "MiddleButton" then
+					-- Reset frame size
+					LeaPlusLC["RecentChatSize"] = 170
+					editFrame:SetSize(600, LeaPlusLC["RecentChatSize"])
+					editFrame:ClearAllPoints()
+					editFrame:SetPoint("BOTTOM", 0, 130)
+				end
+			end)
+
 			-- Create editbox
 			local editBox = editFrame.EditBox
 			editBox:SetAltArrowKeyMode(false)
 			editBox:SetTextInsets(4, 4, 4, 4)
 			editBox:SetWidth(editFrame:GetWidth() - 30)
 			editBox:SetFont(editBox:GetFont(), 16)
+
+			-- Manage focus
+			editBox:HookScript("OnEditFocusLost", function()
+				if MouseIsOver(titleFrame) and IsMouseButtonDown("LeftButton") then
+					editBox:SetFocus()
+				end
+			end)
 
 			-- Close frame with right-click of editframe or editbox
 			local function CloseRecentChatWindow()
@@ -5368,6 +5432,10 @@
 			end)
 
 			editBox:SetScript("OnMouseDown", function(self, btn)
+				if btn == "RightButton" then CloseRecentChatWindow() end
+			end)
+
+			titleFrame:HookScript("OnMouseDown", function(self, btn)
 				if btn == "RightButton" then CloseRecentChatWindow() end
 			end)
 
@@ -5398,9 +5466,20 @@
 					local chatMessage, r, g, b, chatTypeID = chtfrm:GetMessageInfo(iMsg)
 					if chatMessage then
 
-						-- Handle Battle.net
-						if string.match(chatMessage, "k:(%d+):(%d+):BN_WHISPER:") then
-							local id = tonumber(string.match(chatMessage, "k:(%d+):%d+:BN_WHISPER:"))
+						-- Handle Battle.net messages
+						if string.match(chatMessage, "k:(%d+):(%d+):BN_WHISPER:")
+						or string.match(chatMessage, "k:(%d+):(%d+):BN_INLINE_TOAST_ALERT:")
+						or string.match(chatMessage, "k:(%d+):(%d+):BN_INLINE_TOAST_BROADCAST:")
+						then
+							local ctype
+							if string.match(chatMessage, "k:(%d+):(%d+):BN_WHISPER:") then
+								ctype = "BN_WHISPER"
+							elseif string.match(chatMessage, "k:(%d+):(%d+):BN_INLINE_TOAST_ALERT:") then
+								ctype = "BN_INLINE_TOAST_ALERT"
+							elseif string.match(chatMessage, "k:(%d+):(%d+):BN_INLINE_TOAST_BROADCAST:") then
+								ctype = "BN_INLINE_TOAST_BROADCAST"
+							end
+							local id = tonumber(string.match(chatMessage, "k:(%d+):%d+:" .. ctype .. ":"))
 							local totalBNFriends = BNGetNumFriends()
 							for friendIndex = 1, totalBNFriends do
 								local accountInfo = C_BattleNet.GetFriendAccountInfo(friendIndex)
@@ -5408,31 +5487,24 @@
 								local battleTag = accountInfo.battleTag
 								if id == bnetAccountID then
 									battleTag = strsplit("#", battleTag)
-									chatMessage =  gsub(chatMessage, "|HBNplayer:.*:.*:.*:BN_WHISPER:.*:", "[" .. battleTag .. "]:")
+									chatMessage = chatMessage:gsub("(|HBNplayer%S-|k)(%d-)(:%S-" .. ctype .. "%S-|h)%[(%S-)%](|?h?)(:?)", "[" .. battleTag .. "]:")
 								end
 							end
 						end
 
 						-- Handle colors
-						if r and g and b and chatTypeID then
+						if r and g and b then
 							local colorCode = RGBToColorCode(r, g, b)
-							chatMessage = string.gsub(chatMessage, "|r", "|r" .. colorCode) -- Links
 							chatMessage = colorCode .. chatMessage
 						end
 
 						chatMessage = gsub(chatMessage, "|T.-|t", "") -- Remove textures
-						chatMessage = gsub(chatMessage, "{.-}", "") -- Remove ellipsis
-						editBox:Insert(chatMessage .. "|n")
+						editBox:Insert(chatMessage .. "|r|n")
 
 					end
 					totalMsgCount = totalMsgCount + 1
 				end
-				if totalMsgCount == 1 then
-					editBox:Insert("|cff88aabb" .. totalMsgCount .. " " .. L["message shown."] .. "  ")
-				else
-					editBox:Insert("|cff88aabb" .. totalMsgCount .. " " .. L["messages shown."] .. "  ")
-				end
-				editBox:Insert(L["Right-click to close."])
+				titleFrame.m:SetText(L["Messages"] .. ": " .. totalMsgCount)
 				editFrame:SetVerticalScroll(0)
 				C_Timer.After(0.1, function() editFrame.ScrollBar.ScrollDownButton:Click() end)
 				editFrame:Show()
@@ -8410,6 +8482,11 @@
 			maintitle:ClearAllPoints()
 			maintitle:SetPoint("TOP", 0, -72)
 
+			local expTitle = LeaPlusLC:MakeTx(interPanel, "Shadowlands", 0, 0)
+			expTitle:SetFont(expTitle:GetFont(), 32)
+			expTitle:ClearAllPoints()
+			expTitle:SetPoint("TOP", 0, -152)
+
 			local subTitle = LeaPlusLC:MakeTx(interPanel, "curseforge.com/wow/addons/leatrix-plus", 0, 0)
 			subTitle:SetFont(subTitle:GetFont(), 20)
 			subTitle:ClearAllPoints()
@@ -8750,6 +8827,7 @@
 				LeaPlusLC:LoadVarChk("NoChatFade", "Off")					-- Disable chat fade
 				LeaPlusLC:LoadVarChk("UnivGroupColor", "Off")				-- Universal group color
 				LeaPlusLC:LoadVarChk("RecentChatWindow", "Off")				-- Recent chat window
+				LeaPlusLC:LoadVarNum("RecentChatSize", 170, 170, 600)		-- Recent chat size
 				LeaPlusLC:LoadVarChk("MaxChatHstory", "Off")				-- Increase chat history
 
 				-- Text
@@ -8952,6 +9030,7 @@
 			LeaPlusDB["NoChatFade"]				= LeaPlusLC["NoChatFade"]
 			LeaPlusDB["UnivGroupColor"]			= LeaPlusLC["UnivGroupColor"]
 			LeaPlusDB["RecentChatWindow"]		= LeaPlusLC["RecentChatWindow"]
+			LeaPlusDB["RecentChatSize"]			= LeaPlusLC["RecentChatSize"]
 			LeaPlusDB["MaxChatHstory"]			= LeaPlusLC["MaxChatHstory"]
 
 			-- Text
@@ -10930,6 +11009,7 @@
 				LeaPlusDB["NoChatFade"] = "On"					-- Disable chat fade
 				LeaPlusDB["UnivGroupColor"] = "On"				-- Universal group color
 				LeaPlusDB["RecentChatWindow"] = "On"			-- Recent chat window
+				LeaPlusDB["RecentChatSize"] = 170				-- Recent chat size
 				LeaPlusDB["MaxChatHstory"] = "Off"				-- Increase chat history
 
 				-- Text
