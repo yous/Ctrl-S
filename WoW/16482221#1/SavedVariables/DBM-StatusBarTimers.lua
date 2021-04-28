@@ -51,6 +51,7 @@ DBT_AllPersistentOptions = {
 			["HugeBarYOffset"] = 0,
 			["HugeBarsEnabled"] = true,
 			["HugeScale"] = 1.03,
+			["HugeSort"] = "Sort",
 			["HugeTimerPoint"] = "CENTER",
 			["HugeTimerX"] = -300,
 			["HugeTimerY"] = -25,

@@ -131,6 +131,7 @@ LeaPlusDB = {
 	["PowerBarX"] = 0,
 	["PowerBarY"] = 115,
 	["QuestFontChange"] = "Off",
+	["RecentChatSize"] = 170,
 	["RecentChatWindow"] = "On",
 	["SaveProfFilters"] = "Off",
 	["SetWeatherDensity"] = "Off",

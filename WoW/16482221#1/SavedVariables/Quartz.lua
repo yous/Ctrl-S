@@ -54,6 +54,7 @@ Quartz3DB = {
 	["profileKeys"] = {
 		["김곱충 - 줄진"] = "Default",
 		["나는길을몰라 - 아즈샤라"] = "Default",
+		["자동수리로봇 - 아즈샤라"] = "Default",
 	},
 	["profiles"] = {
 		["Default"] = {

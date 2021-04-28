@@ -1176,6 +1176,7 @@ DBMCastleNathria_AllSavedVars = {
 				["timer_berserkTColor"] = 0,
 			}, -- [1]
 			{
+				["BladeMarking"] = "SetOne",
 				["Enabled"] = true,
 				["ExperimentalTimerCorrection"] = true,
 				["InfoFrame"] = true,

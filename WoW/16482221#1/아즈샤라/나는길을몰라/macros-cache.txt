@@ -5,7 +5,6 @@ END
 VER 3 0100000000000003 "눈속임" "132180"
 #showtooltip 눈속임
 /시전 [@mouseover,help][help][@pet] 눈속임
-/petautocastoff [group] 포효
 /petautocaston [nogroup] 포효
 END
 VER 3 0100000000000014 "마무리 사격" "INV_MISC_QUESTIONMARK"
@@ -39,7 +38,14 @@ VER 3 010000000000000C "연발 공격" "132205"
 END
 VER 3 010000000000000E "일제 사격" "132330"
 #showtooltip 일제 사격
-/시전 [nochanneling:속사] 일제 사격
+/시전 [spec:2,nochanneling:속사] 일제 사격
+/stopmacro [spec:2]
+/petattack
+/시전 일제 사격
+/시전 물기
+/시전 날카로운 일격
+/시전 할퀴기
+/시전 치명적인 이빨
 END
 VER 3 0100000000000005 "정조준" "132329"
 #showtooltip 정조준
@@ -57,6 +63,7 @@ VER 3 0100000000000006 "죽은 척하기" "132293"
 #showtooltip 죽은 척하기
 /시전취소
 /시전 죽은 척하기
+/시전 [pet] 죽은 체하기
 END
 VER 3 0100000000000011 "철수" "132294"
 #showtooltip 철수

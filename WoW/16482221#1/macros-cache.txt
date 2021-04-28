@@ -6,6 +6,20 @@ VER 3 000000000000000F "거북의 상" "132199"
 /시전취소
 /시전 거북의 상
 END
+VER 3 0000000000000017 "날카로운 바람" "136018"
+#showtooltip 날카로운 바람
+/시전취소
+/시전 [@mouseover,harm,nodead][harm,nodead] 날카로운 바람
+END
+VER 3 0000000000000013 "날카로운 사격" "2058007"
+#showtooltip 날카로운 사격
+/petattack
+/시전 날카로운 사격
+/시전 물기
+/시전 날카로운 일격
+/시전 할퀴기
+/시전 치명적인 이빨
+END
 VER 3 0000000000000004 "달빛 봉오리" "3641394"
 /대상 달빛 봉오리
 /script T={1,2,3,4,5,6,7,8} i=GetRaidTargetIndex("target") if i==nil then i=GetRaidTargetIndex("unit") SetRaidTarget("target",T[i]) end
@@ -22,6 +36,45 @@ VER 3 0000000000000008 "바닥징" "1033477"
 /cwm [btn:2] 0
 /stopmacro [btn:2]
 /wm [mod:ctrl] 6; [mod:shift] 2; 8
+END
+VER 3 0000000000000012 "살상 명령" "132176"
+#showtooltip 살상 명령
+/petattack
+/시전 살상 명령
+/시전 물기
+/시전 날카로운 일격
+/시전 할퀴기
+/시전 치명적인 이빨
+END
+VER 3 0000000000000011 "야생의 상" "136074"
+#showtooltip 야생의 상
+/petattack
+/시전 야생의 상
+/시전 광폭화
+/사용 13
+/사용 14
+/시전 물기
+/시전 날카로운 일격
+/시전 할퀴기
+/시전 치명적인 이빨
+END
+VER 3 0000000000000015 "야수의 격노" "132127"
+#showtooltip 야수의 격노
+/petattack
+/시전 야수의 격노
+/시전 물기
+/시전 날카로운 일격
+/시전 할퀴기
+/시전 치명적인 이빨
+END
+VER 3 0000000000000019 "영혼 정화" "236288"
+#showtooltip 영혼 정화
+/시전 [@mouseover,help][@player] 영혼 정화
+END
+VER 3 0000000000000010 "영혼형상" "3586268"
+#showtooltip 영혼형상
+/시전취소
+/시전 영혼형상
 END
 VER 3 000000000000000B "원초적 분노" "INV_MISC_QUESTIONMARK"
 #showtooltip 원초적 분노
@@ -42,6 +95,19 @@ VER 3 000000000000000E "장신구 2" "INV_MISC_QUESTIONMARK"
 #showtooltip 14
 /사용 14
 END
+VER 3 0000000000000016 "치유의 파도" "136044"
+#showtooltip 치유의 파도
+/시전 [@mouseover,help][@player] 치유의 파도
+END
+VER 3 0000000000000014 "코브라 사격" "461114"
+#showtooltip 코브라 사격
+/petattack
+/시전 코브라 사격
+/시전 물기
+/시전 날카로운 일격
+/시전 할퀴기
+/시전 치명적인 이빨
+END
 VER 3 0000000000000007 "탈것" "INV_MISC_QUESTIONMARK"
 #showtooltip [mod:ctrl] 여행자의 동토 매머드; 풋내기 가죽뜯깃
 /시전 천상의 북
@@ -51,4 +117,8 @@ END
 VER 3 000000000000000C "허리" "INV_MISC_QUESTIONMARK"
 #showtooltip 6
 /사용 6
+END
+VER 3 0000000000000018 "화염 충격" "135813"
+#showtooltip 화염 충격
+/시전 [@mouseover,harm,nodead][harm,nodead] 화염 충격
 END
