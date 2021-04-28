@@ -1,0 +1,18 @@
+tag 52f5bf416620f3eb0ce8aee6fa834ae2990ed237 v9
+Author:	David Lynch <kemayo@gmail.com>
+Date:	Sat Nov 21 12:51:10 2020 -0600
+
+Tagging v9
+
+commit 3f4a7122d2f3480260ccbf5f17af3b8c50ba6d90
+Author: David Lynch <kemayo@gmail.com>
+Date:   Sat Nov 21 12:51:03 2020 -0600
+
+    Bump TOC for 9.0.2
+
+commit 033011fffa78625fec40c816095e5ec2dc22d464
+Author: David Lynch <kemayo@gmail.com>
+Date:   Thu Oct 22 13:16:27 2020 -0500
+
+    Update TOC with version number
+
