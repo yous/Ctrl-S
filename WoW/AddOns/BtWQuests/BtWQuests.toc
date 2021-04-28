@@ -1,0 +1,30 @@
+## Interface: 90005
+## Title: BtWQuests
+## Version: 1.77.0
+## Notes: 
+## Author: Breen
+## SavedVariables: BtWQuests_Characters
+## SavedVariablesPerCharacter: BtWQuests_Settings BtWQuests_AutoLoad
+
+Defines.lua
+BtWQuestsCharacters.lua
+BtWQuestsDatabase.lua
+
+Localization.lua
+Localization.deDE.lua
+Localization.esES.lua
+Localization.esMX.lua
+Localization.frFR.lua
+Localization.itIT.lua
+Localization.koKR.lua
+Localization.ptBR.lua
+Localization.ruRU.lua
+Localization.zhCN.lua
+Localization.zhTW.lua
+
+BtWQuestsTemplates.xml
+BtWQuests.xml
+BtWQuestsQuestDataProvider.xml
+BtWQuestsGuideDataProvider.xml
+BtWQuestsMinimapButton.xml
+LibMapPinHandler.lua
