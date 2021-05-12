@@ -8631,7 +8631,7 @@ WeakAurasSaved = {
 				["iconEnable"] = true,
 				["rainbowDuration"] = 3,
 				["rainbowFrequency"] = 0.02,
-				["rainbowMode"] = true,
+				["rainbowMode"] = false,
 				["sound"] = 2,
 				["soundChannel"] = 1,
 				["soundDeadzone"] = 1,
@@ -8749,6 +8749,235 @@ WeakAurasSaved = {
 			["xOffset"] = 210,
 			["yOffset"] = -340,
 			["zoom"] = 0.3,
+		},
+		["GlowOnDemand"] = {
+			["_table"] = "d",
+			["actions"] = {
+				["finish"] = {
+					["custom"] = "",
+					["do_custom"] = false,
+					["do_glow"] = true,
+					["glow_action"] = "hide",
+					["glow_frame_type"] = "UNITFRAME",
+				},
+				["init"] = {
+					["custom"] = "",
+					["do_custom"] = false,
+				},
+				["start"] = {
+					["custom"] = "",
+					["do_custom"] = false,
+					["do_glow"] = true,
+					["glow_XOffset"] = 0,
+					["glow_YOffset"] = 0,
+					["glow_action"] = "show",
+					["glow_frame_type"] = "UNITFRAME",
+					["glow_type"] = "Pixel",
+				},
+			},
+			["anchorFrameType"] = "SCREEN",
+			["anchorPoint"] = "CENTER",
+			["animation"] = {
+				["finish"] = {
+					["duration_type"] = "seconds",
+					["easeStrength"] = 3,
+					["easeType"] = "none",
+					["type"] = "none",
+				},
+				["main"] = {
+					["duration_type"] = "seconds",
+					["easeStrength"] = 3,
+					["easeType"] = "none",
+					["type"] = "none",
+				},
+				["start"] = {
+					["duration_type"] = "seconds",
+					["easeStrength"] = 3,
+					["easeType"] = "none",
+					["type"] = "none",
+				},
+			},
+			["authorOptions"] = {
+				{
+					["fontSize"] = "medium",
+					["text"] = "\n\nSee Action for Glow settings\n\n\n",
+					["type"] = "description",
+					["width"] = 2,
+				}, -- [1]
+			},
+			["auto"] = false,
+			["automaticWidth"] = "Auto",
+			["color"] = {
+				1, -- [1]
+				1, -- [2]
+				1, -- [3]
+				1, -- [4]
+			},
+			["conditions"] = {
+			},
+			["config"] = {
+			},
+			["cooldownTextDisabled"] = false,
+			["customText"] = "\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n",
+			["customTextUpdate"] = "update",
+			["desaturate"] = false,
+			["displayIcon"] = 841384,
+			["displayText"] = " ",
+			["fixedWidth"] = 200,
+			["font"] = "Friz Quadrata TT",
+			["fontSize"] = 12,
+			["frameStrata"] = 9,
+			["glow"] = false,
+			["height"] = 11.99995803833,
+			["icon"] = true,
+			["id"] = "GlowOnDemand",
+			["information"] = {
+				["ignoreOptionsEventErrors"] = true,
+			},
+			["internalVersion"] = 45,
+			["inverse"] = false,
+			["justify"] = "LEFT",
+			["load"] = {
+				["class"] = {
+					["multi"] = {
+					},
+				},
+				["difficulty"] = {
+					["multi"] = {
+					},
+				},
+				["faction"] = {
+					["multi"] = {
+					},
+				},
+				["ingroup"] = {
+					["multi"] = {
+					},
+				},
+				["pvptalent"] = {
+					["multi"] = {
+					},
+				},
+				["race"] = {
+					["multi"] = {
+					},
+				},
+				["role"] = {
+					["multi"] = {
+					},
+				},
+				["size"] = {
+					["multi"] = {
+					},
+				},
+				["spec"] = {
+					["multi"] = {
+					},
+				},
+				["talent"] = {
+					["multi"] = {
+					},
+				},
+				["talent2"] = {
+					["multi"] = {
+					},
+				},
+				["zoneIds"] = "",
+			},
+			["outline"] = "OUTLINE",
+			["preferToUpdate"] = false,
+			["regionType"] = "text",
+			["selfPoint"] = "CENTER",
+			["semver"] = "1.0.5",
+			["shadowColor"] = {
+				0, -- [1]
+				0, -- [2]
+				0, -- [3]
+				1, -- [4]
+			},
+			["shadowXOffset"] = 1,
+			["shadowYOffset"] = -1,
+			["stickyDuration"] = false,
+			["text1"] = "%n",
+			["text1Color"] = {
+				1, -- [1]
+				1, -- [2]
+				1, -- [3]
+				1, -- [4]
+			},
+			["text1Containment"] = "INSIDE",
+			["text1Enabled"] = true,
+			["text1Font"] = "Friz Quadrata TT",
+			["text1FontFlags"] = "OUTLINE",
+			["text1FontSize"] = 12,
+			["text1Point"] = "CENTER",
+			["text2"] = "%p",
+			["text2Color"] = {
+				1, -- [1]
+				1, -- [2]
+				1, -- [3]
+				1, -- [4]
+			},
+			["text2Containment"] = "INSIDE",
+			["text2Enabled"] = false,
+			["text2Font"] = "Friz Quadrata TT",
+			["text2FontFlags"] = "OUTLINE",
+			["text2FontSize"] = 24,
+			["text2Point"] = "CENTER",
+			["tocversion"] = 90002,
+			["triggers"] = {
+				[1] = {
+					["trigger"] = {
+						["auranames"] = {
+							"61295", -- [1]
+						},
+						["buffShowOn"] = "showOnActive",
+						["check"] = "update",
+						["combineMatches"] = "showLowest",
+						["combinePerUnit"] = true,
+						["custom_type"] = "stateupdate",
+						["debuffType"] = "HARMFUL",
+						["duration"] = "1",
+						["event"] = "Health",
+						["groupclone"] = true,
+						["name_info"] = "aura",
+						["names"] = {
+							"Power Word: Shield", -- [1]
+						},
+						["showClones"] = true,
+						["spellIds"] = {
+							17, -- [1]
+						},
+						["subeventPrefix"] = "SPELL",
+						["subeventSuffix"] = "_CAST_START",
+						["type"] = "aura2",
+						["unevent"] = "auto",
+						["unit"] = "group",
+						["useGroupRole"] = false,
+						["useGroup_count"] = false,
+						["useName"] = false,
+						["use_absorbMode"] = true,
+						["use_debuffClass"] = false,
+						["use_specific_unit"] = false,
+						["use_stealable"] = true,
+						["use_tooltip"] = false,
+						["use_unit"] = true,
+					},
+					["untrigger"] = {
+					},
+				},
+				["activeTriggerMode"] = -10,
+				["customTriggerLogic"] = "\n\n",
+				["disjunctive"] = "any",
+			},
+			["uid"] = "UWTzLPb2MmS",
+			["url"] = "https://wago.io/GlowOnDemand/23",
+			["version"] = 23,
+			["width"] = 6.9999866485596,
+			["wordWrap"] = "WordWrap",
+			["xOffset"] = -542.00009155273,
+			["yOffset"] = -36.000030517578,
+			["zoom"] = 0,
 		},
 		["Great Vault on Weekly Reward frame"] = {
 			["actions"] = {
@@ -20640,7 +20869,7 @@ WeakAurasSaved = {
 			["customTextUpdate"] = "update",
 			["desaturate"] = false,
 			["displayIcon"] = 1041231,
-			["frameStrata"] = 3,
+			["frameStrata"] = 4,
 			["height"] = 18,
 			["icon"] = true,
 			["iconSource"] = -1,
@@ -20716,11 +20945,11 @@ WeakAurasSaved = {
 				["use_size"] = true,
 				["zoneIds"] = "",
 			},
-			["parent"] = "쐐기 : 기타 0403",
+			["parent"] = "쐐기 : 기타 0503",
 			["preferToUpdate"] = false,
 			["regionType"] = "icon",
 			["selfPoint"] = "RIGHT",
-			["semver"] = "1.0.247",
+			["semver"] = "1.0.253",
 			["stickyDuration"] = false,
 			["subRegions"] = {
 				{
@@ -20824,268 +21053,15 @@ WeakAurasSaved = {
 				["disjunctive"] = "all",
 			},
 			["uid"] = "zZjlxreu6mF",
-			["url"] = "https://wago.io/fCabQ-hF8/248",
-			["version"] = 248,
+			["url"] = "https://wago.io/fCabQ-hF8/254",
+			["version"] = 254,
+			["wagoID"] = "fCabQ-hF8",
 			["width"] = 18,
 			["xOffset"] = -2,
 			["yOffset"] = 0,
 			["zoom"] = 0,
 		},
-		["쐐기 : 고취"] = {
-			["actions"] = {
-				["finish"] = {
-					["do_glow"] = false,
-					["hide_all_glows"] = true,
-				},
-				["init"] = {
-					["custom"] = "",
-					["do_custom"] = false,
-				},
-				["start"] = {
-					["do_glow"] = false,
-					["glow_XOffset"] = 3,
-					["glow_YOffset"] = 3,
-					["glow_action"] = "show",
-					["glow_border"] = false,
-					["glow_color"] = {
-						1, -- [1]
-						1, -- [2]
-						0.75294117647059, -- [3]
-						1, -- [4]
-					},
-					["glow_frame_type"] = "NAMEPLATE",
-					["glow_frequency"] = 0.4,
-					["glow_length"] = 12,
-					["glow_lines"] = 9,
-					["glow_thickness"] = 3,
-					["glow_type"] = "Pixel",
-					["use_glow_color"] = false,
-				},
-			},
-			["alpha"] = 1,
-			["anchorFrameType"] = "SCREEN",
-			["anchorPoint"] = "CENTER",
-			["animation"] = {
-				["finish"] = {
-					["duration_type"] = "seconds",
-					["easeStrength"] = 3,
-					["easeType"] = "none",
-					["type"] = "none",
-				},
-				["main"] = {
-					["duration_type"] = "seconds",
-					["easeStrength"] = 3,
-					["easeType"] = "none",
-					["type"] = "none",
-				},
-				["start"] = {
-					["duration_type"] = "seconds",
-					["easeStrength"] = 3,
-					["easeType"] = "none",
-					["type"] = "none",
-				},
-			},
-			["authorOptions"] = {
-			},
-			["color"] = {
-				1, -- [1]
-				1, -- [2]
-				1, -- [3]
-				0, -- [4]
-			},
-			["conditions"] = {
-				{
-					["changes"] = {
-						{
-							["property"] = "glowexternal",
-							["value"] = {
-								["glow_XOffset"] = 3,
-								["glow_YOffset"] = 3,
-								["glow_action"] = "show",
-								["glow_border"] = true,
-								["glow_color"] = {
-									1, -- [1]
-									1, -- [2]
-									0.57254901960784, -- [3]
-									1, -- [4]
-								},
-								["glow_frame_type"] = "NAMEPLATE",
-								["glow_frequency"] = 0.4,
-								["glow_length"] = 12,
-								["glow_lines"] = 8,
-								["glow_thickness"] = 3,
-								["glow_type"] = "Pixel",
-								["use_glow_color"] = true,
-							},
-						}, -- [1]
-					},
-					["check"] = {
-						["op"] = "==",
-						["trigger"] = 1,
-						["value"] = "343502",
-						["variable"] = "spellId",
-					},
-				}, -- [1]
-				{
-					["changes"] = {
-						{
-							["property"] = "glowexternal",
-							["value"] = {
-								["glow_XOffset"] = 0,
-								["glow_YOffset"] = 0,
-								["glow_action"] = "show",
-								["glow_border"] = true,
-								["glow_color"] = {
-									1, -- [1]
-									1, -- [2]
-									0.75294117647059, -- [3]
-									1, -- [4]
-								},
-								["glow_frame_type"] = "NAMEPLATE",
-								["glow_frequency"] = 0.25,
-								["glow_length"] = 14,
-								["glow_lines"] = 3,
-								["glow_thickness"] = 3,
-								["glow_type"] = "ACShine",
-								["use_glow_color"] = true,
-							},
-						}, -- [1]
-					},
-					["check"] = {
-						["op"] = "==",
-						["trigger"] = 1,
-						["value"] = "343503",
-						["variable"] = "spellId",
-					},
-					["linked"] = true,
-				}, -- [2]
-				{
-					["changes"] = {
-						{
-							["property"] = "glowexternal",
-							["value"] = {
-								["glow_action"] = "hide",
-								["glow_frame_type"] = "NAMEPLATE",
-							},
-						}, -- [1]
-					},
-					["check"] = {
-						["trigger"] = 1,
-						["value"] = 0,
-						["variable"] = "show",
-					},
-					["linked"] = true,
-				}, -- [3]
-			},
-			["config"] = {
-			},
-			["cooldown"] = false,
-			["cooldownEdge"] = false,
-			["cooldownSwipe"] = true,
-			["cooldownTextDisabled"] = false,
-			["desaturate"] = false,
-			["displayIcon"] = 135946,
-			["frameStrata"] = 1,
-			["height"] = 1,
-			["icon"] = true,
-			["iconSource"] = -1,
-			["id"] = "쐐기 : 고취",
-			["information"] = {
-			},
-			["internalVersion"] = 45,
-			["inverse"] = false,
-			["keepAspectRatio"] = false,
-			["load"] = {
-				["affixes"] = {
-					["multi"] = {
-						[123] = true,
-					},
-					["single"] = 122,
-				},
-				["class"] = {
-					["multi"] = {
-					},
-				},
-				["difficulty"] = {
-					["multi"] = {
-						["challenge"] = true,
-					},
-					["single"] = "challenge",
-				},
-				["instance_type"] = {
-				},
-				["size"] = {
-					["multi"] = {
-						["party"] = true,
-					},
-					["single"] = "party",
-				},
-				["spec"] = {
-					["multi"] = {
-					},
-				},
-				["talent"] = {
-					["multi"] = {
-					},
-				},
-				["use_affixes"] = true,
-				["use_difficulty"] = true,
-				["use_never"] = false,
-				["use_size"] = true,
-				["zoneIds"] = "",
-			},
-			["parent"] = "쐐기 : 기타 0403",
-			["preferToUpdate"] = false,
-			["regionType"] = "icon",
-			["selfPoint"] = "CENTER",
-			["semver"] = "1.0.247",
-			["subRegions"] = {
-			},
-			["tocversion"] = 90005,
-			["triggers"] = {
-				[1] = {
-					["trigger"] = {
-						["auranames"] = {
-							"고통", -- [1]
-						},
-						["auraspellids"] = {
-							"343502", -- [1]
-							"343503", -- [2]
-						},
-						["combinePerUnit"] = true,
-						["debuffType"] = "HELPFUL",
-						["event"] = "Health",
-						["hostility"] = "hostile",
-						["names"] = {
-						},
-						["showClones"] = true,
-						["spellIds"] = {
-						},
-						["subeventPrefix"] = "SPELL",
-						["subeventSuffix"] = "_CAST_START",
-						["type"] = "aura2",
-						["unit"] = "nameplate",
-						["useExactSpellId"] = true,
-						["useHostility"] = true,
-						["useMatch_count"] = false,
-						["useName"] = false,
-					},
-					["untrigger"] = {
-					},
-				},
-				["activeTriggerMode"] = -10,
-				["customTriggerLogic"] = "",
-				["disjunctive"] = "any",
-			},
-			["uid"] = "BPfAY8TWIc0",
-			["url"] = "https://wago.io/fCabQ-hF8/248",
-			["version"] = 248,
-			["width"] = 1,
-			["xOffset"] = 0,
-			["yOffset"] = 0,
-			["zoom"] = 0,
-		},
-		["쐐기 : 기타 0403"] = {
+		["쐐기 : 기타 0503"] = {
 			["actions"] = {
 				["finish"] = {
 				},
@@ -21147,12 +21123,11 @@ WeakAurasSaved = {
 				"쐐기 : 전율", -- [4]
 				"쐐기 : 전율 예상", -- [5]
 				"쐐기 : 강화", -- [6]
-				"쐐기 : 고취", -- [7]
 			},
 			["desc"] = "HOBUL - AZSHARA",
 			["frameStrata"] = 1,
 			["groupIcon"] = "525134",
-			["id"] = "쐐기 : 기타 0403",
+			["id"] = "쐐기 : 기타 0503",
 			["information"] = {
 				["groupOffset"] = true,
 				["ignoreOptionsEventErrors"] = true,
@@ -21210,7 +21185,7 @@ WeakAurasSaved = {
 			["regionType"] = "group",
 			["scale"] = 1,
 			["selfPoint"] = "BOTTOMLEFT",
-			["semver"] = "1.0.247",
+			["semver"] = "1.0.253",
 			["tocversion"] = 90005,
 			["triggers"] = {
 				[1] = {
@@ -21234,8 +21209,9 @@ WeakAurasSaved = {
 				["disjunctive"] = "all",
 			},
 			["uid"] = "b1CvyYBVQdW",
-			["url"] = "https://wago.io/fCabQ-hF8/248",
-			["version"] = 248,
+			["url"] = "https://wago.io/fCabQ-hF8/254",
+			["version"] = 254,
+			["wagoID"] = "fCabQ-hF8",
 			["xOffset"] = 0,
 			["yOffset"] = 420,
 		},
@@ -21601,7 +21577,7 @@ WeakAurasSaved = {
 					["do_custom"] = true,
 				},
 				["init"] = {
-					["custom"] = "aura_env.Status = {}\naura_env.LocalS = {\n    [\"속죄의 전당\"] = {\n        [342494] = {\"교만 맞음\"}, -- 교만\n    },\n    [\"승천의 첨탑\"] = {\n        [342494] = {\"교만 맞음\"}, -- 교만\n        [323744] = {\"기절\"}, --암습\n    },\n    [\"역병 몰락지\"] = {\n        [342494] = {\"교만 맞음\"}, -- 교만\n        [328012] = {\"속박됨\"}, -- 구속의 버섯\n        [326242] = {\"속박됨\"}, -- 점액의 물결\n        [331818] = {\"기절\"}, -- 그림자 매복, 베놈블레이드\n        [328409] = {\"기절\"}, -- 거미줄 올가미  \n    },\n    [\"핏빛 심연\"] = {\n        [342494] = {\"교만 맞음\"}, -- 교만\n        [322299] = {\"기절\"}, -- 탐식\n        [335306] = {\"속박됨\"}, -- 날카로운 족쇄\n    },\n    [\"고통의 투기장\"] = {\n        [342494] = {\"교만 맞음\"}, -- 교만\n        [333567] = {\"현혹됨\"},  -- 빙의, 쿨타로크    \n        [320287] = {\"투기장 입장\"},  -- 핏빛 영광, 자브    \n    },\n    [\"저편\"] = {\n        [342494] = {\"교만 맞음\"}, -- 교만\n        [331847] = {\"기절\"}, -- 컹-컹\n        [338762] = {\"기절\"}, -- 미끄러짐\n        [339978] = {\"침묵\"}, -- 평온의 안개\n        [321349] = {\"방향감각 상실\"}, -- 흡수의 아지랑이\n        [320132] = {\"기절\"}, -- 어둠의 격노, 마나스톰 부부\n        [324010] = {\"기절\"}, -- 분출\n    },\n    [\"죽음의 상흔\"] = {\n        [342494] = {\"교만 맞음\"}, -- 교만\n        [334748] = {\"기절\"}, -- 체액 흡수\n        [345625] = {\"침묵\"}, -- 쥭음의 폭발\n        [320646] = {\"침묵\"}, -- 고약한 가스, 역병뼈닥이\n    },\n    [\"티르너 사이드의 안개\"] = {\n        [342494] = {\"교만 맞음\"}, -- 교만\n        [322487] = {\"기절\"},  -- 과성장\n        [328756] = {\"공포\"}, -- 혐오스러운 형상, 말로크\n        [321893] = {\"기절\"},  -- 얼음 폭발, 미스트콜러\n        [337220] = {\"평정\"}, -- 기생성 평정화, 트레도바\n        [337251] = {\"기절\"}, -- 기생성 무력화\n        [337253] = {\"현혹됨\"}, -- 신경 지배\n    },\n}\n\naura_env.message = nil",
+					["custom"] = "aura_env.Status = {}\naura_env.LocalS = {\n    [\"속죄의 전당\"] = {\n        [342494] = {\"교만 맞음\"}, -- 교만\n    },\n    [\"승천의 첨탑\"] = {\n        [342494] = {\"교만 맞음\"}, -- 교만\n        [323744] = {\"기절\"}, --암습\n    },\n    [\"역병 몰락지\"] = {\n        [342494] = {\"교만 맞음\"}, -- 교만\n        [328012] = {\"속박됨\"}, -- 구속의 버섯\n        [326242] = {\"속박됨\"}, -- 점액의 물결\n        [328409] = {\"속박됨\"}, -- 휘감는 거미줄\n        [331818] = {\"기절\"}, -- 그림자 매복, 베놈블레이드\n        [336306] = {\"기절\"},\n    },\n    [\"핏빛 심연\"] = {\n        [342494] = {\"교만 맞음\"}, -- 교만\n        [322299] = {\"기절\"}, -- 탐식\n        [335306] = {\"속박됨\"}, -- 날카로운 족쇄\n    },\n    [\"고통의 투기장\"] = {\n        [342494] = {\"교만 맞음\"}, -- 교만\n        [321768] = {\"기절\"},  -- 고기 갈고리, 선혈토막\n        [333567] = {\"현혹됨\"},  -- 빙의, 쿨타로크\n        [320287] = {\"투기장 입장\"},  -- 핏빛 영광, 자브\n    },\n    [\"저편\"] = {\n        [342494] = {\"교만 맞음\"}, -- 교만\n        [331847] = {\"기절\"}, -- 컹-컹\n        [338762] = {\"기절\"}, -- 미끄러짐\n        [339978] = {\"침묵\"}, -- 평온의 안개\n        [321349] = {\"방향감각 상실\"}, -- 흡수의 아지랑이\n        [320132] = {\"기절\"}, -- 어둠의 격노, 마나스톰 부부\n        [324010] = {\"기절\"}, -- 분출\n    },\n    [\"죽음의 상흔\"] = {\n        [342494] = {\"교만 맞음\"}, -- 교만\n        [334748] = {\"기절\"}, -- 체액 흡수\n        [345625] = {\"침묵\"}, -- 쥭음의 폭발\n        [320646] = {\"침묵\"}, -- 고약한 가스, 역병뼈닥이\n    },\n    [\"티르너 사이드의 안개\"] = {\n        [342494] = {\"교만 맞음\"}, -- 교만\n        [322487] = {\"기절\"},  -- 과성장\n        [328756] = {\"공포\"}, -- 혐오스러운 형상, 말로크\n        [321893] = {\"기절\"},  -- 얼음 폭발, 미스트콜러\n        [337220] = {\"평정\"}, -- 기생성 평정화, 트레도바\n        [337251] = {\"기절\"}, -- 기생성 무력화\n        [337253] = {\"현혹됨\"}, -- 신경 지배\n    },\n}\n\naura_env.message = nil",
 					["do_custom"] = true,
 				},
 				["start"] = {
@@ -21698,11 +21674,11 @@ WeakAurasSaved = {
 				["use_size"] = true,
 				["zoneIds"] = "",
 			},
-			["parent"] = "쐐기 : 기타 0403",
+			["parent"] = "쐐기 : 기타 0503",
 			["preferToUpdate"] = false,
 			["regionType"] = "icon",
 			["selfPoint"] = "CENTER",
-			["semver"] = "1.0.247",
+			["semver"] = "1.0.253",
 			["stickyDuration"] = false,
 			["subRegions"] = {
 			},
@@ -21770,8 +21746,9 @@ WeakAurasSaved = {
 				["disjunctive"] = "custom",
 			},
 			["uid"] = "sJO5llLz2SD",
-			["url"] = "https://wago.io/fCabQ-hF8/248",
-			["version"] = 248,
+			["url"] = "https://wago.io/fCabQ-hF8/254",
+			["version"] = 254,
+			["wagoID"] = "fCabQ-hF8",
 			["width"] = 1,
 			["xOffset"] = 0,
 			["yOffset"] = 0,
@@ -22072,13 +22049,13 @@ WeakAurasSaved = {
 			["mirror"] = false,
 			["orientation"] = "ANTICLOCKWISE",
 			["outline"] = "OUTLINE",
-			["parent"] = "쐐기 : 기타 0403",
+			["parent"] = "쐐기 : 기타 0503",
 			["preferToUpdate"] = false,
 			["regionType"] = "progresstexture",
 			["rotation"] = 0,
 			["sameTexture"] = true,
 			["selfPoint"] = "BOTTOM",
-			["semver"] = "1.0.247",
+			["semver"] = "1.0.253",
 			["slantMode"] = "INSIDE",
 			["startAngle"] = 0,
 			["stickyDuration"] = false,
@@ -22150,7 +22127,7 @@ WeakAurasSaved = {
 				["disjunctive"] = "any",
 			},
 			["uid"] = "0QLkkMlOTBf",
-			["url"] = "https://wago.io/fCabQ-hF8/248",
+			["url"] = "https://wago.io/fCabQ-hF8/254",
 			["useAdjustedMax"] = false,
 			["useAdjustedMin"] = false,
 			["useAdjustededMax"] = false,
@@ -22158,7 +22135,8 @@ WeakAurasSaved = {
 			["useglowColor"] = false,
 			["user_x"] = 0,
 			["user_y"] = 0,
-			["version"] = 248,
+			["version"] = 254,
+			["wagoID"] = "fCabQ-hF8",
 			["width"] = 14,
 			["wordWrap"] = "WordWrap",
 			["xOffset"] = 0,
@@ -23271,12 +23249,12 @@ WeakAurasSaved = {
 			},
 			["orientation"] = "HORIZONTAL",
 			["outline"] = "None",
-			["parent"] = "쐐기 : 기타 0403",
+			["parent"] = "쐐기 : 기타 0503",
 			["preferToUpdate"] = false,
 			["regionType"] = "text",
 			["rotateText"] = "NONE",
 			["selfPoint"] = "CENTER",
-			["semver"] = "1.0.247",
+			["semver"] = "1.0.253",
 			["shadowColor"] = {
 				0, -- [1]
 				0, -- [2]
@@ -23389,8 +23367,9 @@ WeakAurasSaved = {
 				["disjunctive"] = "custom",
 			},
 			["uid"] = "xcawWKe9UZi",
-			["url"] = "https://wago.io/fCabQ-hF8/248",
-			["version"] = 248,
+			["url"] = "https://wago.io/fCabQ-hF8/254",
+			["version"] = 254,
+			["wagoID"] = "fCabQ-hF8",
 			["width"] = 33.999992370605,
 			["wordWrap"] = "WordWrap",
 			["xOffset"] = 0,
@@ -23587,12 +23566,12 @@ WeakAurasSaved = {
 			},
 			["orientation"] = "HORIZONTAL",
 			["outline"] = "None",
-			["parent"] = "쐐기 : 기타 0403",
+			["parent"] = "쐐기 : 기타 0503",
 			["preferToUpdate"] = false,
 			["regionType"] = "text",
 			["rotateText"] = "NONE",
 			["selfPoint"] = "CENTER",
-			["semver"] = "1.0.247",
+			["semver"] = "1.0.253",
 			["shadowColor"] = {
 				0, -- [1]
 				0, -- [2]
@@ -23679,8 +23658,9 @@ WeakAurasSaved = {
 				["disjunctive"] = "all",
 			},
 			["uid"] = "cIk8QDzZs(5",
-			["url"] = "https://wago.io/fCabQ-hF8/248",
-			["version"] = 248,
+			["url"] = "https://wago.io/fCabQ-hF8/254",
+			["version"] = 254,
+			["wagoID"] = "fCabQ-hF8",
 			["width"] = 28.000078201294,
 			["wordWrap"] = "WordWrap",
 			["xOffset"] = 0,
@@ -23878,7 +23858,7 @@ WeakAurasSaved = {
 			},
 			["config"] = {
 				["halk"] = true,
-				["lub"] = true,
+				["lub"] = false,
 				["over"] = true,
 			},
 			["cooldown"] = false,
@@ -23968,13 +23948,13 @@ WeakAurasSaved = {
 			},
 			["mirror"] = false,
 			["outline"] = "OUTLINE",
-			["parent"] = "쐐기 : 기타 0403",
+			["parent"] = "쐐기 : 기타 0503",
 			["preferToUpdate"] = false,
 			["regionType"] = "text",
 			["rotate"] = true,
 			["rotation"] = 180,
 			["selfPoint"] = "CENTER",
-			["semver"] = "1.0.247",
+			["semver"] = "1.0.253",
 			["shadowColor"] = {
 				0, -- [1]
 				0, -- [2]
@@ -24066,8 +24046,9 @@ WeakAurasSaved = {
 				["disjunctive"] = "custom",
 			},
 			["uid"] = "FcuCyLeB94g",
-			["url"] = "https://wago.io/fCabQ-hF8/248",
-			["version"] = 248,
+			["url"] = "https://wago.io/fCabQ-hF8/254",
+			["version"] = 254,
+			["wagoID"] = "fCabQ-hF8",
 			["width"] = 50,
 			["wordWrap"] = "WordWrap",
 			["xOffset"] = 0,
