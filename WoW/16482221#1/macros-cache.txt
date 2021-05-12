@@ -111,6 +111,14 @@ VER 3 000000000000001F "S대지의 보호막" "136089"
 #showtooltip 대지의 보호막
 /시전 [@mouseover,help][@player] 대지의 보호막
 END
+VER 3 0000000000000021 "S대지의 정령" "INV_MISC_QUESTIONMARK"
+#showtooltip [nopet][pet:원시 불의 정령] 대지의 정령; [pet:원시 대지의 정령] 파쇄
+/시전 [pet:원시 대지의 정령] 파쇄; 대지의 정령
+END
+VER 3 0000000000000020 "S불의 정령" "INV_MISC_QUESTIONMARK"
+#showtooltip [nopet][pet:원시 대지의 정령] 불의 정령; [pet:원시 불의 정령] 유성; [pet:원시 폭풍의 정령] 폭풍의 눈
+/시전 [pet:원시 불의 정령] 유성; [pet:원시 폭풍의 정령] 폭풍의 눈; [nopet] 불의 정령
+END
 VER 3 000000000000001B "S속박의 토템" "136102"
 #showtooltip 속박의 토템
 /시전 [@cursor] 속박의 토템
@@ -134,6 +142,10 @@ END
 VER 3 0000000000000016 "S치유의 파도" "136044"
 #showtooltip 치유의 파도
 /시전 [@mouseover,help][@player] 치유의 파도
+END
+VER 3 0000000000000022 "S태고의 파도" "3578231"
+#showtooltip 태고의 파도
+/시전 [@mouseover,harm,nodead][harm,nodead] 태고의 파도
 END
 VER 3 0000000000000018 "S화염 충격" "135813"
 #showtooltip 화염 충격

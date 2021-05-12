@@ -32,16 +32,16 @@ BtWQuests_Characters = {
 			},
 			[41177] = {
 			},
-			[42421] = {
+			[42170] = {
 				{
-					"0/4 수라마르 전역 퀘스트 4개 완료", -- [1]
+					"0/4 발샤라 전역 퀘스트 4개 완료", -- [1]
 					"object", -- [2]
 					false, -- [3]
 				}, -- [1]
 			},
-			[42422] = {
+			[42421] = {
 				{
-					"0/4 감시관 전역 퀘스트 4개 완료", -- [1]
+					"0/4 수라마르 전역 퀘스트 4개 완료", -- [1]
 					"object", -- [2]
 					false, -- [3]
 				}, -- [1]
@@ -107,16 +107,16 @@ BtWQuests_Characters = {
 					false, -- [3]
 				}, -- [2]
 			},
-			[50602] = {
+			[50598] = {
 				{
-					"0/4 나즈미르 전역 퀘스트 4개 완료", -- [1]
+					"0/4 줄다자르 전역 퀘스트 4개 완료", -- [1]
 					"object", -- [2]
 					false, -- [3]
 				}, -- [1]
 			},
-			[50606] = {
+			[50602] = {
 				{
-					"0/4 쿨 티라스, 습격, 격전지 지역에서 전역 퀘스트 4개 완료", -- [1]
+					"0/4 나즈미르 전역 퀘스트 4개 완료", -- [1]
 					"object", -- [2]
 					false, -- [3]
 				}, -- [1]
@@ -141,6 +141,13 @@ BtWQuests_Characters = {
 				{
 					"0/1 마력의 황금 보주", -- [1]
 					"item", -- [2]
+					false, -- [3]
+				}, -- [1]
+			},
+			[60381] = {
+				{
+					"0/3 몽환숲에서 전역 퀘스트 3개 완료", -- [1]
+					"object", -- [2]
 					false, -- [3]
 				}, -- [1]
 			},
@@ -172,11 +179,11 @@ BtWQuests_Characters = {
 					false, -- [3]
 				}, -- [1]
 			},
-			[62444] = {
+			[62443] = {
 				{
-					"1/1 몽환숲에서 전역 퀘스트 완료", -- [1]
+					"0/1 몽환숲에서 전역 퀘스트 완료", -- [1]
 					"object", -- [2]
-					true, -- [3]
+					false, -- [3]
 				}, -- [1]
 			},
 		},
@@ -280,10 +287,6 @@ BtWQuests_Characters = {
 			[31884] = true,
 			[31885] = true,
 			[32009] = true,
-			[32468] = true,
-			[32469] = true,
-			[32470] = true,
-			[32471] = true,
 			[32618] = true,
 			[32661] = true,
 			[32662] = true,
@@ -1913,10 +1916,8 @@ BtWQuests_Characters = {
 			[58799] = true,
 			[58800] = true,
 			[58821] = true,
-			[58837] = true,
 			[58843] = true,
 			[58869] = true,
-			[58870] = true,
 			[58871] = true,
 			[58882] = true,
 			[58883] = true,
@@ -1997,7 +1998,6 @@ BtWQuests_Characters = {
 			[59621] = true,
 			[59622] = true,
 			[59623] = true,
-			[59642] = true,
 			[59644] = true,
 			[59656] = true,
 			[59674] = true,
@@ -2231,10 +2231,6 @@ BtWQuests_Characters = {
 			[60360] = true,
 			[60361] = true,
 			[60366] = true,
-			[60388] = true,
-			[60401] = true,
-			[60402] = true,
-			[60403] = true,
 			[60420] = true,
 			[60428] = true,
 			[60429] = true,
@@ -2315,11 +2311,9 @@ BtWQuests_Characters = {
 			[60831] = true,
 			[60839] = true,
 			[60840] = true,
-			[60842] = true,
 			[60856] = true,
 			[60857] = true,
 			[60859] = true,
-			[60872] = true,
 			[60881] = true,
 			[60886] = true,
 			[60890] = true,
@@ -2357,7 +2351,6 @@ BtWQuests_Characters = {
 			[61107] = true,
 			[61113] = true,
 			[61126] = true,
-			[61141] = true,
 			[61143] = true,
 			[61144] = true,
 			[61147] = true,
@@ -2420,7 +2413,6 @@ BtWQuests_Characters = {
 			[61559] = true,
 			[61590] = true,
 			[61600] = true,
-			[61609] = true,
 			[61701] = true,
 			[61702] = true,
 			[61703] = true,
@@ -2478,6 +2470,7 @@ BtWQuests_Characters = {
 			[62198] = true,
 			[62199] = true,
 			[62234] = true,
+			[62239] = true,
 			[62243] = true,
 			[62248] = true,
 			[62255] = true,
@@ -2519,7 +2512,6 @@ BtWQuests_Characters = {
 			[62641] = true,
 			[62654] = true,
 			[62655] = true,
-			[62686] = true,
 			[62697] = true,
 			[62699] = true,
 			[62700] = true,
@@ -2570,7 +2562,6 @@ BtWQuests_Characters = {
 			[62936] = true,
 			[62938] = true,
 			[62939] = true,
-			[62944] = true,
 			[62949] = true,
 			[62956] = true,
 			[62957] = true,
@@ -2596,20 +2587,18 @@ BtWQuests_Characters = {
 			[63022] = true,
 			[63029] = true,
 			[63030] = true,
-			[63031] = true,
 			[63032] = true,
 			[63033] = true,
 			[63046] = true,
 			[63051] = true,
-			[63062] = true,
 			[63067] = true,
 			[63068] = true,
-			[63069] = true,
 			[63070] = true,
 			[63071] = true,
 			[63073] = true,
 			[63091] = true,
 			[63092] = true,
+			[63100] = true,
 			[63132] = true,
 			[63133] = true,
 			[63134] = true,
@@ -2630,6 +2619,7 @@ BtWQuests_Characters = {
 			[63161] = true,
 			[63163] = true,
 			[63164] = true,
+			[63166] = true,
 			[63177] = true,
 			[63183] = true,
 			[63193] = true,
@@ -2660,6 +2650,7 @@ BtWQuests_Characters = {
 			[63253] = true,
 			[63254] = true,
 			[63255] = true,
+			[63256] = true,
 			[63257] = true,
 			[63262] = true,
 			[63263] = true,
@@ -2676,6 +2667,7 @@ BtWQuests_Characters = {
 			[63304] = true,
 			[63308] = true,
 			[63312] = true,
+			[63316] = true,
 			[63320] = true,
 			[63324] = true,
 			[63328] = true,
@@ -2699,6 +2691,7 @@ BtWQuests_Characters = {
 			[63424] = true,
 			[63446] = true,
 			[63449] = true,
+			[63452] = true,
 			[63523] = true,
 			[63611] = true,
 			[63641] = true,
@@ -3258,7 +3251,7 @@ BtWQuests_Characters = {
 		},
 		["ignoredChains"] = {
 		},
-		["level"] = 52,
+		["level"] = 53,
 		["name"] = "자동수리로봇",
 		["professions"] = {
 			[185] = true,
@@ -3283,16 +3276,16 @@ BtWQuests_Characters = {
 					false, -- [3]
 				}, -- [1]
 			},
-			[50602] = {
+			[50598] = {
 				{
-					"0/4 나즈미르 전역 퀘스트 4개 완료", -- [1]
+					"0/4 줄다자르 전역 퀘스트 4개 완료", -- [1]
 					"object", -- [2]
 					false, -- [3]
 				}, -- [1]
 			},
-			[50606] = {
+			[50602] = {
 				{
-					"0/4 쿨 티라스, 습격, 격전지 지역에서 전역 퀘스트 4개 완료", -- [1]
+					"0/4 나즈미르 전역 퀘스트 4개 완료", -- [1]
 					"object", -- [2]
 					false, -- [3]
 				}, -- [1]
@@ -3369,6 +3362,76 @@ BtWQuests_Characters = {
 					false, -- [3]
 				}, -- [1]
 			},
+			[57316] = {
+				{
+					"0/3 고통의 투기장 상대 쓰러뜨리기", -- [1]
+					"monster", -- [2]
+					false, -- [3]
+				}, -- [1]
+			},
+			[57825] = {
+			},
+			[58161] = {
+			},
+			[60277] = {
+				{
+					"0/1 파멸의 응집체 처치", -- [1]
+					"monster", -- [2]
+					false, -- [3]
+				}, -- [1]
+			},
+			[60316] = {
+				{
+					"0/1 변형된 파수병 처치", -- [1]
+					"monster", -- [2]
+					false, -- [3]
+				}, -- [1]
+			},
+			[60466] = {
+				{
+					"1/1 엘리시안 실타래", -- [1]
+					"item", -- [2]
+					true, -- [3]
+				}, -- [1]
+				{
+					"0/4 구름성큼걸이 모피", -- [1]
+					"item", -- [2]
+					false, -- [3]
+				}, -- [2]
+				{
+					"0/12 깃사자 깃털", -- [1]
+					"item", -- [2]
+					false, -- [3]
+				}, -- [3]
+			},
+			[62723] = {
+				{
+					"키리안 돕기", -- [1]
+					"progressbar", -- [2]
+					false, -- [3]
+				}, -- [1]
+			},
+			[62748] = {
+				{
+					"강령군주 돕기", -- [1]
+					"progressbar", -- [2]
+					false, -- [3]
+				}, -- [1]
+			},
+			[62763] = {
+				{
+					"나이트 페이 돕기", -- [1]
+					"progressbar", -- [2]
+					false, -- [3]
+				}, -- [1]
+			},
+			[62774] = {
+				{
+					"평온의 웅덩이 지원", -- [1]
+					"progressbar", -- [2]
+					false, -- [3]
+				}, -- [1]
+			},
 			[62778] = {
 				{
 					"벤티르 돕기", -- [1]
@@ -3436,6 +3499,10 @@ BtWQuests_Characters = {
 			[31884] = true,
 			[31885] = true,
 			[32009] = true,
+			[32468] = true,
+			[32469] = true,
+			[32470] = true,
+			[32471] = true,
 			[32674] = true,
 			[32675] = true,
 			[46846] = true,
@@ -4228,6 +4295,8 @@ BtWQuests_Characters = {
 			[57724] = true,
 			[57787] = true,
 			[57816] = true,
+			[57818] = true,
+			[57824] = true,
 			[57908] = true,
 			[57909] = true,
 			[57912] = true,
@@ -4236,6 +4305,7 @@ BtWQuests_Characters = {
 			[57949] = true,
 			[57950] = true,
 			[57951] = true,
+			[57952] = true,
 			[57976] = true,
 			[57977] = true,
 			[57979] = true,
@@ -4248,14 +4318,16 @@ BtWQuests_Characters = {
 			[57993] = true,
 			[57994] = true,
 			[58011] = true,
-			[58013] = true,
 			[58016] = true,
 			[58027] = true,
 			[58031] = true,
 			[58036] = true,
 			[58045] = true,
+			[58068] = true,
 			[58086] = true,
 			[58087] = true,
+			[58088] = true,
+			[58090] = true,
 			[58117] = true,
 			[58174] = true,
 			[58268] = true,
@@ -4270,6 +4342,7 @@ BtWQuests_Characters = {
 			[58486] = true,
 			[58488] = true,
 			[58524] = true,
+			[58575] = true,
 			[58589] = true,
 			[58590] = true,
 			[58591] = true,
@@ -4278,6 +4351,11 @@ BtWQuests_Characters = {
 			[58616] = true,
 			[58617] = true,
 			[58618] = true,
+			[58619] = true,
+			[58620] = true,
+			[58621] = true,
+			[58622] = true,
+			[58623] = true,
 			[58654] = true,
 			[58714] = true,
 			[58719] = true,
@@ -4295,10 +4373,12 @@ BtWQuests_Characters = {
 			[58869] = true,
 			[58882] = true,
 			[58883] = true,
+			[58900] = true,
 			[58916] = true,
 			[58931] = true,
 			[58932] = true,
 			[58941] = true,
+			[58947] = true,
 			[58976] = true,
 			[58977] = true,
 			[58978] = true,
@@ -4328,6 +4408,7 @@ BtWQuests_Characters = {
 			[59199] = true,
 			[59200] = true,
 			[59202] = true,
+			[59203] = true,
 			[59206] = true,
 			[59209] = true,
 			[59210] = true,
@@ -4349,6 +4430,7 @@ BtWQuests_Characters = {
 			[59716] = true,
 			[59724] = true,
 			[59726] = true,
+			[59750] = true,
 			[59751] = true,
 			[59752] = true,
 			[59753] = true,
@@ -4368,15 +4450,22 @@ BtWQuests_Characters = {
 			[59773] = true,
 			[59774] = true,
 			[59776] = true,
+			[59781] = true,
+			[59800] = true,
+			[59837] = true,
+			[59843] = true,
 			[59846] = true,
+			[59867] = true,
 			[59868] = true,
 			[59874] = true,
+			[59879] = true,
 			[59885] = true,
 			[59897] = true,
 			[59907] = true,
 			[59911] = true,
 			[59914] = true,
 			[59915] = true,
+			[59917] = true,
 			[59920] = true,
 			[59926] = true,
 			[59927] = true,
@@ -4413,6 +4502,7 @@ BtWQuests_Characters = {
 			[59981] = true,
 			[59984] = true,
 			[59985] = true,
+			[59994] = true,
 			[60005] = true,
 			[60006] = true,
 			[60007] = true,
@@ -4515,6 +4605,7 @@ BtWQuests_Characters = {
 			[60859] = true,
 			[60881] = true,
 			[60886] = true,
+			[60900] = true,
 			[60901] = true,
 			[60905] = true,
 			[60972] = true,
@@ -4534,6 +4625,7 @@ BtWQuests_Characters = {
 			[61289] = true,
 			[61290] = true,
 			[61291] = true,
+			[61470] = true,
 			[61715] = true,
 			[61716] = true,
 			[61727] = true,
@@ -4557,6 +4649,7 @@ BtWQuests_Characters = {
 			[62716] = true,
 			[62740] = true,
 			[62745] = true,
+			[62785] = true,
 			[62803] = true,
 			[62912] = true,
 			[62939] = true,
@@ -4732,6 +4825,20 @@ BtWQuests_Characters = {
 				["barMin"] = 0,
 				["barValue"] = 0,
 				["name"] = "아제로스의 용사들",
+				["standing"] = 4,
+			},
+			[2407] = {
+				["barMax"] = 3000,
+				["barMin"] = 0,
+				["barValue"] = 0,
+				["name"] = "승천자",
+				["standing"] = 4,
+			},
+			[2410] = {
+				["barMax"] = 3000,
+				["barMin"] = 0,
+				["barValue"] = 2310,
+				["name"] = "죽지 않는 군대",
 				["standing"] = 4,
 			},
 			[2413] = {
