@@ -1,10 +1,10 @@
-tag 062fd2ce6ca848d52cfd1b935777c2314acd57f0 DetailsRetail.9.0.5.8406.144
+tag efe4eebfe7e2bf74a6b31af40c817bb1d91d46e3 DetailsRetail.9.0.5.8501a.144
 Author:	Tercio Jose <terciob19@hotmail.com>
-Date:	Tue Apr 13 18:03:49 2021 -0300
+Date:	Mon May 17 18:38:14 2021 -0300
 
-commit 4a28c63b4e0d2f9fd74338e6146e15522f3ef3b8
+commit eba3036d02db0ce3688c4a49c8890c29ef1d79e7
 Author: Tercio Jose <terciob19@hotmail.com>
-Date:   Tue Apr 13 18:02:15 2021 -0300
+Date:   Mon May 17 18:37:25 2021 -0300
 
-    Fixed combability issues with the tbc beta version
+    Fixes for the latest release
 
