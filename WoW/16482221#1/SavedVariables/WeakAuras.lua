@@ -2494,7 +2494,7 @@ WeakAurasSaved = {
 			["preferToUpdate"] = true,
 			["regionType"] = "icon",
 			["selfPoint"] = "CENTER",
-			["semver"] = "1.0.9",
+			["semver"] = "1.0.10",
 			["spark"] = false,
 			["sparkBlendMode"] = "ADD",
 			["sparkColor"] = {
@@ -2554,12 +2554,459 @@ WeakAurasSaved = {
 				["activeTriggerMode"] = -10,
 			},
 			["uid"] = "DIDqJJlVmg(",
-			["url"] = "https://wago.io/uYX5mP3U5/10",
+			["url"] = "https://wago.io/uYX5mP3U5/11",
 			["useAdjustededMax"] = false,
 			["useAdjustededMin"] = false,
-			["version"] = 10,
+			["version"] = 11,
+			["wagoID"] = "uYX5mP3U5",
 			["width"] = 1,
 			["xOffset"] = -3000,
+			["yOffset"] = 0,
+			["zoom"] = 0,
+		},
+		["EDE [DOS] Clear Stacks"] = {
+			["actions"] = {
+				["finish"] = {
+					["do_sound"] = false,
+					["sound"] = "Interface\\Addons\\WeakAuras\\PowerAurasMedia\\Sounds\\BITE.ogg",
+				},
+				["init"] = {
+				},
+				["start"] = {
+					["do_sound"] = false,
+					["sound"] = "Interface\\Addons\\WeakAuras\\PowerAurasMedia\\Sounds\\thunder.ogg",
+				},
+			},
+			["alpha"] = 1,
+			["anchorFrameType"] = "SCREEN",
+			["anchorPoint"] = "CENTER",
+			["animation"] = {
+				["finish"] = {
+					["duration_type"] = "seconds",
+					["easeStrength"] = 3,
+					["easeType"] = "none",
+					["type"] = "none",
+				},
+				["main"] = {
+					["duration_type"] = "seconds",
+					["easeStrength"] = 3,
+					["easeType"] = "none",
+					["type"] = "none",
+				},
+				["start"] = {
+					["duration_type"] = "seconds",
+					["easeStrength"] = 3,
+					["easeType"] = "none",
+					["type"] = "none",
+				},
+			},
+			["authorOptions"] = {
+			},
+			["auto"] = true,
+			["color"] = {
+				1, -- [1]
+				1, -- [2]
+				1, -- [3]
+				1, -- [4]
+			},
+			["conditions"] = {
+				{
+					["changes"] = {
+						{
+							["property"] = "sound",
+							["value"] = {
+								["sound"] = "Interface\\AddOns\\WeakAuras\\Media\\Sounds\\AirHorn.ogg",
+								["sound_channel"] = "Master",
+								["sound_type"] = "Play",
+							},
+						}, -- [1]
+					},
+					["check"] = {
+						["op"] = ">=",
+						["trigger"] = 1,
+						["value"] = "8",
+						["variable"] = "stacks",
+					},
+				}, -- [1]
+			},
+			["config"] = {
+			},
+			["cooldown"] = false,
+			["cooldownEdge"] = false,
+			["cooldownSwipe"] = true,
+			["cooldownTextDisabled"] = false,
+			["desaturate"] = false,
+			["frameStrata"] = 1,
+			["height"] = 1,
+			["icon"] = true,
+			["iconSource"] = -1,
+			["id"] = "EDE [DOS] Clear Stacks",
+			["information"] = {
+				["ignoreOptionsEventErrors"] = true,
+			},
+			["internalVersion"] = 45,
+			["inverse"] = false,
+			["keepAspectRatio"] = false,
+			["load"] = {
+				["class"] = {
+					["multi"] = {
+					},
+				},
+				["ingroup"] = {
+				},
+				["size"] = {
+					["multi"] = {
+					},
+				},
+				["spec"] = {
+					["multi"] = {
+					},
+				},
+				["talent"] = {
+					["multi"] = {
+					},
+				},
+				["use_ingroup"] = false,
+				["use_zoneIds"] = true,
+				["zoneIds"] = "1680, 1678, 1679, 1677",
+			},
+			["parent"] = "Ellesmere's Dungeon Essentials",
+			["preferToUpdate"] = true,
+			["regionType"] = "icon",
+			["selfPoint"] = "CENTER",
+			["semver"] = "1.0.10",
+			["subRegions"] = {
+				{
+					["anchorXOffset"] = 0,
+					["anchorYOffset"] = 0,
+					["rotateText"] = "NONE",
+					["text_anchorPoint"] = "CENTER",
+					["text_anchorYOffset"] = 0,
+					["text_automaticWidth"] = "Auto",
+					["text_color"] = {
+						1, -- [1]
+						0, -- [2]
+						0.058823529411765, -- [3]
+						1, -- [4]
+					},
+					["text_fixedWidth"] = 64,
+					["text_font"] = "Friz Quadrata TT",
+					["text_fontSize"] = 30,
+					["text_fontType"] = "OUTLINE",
+					["text_justify"] = "CENTER",
+					["text_selfPoint"] = "AUTO",
+					["text_shadowColor"] = {
+						0, -- [1]
+						0, -- [2]
+						0, -- [3]
+						1, -- [4]
+					},
+					["text_shadowXOffset"] = 0,
+					["text_shadowYOffset"] = 0,
+					["text_text"] = "%s",
+					["text_text_format_s_format"] = "none",
+					["text_visible"] = true,
+					["text_wordWrap"] = "WordWrap",
+					["type"] = "subtext",
+				}, -- [1]
+				{
+					["glow"] = true,
+					["glowBorder"] = false,
+					["glowColor"] = {
+						1, -- [1]
+						1, -- [2]
+						1, -- [3]
+						1, -- [4]
+					},
+					["glowFrequency"] = 0.25,
+					["glowLength"] = 10,
+					["glowLines"] = 8,
+					["glowScale"] = 1,
+					["glowThickness"] = 1,
+					["glowType"] = "buttonOverlay",
+					["glowXOffset"] = 0,
+					["glowYOffset"] = 0,
+					["type"] = "subglow",
+					["useGlowColor"] = false,
+				}, -- [2]
+			},
+			["tocversion"] = 90005,
+			["triggers"] = {
+				[1] = {
+					["trigger"] = {
+						["auranames"] = {
+							"334496", -- [1]
+						},
+						["auraspellids"] = {
+							"334496", -- [1]
+						},
+						["debuffType"] = "HARMFUL",
+						["duration"] = "1",
+						["event"] = "Combat Log",
+						["names"] = {
+						},
+						["sourceUnit"] = "focus",
+						["spellIds"] = {
+						},
+						["spellName"] = "Undying Rage",
+						["subeventPrefix"] = "SPELL",
+						["subeventSuffix"] = "_CAST_START",
+						["type"] = "aura2",
+						["unevent"] = "timed",
+						["unit"] = "player",
+						["useExactSpellId"] = true,
+						["useName"] = false,
+						["use_sourceUnit"] = false,
+						["use_spellName"] = true,
+					},
+					["untrigger"] = {
+					},
+				},
+				["activeTriggerMode"] = -10,
+			},
+			["uid"] = "Gh6Joumzl2w",
+			["url"] = "https://wago.io/uYX5mP3U5/11",
+			["version"] = 11,
+			["wagoID"] = "uYX5mP3U5",
+			["width"] = 1,
+			["xOffset"] = -3000,
+			["yOffset"] = 0,
+			["zoom"] = 0,
+		},
+		["EDE [DOS] Deathwalker's Spirit Fixate Nameplate Indicator"] = {
+			["actions"] = {
+				["finish"] = {
+				},
+				["init"] = {
+					["custom"] = "aura_env.guids  = {}\naura_env.trackedUnitName = \"Atal'ai Deathwalker's Spirit\"",
+					["do_custom"] = true,
+				},
+				["start"] = {
+					["do_sound"] = true,
+					["sound"] = "Interface\\AddOns\\WeakAuras\\Media\\Sounds\\AirHorn.ogg",
+					["sound_channel"] = "Master",
+				},
+			},
+			["alpha"] = 1,
+			["anchorFrameType"] = "SCREEN",
+			["anchorPoint"] = "CENTER",
+			["animation"] = {
+				["finish"] = {
+					["duration_type"] = "seconds",
+					["easeStrength"] = 3,
+					["easeType"] = "none",
+					["type"] = "none",
+				},
+				["main"] = {
+					["duration_type"] = "seconds",
+					["easeStrength"] = 3,
+					["easeType"] = "none",
+					["type"] = "none",
+				},
+				["start"] = {
+					["duration_type"] = "seconds",
+					["easeStrength"] = 3,
+					["easeType"] = "none",
+					["type"] = "none",
+				},
+			},
+			["authorOptions"] = {
+				{
+					["bigStep"] = 1,
+					["default"] = 0,
+					["key"] = "xOffset",
+					["max"] = 200,
+					["min"] = -200,
+					["name"] = "X-Offset",
+					["step"] = 1,
+					["type"] = "range",
+					["useDesc"] = false,
+					["width"] = 1,
+				}, -- [1]
+				{
+					["bigStep"] = 1,
+					["default"] = 0,
+					["key"] = "yOffset",
+					["max"] = 200,
+					["min"] = -200,
+					["name"] = "Y-Offset",
+					["step"] = 1,
+					["type"] = "range",
+					["useDesc"] = false,
+					["width"] = 1,
+				}, -- [2]
+			},
+			["color"] = {
+				1, -- [1]
+				1, -- [2]
+				1, -- [3]
+				1, -- [4]
+			},
+			["conditions"] = {
+				{
+					["changes"] = {
+						{
+						}, -- [1]
+					},
+					["check"] = {
+					},
+				}, -- [1]
+			},
+			["config"] = {
+				["xOffset"] = 50,
+				["yOffset"] = -10,
+			},
+			["cooldown"] = false,
+			["cooldownEdge"] = false,
+			["cooldownSwipe"] = true,
+			["cooldownTextDisabled"] = false,
+			["customText"] = "function()\n    if aura_env.state and aura_env.state.PassUnit then\n        local region = aura_env.region\n        local plate = C_NamePlate.GetNamePlateForUnit(aura_env.state.PassUnit)\n        if plate then\n            region:ClearAllPoints()\n            region:SetPoint(\"BOTTOM\", plate, \"TOP\", aura_env.config.xOffset, aura_env.config.yOffset)\n            region:Show()\n        else\n            region:Hide()\n        end\n    end\nend\n\n\n",
+			["desaturate"] = false,
+			["desc"] = "Puts an indicator on Spiteful Shades that target you and plays a sound notification.\nYou can offset the anchor to your liking in the \"Custom Options\" tab.",
+			["displayIcon"] = 236188,
+			["frameStrata"] = 1,
+			["height"] = 40,
+			["icon"] = true,
+			["iconSource"] = 0,
+			["id"] = "EDE [DOS] Deathwalker's Spirit Fixate Nameplate Indicator",
+			["information"] = {
+				["ignoreOptionsEventErrors"] = true,
+			},
+			["internalVersion"] = 45,
+			["inverse"] = false,
+			["keepAspectRatio"] = false,
+			["load"] = {
+				["affixes"] = {
+					["multi"] = {
+						[123] = true,
+					},
+					["single"] = 123,
+				},
+				["class"] = {
+					["multi"] = {
+					},
+				},
+				["difficulty"] = {
+					["multi"] = {
+						["challenge"] = true,
+					},
+					["single"] = "challenge",
+				},
+				["size"] = {
+					["multi"] = {
+						["party"] = true,
+					},
+					["single"] = "party",
+				},
+				["spec"] = {
+					["multi"] = {
+					},
+				},
+				["talent"] = {
+					["multi"] = {
+					},
+				},
+				["use_combat"] = true,
+				["use_zoneIds"] = true,
+				["zoneIds"] = "1680, 1678, 1679, 1677",
+			},
+			["parent"] = "Ellesmere's Dungeon Essentials",
+			["preferToUpdate"] = true,
+			["regionType"] = "icon",
+			["selfPoint"] = "CENTER",
+			["semver"] = "1.0.10",
+			["subRegions"] = {
+				{
+					["anchorXOffset"] = 0,
+					["anchorYOffset"] = 0,
+					["rotateText"] = "NONE",
+					["text_anchorPoint"] = "INNER_BOTTOMRIGHT",
+					["text_automaticWidth"] = "Auto",
+					["text_color"] = {
+						1, -- [1]
+						1, -- [2]
+						1, -- [3]
+						1, -- [4]
+					},
+					["text_fixedWidth"] = 64,
+					["text_font"] = "Friz Quadrata TT",
+					["text_fontSize"] = 12,
+					["text_fontType"] = "OUTLINE",
+					["text_justify"] = "CENTER",
+					["text_selfPoint"] = "AUTO",
+					["text_shadowColor"] = {
+						0, -- [1]
+						0, -- [2]
+						0, -- [3]
+						1, -- [4]
+					},
+					["text_shadowXOffset"] = 0,
+					["text_shadowYOffset"] = 0,
+					["text_text"] = "%c",
+					["text_text_format_s_format"] = "none",
+					["text_visible"] = true,
+					["text_wordWrap"] = "WordWrap",
+					["type"] = "subtext",
+				}, -- [1]
+				{
+					["glow"] = true,
+					["glowBorder"] = false,
+					["glowColor"] = {
+						1, -- [1]
+						1, -- [2]
+						1, -- [3]
+						1, -- [4]
+					},
+					["glowFrequency"] = 0.25,
+					["glowLength"] = 10,
+					["glowLines"] = 8,
+					["glowScale"] = 1,
+					["glowThickness"] = 1,
+					["glowType"] = "buttonOverlay",
+					["glowXOffset"] = 0,
+					["glowYOffset"] = 0,
+					["type"] = "subglow",
+					["useGlowColor"] = false,
+				}, -- [2]
+			},
+			["tocversion"] = 90005,
+			["triggers"] = {
+				[1] = {
+					["trigger"] = {
+						["check"] = "event",
+						["custom"] = "function(allstates, event, unit, ...)    \n    if event == \"NAME_PLATE_UNIT_ADDED\" then\n        if unit and unit ~= \"target\" then \n            if aura_env.guids[UnitGUID(unit)] then\n                allstates[UnitGUID(unit)] = { \n                    show = true,\n                    changed = true,\n                    PassUnit = unit,\n                    progressType = \"static\",\n                }\n            end\n        end\n    end\n    if event == \"NAME_PLATE_UNIT_REMOVED\" then\n        if unit then \n            if allstates[UnitGUID(unit)] then\n                allstates[UnitGUID(unit)].changed = true\n                allstates[UnitGUID(unit)].PassUnit = \"none\"\n            end\n        end    \n    end\n    if event == \"UNIT_THREAT_LIST_UPDATE\" then\n        if unit then            \n            local _,_, threatPct, _, _ = UnitDetailedThreatSituation(\"player\", unit)\n            if threatPct == 100 and GetUnitName(unit) == aura_env.trackedUnitName then\n                for i=1,255 do\n                    local u = \"nameplate\"..i\n                    if UnitExists(u) then\n                        if u == unit then\n                            allstates[UnitGUID(unit)] = { \n                                show = true,\n                                changed = true,\n                                PassUnit = u,\n                                progressType = \"static\",\n                            }\n                        end\n                    end\n                end\n            end\n        end\n    end\n    return true\nend\n\n\n",
+						["custom_hide"] = "timed",
+						["custom_type"] = "stateupdate",
+						["debuffType"] = "HELPFUL",
+						["duration"] = "1",
+						["event"] = "Combat Log",
+						["events"] = "NAME_PLATE_UNIT_ADDED, NAME_PLATE_UNIT_REMOVED, UNIT_THREAT_LIST_UPDATE",
+						["nameplateType"] = "hostile",
+						["names"] = {
+						},
+						["spellIds"] = {
+						},
+						["subeventPrefix"] = "SPELL",
+						["subeventSuffix"] = "_CAST_START",
+						["type"] = "custom",
+						["unevent"] = "timed",
+						["unit"] = "nameplate",
+						["use_absorbMode"] = true,
+						["use_nameplateType"] = true,
+						["use_unit"] = true,
+					},
+					["untrigger"] = {
+						["unit"] = "nameplate",
+					},
+				},
+				["activeTriggerMode"] = -10,
+			},
+			["uid"] = "MKbCSniSEbZ",
+			["url"] = "https://wago.io/uYX5mP3U5/11",
+			["version"] = 11,
+			["wagoID"] = "uYX5mP3U5",
+			["width"] = 40,
+			["xOffset"] = 0,
 			["yOffset"] = 0,
 			["zoom"] = 0,
 		},
@@ -2675,7 +3122,7 @@ WeakAurasSaved = {
 			["preferToUpdate"] = true,
 			["regionType"] = "icon",
 			["selfPoint"] = "CENTER",
-			["semver"] = "1.0.9",
+			["semver"] = "1.0.10",
 			["spark"] = false,
 			["sparkBlendMode"] = "ADD",
 			["sparkColor"] = {
@@ -2737,14 +3184,462 @@ WeakAurasSaved = {
 				["activeTriggerMode"] = -10,
 			},
 			["uid"] = "6YMXGijvpCg",
-			["url"] = "https://wago.io/uYX5mP3U5/10",
+			["url"] = "https://wago.io/uYX5mP3U5/11",
 			["useAdjustededMax"] = false,
 			["useAdjustededMin"] = false,
-			["version"] = 10,
+			["version"] = 11,
+			["wagoID"] = "uYX5mP3U5",
 			["width"] = 1,
 			["xOffset"] = -3000,
 			["yOffset"] = 0,
 			["zoom"] = 0,
+		},
+		["EDE [HOA] Deadly Thrust"] = {
+			["actions"] = {
+				["finish"] = {
+				},
+				["init"] = {
+				},
+				["start"] = {
+					["do_sound"] = true,
+					["sound"] = "Interface\\Addons\\Details\\sounds\\sound_gun2.ogg",
+					["sound_channel"] = "SFX",
+				},
+			},
+			["alpha"] = 1,
+			["anchorFrameType"] = "SCREEN",
+			["anchorPoint"] = "CENTER",
+			["animation"] = {
+				["finish"] = {
+					["duration_type"] = "seconds",
+					["easeStrength"] = 3,
+					["easeType"] = "none",
+					["type"] = "none",
+				},
+				["main"] = {
+					["duration_type"] = "seconds",
+					["easeStrength"] = 3,
+					["easeType"] = "none",
+					["type"] = "none",
+				},
+				["start"] = {
+					["duration_type"] = "seconds",
+					["easeStrength"] = 3,
+					["easeType"] = "none",
+					["type"] = "none",
+				},
+			},
+			["authorOptions"] = {
+			},
+			["auto"] = true,
+			["color"] = {
+				1, -- [1]
+				1, -- [2]
+				1, -- [3]
+				1, -- [4]
+			},
+			["conditions"] = {
+			},
+			["config"] = {
+			},
+			["cooldown"] = true,
+			["cooldownEdge"] = false,
+			["cooldownSwipe"] = true,
+			["cooldownTextDisabled"] = false,
+			["desaturate"] = false,
+			["displayIcon"] = "1117879",
+			["frameStrata"] = 1,
+			["height"] = 1,
+			["icon"] = true,
+			["iconSource"] = -1,
+			["id"] = "EDE [HOA] Deadly Thrust",
+			["information"] = {
+				["ignoreOptionsEventErrors"] = true,
+			},
+			["internalVersion"] = 45,
+			["inverse"] = false,
+			["keepAspectRatio"] = false,
+			["load"] = {
+				["class"] = {
+					["multi"] = {
+					},
+				},
+				["size"] = {
+					["multi"] = {
+					},
+				},
+				["spec"] = {
+					["multi"] = {
+					},
+				},
+				["talent"] = {
+					["multi"] = {
+					},
+				},
+				["use_zoneIds"] = true,
+				["zoneIds"] = "g409",
+			},
+			["parent"] = "Ellesmere's Dungeon Essentials",
+			["preferToUpdate"] = true,
+			["regionType"] = "icon",
+			["selfPoint"] = "CENTER",
+			["semver"] = "1.0.10",
+			["subRegions"] = {
+				{
+					["anchorXOffset"] = 0,
+					["anchorYOffset"] = 0,
+					["rotateText"] = "NONE",
+					["text_anchorPoint"] = "CENTER",
+					["text_anchorXOffset"] = 0,
+					["text_anchorYOffset"] = 0,
+					["text_automaticWidth"] = "Auto",
+					["text_color"] = {
+						1, -- [1]
+						1, -- [2]
+						1, -- [3]
+						1, -- [4]
+					},
+					["text_fixedWidth"] = 64,
+					["text_font"] = "Friz Quadrata TT",
+					["text_fontSize"] = 28,
+					["text_fontType"] = "OUTLINE",
+					["text_justify"] = "CENTER",
+					["text_selfPoint"] = "AUTO",
+					["text_shadowColor"] = {
+						0, -- [1]
+						0, -- [2]
+						0, -- [3]
+						1, -- [4]
+					},
+					["text_shadowXOffset"] = 0,
+					["text_shadowYOffset"] = 0,
+					["text_text"] = "%p",
+					["text_text_format_p_format"] = "timed",
+					["text_text_format_p_time_dynamic_threshold"] = 3,
+					["text_text_format_p_time_format"] = 0,
+					["text_text_format_p_time_precision"] = 1,
+					["text_text_format_s_format"] = "none",
+					["text_visible"] = false,
+					["text_wordWrap"] = "WordWrap",
+					["type"] = "subtext",
+				}, -- [1]
+				{
+					["anchorXOffset"] = 0,
+					["anchorYOffset"] = 0,
+					["rotateText"] = "NONE",
+					["text_anchorPoint"] = "OUTER_BOTTOM",
+					["text_automaticWidth"] = "Auto",
+					["text_color"] = {
+						1, -- [1]
+						1, -- [2]
+						1, -- [3]
+						1, -- [4]
+					},
+					["text_fixedWidth"] = 64,
+					["text_font"] = "Friz Quadrata TT",
+					["text_fontSize"] = 17,
+					["text_fontType"] = "OUTLINE",
+					["text_justify"] = "CENTER",
+					["text_selfPoint"] = "AUTO",
+					["text_shadowColor"] = {
+						0, -- [1]
+						0, -- [2]
+						0, -- [3]
+						1, -- [4]
+					},
+					["text_shadowXOffset"] = 0,
+					["text_shadowYOffset"] = 0,
+					["text_text"] = "Frontal",
+					["text_text_format_p_format"] = "timed",
+					["text_text_format_p_time_dynamic_threshold"] = 60,
+					["text_text_format_p_time_format"] = 0,
+					["text_text_format_p_time_precision"] = 1,
+					["text_visible"] = true,
+					["text_wordWrap"] = "WordWrap",
+					["type"] = "subtext",
+				}, -- [2]
+			},
+			["tocversion"] = 90005,
+			["triggers"] = {
+				[1] = {
+					["trigger"] = {
+						["auraspellids"] = {
+							"326632", -- [1]
+						},
+						["debuffType"] = "HARMFUL",
+						["duration"] = "1",
+						["event"] = "Cast",
+						["names"] = {
+						},
+						["spellId"] = 325523,
+						["spellIds"] = {
+						},
+						["subeventPrefix"] = "SPELL",
+						["subeventSuffix"] = "_CAST_START",
+						["type"] = "unit",
+						["unevent"] = "auto",
+						["unit"] = "nameplate",
+						["useExactSpellId"] = true,
+						["use_absorbMode"] = true,
+						["use_spellId"] = true,
+						["use_unit"] = true,
+					},
+					["untrigger"] = {
+						["unit"] = "nameplate",
+					},
+				},
+				["activeTriggerMode"] = -10,
+			},
+			["uid"] = "eC7xZV4U3Oh",
+			["url"] = "https://wago.io/uYX5mP3U5/11",
+			["version"] = 11,
+			["wagoID"] = "uYX5mP3U5",
+			["width"] = 1,
+			["xOffset"] = -3000,
+			["yOffset"] = 0,
+			["zoom"] = 0.3,
+		},
+		["EDE [HOA] Sin Quake"] = {
+			["actions"] = {
+				["finish"] = {
+				},
+				["init"] = {
+				},
+				["start"] = {
+					["do_sound"] = true,
+					["sound"] = "Interface\\Addons\\Details\\sounds\\sound_gun2.ogg",
+				},
+			},
+			["alpha"] = 1,
+			["anchorFrameType"] = "SCREEN",
+			["anchorPoint"] = "CENTER",
+			["animation"] = {
+				["finish"] = {
+					["duration_type"] = "seconds",
+					["easeStrength"] = 3,
+					["easeType"] = "none",
+					["type"] = "none",
+				},
+				["main"] = {
+					["duration_type"] = "seconds",
+					["easeStrength"] = 3,
+					["easeType"] = "none",
+					["type"] = "none",
+				},
+				["start"] = {
+					["duration_type"] = "seconds",
+					["easeStrength"] = 3,
+					["easeType"] = "none",
+					["type"] = "none",
+				},
+			},
+			["authorOptions"] = {
+			},
+			["auto"] = true,
+			["color"] = {
+				1, -- [1]
+				1, -- [2]
+				1, -- [3]
+				1, -- [4]
+			},
+			["conditions"] = {
+			},
+			["config"] = {
+			},
+			["cooldown"] = true,
+			["cooldownEdge"] = false,
+			["cooldownSwipe"] = true,
+			["cooldownTextDisabled"] = false,
+			["desaturate"] = false,
+			["displayIcon"] = "136025",
+			["frameStrata"] = 1,
+			["height"] = 1,
+			["icon"] = true,
+			["iconSource"] = -1,
+			["id"] = "EDE [HOA] Sin Quake",
+			["information"] = {
+				["ignoreOptionsEventErrors"] = true,
+			},
+			["internalVersion"] = 45,
+			["inverse"] = false,
+			["keepAspectRatio"] = false,
+			["load"] = {
+				["class"] = {
+					["multi"] = {
+					},
+				},
+				["size"] = {
+					["multi"] = {
+					},
+				},
+				["spec"] = {
+					["multi"] = {
+					},
+				},
+				["talent"] = {
+					["multi"] = {
+					},
+				},
+				["use_combat"] = true,
+				["use_zoneIds"] = true,
+				["zoneIds"] = "g409",
+			},
+			["parent"] = "Ellesmere's Dungeon Essentials",
+			["preferToUpdate"] = true,
+			["regionType"] = "icon",
+			["selfPoint"] = "CENTER",
+			["semver"] = "1.0.10",
+			["subRegions"] = {
+				{
+					["anchorXOffset"] = 0,
+					["anchorYOffset"] = 0,
+					["rotateText"] = "NONE",
+					["text_anchorPoint"] = "CENTER",
+					["text_anchorXOffset"] = 0,
+					["text_anchorYOffset"] = 0,
+					["text_automaticWidth"] = "Auto",
+					["text_color"] = {
+						1, -- [1]
+						1, -- [2]
+						1, -- [3]
+						1, -- [4]
+					},
+					["text_fixedWidth"] = 64,
+					["text_font"] = "Friz Quadrata TT",
+					["text_fontSize"] = 28,
+					["text_fontType"] = "OUTLINE",
+					["text_justify"] = "CENTER",
+					["text_selfPoint"] = "AUTO",
+					["text_shadowColor"] = {
+						0, -- [1]
+						0, -- [2]
+						0, -- [3]
+						1, -- [4]
+					},
+					["text_shadowXOffset"] = 0,
+					["text_shadowYOffset"] = 0,
+					["text_text"] = "%p",
+					["text_text_format_p_format"] = "timed",
+					["text_text_format_p_time_dynamic_threshold"] = 3,
+					["text_text_format_p_time_format"] = 0,
+					["text_text_format_p_time_precision"] = 1,
+					["text_text_format_s_format"] = "none",
+					["text_visible"] = false,
+					["text_wordWrap"] = "WordWrap",
+					["type"] = "subtext",
+				}, -- [1]
+				{
+					["anchorXOffset"] = 0,
+					["anchorYOffset"] = 0,
+					["rotateText"] = "NONE",
+					["text_anchorPoint"] = "OUTER_BOTTOM",
+					["text_automaticWidth"] = "Auto",
+					["text_color"] = {
+						1, -- [1]
+						1, -- [2]
+						1, -- [3]
+						1, -- [4]
+					},
+					["text_fixedWidth"] = 64,
+					["text_font"] = "Friz Quadrata TT",
+					["text_fontSize"] = 17,
+					["text_fontType"] = "OUTLINE",
+					["text_justify"] = "CENTER",
+					["text_selfPoint"] = "AUTO",
+					["text_shadowColor"] = {
+						0, -- [1]
+						0, -- [2]
+						0, -- [3]
+						1, -- [4]
+					},
+					["text_shadowXOffset"] = 0,
+					["text_shadowYOffset"] = 0,
+					["text_text"] = "avoid",
+					["text_text_format_p_format"] = "timed",
+					["text_text_format_p_time_dynamic_threshold"] = 60,
+					["text_text_format_p_time_format"] = 0,
+					["text_text_format_p_time_precision"] = 1,
+					["text_visible"] = true,
+					["text_wordWrap"] = "WordWrap",
+					["type"] = "subtext",
+				}, -- [2]
+				{
+					["anchorXOffset"] = 0,
+					["anchorYOffset"] = 0,
+					["rotateText"] = "NONE",
+					["text_anchorPoint"] = "OUTER_BOTTOM",
+					["text_automaticWidth"] = "Auto",
+					["text_color"] = {
+						1, -- [1]
+						1, -- [2]
+						1, -- [3]
+						1, -- [4]
+					},
+					["text_fixedWidth"] = 64,
+					["text_font"] = "Friz Quadrata TT",
+					["text_fontSize"] = 17,
+					["text_fontType"] = "OUTLINE",
+					["text_justify"] = "CENTER",
+					["text_selfPoint"] = "AUTO",
+					["text_shadowColor"] = {
+						0, -- [1]
+						0, -- [2]
+						0, -- [3]
+						1, -- [4]
+					},
+					["text_shadowXOffset"] = 0,
+					["text_shadowYOffset"] = 0,
+					["text_text"] = "CD",
+					["text_text_format_p_format"] = "timed",
+					["text_text_format_p_time_dynamic_threshold"] = 60,
+					["text_text_format_p_time_format"] = 0,
+					["text_text_format_p_time_precision"] = 1,
+					["text_visible"] = false,
+					["text_wordWrap"] = "WordWrap",
+					["type"] = "subtext",
+				}, -- [3]
+			},
+			["tocversion"] = 90005,
+			["triggers"] = {
+				[1] = {
+					["trigger"] = {
+						["auraspellids"] = {
+							"326632", -- [1]
+						},
+						["debuffType"] = "HARMFUL",
+						["duration"] = "1",
+						["event"] = "Cast",
+						["names"] = {
+						},
+						["spellId"] = 326441,
+						["spellIds"] = {
+						},
+						["subeventPrefix"] = "SPELL",
+						["subeventSuffix"] = "_CAST_START",
+						["type"] = "unit",
+						["unevent"] = "auto",
+						["unit"] = "nameplate",
+						["useExactSpellId"] = true,
+						["use_absorbMode"] = true,
+						["use_spellId"] = true,
+						["use_unit"] = true,
+					},
+					["untrigger"] = {
+						["unit"] = "nameplate",
+					},
+				},
+				["activeTriggerMode"] = -10,
+				["customTriggerLogic"] = "function(t)\n    return t[1] or (not t[1] and t[2])\nend",
+				["disjunctive"] = "any",
+			},
+			["uid"] = "KLq4F9tYBGx",
+			["url"] = "https://wago.io/uYX5mP3U5/11",
+			["version"] = 11,
+			["wagoID"] = "uYX5mP3U5",
+			["width"] = 1,
+			["xOffset"] = -3000,
+			["yOffset"] = 0,
+			["zoom"] = 0.3,
 		},
 		["EDE [HOA] Stone Breath"] = {
 			["actions"] = {
@@ -2834,7 +3729,7 @@ WeakAurasSaved = {
 			["preferToUpdate"] = true,
 			["regionType"] = "icon",
 			["selfPoint"] = "CENTER",
-			["semver"] = "1.0.9",
+			["semver"] = "1.0.10",
 			["subRegions"] = {
 			},
 			["tocversion"] = 90002,
@@ -2871,8 +3766,9 @@ WeakAurasSaved = {
 				["activeTriggerMode"] = -10,
 			},
 			["uid"] = "ZL7TE0vdMKQ",
-			["url"] = "https://wago.io/uYX5mP3U5/10",
-			["version"] = 10,
+			["url"] = "https://wago.io/uYX5mP3U5/11",
+			["version"] = 11,
+			["wagoID"] = "uYX5mP3U5",
 			["width"] = 1,
 			["xOffset"] = -3000,
 			["yOffset"] = 0,
@@ -2986,7 +3882,7 @@ WeakAurasSaved = {
 			["preferToUpdate"] = true,
 			["regionType"] = "icon",
 			["selfPoint"] = "CENTER",
-			["semver"] = "1.0.9",
+			["semver"] = "1.0.10",
 			["spark"] = false,
 			["sparkBlendMode"] = "ADD",
 			["sparkColor"] = {
@@ -3052,11 +3948,12 @@ WeakAurasSaved = {
 				["activeTriggerMode"] = -10,
 			},
 			["uid"] = "PlSFl(tgKML",
-			["url"] = "https://wago.io/uYX5mP3U5/10",
+			["url"] = "https://wago.io/uYX5mP3U5/11",
 			["useAdjustededMax"] = false,
 			["useAdjustededMin"] = false,
 			["useTooltip"] = false,
-			["version"] = 10,
+			["version"] = 11,
+			["wagoID"] = "uYX5mP3U5",
 			["width"] = 1,
 			["xOffset"] = -3000,
 			["yOffset"] = 0,
@@ -3171,7 +4068,7 @@ WeakAurasSaved = {
 			["preferToUpdate"] = true,
 			["regionType"] = "icon",
 			["selfPoint"] = "CENTER",
-			["semver"] = "1.0.9",
+			["semver"] = "1.0.10",
 			["spark"] = false,
 			["sparkBlendMode"] = "ADD",
 			["sparkColor"] = {
@@ -3237,11 +4134,12 @@ WeakAurasSaved = {
 				["activeTriggerMode"] = -10,
 			},
 			["uid"] = "TsDdJ5(NjSe",
-			["url"] = "https://wago.io/uYX5mP3U5/10",
+			["url"] = "https://wago.io/uYX5mP3U5/11",
 			["useAdjustededMax"] = false,
 			["useAdjustededMin"] = false,
 			["useTooltip"] = false,
-			["version"] = 10,
+			["version"] = 11,
+			["wagoID"] = "uYX5mP3U5",
 			["width"] = 1,
 			["xOffset"] = -3000,
 			["yOffset"] = 0,
@@ -3356,7 +4254,7 @@ WeakAurasSaved = {
 			["preferToUpdate"] = true,
 			["regionType"] = "icon",
 			["selfPoint"] = "CENTER",
-			["semver"] = "1.0.9",
+			["semver"] = "1.0.10",
 			["spark"] = false,
 			["sparkBlendMode"] = "ADD",
 			["sparkColor"] = {
@@ -3428,17 +4326,18 @@ WeakAurasSaved = {
 				["activeTriggerMode"] = -10,
 			},
 			["uid"] = "WXh3uyi22y8",
-			["url"] = "https://wago.io/uYX5mP3U5/10",
+			["url"] = "https://wago.io/uYX5mP3U5/11",
 			["useAdjustededMax"] = false,
 			["useAdjustededMin"] = false,
 			["useTooltip"] = false,
-			["version"] = 10,
+			["version"] = 11,
+			["wagoID"] = "uYX5mP3U5",
 			["width"] = 1,
 			["xOffset"] = -3000,
 			["yOffset"] = 0,
 			["zoom"] = 0,
 		},
-		["EDE [MOT] Tongue Lashing"] = {
+		["EDE [MOTS] Tongue Lashing"] = {
 			["actions"] = {
 				["finish"] = {
 				},
@@ -3514,7 +4413,7 @@ WeakAurasSaved = {
 				1, -- [4]
 			},
 			["icon_side"] = "RIGHT",
-			["id"] = "EDE [MOT] Tongue Lashing",
+			["id"] = "EDE [MOTS] Tongue Lashing",
 			["information"] = {
 				["ignoreOptionsEventErrors"] = true,
 			},
@@ -3543,9 +4442,10 @@ WeakAurasSaved = {
 			},
 			["orientation"] = "HORIZONTAL",
 			["parent"] = "Ellesmere's Dungeon Essentials",
+			["preferToUpdate"] = true,
 			["regionType"] = "icon",
 			["selfPoint"] = "CENTER",
-			["semver"] = "1.0.9",
+			["semver"] = "1.0.10",
 			["spark"] = false,
 			["sparkBlendMode"] = "ADD",
 			["sparkColor"] = {
@@ -3691,11 +4591,12 @@ WeakAurasSaved = {
 				["activeTriggerMode"] = -10,
 			},
 			["uid"] = "pIbcgyXfszD",
-			["url"] = "https://wago.io/uYX5mP3U5/10",
+			["url"] = "https://wago.io/uYX5mP3U5/11",
 			["useAdjustededMax"] = false,
 			["useAdjustededMin"] = false,
 			["useTooltip"] = false,
-			["version"] = 10,
+			["version"] = 11,
+			["wagoID"] = "uYX5mP3U5",
 			["width"] = 1,
 			["xOffset"] = -3000,
 			["yOffset"] = 0,
@@ -3813,7 +4714,7 @@ WeakAurasSaved = {
 			["preferToUpdate"] = true,
 			["regionType"] = "icon",
 			["selfPoint"] = "CENTER",
-			["semver"] = "1.0.9",
+			["semver"] = "1.0.10",
 			["spark"] = false,
 			["sparkBlendMode"] = "ADD",
 			["sparkColor"] = {
@@ -3885,11 +4786,12 @@ WeakAurasSaved = {
 				["activeTriggerMode"] = -10,
 			},
 			["uid"] = "wChrOtjXFYi",
-			["url"] = "https://wago.io/uYX5mP3U5/10",
+			["url"] = "https://wago.io/uYX5mP3U5/11",
 			["useAdjustededMax"] = false,
 			["useAdjustededMin"] = false,
 			["useTooltip"] = false,
-			["version"] = 10,
+			["version"] = 11,
+			["wagoID"] = "uYX5mP3U5",
 			["width"] = 1,
 			["xOffset"] = -3000,
 			["yOffset"] = 0,
@@ -3983,7 +4885,7 @@ WeakAurasSaved = {
 			["preferToUpdate"] = true,
 			["regionType"] = "icon",
 			["selfPoint"] = "CENTER",
-			["semver"] = "1.0.9",
+			["semver"] = "1.0.10",
 			["subRegions"] = {
 			},
 			["tocversion"] = 90002,
@@ -4024,8 +4926,9 @@ WeakAurasSaved = {
 				["activeTriggerMode"] = -10,
 			},
 			["uid"] = "XaBAZl6ZXVB",
-			["url"] = "https://wago.io/uYX5mP3U5/10",
-			["version"] = 10,
+			["url"] = "https://wago.io/uYX5mP3U5/11",
+			["version"] = 11,
+			["wagoID"] = "uYX5mP3U5",
 			["width"] = 1,
 			["xOffset"] = -3000,
 			["yOffset"] = 0,
@@ -4120,7 +5023,7 @@ WeakAurasSaved = {
 			["preferToUpdate"] = true,
 			["regionType"] = "icon",
 			["selfPoint"] = "CENTER",
-			["semver"] = "1.0.9",
+			["semver"] = "1.0.10",
 			["subRegions"] = {
 			},
 			["tocversion"] = 90002,
@@ -4165,8 +5068,9 @@ WeakAurasSaved = {
 				["activeTriggerMode"] = -10,
 			},
 			["uid"] = "f40QVOFJkHZ",
-			["url"] = "https://wago.io/uYX5mP3U5/10",
-			["version"] = 10,
+			["url"] = "https://wago.io/uYX5mP3U5/11",
+			["version"] = 11,
+			["wagoID"] = "uYX5mP3U5",
 			["width"] = 1,
 			["xOffset"] = -3000,
 			["yOffset"] = 0,
@@ -4346,7 +5250,7 @@ WeakAurasSaved = {
 			["preferToUpdate"] = true,
 			["regionType"] = "icon",
 			["selfPoint"] = "CENTER",
-			["semver"] = "1.0.9",
+			["semver"] = "1.0.10",
 			["stickyDuration"] = false,
 			["subRegions"] = {
 				{
@@ -4431,8 +5335,9 @@ WeakAurasSaved = {
 				["disjunctive"] = "all",
 			},
 			["uid"] = "ItfMSDCrEVV",
-			["url"] = "https://wago.io/uYX5mP3U5/10",
-			["version"] = 10,
+			["url"] = "https://wago.io/uYX5mP3U5/11",
+			["version"] = 11,
+			["wagoID"] = "uYX5mP3U5",
 			["width"] = 80,
 			["xOffset"] = -15,
 			["yOffset"] = 90,
@@ -4526,7 +5431,7 @@ WeakAurasSaved = {
 			["preferToUpdate"] = true,
 			["regionType"] = "icon",
 			["selfPoint"] = "CENTER",
-			["semver"] = "1.0.9",
+			["semver"] = "1.0.10",
 			["subRegions"] = {
 			},
 			["tocversion"] = 90002,
@@ -4567,8 +5472,273 @@ WeakAurasSaved = {
 				["activeTriggerMode"] = -10,
 			},
 			["uid"] = "1rfAzY5xQ6k",
-			["url"] = "https://wago.io/uYX5mP3U5/10",
-			["version"] = 10,
+			["url"] = "https://wago.io/uYX5mP3U5/11",
+			["version"] = 11,
+			["wagoID"] = "uYX5mP3U5",
+			["width"] = 1,
+			["xOffset"] = -3000,
+			["yOffset"] = 0,
+			["zoom"] = 0.3,
+		},
+		["EDE [NW] Throw Cleaver"] = {
+			["actions"] = {
+				["finish"] = {
+				},
+				["init"] = {
+				},
+				["start"] = {
+					["do_sound"] = true,
+					["sound"] = "Interface\\AddOns\\WeakAuras\\Media\\Sounds\\AirHorn.ogg",
+				},
+			},
+			["alpha"] = 1,
+			["anchorFrameType"] = "SCREEN",
+			["anchorPoint"] = "CENTER",
+			["animation"] = {
+				["finish"] = {
+					["duration_type"] = "seconds",
+					["easeStrength"] = 3,
+					["easeType"] = "none",
+					["type"] = "none",
+				},
+				["main"] = {
+					["duration_type"] = "seconds",
+					["easeStrength"] = 3,
+					["easeType"] = "none",
+					["type"] = "none",
+				},
+				["start"] = {
+					["duration_type"] = "seconds",
+					["easeStrength"] = 3,
+					["easeType"] = "none",
+					["type"] = "none",
+				},
+			},
+			["authorOptions"] = {
+			},
+			["auto"] = true,
+			["color"] = {
+				1, -- [1]
+				1, -- [2]
+				1, -- [3]
+				1, -- [4]
+			},
+			["conditions"] = {
+				{
+					["changes"] = {
+						{
+							["property"] = "chat",
+							["value"] = {
+								["message"] = "3",
+								["message_type"] = "SAY",
+							},
+						}, -- [1]
+					},
+					["check"] = {
+						["op"] = "<=",
+						["trigger"] = 1,
+						["value"] = "3",
+						["variable"] = "expirationTime",
+					},
+				}, -- [1]
+				{
+					["changes"] = {
+						{
+							["property"] = "chat",
+							["value"] = {
+								["message"] = "2",
+								["message_type"] = "SAY",
+							},
+						}, -- [1]
+					},
+					["check"] = {
+						["op"] = "<=",
+						["trigger"] = 1,
+						["value"] = "2",
+						["variable"] = "expirationTime",
+					},
+					["linked"] = false,
+				}, -- [2]
+				{
+					["changes"] = {
+						{
+							["property"] = "chat",
+							["value"] = {
+								["message"] = "1",
+								["message_type"] = "SAY",
+							},
+						}, -- [1]
+					},
+					["check"] = {
+						["op"] = "<=",
+						["trigger"] = 1,
+						["value"] = "1",
+						["variable"] = "expirationTime",
+					},
+					["linked"] = false,
+				}, -- [3]
+			},
+			["config"] = {
+			},
+			["cooldown"] = true,
+			["cooldownEdge"] = false,
+			["cooldownSwipe"] = true,
+			["cooldownTextDisabled"] = false,
+			["desaturate"] = false,
+			["displayIcon"] = "237517",
+			["frameStrata"] = 1,
+			["height"] = 1,
+			["icon"] = true,
+			["iconSource"] = -1,
+			["id"] = "EDE [NW] Throw Cleaver",
+			["information"] = {
+				["ignoreOptionsEventErrors"] = true,
+			},
+			["internalVersion"] = 45,
+			["inverse"] = false,
+			["keepAspectRatio"] = false,
+			["load"] = {
+				["class"] = {
+					["multi"] = {
+					},
+				},
+				["size"] = {
+					["multi"] = {
+					},
+				},
+				["spec"] = {
+					["multi"] = {
+					},
+				},
+				["talent"] = {
+					["multi"] = {
+					},
+				},
+				["use_zoneIds"] = true,
+				["zoneIds"] = "g410",
+			},
+			["parent"] = "Ellesmere's Dungeon Essentials",
+			["preferToUpdate"] = true,
+			["regionType"] = "icon",
+			["selfPoint"] = "CENTER",
+			["semver"] = "1.0.10",
+			["subRegions"] = {
+				{
+					["anchorXOffset"] = 0,
+					["anchorYOffset"] = 0,
+					["rotateText"] = "NONE",
+					["text_anchorPoint"] = "CENTER",
+					["text_anchorXOffset"] = 0,
+					["text_anchorYOffset"] = 0,
+					["text_automaticWidth"] = "Auto",
+					["text_color"] = {
+						1, -- [1]
+						1, -- [2]
+						1, -- [3]
+						1, -- [4]
+					},
+					["text_fixedWidth"] = 64,
+					["text_font"] = "Friz Quadrata TT",
+					["text_fontSize"] = 28,
+					["text_fontType"] = "OUTLINE",
+					["text_justify"] = "CENTER",
+					["text_selfPoint"] = "AUTO",
+					["text_shadowColor"] = {
+						0, -- [1]
+						0, -- [2]
+						0, -- [3]
+						1, -- [4]
+					},
+					["text_shadowXOffset"] = 0,
+					["text_shadowYOffset"] = 0,
+					["text_text"] = "%p",
+					["text_text_format_p_format"] = "timed",
+					["text_text_format_p_time_dynamic_threshold"] = 3,
+					["text_text_format_p_time_format"] = 0,
+					["text_text_format_p_time_precision"] = 1,
+					["text_visible"] = false,
+					["text_wordWrap"] = "WordWrap",
+					["type"] = "subtext",
+				}, -- [1]
+				{
+					["anchorXOffset"] = 0,
+					["anchorYOffset"] = 0,
+					["rotateText"] = "NONE",
+					["text_anchorPoint"] = "OUTER_BOTTOM",
+					["text_anchorYOffset"] = 0,
+					["text_automaticWidth"] = "Auto",
+					["text_color"] = {
+						1, -- [1]
+						1, -- [2]
+						1, -- [3]
+						1, -- [4]
+					},
+					["text_fixedWidth"] = 64,
+					["text_font"] = "Friz Quadrata TT",
+					["text_fontSize"] = 17,
+					["text_fontType"] = "OUTLINE",
+					["text_justify"] = "CENTER",
+					["text_selfPoint"] = "AUTO",
+					["text_shadowColor"] = {
+						0, -- [1]
+						0, -- [2]
+						0, -- [3]
+						1, -- [4]
+					},
+					["text_shadowXOffset"] = 0,
+					["text_shadowYOffset"] = 0,
+					["text_text"] = "hit mob",
+					["text_text_format_p_format"] = "timed",
+					["text_text_format_p_time_dynamic_threshold"] = 60,
+					["text_text_format_p_time_format"] = 0,
+					["text_text_format_p_time_precision"] = 1,
+					["text_text_format_tooltip1_format"] = "none",
+					["text_visible"] = true,
+					["text_wordWrap"] = "WordWrap",
+					["type"] = "subtext",
+				}, -- [2]
+			},
+			["tocversion"] = 90005,
+			["triggers"] = {
+				[1] = {
+					["trigger"] = {
+						["auraspellids"] = {
+							"323471", -- [1]
+						},
+						["debuffType"] = "HARMFUL",
+						["destUnit"] = "player",
+						["duration"] = "1",
+						["event"] = "Cast",
+						["fetchTooltip"] = false,
+						["names"] = {
+						},
+						["remaining"] = "3",
+						["remaining_operator"] = "<",
+						["spellId"] = 323496,
+						["spellIds"] = {
+						},
+						["subeventPrefix"] = "SPELL",
+						["subeventSuffix"] = "_CAST_START",
+						["type"] = "aura2",
+						["unevent"] = "auto",
+						["unit"] = "player",
+						["useExactSpellId"] = true,
+						["use_absorbMode"] = true,
+						["use_destUnit"] = true,
+						["use_remaining"] = true,
+						["use_spellId"] = true,
+						["use_unit"] = true,
+					},
+					["untrigger"] = {
+						["unit"] = "nameplate",
+					},
+				},
+				["activeTriggerMode"] = -10,
+			},
+			["uid"] = "ZXqG3JyyTIv",
+			["url"] = "https://wago.io/uYX5mP3U5/11",
+			["version"] = 11,
+			["wagoID"] = "uYX5mP3U5",
 			["width"] = 1,
 			["xOffset"] = -3000,
 			["yOffset"] = 0,
@@ -4748,7 +5918,7 @@ WeakAurasSaved = {
 			["preferToUpdate"] = true,
 			["regionType"] = "icon",
 			["selfPoint"] = "CENTER",
-			["semver"] = "1.0.9",
+			["semver"] = "1.0.10",
 			["stickyDuration"] = false,
 			["subRegions"] = {
 				{
@@ -4833,8 +6003,9 @@ WeakAurasSaved = {
 				["disjunctive"] = "all",
 			},
 			["uid"] = "1ePm4dV(vOc",
-			["url"] = "https://wago.io/uYX5mP3U5/10",
-			["version"] = 10,
+			["url"] = "https://wago.io/uYX5mP3U5/11",
+			["version"] = 11,
+			["wagoID"] = "uYX5mP3U5",
 			["width"] = 80,
 			["xOffset"] = -15,
 			["yOffset"] = 90,
@@ -4933,7 +6104,7 @@ WeakAurasSaved = {
 			["preferToUpdate"] = true,
 			["regionType"] = "icon",
 			["selfPoint"] = "CENTER",
-			["semver"] = "1.0.9",
+			["semver"] = "1.0.10",
 			["subRegions"] = {
 			},
 			["tocversion"] = 90002,
@@ -4974,8 +6145,9 @@ WeakAurasSaved = {
 				["disjunctive"] = "any",
 			},
 			["uid"] = "jSoO8VxYfO0",
-			["url"] = "https://wago.io/uYX5mP3U5/10",
-			["version"] = 10,
+			["url"] = "https://wago.io/uYX5mP3U5/11",
+			["version"] = 11,
+			["wagoID"] = "uYX5mP3U5",
 			["width"] = 1,
 			["xOffset"] = -3000,
 			["yOffset"] = 0,
@@ -5090,7 +6262,7 @@ WeakAurasSaved = {
 			["preferToUpdate"] = true,
 			["regionType"] = "icon",
 			["selfPoint"] = "CENTER",
-			["semver"] = "1.0.9",
+			["semver"] = "1.0.10",
 			["spark"] = false,
 			["sparkBlendMode"] = "ADD",
 			["sparkColor"] = {
@@ -5142,11 +6314,272 @@ WeakAurasSaved = {
 				["disjunctive"] = "any",
 			},
 			["uid"] = "TYAZN)BAw(e",
-			["url"] = "https://wago.io/uYX5mP3U5/10",
+			["url"] = "https://wago.io/uYX5mP3U5/11",
 			["useAdjustededMax"] = false,
 			["useAdjustededMin"] = false,
 			["useTooltip"] = false,
-			["version"] = 10,
+			["version"] = 11,
+			["wagoID"] = "uYX5mP3U5",
+			["width"] = 1,
+			["xOffset"] = -3000,
+			["yOffset"] = 0,
+			["zoom"] = 0,
+		},
+		["EDE [PF] Slime Wave"] = {
+			["actions"] = {
+				["finish"] = {
+				},
+				["init"] = {
+				},
+				["start"] = {
+					["do_sound"] = true,
+					["sound"] = "Interface\\Addons\\Details\\sounds\\sound_gun2.ogg",
+				},
+			},
+			["alpha"] = 1,
+			["anchorFrameType"] = "SCREEN",
+			["anchorPoint"] = "CENTER",
+			["animation"] = {
+				["finish"] = {
+					["duration_type"] = "seconds",
+					["easeStrength"] = 3,
+					["easeType"] = "none",
+					["type"] = "none",
+				},
+				["main"] = {
+					["duration_type"] = "seconds",
+					["easeStrength"] = 3,
+					["easeType"] = "none",
+					["type"] = "none",
+				},
+				["start"] = {
+					["duration_type"] = "seconds",
+					["easeStrength"] = 3,
+					["easeType"] = "none",
+					["type"] = "none",
+				},
+			},
+			["authorOptions"] = {
+			},
+			["auto"] = false,
+			["backgroundColor"] = {
+				0, -- [1]
+				0, -- [2]
+				0, -- [3]
+				0.5, -- [4]
+			},
+			["barColor"] = {
+				1, -- [1]
+				0, -- [2]
+				0, -- [3]
+				1, -- [4]
+			},
+			["color"] = {
+				1, -- [1]
+				1, -- [2]
+				1, -- [3]
+				1, -- [4]
+			},
+			["conditions"] = {
+			},
+			["config"] = {
+			},
+			["cooldown"] = true,
+			["cooldownEdge"] = false,
+			["cooldownSwipe"] = true,
+			["cooldownTextDisabled"] = false,
+			["desaturate"] = false,
+			["displayIcon"] = "132104",
+			["frameStrata"] = 1,
+			["height"] = 1,
+			["icon"] = true,
+			["iconSource"] = 0,
+			["icon_color"] = {
+				1, -- [1]
+				1, -- [2]
+				1, -- [3]
+				1, -- [4]
+			},
+			["icon_side"] = "RIGHT",
+			["id"] = "EDE [PF] Slime Wave",
+			["information"] = {
+				["ignoreOptionsEventErrors"] = true,
+			},
+			["internalVersion"] = 45,
+			["inverse"] = false,
+			["keepAspectRatio"] = false,
+			["load"] = {
+				["class"] = {
+					["multi"] = {
+					},
+				},
+				["size"] = {
+					["multi"] = {
+					},
+				},
+				["spec"] = {
+					["multi"] = {
+					},
+				},
+				["talent"] = {
+					["multi"] = {
+					},
+				},
+				["use_zoneIds"] = true,
+				["zoneIds"] = "g415",
+			},
+			["orientation"] = "HORIZONTAL",
+			["parent"] = "Ellesmere's Dungeon Essentials",
+			["preferToUpdate"] = true,
+			["regionType"] = "icon",
+			["selfPoint"] = "CENTER",
+			["semver"] = "1.0.10",
+			["spark"] = false,
+			["sparkBlendMode"] = "ADD",
+			["sparkColor"] = {
+				1, -- [1]
+				1, -- [2]
+				1, -- [3]
+				1, -- [4]
+			},
+			["sparkHeight"] = 30,
+			["sparkHidden"] = "NEVER",
+			["sparkOffsetX"] = 0,
+			["sparkOffsetY"] = 0,
+			["sparkRotation"] = 0,
+			["sparkRotationMode"] = "AUTO",
+			["sparkTexture"] = "Interface\\CastingBar\\UI-CastingBar-Spark",
+			["sparkWidth"] = 10,
+			["subRegions"] = {
+				{
+					["anchorXOffset"] = 0,
+					["anchorYOffset"] = 0,
+					["rotateText"] = "NONE",
+					["text_anchorPoint"] = "CENTER",
+					["text_anchorXOffset"] = 0,
+					["text_anchorYOffset"] = 0,
+					["text_automaticWidth"] = "Auto",
+					["text_color"] = {
+						1, -- [1]
+						1, -- [2]
+						1, -- [3]
+						1, -- [4]
+					},
+					["text_fixedWidth"] = 64,
+					["text_font"] = "Friz Quadrata TT",
+					["text_fontSize"] = 28,
+					["text_fontType"] = "OUTLINE",
+					["text_justify"] = "CENTER",
+					["text_selfPoint"] = "AUTO",
+					["text_shadowColor"] = {
+						0, -- [1]
+						0, -- [2]
+						0, -- [3]
+						1, -- [4]
+					},
+					["text_shadowXOffset"] = 0,
+					["text_shadowYOffset"] = 0,
+					["text_text"] = "%p",
+					["text_text_format_p_format"] = "timed",
+					["text_text_format_p_time_dynamic_threshold"] = 3,
+					["text_text_format_p_time_format"] = 0,
+					["text_text_format_p_time_precision"] = 1,
+					["text_text_format_s_format"] = "none",
+					["text_visible"] = false,
+					["text_wordWrap"] = "WordWrap",
+					["type"] = "subtext",
+				}, -- [1]
+				{
+					["anchorXOffset"] = 0,
+					["anchorYOffset"] = 0,
+					["rotateText"] = "NONE",
+					["text_anchorPoint"] = "OUTER_BOTTOM",
+					["text_anchorYOffset"] = 0,
+					["text_automaticWidth"] = "Auto",
+					["text_color"] = {
+						1, -- [1]
+						1, -- [2]
+						1, -- [3]
+						1, -- [4]
+					},
+					["text_fixedWidth"] = 64,
+					["text_font"] = "Friz Quadrata TT",
+					["text_fontSize"] = 17,
+					["text_fontType"] = "OUTLINE",
+					["text_justify"] = "CENTER",
+					["text_selfPoint"] = "AUTO",
+					["text_shadowColor"] = {
+						0, -- [1]
+						0, -- [2]
+						0, -- [3]
+						1, -- [4]
+					},
+					["text_shadowXOffset"] = 0,
+					["text_shadowYOffset"] = 0,
+					["text_text"] = "frontal",
+					["text_text_format_p_format"] = "timed",
+					["text_text_format_p_time_dynamic_threshold"] = 60,
+					["text_text_format_p_time_format"] = 0,
+					["text_text_format_p_time_precision"] = 1,
+					["text_visible"] = true,
+					["text_wordWrap"] = "WordWrap",
+					["type"] = "subtext",
+				}, -- [2]
+			},
+			["texture"] = "Blizzard",
+			["tocversion"] = 90005,
+			["triggers"] = {
+				[1] = {
+					["trigger"] = {
+						["auranames"] = {
+							"", -- [1]
+						},
+						["buffShowOn"] = "showOnActive",
+						["debuffType"] = "HARMFUL",
+						["destUnit"] = "player",
+						["duration"] = "3",
+						["event"] = "Cast",
+						["genericShowOn"] = "showOnCooldown",
+						["names"] = {
+						},
+						["percentpower"] = "90",
+						["percentpower_operator"] = ">",
+						["realSpellName"] = 0,
+						["spellId"] = "324667",
+						["spellIds"] = {
+						},
+						["spellName"] = 0,
+						["subeventPrefix"] = "SPELL",
+						["subeventSuffix"] = "_CAST_START",
+						["type"] = "unit",
+						["unevent"] = "auto",
+						["unit"] = "boss",
+						["useName"] = true,
+						["use_absorbMode"] = true,
+						["use_cloneId"] = true,
+						["use_destUnit"] = false,
+						["use_genericShowOn"] = true,
+						["use_percentpower"] = true,
+						["use_powertype"] = false,
+						["use_sourceUnit"] = false,
+						["use_spellId"] = true,
+						["use_spellName"] = true,
+						["use_track"] = true,
+						["use_unit"] = true,
+					},
+					["untrigger"] = {
+						["unit"] = "boss",
+					},
+				},
+				["activeTriggerMode"] = -10,
+			},
+			["uid"] = "qR0w3Vu5Jg3",
+			["url"] = "https://wago.io/uYX5mP3U5/11",
+			["useAdjustededMax"] = false,
+			["useAdjustededMin"] = false,
+			["useTooltip"] = false,
+			["version"] = 11,
+			["wagoID"] = "uYX5mP3U5",
 			["width"] = 1,
 			["xOffset"] = -3000,
 			["yOffset"] = 0,
@@ -5258,9 +6691,10 @@ WeakAurasSaved = {
 			},
 			["orientation"] = "HORIZONTAL",
 			["parent"] = "Ellesmere's Dungeon Essentials",
+			["preferToUpdate"] = true,
 			["regionType"] = "icon",
 			["selfPoint"] = "CENTER",
-			["semver"] = "1.0.9",
+			["semver"] = "1.0.10",
 			["spark"] = false,
 			["sparkBlendMode"] = "ADD",
 			["sparkColor"] = {
@@ -5397,11 +6831,12 @@ WeakAurasSaved = {
 				["activeTriggerMode"] = -10,
 			},
 			["uid"] = "Z)n57)4aRQy",
-			["url"] = "https://wago.io/uYX5mP3U5/10",
+			["url"] = "https://wago.io/uYX5mP3U5/11",
 			["useAdjustededMax"] = false,
 			["useAdjustededMin"] = false,
 			["useTooltip"] = false,
-			["version"] = 10,
+			["version"] = 11,
+			["wagoID"] = "uYX5mP3U5",
 			["width"] = 1,
 			["xOffset"] = -3000,
 			["yOffset"] = 0,
@@ -5525,7 +6960,7 @@ WeakAurasSaved = {
 			["preferToUpdate"] = true,
 			["regionType"] = "icon",
 			["selfPoint"] = "CENTER",
-			["semver"] = "1.0.9",
+			["semver"] = "1.0.10",
 			["spark"] = false,
 			["sparkBlendMode"] = "ADD",
 			["sparkColor"] = {
@@ -5588,11 +7023,12 @@ WeakAurasSaved = {
 				["activeTriggerMode"] = -10,
 			},
 			["uid"] = "gUk85eBA88J",
-			["url"] = "https://wago.io/uYX5mP3U5/10",
+			["url"] = "https://wago.io/uYX5mP3U5/11",
 			["useAdjustededMax"] = false,
 			["useAdjustededMin"] = false,
 			["useTooltip"] = false,
-			["version"] = 10,
+			["version"] = 11,
+			["wagoID"] = "uYX5mP3U5",
 			["width"] = 1,
 			["xOffset"] = -3000,
 			["yOffset"] = 0,
@@ -5712,7 +7148,7 @@ WeakAurasSaved = {
 			["preferToUpdate"] = true,
 			["regionType"] = "icon",
 			["selfPoint"] = "CENTER",
-			["semver"] = "1.0.9",
+			["semver"] = "1.0.10",
 			["spark"] = false,
 			["sparkBlendMode"] = "ADD",
 			["sparkColor"] = {
@@ -5782,11 +7218,12 @@ WeakAurasSaved = {
 				["activeTriggerMode"] = -10,
 			},
 			["uid"] = "fdE9bSI4Q5L",
-			["url"] = "https://wago.io/uYX5mP3U5/10",
+			["url"] = "https://wago.io/uYX5mP3U5/11",
 			["useAdjustededMax"] = false,
 			["useAdjustededMin"] = false,
 			["useTooltip"] = false,
-			["version"] = 10,
+			["version"] = 11,
+			["wagoID"] = "uYX5mP3U5",
 			["width"] = 1,
 			["xOffset"] = -3000,
 			["yOffset"] = 0,
@@ -5906,7 +7343,7 @@ WeakAurasSaved = {
 			["preferToUpdate"] = true,
 			["regionType"] = "icon",
 			["selfPoint"] = "CENTER",
-			["semver"] = "1.0.9",
+			["semver"] = "1.0.10",
 			["spark"] = false,
 			["sparkBlendMode"] = "ADD",
 			["sparkColor"] = {
@@ -5969,11 +7406,12 @@ WeakAurasSaved = {
 				["activeTriggerMode"] = -10,
 			},
 			["uid"] = "TwCn5rllTb3",
-			["url"] = "https://wago.io/uYX5mP3U5/10",
+			["url"] = "https://wago.io/uYX5mP3U5/11",
 			["useAdjustededMax"] = false,
 			["useAdjustededMin"] = false,
 			["useTooltip"] = false,
-			["version"] = 10,
+			["version"] = 11,
+			["wagoID"] = "uYX5mP3U5",
 			["width"] = 1,
 			["xOffset"] = -3000,
 			["yOffset"] = 0,
@@ -6093,7 +7531,7 @@ WeakAurasSaved = {
 			["preferToUpdate"] = true,
 			["regionType"] = "icon",
 			["selfPoint"] = "CENTER",
-			["semver"] = "1.0.9",
+			["semver"] = "1.0.10",
 			["spark"] = false,
 			["sparkBlendMode"] = "ADD",
 			["sparkColor"] = {
@@ -6156,11 +7594,12 @@ WeakAurasSaved = {
 				["activeTriggerMode"] = -10,
 			},
 			["uid"] = "R1UDDXjbxNU",
-			["url"] = "https://wago.io/uYX5mP3U5/10",
+			["url"] = "https://wago.io/uYX5mP3U5/11",
 			["useAdjustededMax"] = false,
 			["useAdjustededMin"] = false,
 			["useTooltip"] = false,
-			["version"] = 10,
+			["version"] = 11,
+			["wagoID"] = "uYX5mP3U5",
 			["width"] = 1,
 			["xOffset"] = -3000,
 			["yOffset"] = 0,
@@ -6277,9 +7716,10 @@ WeakAurasSaved = {
 			},
 			["orientation"] = "HORIZONTAL",
 			["parent"] = "Ellesmere's Dungeon Essentials",
+			["preferToUpdate"] = true,
 			["regionType"] = "icon",
 			["selfPoint"] = "CENTER",
-			["semver"] = "1.0.9",
+			["semver"] = "1.0.10",
 			["spark"] = false,
 			["sparkBlendMode"] = "ADD",
 			["sparkColor"] = {
@@ -6413,11 +7853,12 @@ WeakAurasSaved = {
 				["activeTriggerMode"] = -10,
 			},
 			["uid"] = "yQ51A8ad8Z9",
-			["url"] = "https://wago.io/uYX5mP3U5/10",
+			["url"] = "https://wago.io/uYX5mP3U5/11",
 			["useAdjustededMax"] = false,
 			["useAdjustededMin"] = false,
 			["useTooltip"] = false,
-			["version"] = 10,
+			["version"] = 11,
+			["wagoID"] = "uYX5mP3U5",
 			["width"] = 1,
 			["xOffset"] = -3000,
 			["yOffset"] = 0,
@@ -6534,9 +7975,10 @@ WeakAurasSaved = {
 			},
 			["orientation"] = "HORIZONTAL",
 			["parent"] = "Ellesmere's Dungeon Essentials",
+			["preferToUpdate"] = true,
 			["regionType"] = "icon",
 			["selfPoint"] = "CENTER",
-			["semver"] = "1.0.9",
+			["semver"] = "1.0.10",
 			["spark"] = false,
 			["sparkBlendMode"] = "ADD",
 			["sparkColor"] = {
@@ -6670,11 +8112,12 @@ WeakAurasSaved = {
 				["activeTriggerMode"] = -10,
 			},
 			["uid"] = "62sKmsg24vb",
-			["url"] = "https://wago.io/uYX5mP3U5/10",
+			["url"] = "https://wago.io/uYX5mP3U5/11",
 			["useAdjustededMax"] = false,
 			["useAdjustededMin"] = false,
 			["useTooltip"] = false,
-			["version"] = 10,
+			["version"] = 11,
+			["wagoID"] = "uYX5mP3U5",
 			["width"] = 1,
 			["xOffset"] = -3000,
 			["yOffset"] = 0,
@@ -6791,9 +8234,10 @@ WeakAurasSaved = {
 			},
 			["orientation"] = "HORIZONTAL",
 			["parent"] = "Ellesmere's Dungeon Essentials",
+			["preferToUpdate"] = true,
 			["regionType"] = "icon",
 			["selfPoint"] = "CENTER",
-			["semver"] = "1.0.9",
+			["semver"] = "1.0.10",
 			["spark"] = false,
 			["sparkBlendMode"] = "ADD",
 			["sparkColor"] = {
@@ -6927,11 +8371,12 @@ WeakAurasSaved = {
 				["activeTriggerMode"] = -10,
 			},
 			["uid"] = "9kOltC1KKQg",
-			["url"] = "https://wago.io/uYX5mP3U5/10",
+			["url"] = "https://wago.io/uYX5mP3U5/11",
 			["useAdjustededMax"] = false,
 			["useAdjustededMin"] = false,
 			["useTooltip"] = false,
-			["version"] = 10,
+			["version"] = 11,
+			["wagoID"] = "uYX5mP3U5",
 			["width"] = 1,
 			["xOffset"] = -3000,
 			["yOffset"] = 0,
@@ -7048,9 +8493,10 @@ WeakAurasSaved = {
 			},
 			["orientation"] = "HORIZONTAL",
 			["parent"] = "Ellesmere's Dungeon Essentials",
+			["preferToUpdate"] = true,
 			["regionType"] = "icon",
 			["selfPoint"] = "CENTER",
-			["semver"] = "1.0.9",
+			["semver"] = "1.0.10",
 			["spark"] = false,
 			["sparkBlendMode"] = "ADD",
 			["sparkColor"] = {
@@ -7184,11 +8630,12 @@ WeakAurasSaved = {
 				["activeTriggerMode"] = -10,
 			},
 			["uid"] = "U5afqIKLQYh",
-			["url"] = "https://wago.io/uYX5mP3U5/10",
+			["url"] = "https://wago.io/uYX5mP3U5/11",
 			["useAdjustededMax"] = false,
 			["useAdjustededMin"] = false,
 			["useTooltip"] = false,
-			["version"] = 10,
+			["version"] = 11,
+			["wagoID"] = "uYX5mP3U5",
 			["width"] = 1,
 			["xOffset"] = -3000,
 			["yOffset"] = 0,
@@ -7308,7 +8755,7 @@ WeakAurasSaved = {
 			["preferToUpdate"] = true,
 			["regionType"] = "icon",
 			["selfPoint"] = "CENTER",
-			["semver"] = "1.0.9",
+			["semver"] = "1.0.10",
 			["spark"] = false,
 			["sparkBlendMode"] = "ADD",
 			["sparkColor"] = {
@@ -7368,11 +8815,12 @@ WeakAurasSaved = {
 				["activeTriggerMode"] = -10,
 			},
 			["uid"] = "qADD0kZB8Zh",
-			["url"] = "https://wago.io/uYX5mP3U5/10",
+			["url"] = "https://wago.io/uYX5mP3U5/11",
 			["useAdjustededMax"] = false,
 			["useAdjustededMin"] = false,
 			["useTooltip"] = false,
-			["version"] = 10,
+			["version"] = 11,
+			["wagoID"] = "uYX5mP3U5",
 			["width"] = 1,
 			["xOffset"] = -3000,
 			["yOffset"] = 0,
@@ -7497,7 +8945,7 @@ WeakAurasSaved = {
 			["preferToUpdate"] = true,
 			["regionType"] = "icon",
 			["selfPoint"] = "CENTER",
-			["semver"] = "1.0.9",
+			["semver"] = "1.0.10",
 			["spark"] = false,
 			["sparkBlendMode"] = "ADD",
 			["sparkColor"] = {
@@ -7557,11 +9005,12 @@ WeakAurasSaved = {
 				["activeTriggerMode"] = -10,
 			},
 			["uid"] = "6BUGWC)1ZRb",
-			["url"] = "https://wago.io/uYX5mP3U5/10",
+			["url"] = "https://wago.io/uYX5mP3U5/11",
 			["useAdjustededMax"] = false,
 			["useAdjustededMin"] = false,
 			["useTooltip"] = false,
-			["version"] = 10,
+			["version"] = 11,
+			["wagoID"] = "uYX5mP3U5",
 			["width"] = 1,
 			["xOffset"] = -3000,
 			["yOffset"] = 0,
@@ -7685,7 +9134,7 @@ WeakAurasSaved = {
 			["preferToUpdate"] = true,
 			["regionType"] = "icon",
 			["selfPoint"] = "CENTER",
-			["semver"] = "1.0.9",
+			["semver"] = "1.0.10",
 			["spark"] = false,
 			["sparkBlendMode"] = "ADD",
 			["sparkColor"] = {
@@ -7746,11 +9195,12 @@ WeakAurasSaved = {
 				["activeTriggerMode"] = -10,
 			},
 			["uid"] = "fg2HTz7oNrE",
-			["url"] = "https://wago.io/uYX5mP3U5/10",
+			["url"] = "https://wago.io/uYX5mP3U5/11",
 			["useAdjustededMax"] = false,
 			["useAdjustededMin"] = false,
 			["useTooltip"] = false,
-			["version"] = 10,
+			["version"] = 11,
+			["wagoID"] = "uYX5mP3U5",
 			["width"] = 1,
 			["xOffset"] = -3000,
 			["yOffset"] = 0,
@@ -7874,7 +9324,7 @@ WeakAurasSaved = {
 			["preferToUpdate"] = true,
 			["regionType"] = "icon",
 			["selfPoint"] = "CENTER",
-			["semver"] = "1.0.9",
+			["semver"] = "1.0.10",
 			["spark"] = false,
 			["sparkBlendMode"] = "ADD",
 			["sparkColor"] = {
@@ -7934,11 +9384,12 @@ WeakAurasSaved = {
 				["activeTriggerMode"] = -10,
 			},
 			["uid"] = "iho8vMeNRic",
-			["url"] = "https://wago.io/uYX5mP3U5/10",
+			["url"] = "https://wago.io/uYX5mP3U5/11",
 			["useAdjustededMax"] = false,
 			["useAdjustededMin"] = false,
 			["useTooltip"] = false,
-			["version"] = 10,
+			["version"] = 11,
+			["wagoID"] = "uYX5mP3U5",
 			["width"] = 1,
 			["xOffset"] = -3000,
 			["yOffset"] = 0,
@@ -8062,7 +9513,7 @@ WeakAurasSaved = {
 			["preferToUpdate"] = true,
 			["regionType"] = "icon",
 			["selfPoint"] = "CENTER",
-			["semver"] = "1.0.9",
+			["semver"] = "1.0.10",
 			["spark"] = false,
 			["sparkBlendMode"] = "ADD",
 			["sparkColor"] = {
@@ -8123,11 +9574,12 @@ WeakAurasSaved = {
 				["activeTriggerMode"] = -10,
 			},
 			["uid"] = "mm0UDC2ijhX",
-			["url"] = "https://wago.io/uYX5mP3U5/10",
+			["url"] = "https://wago.io/uYX5mP3U5/11",
 			["useAdjustededMax"] = false,
 			["useAdjustededMin"] = false,
 			["useTooltip"] = false,
-			["version"] = 10,
+			["version"] = 11,
+			["wagoID"] = "uYX5mP3U5",
 			["width"] = 1,
 			["xOffset"] = -3000,
 			["yOffset"] = 0,
@@ -8196,33 +9648,39 @@ WeakAurasSaved = {
 			["controlledChildren"] = {
 				"EDE [DOS] Blood Barrier Inc", -- [1]
 				"EDE [DOS] Erupting Darkness", -- [2]
-				"EDE [MTS] Radiant Breath", -- [3]
-				"EDE [NW] Gut Slice", -- [4]
-				"EDE [PF] Belch Plague", -- [5]
-				"EDE [SD] Echoing Thrust", -- [6]
-				"EDE [SD] Severing Slice", -- [7]
-				"EDE [SD] Growing Mistrust", -- [8]
-				"EDE [TOP] Vile Eruption", -- [9]
-				"EDE [TOP] Death Winds", -- [10]
-				"EDE[TOP] Dark Devastation", -- [11]
-				"EDE [TOP] Ghostly Charge", -- [12]
-				"EDE [HOA] Stone Breath", -- [13]
-				"EDE [HOA] Unleashed Suffering", -- [14]
-				"EDE [SOA] Run Through", -- [15]
-				"EDE [NW] Necrotic Breath", -- [16]
-				"EDE [SD] Sweeping Slash", -- [17]
-				"EDE [PF] Festering Belch", -- [18]
-				"EDE [PF] Wing Buffet", -- [19]
-				"EDE [MOT] Tongue Lashing", -- [20]
-				"EDE [NW] Repentance Check", -- [21]
-				"EDE [OTHERS] Blinding Light Check", -- [22]
-				"EDE [NW] Shadow Well", -- [23]
-				"EDE [MOTS] Bewildering Pollen (Boss) 2", -- [24]
-				"EDE [MOTS] Bewildering Pollen (Trash)", -- [25]
-				"EDE [SOA] Crescendo", -- [26]
-				"EDE [SOA] Charged Spear", -- [27]
-				"EDE [SOA] Crashing Strike", -- [28]
-				"EDE [SOA] Diminuendo", -- [29]
+				"EDE [DOS] Clear Stacks", -- [3]
+				"EDE [DOS] Deathwalker's Spirit Fixate Nameplate Indicator", -- [4]
+				"EDE [HOA] Stone Breath", -- [5]
+				"EDE [HOA] Unleashed Suffering", -- [6]
+				"EDE [HOA] Deadly Thrust", -- [7]
+				"EDE [HOA] Sin Quake", -- [8]
+				"EDE [MTS] Radiant Breath", -- [9]
+				"EDE [MOTS] Bewildering Pollen (Boss) 2", -- [10]
+				"EDE [MOTS] Bewildering Pollen (Trash)", -- [11]
+				"EDE [MOTS] Tongue Lashing", -- [12]
+				"EDE [NW] Gut Slice", -- [13]
+				"EDE [NW] Shadow Well", -- [14]
+				"EDE [NW] Necrotic Breath", -- [15]
+				"EDE [NW] Repentance Check", -- [16]
+				"EDE [NW] Throw Cleaver", -- [17]
+				"EDE [OTHERS] Blinding Light Check", -- [18]
+				"EDE [PF] Belch Plague", -- [19]
+				"EDE [PF] Festering Belch", -- [20]
+				"EDE [PF] Wing Buffet", -- [21]
+				"EDE [PF] Slime Wave", -- [22]
+				"EDE [SD] Echoing Thrust", -- [23]
+				"EDE [SD] Severing Slice", -- [24]
+				"EDE [SD] Growing Mistrust", -- [25]
+				"EDE [SD] Sweeping Slash", -- [26]
+				"EDE [SOA] Run Through", -- [27]
+				"EDE [SOA] Crescendo", -- [28]
+				"EDE [SOA] Charged Spear", -- [29]
+				"EDE [SOA] Crashing Strike", -- [30]
+				"EDE [SOA] Diminuendo", -- [31]
+				"EDE [TOP] Vile Eruption", -- [32]
+				"EDE [TOP] Death Winds", -- [33]
+				"EDE[TOP] Dark Devastation", -- [34]
+				"EDE [TOP] Ghostly Charge", -- [35]
 			},
 			["frameStrata"] = 1,
 			["fullCircle"] = true,
@@ -8260,7 +9718,7 @@ WeakAurasSaved = {
 			["rowSpace"] = 1,
 			["scale"] = 1,
 			["selfPoint"] = "LEFT",
-			["semver"] = "1.0.9",
+			["semver"] = "1.0.10",
 			["sort"] = "none",
 			["space"] = 2,
 			["stagger"] = 0,
@@ -8286,9 +9744,10 @@ WeakAurasSaved = {
 				}, -- [1]
 			},
 			["uid"] = "8bL1ytmZrbb",
-			["url"] = "https://wago.io/uYX5mP3U5/10",
+			["url"] = "https://wago.io/uYX5mP3U5/11",
 			["useLimit"] = false,
-			["version"] = 10,
+			["version"] = 11,
+			["wagoID"] = "uYX5mP3U5",
 			["xOffset"] = -23.999877929688,
 			["yOffset"] = 9.9998779296875,
 		},
@@ -8936,10 +10395,18 @@ WeakAurasSaved = {
 						["combineMatches"] = "showLowest",
 						["combinePerUnit"] = true,
 						["custom_type"] = "stateupdate",
+						["debuffClass"] = {
+							["curse"] = true,
+							["disease"] = true,
+							["enrage"] = true,
+							["magic"] = true,
+							["poison"] = true,
+						},
 						["debuffType"] = "HARMFUL",
 						["duration"] = "1",
 						["event"] = "Health",
 						["groupclone"] = true,
+						["ignoreSelf"] = false,
 						["name_info"] = "aura",
 						["names"] = {
 							"Power Word: Shield", -- [1]
@@ -8953,11 +10420,12 @@ WeakAurasSaved = {
 						["type"] = "aura2",
 						["unevent"] = "auto",
 						["unit"] = "group",
+						["useClass"] = false,
 						["useGroupRole"] = false,
 						["useGroup_count"] = false,
 						["useName"] = false,
 						["use_absorbMode"] = true,
-						["use_debuffClass"] = false,
+						["use_debuffClass"] = true,
 						["use_specific_unit"] = false,
 						["use_stealable"] = true,
 						["use_tooltip"] = false,
@@ -20946,10 +22414,10 @@ WeakAurasSaved = {
 				["zoneIds"] = "",
 			},
 			["parent"] = "쐐기 : 기타 0503",
-			["preferToUpdate"] = false,
+			["preferToUpdate"] = true,
 			["regionType"] = "icon",
 			["selfPoint"] = "RIGHT",
-			["semver"] = "1.0.253",
+			["semver"] = "1.0.257",
 			["stickyDuration"] = false,
 			["subRegions"] = {
 				{
@@ -21053,8 +22521,8 @@ WeakAurasSaved = {
 				["disjunctive"] = "all",
 			},
 			["uid"] = "zZjlxreu6mF",
-			["url"] = "https://wago.io/fCabQ-hF8/254",
-			["version"] = 254,
+			["url"] = "https://wago.io/fCabQ-hF8/258",
+			["version"] = 258,
 			["wagoID"] = "fCabQ-hF8",
 			["width"] = 18,
 			["xOffset"] = -2,
@@ -21181,11 +22649,11 @@ WeakAurasSaved = {
 				["use_class"] = false,
 				["zoneIds"] = "",
 			},
-			["preferToUpdate"] = false,
+			["preferToUpdate"] = true,
 			["regionType"] = "group",
 			["scale"] = 1,
 			["selfPoint"] = "BOTTOMLEFT",
-			["semver"] = "1.0.253",
+			["semver"] = "1.0.257",
 			["tocversion"] = 90005,
 			["triggers"] = {
 				[1] = {
@@ -21209,8 +22677,8 @@ WeakAurasSaved = {
 				["disjunctive"] = "all",
 			},
 			["uid"] = "b1CvyYBVQdW",
-			["url"] = "https://wago.io/fCabQ-hF8/254",
-			["version"] = 254,
+			["url"] = "https://wago.io/fCabQ-hF8/258",
+			["version"] = 258,
 			["wagoID"] = "fCabQ-hF8",
 			["xOffset"] = 0,
 			["yOffset"] = 420,
@@ -21220,7 +22688,7 @@ WeakAurasSaved = {
 				["finish"] = {
 				},
 				["init"] = {
-					["custom"] = "aura_env.Target = {}\naura_env.TbN = {}\n\naura_env.LocalT = {   \n    [\"??\"] = {\n    }, \n    [\"고통의 투기장\"] = {\n        [\"기회 포착\"] = true, -- 비열한 자 시라\n        [\"죽음풍\"] = true,\n        [\"뼈 창\"] = true,\n        [\"베기\"] = true,\n        [\"시체 삼키기\"] = true,\n        [\"사격\"] = true,\n        [\"날카로운 불화\"] = true,\n        [\"영혼 결속\"] = true,\n        [\"튕기는 칼날\"] = true,\n        [\"영혼의 손길\"] = true,\n        [\"괴저 화살\"] = true,\n        [\"죽음의 화살\"] = true,\n    },\n    [\"속죄의 전당\"] = {\n        [\"사격\"] = true, \n        [\"바위 분쇄의 도약\"] = true,\n        [\"생명력 착취\"] = true,\n        [\"절멸의 저주\"] = true,\n    },\n    [\"승천의 첨탑\"] = {\n        [\"충전된 창\"] = true,\n        [\"어둠 채찍\"] = true,\n        [\"지식의 무게\"] = true,\n        [\"던지기\"] = true,\n    },\n    [\"역병 몰락지\"] = {\n        [\"사격\"] = true, \n        [\"분쇄의 포옹\"] = true,\n        [\"흉측한 타액\"] = true,\n        [\"옭아매는 감염\"] = true,\n        [\"옭아매는 오물\"] = true,\n    },\n    [\"저편\"] = {\n        [\"사술\"] = true,\n        [\"흡수의 아지랑이\"] = true,\n        [\"최면성 반짝먼지\"] = true,\n        [\"번개 방출\"] = true,\n        [\"컹-컹\"] = true,\n        [\"방향유\"] = true,\n        [\"비전 번개\"] = true, -- 자이엑사\n    },\n    [\"죽음의 상흔\"] = {\n        [\"얼음 화살\"] = true, \n        [\"사격\"] = true, \n        [\"들썩이는 구토\"] = true, -- 역병뼈닥이\n        [\"병독의 집착\"] = true, -- 의사 스티치\n        [\"고기 갈고리\"] = true, \n        [\"식칼 투척\"] = true, \n        [\"질병 분출\"] = true, \n        [\"살점 던지기\"] = true, \n        [\"방부 수액\"] = true, \n        [\"체액 흡수\"] = true, \n        [\"들붙는 어둠\"] = true, \n        [\"얼어붙은 구속\"] = true, \n        [\"어둠의 추방\"] = true, \n    },\n    [\"티르너 사이드의 안개\"] = {\n        [\"과성장\"] = true,\n        [\"영혼의 화살\"] = true, \n        [\"안개장막 이빨\"] = true, \n        [\"얼음땡\"] = true, -- 미스트콜러\n        [\"얼음땡 시선 집중\"] = true, -- 환영 여우\n        [\"휘발성 산\"] = true, -- \n        [\"정신의 연결\"] = true, -- 트레도바\n        [\"사냥감의 징표\"] = true, \n        [\"기생성 평정화\"] = true, \n        [\"기생성 무력화\"] = true, \n        [\"신경 지배\"] = true,\n    },  \n    [\"핏빛 심연\"] = {\n        [\"공포의 사격\"] = true,\n        [\"육중한 돌격\"] = true, -- 크릭시스\n        [\"포식\"] = true,\n        [\"어두운 화살\"] = true,\n        [\"암울한 폭발\"] = true,\n        [\"날카로운 족쇄\"] = true,\n        [\"연구물 던지기\"] = true,\n        [\"폭발성 양피지\"] = true,\n        [\"폭발적인 분노\"] = true,\n        [\"억제의 저주\"] = true,\n        [\"영혼 파멸\"] = true,\n        [\"탐식\"] = true,\n        [\"혹독\"] = true,-- 타르볼드\n    },\n    \n}\n\naura_env.LocalN = {   \n    [\"??\"] = {\n    }, \n    [\"고통의 투기장\"] = {\n        [\"원한의 망령\"] = true, --원한\n    },\n    [\"속죄의 전당\"] = {\n        [\"원한의 망령\"] = true, --원한\n        [\"시기의 현신\"] = true, \n        [\"섬뜩한 교구민\"] = true, --알리즈\n    },\n    [\"승천의 첨탑\"] = {\n        [\"원한의 망령\"] = true, --원한\n    },\n    [\"역병 몰락지\"] = {\n        [\"원한의 망령\"] = true, --원한\n    },\n    [\"저편\"] = {\n        [\"원한의 망령\"] = true, --원한\n        [\"학카르의 자손\"] = true, -- 학카르\n    },\n    [\"죽음의 상흔\"] = {\n        [\"원한의 망령\"] = true, --원한\n        [\"오물 구더기\"] = true, --역병뼈닥이\n    },\n    [\"티르너 사이드의 안개\"] = {\n        [\"원한의 망령\"] = true, --원한\n        [\"환영 여우\"] = true, --미스트콜러\n        [\"게걸충 애벌레\"] = true, \n    },  \n    [\"핏빛 심연\"] = {\n        [\"원한의 망령\"] = true, --원한\n    },\n}\n\n\naura_env.anchorFunc = function()\n    for _, region in pairs(WeakAuras.clones[aura_env.id]) do\n        if region.state and region.state.show then\n            if region.state.cast then\n                region:ClearAllPoints()\n                region:SetPoint(\"RIGHT\", region.state.frame, \"LEFT\", aura_env.config.cx, aura_env.config.cy)\n                region:SetScale(aura_env.config.cscale)\n            else\n                region:ClearAllPoints()\n                region:SetPoint(\"RIGHT\", region.state.frame, \"LEFT\", aura_env.config.x, aura_env.config.y)\n                region:SetScale(1)\n            end\n        end\n    end\nend",
+					["custom"] = "aura_env.Target = {}\naura_env.TbN = {}\n\naura_env.LocalT = {   \n    [\"??\"] = {\n    }, \n    [\"고통의 투기장\"] = {\n        [\"이글거리는 죽음\"] = true,\n        [\"죽음풍\"] = true,\n        [\"뼈 창\"] = true,\n        [\"베기\"] = true,\n        [\"시체 삼키기\"] = true,  \n        [\"방패 가격\"] = true,\n        [\"혼란의 강타\"] = true,\n        [\"부패의 일격\"] = true,\n        [\"사격\"] = true,\n        [\"날카로운 불화\"] = true,\n        [\"영혼 결속\"] = true,\n        [\"튕기는 칼날\"] = true,\n        [\"영혼의 손길\"] = true,\n        [\"괴저 화살\"] = true,\n        [\"죽음의 화살\"] = true,\n    },\n    [\"속죄의 전당\"] = {\n        [\"사격\"] = true, \n        [\"바위 분쇄의 도약\"] = true,\n        [\"생명력 착취\"] = true,\n        [\"절멸의 저주\"] = true,\n    },\n    [\"승천의 첨탑\"] = {\n        [\"충전된 창\"] = true,\n        [\"어둠 채찍\"] = true,\n        [\"지식의 무게\"] = true,\n        [\"던지기\"] = true,\n    },\n    [\"역병 몰락지\"] = {\n        [\"사격\"] = true, \n        [\"분쇄의 포옹\"] = true,\n        [\"흉측한 타액\"] = true,\n        [\"옭아매는 감염\"] = true,\n        [\"옭아매는 오물\"] = true,\n    },\n    [\"저편\"] = {\n        [\"사술\"] = true,\n        [\"흡수의 아지랑이\"] = true,\n        [\"번개 방출\"] = true,\n        [\"컹-컹\"] = true,\n        [\"방향유\"] = true,\n    },\n    [\"죽음의 상흔\"] = {\n        [\"얼음 화살\"] = true, \n        [\"사격\"] = true, \n        [\"들썩이는 구토\"] = true, -- 역병뼈닥이\n        [\"병독의 집착\"] = true, -- 의사 스티치\n        [\"뼈다귀 발톱\"] = true, \n        [\"고기 갈고리\"] = true, \n        [\"식칼 투척\"] = true, \n        [\"질병 분출\"] = true, \n        [\"살점 던지기\"] = true, \n        [\"방부 수액\"] = true, \n        [\"체액 흡수\"] = true, \n        [\"들붙는 어둠\"] = true, \n        [\"얼어붙은 구속\"] = true, \n        [\"어둠의 추방\"] = true, \n    },\n    [\"티르너 사이드의 안개\"] = {\n        [\"과성장\"] = true,\n        [\"영혼의 화살\"] = true, \n        [\"안개장막 이빨\"] = true, \n        [\"얼음땡\"] = true, -- 미스트콜러\n        [\"얼음땡 시선 집중\"] = true, -- 환영 여우\n        [\"휘발성 산\"] = true, -- \n        [\"정신의 연결\"] = true, -- 트레도바\n        [\"사냥감의 징표\"] = true, \n        [\"기생성 평정화\"] = true, \n        [\"기생성 무력화\"] = true, \n        [\"신경 지배\"] = true,\n    },  \n    [\"핏빛 심연\"] = {\n        [\"공포의 사격\"] = true,\n        [\"육중한 돌격\"] = true, -- 크릭시스\n        [\"포식\"] = true,\n        [\"어두운 화살\"] = true,\n        [\"암울한 폭발\"] = true,\n        [\"날카로운 족쇄\"] = true,\n        [\"연구물 던지기\"] = true,\n        [\"폭발성 양피지\"] = true,\n        [\"폭발적인 분노\"] = true,\n        [\"억제의 저주\"] = true,\n        [\"영혼 파멸\"] = true,\n        [\"탐식\"] = true,\n        [\"혹독\"] = true,-- 타르볼드\n    },\n    \n}\n\naura_env.LocalN = {   \n    [\"??\"] = {\n    }, \n    [\"고통의 투기장\"] = {\n    },\n    [\"속죄의 전당\"] = {\n        [\"시기의 현신\"] = true, \n        [\"섬뜩한 교구민\"] = true, --알리즈\n    },\n    [\"승천의 첨탑\"] = {\n    },\n    [\"역병 몰락지\"] = {\n    },\n    [\"저편\"] = {\n        [\"학카르의 자손\"] = true, -- 학카르\n    },\n    [\"죽음의 상흔\"] = {\n        [\"오물 구더기\"] = true, --역병뼈닥이\n    },\n    [\"티르너 사이드의 안개\"] = {\n        [\"환영 여우\"] = true, --미스트콜러\n        [\"게걸충 애벌레\"] = true, \n    },  \n    [\"핏빛 심연\"] = {\n    },\n}\n\n\naura_env.anchorFunc = function()\n    for _, region in pairs(WeakAuras.clones[aura_env.id]) do\n        if region.state and region.state.show then\n            if region.state.cast then\n                region:ClearAllPoints()\n                region:SetPoint(\"RIGHT\", region.state.frame, \"LEFT\", aura_env.config.cx, aura_env.config.cy)\n                region:SetScale(aura_env.config.cscale)\n            else\n                region:ClearAllPoints()\n                region:SetPoint(\"RIGHT\", region.state.frame, \"LEFT\", aura_env.config.x, aura_env.config.y)\n                region:SetScale(1)\n            end\n        end\n    end\nend",
 					["do_custom"] = true,
 				},
 				["start"] = {
@@ -21488,7 +22956,7 @@ WeakAurasSaved = {
 			["rotate"] = false,
 			["rotation"] = 0,
 			["selfPoint"] = "CENTER",
-			["semver"] = "1.0.110",
+			["semver"] = "1.0.111",
 			["stickyDuration"] = false,
 			["text1"] = "%n",
 			["text1Color"] = {
@@ -21523,7 +22991,7 @@ WeakAurasSaved = {
 				[1] = {
 					["trigger"] = {
 						["check"] = "event",
-						["custom"] = "function(states)\n    for _, v in pairs(states) do\n        v.show = false;\n        v.changed = true;\n    end\n    \n    for _, plate in pairs(C_NamePlate.GetNamePlates()) do\n        local unit = plate.namePlateUnitToken\n        if unit and UnitIsUnit(unit..\"target\", \"player\") then\n            local name = UnitName(unit)\n            local cast = UnitCastingInfo(unit)\n            local channel = UnitChannelInfo(unit)\n            if aura_env.Target[cast] or aura_env.Target[channel] then\n                states[unit] = states[unit] or {}\n                local state = states[unit]\n                state.frame = C_NamePlate.GetNamePlateForUnit(unit)\n                state.changed = true\n                state.show = true\n                state.cast = true\n            elseif aura_env.TbN[name] then\n                states[unit] = states[unit] or {}\n                local state = states[unit]\n                state.frame = C_NamePlate.GetNamePlateForUnit(unit)\n                state.changed = true\n                state.show = true\n                state.cast = false\n            end\n        end\n    end\n    return true\nend",
+						["custom"] = "function(states)\n    for _, v in pairs(states) do\n        v.show = false;\n        v.changed = true;\n    end\n    \n    for _, plate in pairs(C_NamePlate.GetNamePlates()) do\n        local unit = plate.namePlateUnitToken\n        if unit and UnitIsUnit(unit..\"target\", \"player\") then\n            local name = UnitName(unit)\n            local cast = UnitCastingInfo(unit)\n            local channel = UnitChannelInfo(unit)\n            if aura_env.Target[cast] or aura_env.Target[channel] then\n                states[unit] = states[unit] or {}\n                local state = states[unit]\n                state.frame = C_NamePlate.GetNamePlateForUnit(unit)\n                state.changed = true\n                state.show = true\n                state.cast = true\n            elseif name == \"원한의 망령\" or aura_env.TbN[name] then\n                states[unit] = states[unit] or {}\n                local state = states[unit]\n                state.frame = C_NamePlate.GetNamePlateForUnit(unit)\n                state.changed = true\n                state.show = true\n                state.cast = false\n            end\n        end\n    end\n    return true\nend",
 						["custom_type"] = "stateupdate",
 						["debuffType"] = "HELPFUL",
 						["event"] = "Chat Message",
@@ -21563,8 +23031,9 @@ WeakAurasSaved = {
 				["disjunctive"] = "custom",
 			},
 			["uid"] = "Ta1Qs)nAEp5",
-			["url"] = "https://wago.io/uUwU71sI8/111",
-			["version"] = 111,
+			["url"] = "https://wago.io/uUwU71sI8/112",
+			["version"] = 112,
+			["wagoID"] = "uUwU71sI8",
 			["width"] = 57,
 			["xOffset"] = 0,
 			["yOffset"] = 4320,
@@ -21675,10 +23144,10 @@ WeakAurasSaved = {
 				["zoneIds"] = "",
 			},
 			["parent"] = "쐐기 : 기타 0503",
-			["preferToUpdate"] = false,
+			["preferToUpdate"] = true,
 			["regionType"] = "icon",
 			["selfPoint"] = "CENTER",
-			["semver"] = "1.0.253",
+			["semver"] = "1.0.257",
 			["stickyDuration"] = false,
 			["subRegions"] = {
 			},
@@ -21746,8 +23215,8 @@ WeakAurasSaved = {
 				["disjunctive"] = "custom",
 			},
 			["uid"] = "sJO5llLz2SD",
-			["url"] = "https://wago.io/fCabQ-hF8/254",
-			["version"] = 254,
+			["url"] = "https://wago.io/fCabQ-hF8/258",
+			["version"] = 258,
 			["wagoID"] = "fCabQ-hF8",
 			["width"] = 1,
 			["xOffset"] = 0,
@@ -22050,12 +23519,12 @@ WeakAurasSaved = {
 			["orientation"] = "ANTICLOCKWISE",
 			["outline"] = "OUTLINE",
 			["parent"] = "쐐기 : 기타 0503",
-			["preferToUpdate"] = false,
+			["preferToUpdate"] = true,
 			["regionType"] = "progresstexture",
 			["rotation"] = 0,
 			["sameTexture"] = true,
 			["selfPoint"] = "BOTTOM",
-			["semver"] = "1.0.253",
+			["semver"] = "1.0.257",
 			["slantMode"] = "INSIDE",
 			["startAngle"] = 0,
 			["stickyDuration"] = false,
@@ -22127,7 +23596,7 @@ WeakAurasSaved = {
 				["disjunctive"] = "any",
 			},
 			["uid"] = "0QLkkMlOTBf",
-			["url"] = "https://wago.io/fCabQ-hF8/254",
+			["url"] = "https://wago.io/fCabQ-hF8/258",
 			["useAdjustedMax"] = false,
 			["useAdjustedMin"] = false,
 			["useAdjustededMax"] = false,
@@ -22135,7 +23604,7 @@ WeakAurasSaved = {
 			["useglowColor"] = false,
 			["user_x"] = 0,
 			["user_y"] = 0,
-			["version"] = 254,
+			["version"] = 258,
 			["wagoID"] = "fCabQ-hF8",
 			["width"] = 14,
 			["wordWrap"] = "WordWrap",
@@ -22150,7 +23619,7 @@ WeakAurasSaved = {
 					["do_custom"] = true,
 				},
 				["init"] = {
-					["custom"] = "aura_env.Chat = {}\naura_env.BChat = {}\n\naura_env.LocalC = {   \n    [\"??\"] = {\n    }, \n    [\"고통의 투기장\"] = {\n        [\"기회 포착\"] = true, -- 비열한 자 시라\n        [\"죽음풍\"] = true,\n        [\"뼈 창\"] = true,\n        [\"베기\"] = true,\n        [\"시체 삼키기\"] = true,\n        [\"사격\"] = false,\n        [\"날카로운 불화\"] = false,\n        [\"영혼 결속\"] = true,\n        [\"튕기는 칼날\"] = true,\n        [\"영혼의 손길\"] = false,\n        [\"괴저 화살\"] = false,\n        [\"죽음의 화살\"] = false,\n    },\n    [\"속죄의 전당\"] = {\n        [\"생명력 착취\"] = true,\n        [\"절멸의 저주\"] = true,\n        [\"사격\"] = false, \n    },\n    [\"승천의 첨탑\"] = {\n        [\"충전된 창\"] = true,\n        [\"어둠 채찍\"] = true,\n        [\"지식의 무게\"] = true,\n        [\"던지기\"] = true,\n    },\n    [\"역병 몰락지\"] = {\n        [\"사격\"] = true, \n        [\"흉측한 타액\"] = true,\n        [\"옭아매는 감염\"] = true,\n        [\"옭아매는 오물\"] = true,\n        [\"분쇄의 포옹\"] = true,\n    },\n    [\"저편\"] = {\n        [\"사술\"] = false,\n        [\"최면성 반짝먼지\"] = true,\n        [\"흡수의 아지랑이\"] = true,\n        [\"번개 방출\"] = false,\n        [\"컹-컹\"] = false,\n        [\"방향유\"] = false,\n    },\n    [\"죽음의 상흔\"] = {\n        [\"피 포식\"] = false, \n        [\"사격\"] = true, \n        [\"얼음 화살\"] = true, \n        [\"병독의 집착\"] = true, --의사 스티치\n        [\"고기 갈고리\"] = true, \n        [\"질병 분출\"] = true, \n        [\"들붙는 어둠\"] = true, \n        [\"식칼 투척\"] = true, \n        [\"방부 수액\"] = true, \n        [\"살점 던지기\"] = false, \n        [\"체액 흡수\"] = true, \n    },\n    [\"티르너 사이드의 안개\"] = {\n        [\"과성장\"] = true,\n        [\"영혼의 화살\"] = true, \n        [\"안개장막 이빨\"] = true, \n        [\"얼음땡 시선 집중\"] = true, --환영 여우, 미스트콜러\n        [\"휘발성 산\"] = true,\n    },\n    [\"핏빛 심연\"] = {\n        [\"공포의 사격\"] = false,\n        [\"포식\"] = true,\n        [\"연구물 던지기\"] = false,\n        [\"폭발성 양피지\"] = true,\n        [\"어두운 화살\"] = false,\n        [\"암울한 폭발\"] = true,\n        [\"날카로운 족쇄\"] = true,\n        [\"영혼 파멸\"] = false,\n        [\"폭발적인 분노\"] = true,\n        [\"탐식\"] = true,\n        [\"억제의 저주\"] = true,\n    },\n}\n\naura_env.LocalB = {   \n    [\"??\"] = {\n    }, \n    [\"고통의 투기장\"] = {\n    },\n    [\"속죄의 전당\"] = {\n    },\n    [\"승천의 첨탑\"] = {\n        [\"충전된 창\"] = true,\n    },\n    [\"역병 몰락지\"] = {\n    },\n    [\"저편\"] = {\n        [\"비전 번개\"] = true, -- 자이엑사\n    },\n    [\"죽음의 상흔\"] = {\n        [\"들썩이는 구토\"] = true, -- 역병뼈닥이\n        [\"얼어붙은 구속\"] = true, \n        [\"어둠의 추방\"] = true, \n    },\n    [\"티르너 사이드의 안개\"] = {\n        [\"얼음땡\"] = true, -- 미스트콜러\n        [\"정신의 연결\"] = true, -- 트레도바\n        [\"사냥감의 징표\"] = true, \n        [\"기생성 평정화\"] = true, \n        [\"기생성 무력화\"] = true, \n        [\"신경 지배\"] = true,\n    },\n    [\"핏빛 심연\"] = {\n        [\"육중한 돌격\"] = true, -- 크릭시스\n        [\"혹독\"] = true,-- 타르볼드\n    },\n}\n-----------------------------------------\n--            USER SETTINGS            --\n----------------------------------------\nlocal ver = { 'DOWN', 'UP' };\nlocal sor = { 'DESC', 'ASC' };\n\nlocal spacing = aura_env.config.spacing or 3 -- adjust to preference\nlocal vertical_growth = aura_env.config.ver and ver[aura_env.config.ver] or 'DOWN' -- or \"DOWN\"\nlocal sort_direction = aura_env.config.sor and sor[aura_env.config.sor] or 'DESC'\n\n-----------------------------------------\n--             DO NOT TOUCH            --\n-----------------------------------------\n\nlocal aura_env = aura_env\naura_env.sortAndOffset = function()\n    local baseX = WeakAuras.regions[aura_env.id].region.xOffset\n    local baseY = WeakAuras.regions[aura_env.id].region.yOffset\n    local count = 0\n    local t = {}\n    \n    for _, v in pairs(WeakAuras.clones[aura_env.id]) do\n        table.insert(t, v)\n    end\n    \n    table.sort(t, function(a,b) \n            if a.state and b.state then\n                if sort_direction == \"DESC\" then\n                    return a.state.expirationTime < b.state.expirationTime\n                else\n                    return a.state.expirationTime > b.state.expirationTime\n                end\n            end\n    end)\n    \n    for _, region in ipairs(t) do\n        if region.toShow then\n            local yOff = - count * (region.height + spacing)\n            yOff = vertical_growth == \"UP\" and 0-yOff or yOff\n            region:SetOffset(baseX, baseY + yOff)\n            count = count + 1\n        end\n    end\nend",
+					["custom"] = "aura_env.Chat = {}\naura_env.BChat = {}\n\naura_env.LocalC = {   \n    [\"??\"] = {\n    }, \n    [\"고통의 투기장\"] = {\n        [\"죽음풍\"] = true,\n        [\"뼈 창\"] = true,\n        [\"베기\"] = true,\n        [\"시체 삼키기\"] = true,\n        [\"방패 가격\"] = true,\n        [\"혼란의 강타\"] = true,\n        [\"부패의 일격\"] = true,\n        [\"사격\"] = false,\n        [\"날카로운 불화\"] = false,\n        [\"영혼 결속\"] = true,\n        [\"튕기는 칼날\"] = true,\n        [\"영혼의 손길\"] = false,\n        [\"괴저 화살\"] = false,\n        [\"죽음의 화살\"] = false,\n    },\n    [\"속죄의 전당\"] = {\n        [\"생명력 착취\"] = true,\n        [\"절멸의 저주\"] = true,\n        [\"사격\"] = false, \n    },\n    [\"승천의 첨탑\"] = {\n        [\"충전된 창\"] = true,\n        [\"어둠 채찍\"] = true,\n        [\"지식의 무게\"] = true,\n        [\"던지기\"] = true,\n    },\n    [\"역병 몰락지\"] = {\n        [\"사격\"] = true, \n        [\"흉측한 타액\"] = true,\n        [\"옭아매는 감염\"] = true,\n        [\"옭아매는 오물\"] = true,\n        [\"분쇄의 포옹\"] = true,\n    },\n    [\"저편\"] = {\n        [\"사술\"] = false,\n        [\"흡수의 아지랑이\"] = true,\n        [\"번개 방출\"] = false,\n        [\"컹-컹\"] = false,\n        [\"방향유\"] = false,\n    },\n    [\"죽음의 상흔\"] = {\n        [\"피 포식\"] = false, \n        [\"사격\"] = true, \n        [\"얼음 화살\"] = true, \n        [\"뼈다귀 발톱\"] = true, \n        [\"병독의 집착\"] = true, --의사 스티치\n        [\"고기 갈고리\"] = true, \n        [\"질병 분출\"] = true, \n        [\"들붙는 어둠\"] = true, \n        [\"식칼 투척\"] = true, \n        [\"방부 수액\"] = true, \n        [\"살점 던지기\"] = false, \n        [\"체액 흡수\"] = true, \n    },\n    [\"티르너 사이드의 안개\"] = {\n        [\"과성장\"] = true,\n        [\"영혼의 화살\"] = true, \n        [\"안개장막 이빨\"] = true, \n        [\"얼음땡 시선 집중\"] = true, --환영 여우, 미스트콜러\n        [\"휘발성 산\"] = true,\n    },\n    [\"핏빛 심연\"] = {\n        [\"공포의 사격\"] = false,\n        [\"포식\"] = true,\n        [\"연구물 던지기\"] = false,\n        [\"폭발성 양피지\"] = true,\n        [\"어두운 화살\"] = false,\n        [\"암울한 폭발\"] = true,\n        [\"날카로운 족쇄\"] = true,\n        [\"영혼 파멸\"] = false,\n        [\"폭발적인 분노\"] = true,\n        [\"탐식\"] = true,\n        [\"억제의 저주\"] = true,\n    },\n}\n\naura_env.LocalB = {   \n    [\"??\"] = {\n    }, \n    [\"고통의 투기장\"] = {\n        [\"이글거리는 죽음\"] = true,\n    },\n    [\"속죄의 전당\"] = {\n    },\n    [\"승천의 첨탑\"] = {\n        [\"충전된 창\"] = true,\n    },\n    [\"역병 몰락지\"] = {\n    },\n    [\"저편\"] = {\n    },\n    [\"죽음의 상흔\"] = {\n        [\"들썩이는 구토\"] = true, -- 역병뼈닥이\n        [\"얼어붙은 구속\"] = true, \n        [\"어둠의 추방\"] = true, \n    },\n    [\"티르너 사이드의 안개\"] = {\n        [\"얼음땡\"] = true, -- 미스트콜러\n        [\"정신의 연결\"] = true, -- 트레도바\n        [\"사냥감의 징표\"] = true, \n        [\"기생성 평정화\"] = true, \n        [\"기생성 무력화\"] = true, \n        [\"신경 지배\"] = true,\n    },\n    [\"핏빛 심연\"] = {\n        [\"육중한 돌격\"] = true, -- 크릭시스\n        [\"혹독\"] = true,-- 타르볼드\n    },\n}\n-----------------------------------------\n--            USER SETTINGS            --\n----------------------------------------\nlocal ver = { 'DOWN', 'UP' };\nlocal sor = { 'DESC', 'ASC' };\n\nlocal spacing = aura_env.config.spacing or 3 -- adjust to preference\nlocal vertical_growth = aura_env.config.ver and ver[aura_env.config.ver] or 'DOWN' -- or \"DOWN\"\nlocal sort_direction = aura_env.config.sor and sor[aura_env.config.sor] or 'DESC'\n\n-----------------------------------------\n--             DO NOT TOUCH            --\n-----------------------------------------\n\nlocal aura_env = aura_env\naura_env.sortAndOffset = function()\n    local baseX = WeakAuras.regions[aura_env.id].region.xOffset\n    local baseY = WeakAuras.regions[aura_env.id].region.yOffset\n    local count = 0\n    local t = {}\n    \n    for _, v in pairs(WeakAuras.clones[aura_env.id]) do\n        table.insert(t, v)\n    end\n    \n    table.sort(t, function(a,b) \n            if a.state and b.state then\n                if sort_direction == \"DESC\" then\n                    return a.state.expirationTime < b.state.expirationTime\n                else\n                    return a.state.expirationTime > b.state.expirationTime\n                end\n            end\n    end)\n    \n    for _, region in ipairs(t) do\n        if region.toShow then\n            local yOff = - count * (region.height + spacing)\n            yOff = vertical_growth == \"UP\" and 0-yOff or yOff\n            region:SetOffset(baseX, baseY + yOff)\n            count = count + 1\n        end\n    end\nend",
 					["do_custom"] = true,
 				},
 				["start"] = {
@@ -22436,7 +23905,7 @@ WeakAurasSaved = {
 			["rotation"] = 0,
 			["scale"] = 1,
 			["selfPoint"] = "CENTER",
-			["semver"] = "1.0.110",
+			["semver"] = "1.0.111",
 			["sequence"] = 1,
 			["shadowColor"] = {
 				0, -- [1]
@@ -22588,10 +24057,11 @@ WeakAurasSaved = {
 				["disjunctive"] = "custom",
 			},
 			["uid"] = "BSBv6iYb28z",
-			["url"] = "https://wago.io/uUwU71sI8/111",
+			["url"] = "https://wago.io/uUwU71sI8/112",
 			["useAdjustededMax"] = false,
 			["useAdjustededMin"] = false,
-			["version"] = 111,
+			["version"] = 112,
+			["wagoID"] = "uUwU71sI8",
 			["width"] = 44.000003814697,
 			["wordWrap"] = "WordWrap",
 			["xOffset"] = 0,
@@ -22690,7 +24160,7 @@ WeakAurasSaved = {
 			["regionType"] = "group",
 			["scale"] = 1,
 			["selfPoint"] = "BOTTOMLEFT",
-			["semver"] = "1.0.110",
+			["semver"] = "1.0.111",
 			["subRegions"] = {
 			},
 			["tocversion"] = 90005,
@@ -22713,8 +24183,9 @@ WeakAurasSaved = {
 				}, -- [1]
 			},
 			["uid"] = "EDWZYrb3C1v",
-			["url"] = "https://wago.io/uUwU71sI8/111",
-			["version"] = 111,
+			["url"] = "https://wago.io/uUwU71sI8/112",
+			["version"] = 112,
+			["wagoID"] = "uUwU71sI8",
 			["xOffset"] = 7.9999389648438,
 			["yOffset"] = 1.0000610351563,
 		},
@@ -22723,7 +24194,7 @@ WeakAurasSaved = {
 				["finish"] = {
 				},
 				["init"] = {
-					["custom"] = "aura_env.Target = {}\naura_env.TbN = {}\n\naura_env.Exc = {   \n    --    [\"죽음의 찌르기\"] = true,\n    [\"죽음풍\"] = true,\n}\n\naura_env.LocalT = {   \n    [\"??\"] = {\n    }, \n    [\"고통의 투기장\"] = {\n        [\"죽음풍\"] = true,\n        [\"끔찍한 분출\"] = true,\n        [\"암흑 황폐\"] = true, \n    },\n    [\"속죄의 전당\"] = {\n        [\"죽음의 찌르기\"] = true, \n        [\"속사\"] = true, \n        [\"강력 휘둘러치기\"] = true,\n        [\"돌 숨결\"] = true,\n        [\"풀려난 괴로움\"] = true,\n    },\n    [\"승천의 첨탑\"] = {\n        [\"휩쓸기 강타\"] = true,\n        [\"몰아치는 일격\"] = true,\n        [\"점점 여리게\"] = true,\n        [\"눈부신 섬광\"] = true,\n        [\"돌파\"] = true,\n    },\n    [\"역병 몰락지\"] = {\n        [\"폭풍 날개\"] = true, \n        [\"역병 내뿜기\"] = true,\n        [\"부패한 트림\"] = true,\n        [\"맹독 관통자\"] = true,\n        [\"점액의 손길\"] = true,\n    },\n    [\"저편\"] = {\n        [\"분출하는 어둠\"] = true,\n    },\n    [\"죽음의 상흔\"] = {\n        [\"소름 끼치는 회전베기\"] = true, \n        [\"내장 절단\"] = true,\n        [\"괴저 숨결\"] = true, \n    },\n    [\"티르너 사이드의 안개\"] = {\n        [\"혼란의 꽃가루\"] = true,\n        [\"질풍창\"] = true, \n        [\"혀 채찍질\"] = true, \n        [\"빛나는 숨결\"] = true,\n        [\"피구\"] = true,\n    },\n    [\"핏빛 심연\"] = {\n        [\"메아리치는 찌르기\"] = true,\n        [\"절단의 분쇄\"] = true,\n        [\"휩쓰는 베기\"] = true,\n    },\n}\n\n\naura_env.anchorFunc = function()\n    for _, region in pairs(WeakAuras.clones[aura_env.id]) do\n        if region.state and region.state.show then\n            region:ClearAllPoints()\n            region:SetPoint(\"RIGHT\", region.state.frame, \"LEFT\", aura_env.config.cx, aura_env.config.cy)\n            region:SetScale(aura_env.config.cscale)\n        end\n    end\nend",
+					["custom"] = "aura_env.Target = {}\naura_env.TbN = {}\n\naura_env.Exc = {   \n    --    [\"죽음의 찌르기\"] = true,\n    [\"죽음풍\"] = true,\n}\n\naura_env.LocalT = {   \n    [\"??\"] = {\n    }, \n    [\"고통의 투기장\"] = {\n        [\"죽음풍\"] = true,\n        [\"끔찍한 분출\"] = true,\n        [\"암흑 황폐\"] = true, \n    },\n    [\"속죄의 전당\"] = {\n        [\"죽음의 찌르기\"] = true, \n        [\"속사\"] = true, \n        [\"강력 휘둘러치기\"] = true,\n        [\"돌 숨결\"] = true,\n        [\"풀려난 괴로움\"] = true,\n    },\n    [\"승천의 첨탑\"] = {\n        [\"휩쓸기 강타\"] = true,\n        [\"몰아치는 일격\"] = true,\n        [\"점점 여리게\"] = true,\n        [\"눈부신 섬광\"] = true,\n        [\"돌파\"] = true,\n    },\n    [\"역병 몰락지\"] = {\n        [\"폭풍 날개\"] = true, \n        [\"역병 내뿜기\"] = true,\n        [\"부패한 트림\"] = true,\n        [\"맹독 관통자\"] = true,\n        [\"점액의 손길\"] = true,\n    },\n    [\"저편\"] = {\n        [\"분출하는 어둠\"] = true,\n        [\"최면성 반짝먼지\"] = true,\n    },\n    [\"죽음의 상흔\"] = {\n        [\"소름 끼치는 회전베기\"] = true, \n        [\"내장 절단\"] = true,\n        [\"괴저 숨결\"] = true, \n    },\n    [\"티르너 사이드의 안개\"] = {\n        [\"혼란의 꽃가루\"] = true,\n        [\"질풍창\"] = true, \n        [\"혀 채찍질\"] = true, \n        [\"빛나는 숨결\"] = true,\n        [\"피구\"] = true,\n    },\n    [\"핏빛 심연\"] = {\n        [\"메아리치는 찌르기\"] = true,\n        [\"절단의 분쇄\"] = true,\n        [\"휩쓰는 베기\"] = true,\n    },\n}\n\n\naura_env.anchorFunc = function()\n    for _, region in pairs(WeakAuras.clones[aura_env.id]) do\n        if region.state and region.state.show then\n            region:ClearAllPoints()\n            region:SetPoint(\"RIGHT\", region.state.frame, \"LEFT\", aura_env.config.cx, aura_env.config.cy)\n            region:SetScale(aura_env.config.cscale)\n        end\n    end\nend",
 					["do_custom"] = true,
 				},
 				["start"] = {
@@ -22956,7 +24427,7 @@ WeakAurasSaved = {
 			["rotate"] = false,
 			["rotation"] = 0,
 			["selfPoint"] = "CENTER",
-			["semver"] = "1.0.110",
+			["semver"] = "1.0.111",
 			["stickyDuration"] = false,
 			["text1"] = "%n",
 			["text1Color"] = {
@@ -23031,8 +24502,9 @@ WeakAurasSaved = {
 				["disjunctive"] = "custom",
 			},
 			["uid"] = "kqma)OCW)49",
-			["url"] = "https://wago.io/uUwU71sI8/111",
-			["version"] = 111,
+			["url"] = "https://wago.io/uUwU71sI8/112",
+			["version"] = 112,
+			["wagoID"] = "uUwU71sI8",
 			["width"] = 57,
 			["xOffset"] = 0,
 			["yOffset"] = 4320,
@@ -23250,11 +24722,11 @@ WeakAurasSaved = {
 			["orientation"] = "HORIZONTAL",
 			["outline"] = "None",
 			["parent"] = "쐐기 : 기타 0503",
-			["preferToUpdate"] = false,
+			["preferToUpdate"] = true,
 			["regionType"] = "text",
 			["rotateText"] = "NONE",
 			["selfPoint"] = "CENTER",
-			["semver"] = "1.0.253",
+			["semver"] = "1.0.257",
 			["shadowColor"] = {
 				0, -- [1]
 				0, -- [2]
@@ -23367,8 +24839,8 @@ WeakAurasSaved = {
 				["disjunctive"] = "custom",
 			},
 			["uid"] = "xcawWKe9UZi",
-			["url"] = "https://wago.io/fCabQ-hF8/254",
-			["version"] = 254,
+			["url"] = "https://wago.io/fCabQ-hF8/258",
+			["version"] = 258,
 			["wagoID"] = "fCabQ-hF8",
 			["width"] = 33.999992370605,
 			["wordWrap"] = "WordWrap",
@@ -23567,11 +25039,11 @@ WeakAurasSaved = {
 			["orientation"] = "HORIZONTAL",
 			["outline"] = "None",
 			["parent"] = "쐐기 : 기타 0503",
-			["preferToUpdate"] = false,
+			["preferToUpdate"] = true,
 			["regionType"] = "text",
 			["rotateText"] = "NONE",
 			["selfPoint"] = "CENTER",
-			["semver"] = "1.0.253",
+			["semver"] = "1.0.257",
 			["shadowColor"] = {
 				0, -- [1]
 				0, -- [2]
@@ -23658,8 +25130,8 @@ WeakAurasSaved = {
 				["disjunctive"] = "all",
 			},
 			["uid"] = "cIk8QDzZs(5",
-			["url"] = "https://wago.io/fCabQ-hF8/254",
-			["version"] = 254,
+			["url"] = "https://wago.io/fCabQ-hF8/258",
+			["version"] = 258,
 			["wagoID"] = "fCabQ-hF8",
 			["width"] = 28.000078201294,
 			["wordWrap"] = "WordWrap",
@@ -23949,12 +25421,12 @@ WeakAurasSaved = {
 			["mirror"] = false,
 			["outline"] = "OUTLINE",
 			["parent"] = "쐐기 : 기타 0503",
-			["preferToUpdate"] = false,
+			["preferToUpdate"] = true,
 			["regionType"] = "text",
 			["rotate"] = true,
 			["rotation"] = 180,
 			["selfPoint"] = "CENTER",
-			["semver"] = "1.0.253",
+			["semver"] = "1.0.257",
 			["shadowColor"] = {
 				0, -- [1]
 				0, -- [2]
@@ -24046,8 +25518,8 @@ WeakAurasSaved = {
 				["disjunctive"] = "custom",
 			},
 			["uid"] = "FcuCyLeB94g",
-			["url"] = "https://wago.io/fCabQ-hF8/254",
-			["version"] = 254,
+			["url"] = "https://wago.io/fCabQ-hF8/258",
+			["version"] = 258,
 			["wagoID"] = "fCabQ-hF8",
 			["width"] = 50,
 			["wordWrap"] = "WordWrap",

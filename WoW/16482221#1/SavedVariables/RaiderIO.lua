@@ -3,15 +3,16 @@ RaiderIO_Config = {
 }
 RaiderIO_LastCharacter = "kr-자동수리로봇-azshara"
 RaiderIO_MissingCharacters = {
-	["kr-Magdaraos-azshara"] = true,
-	["kr-강수준진-azshara"] = true,
-	["kr-고객전용추적-azshara"] = true,
-	["kr-바람고양이-azshara"] = true,
-	["kr-소주레이-azshara"] = true,
-	["kr-언데드방패병-azshara"] = true,
-	["kr-자동수리로봇-azshara"] = true,
-	["kr-잘못하는데요-azshara"] = true,
-	["kr-허훈윤-azshara"] = true,
+	["kr-공수래풀수거-azshara"] = true,
+	["kr-까따리나-azshara"] = true,
+	["kr-슈미르엔-azshara"] = true,
+	["kr-아가씨사제-azshara"] = true,
+	["kr-응삼이오빠-azshara"] = true,
+	["kr-집불도적-azshara"] = true,
+	["kr-천무기사-azshara"] = true,
+	["kr-켈리센드라-azshara"] = true,
+	["kr-턱도리탕-azshara"] = true,
+	["kr-환상갈매기-azshara"] = true,
 }
 RaiderIO_MissingServers = {
 }

@@ -127,6 +127,9 @@ VER 3 000000000000001A "S연쇄 치유" "136042"
 #showtooltip 연쇄 치유
 /시전 [@mouseover,help][@player] 연쇄 치유
 END
+VER 3 0000000000000023 "S윤회" "451167"
+#showtooltip 윤회
+END
 VER 3 000000000000001E "S정화, 영혼 정화" "INV_MISC_QUESTIONMARK"
 #showtooltip [mod:shift] 영혼 정화; 정화
 /시전 [@mouseover,harm,nodead][harm,nodead] 정화; [@mouseover,help][help] 영혼 정화
@@ -146,6 +149,11 @@ END
 VER 3 0000000000000022 "S태고의 파도" "3578231"
 #showtooltip 태고의 파도
 /시전 [@mouseover,harm,nodead][harm,nodead] 태고의 파도
+END
+VER 3 0000000000000024 "S폭풍수호자" "INV_MISC_QUESTIONMARK"
+#showtooltip 폭풍수호자
+/시전 폭풍수호자
+/사용 13
 END
 VER 3 0000000000000018 "S화염 충격" "135813"
 #showtooltip 화염 충격
